@@ -1,5 +1,7 @@
 # Diner Dost — handoff to another Codex device
 
+Receiving-device continuation, 23 October 2026: upstream `775355a` adds `docs/VERCEL_DATABASE_HANDOFF.md`. The receiving user then explicitly chose **a new database**, so this deployment uses a fresh production resource without transferring original restaurant data. The `web-paid-replacements` branch has Q89 source 0.4.31 in verification, with 263 local backend passes and nine isolated PostgreSQL Q89 passes. No new production release or migration of the original live database is claimed. See `docs/Q89_PAID_REPLACEMENT.md` and the current CLIENT_FEEDBACK checkpoint. The receiving project is `prem-2230/dinerdost-web`; QA is isolated. Connection secrets and QA credentials remain local/ignored. PP work remains separate and pending at its prior counts.
+
 Prepared 22 October 2026 after the user's request to continue on another device and use that operator's Vercel account. This is a portable project-context snapshot, not a transfer of a live Codex session, account credentials or hidden model state. No destination device/account has been connected or deployed by this handoff.
 
 ## Current verified state

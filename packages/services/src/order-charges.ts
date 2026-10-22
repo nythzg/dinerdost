@@ -1,4 +1,5 @@
 import {requireWebBillEditable} from './web-bill-policy';
+import {replacementFloor} from './web-replacements';
 import { z } from "zod";
 import type { Database } from "@dinerdost/database";
 import {
@@ -127,6 +128,7 @@ export async function changeRoundCharges(
         round.rounding_mode,
       );
       ensure(payable + roundOff>=num(round.paid),'PAYABLE_BELOW_RECEIVED','The new payable cannot be below the amount already received.',409);
+      await replacementFloor(tx,orderId,roundId,payable+roundOff);
       await resetRewards(tx, roundId);
       await tx.query(
         "UPDATE order_rounds SET charges=$2::jsonb,charges_total=$3,discount=manual_discount,tax=$4,payable=$5,round_off=$6,quote_version=NULL,version=version+1 WHERE id=$1",

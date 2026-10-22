@@ -199,6 +199,7 @@ export function ThermalReceipt({ bill }: { bill: Row }) {
           </div>
         </section>
       )}
+      {bill.replacement&&<section className="receipt-balance"><p>Paid replacement · {bill.replacement.number}<br/>Original order #{bill.replacement.sourceOrderNumber}{bill.replacement.originalInvoiceNumber?' · '+bill.replacement.originalInvoiceNumber:''}</p><div className="receipt-summary-row"><span>Original payment credit</span><strong>{amount(bill.replacement.credit)}</strong></div><div className="receipt-summary-row"><span>Supplementary amount</span><strong>{amount(Number(bill.totals.payable)-Number(bill.replacement.credit))}</strong></div></section>}
       <footer className="receipt-footer">
         {settings.fssai && (
           <p>

@@ -331,6 +331,7 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
   return (
     <>
       {order.table && <p className="order-table-heading"><T>Table</T> {order.table.label}</p>}
+      {(order.replacements??[]).map((r:Row)=><p className="panel" key={r.id}>Paid replacement · <a className="text-button" href={'/replacement/'+r.id} target="_blank" rel="noreferrer">{r.number}</a> · <Link className="text-button" href={'/app/orders/'+(r.source_order_id===order.id?r.target_order_id:r.source_order_id)}>{r.source_order_id===order.id?'Open replacement order':'Original order'}</Link> · Payment credit {money(r.amount)}</p>)}
       <div className="detail-toolbar">
         <Link className="subtle-link" href="/app/orders">
           <T>{"All orders"}</T>
@@ -961,7 +962,8 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
             {!locked&&order.customer_id&&can(data.actor,'orders')&&order.rounds.some((r:Row)=>Number(r.paid)===0&&['PENDING','ACCEPTED'].includes(r.status)&&(r.kot_status==='HELD'||['STAFF','QR_ORDER_ONLY'].includes(r.payment_gate)))&&<button className="button full-width" onClick={()=>{const eligible=order.rounds.filter((r:Row)=>Number(r.paid)===0&&r.payment_status!=='PAID'&&['PENDING','ACCEPTED'].includes(r.status)&&(r.kot_status==='HELD'||['STAFF','QR_ORDER_ONLY'].includes(r.payment_gate)));if(!eligible.length)return;modal('Apply coupon',<RewardEntry fields={[...(eligible.length>1?[{name:'roundId',label:'Round',type:'select' as const,value:eligible[0].id,options:eligible.map((r:Row)=>({value:r.id,label:'Round '+r.round_number}))}]:[]),{name:'code',label:'Coupon code',help:'Replaces any loyalty claim on this round.'}]} save={values=>{const r=eligible.find((r:Row)=>r.id===(values.roundId??eligible[0].id));return action('reward',{version:r.version,couponCode:String(values.code).trim(),points:0},{roundId:r.id})}} submit="Apply coupon"/>)}}>Coupon</button>}
             <p className="muted">Loyalty cap: {money(outlet?.web_loyalty_cap_paise??5000)} per bill · managed by Diner Dost.</p>
             {data.platformLoyaltyAdmin&&<button className="text-button" onClick={()=>form('Platform loyalty limit',[{name:'limit',label:'Maximum per bill (₹)',type:'number',min:0,max:10000000,step:.01,value:Number(outlet.web_loyalty_cap_paise)/100,help:'Does not rewrite earlier claims.'}],v=>run('loyaltyCap',{outletId:outlet.id,version:outlet.version,limit:Math.round(v.limit*100)}),'Save loyalty limit')}>Configure loyalty cap</button>}
-            {Number(order.refund_total)>0&&<><div className="total-row"><span>Refunded</span><strong>{money(order.refund_total)}</strong></div><div className="total-row"><span>Net received</span><strong>{money(Number(order.totals.paid)-Number(order.refund_total))}</strong></div></>}
+            {(order.replacements??[]).map((r:Row)=><div className="total-row" key={r.id}><span>{r.source_order_id===order.id?'Credited to replacement':'Included original credit'}</span><strong>{money(r.amount)}</strong></div>)}
+            {Number(order.refund_total)>0&&<><div className="total-row"><span>Refunded</span><strong>{money(order.refund_total)}</strong></div><div className="total-row"><span>Net received</span><strong>{money(Number(order.totals.paid)-Number(order.refund_total)-(order.replacements??[]).filter((r:Row)=>r.source_order_id===order.id).reduce((n:number,r:Row)=>n+Number(r.amount),0))}</strong></div></>}
             <div className="total-row grand-total">
               <strong>
                 <T>{"Outstanding"}</T>

@@ -79,7 +79,7 @@ export async function dishReport(db: Database, actor: Actor, input: unknown) {
       items: rows.slice(0, 100),
       hasMore: rows.length > 100,
       basis:
-        "Settled final invoices; sales after discounts, before tax/charges/rounding. Profit uses recorded ingredient costs; historical or unconfigured costs stay unknown.",
+        "Gross settled final invoices; sales after discounts, before tax/charges/rounding. Refund and paid-replacement credit adjustments are shown in the financial report. Profit uses recorded ingredient costs; historical or unconfigured costs stay unknown.",
     };
   });
 }

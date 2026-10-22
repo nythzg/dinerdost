@@ -210,5 +210,25 @@
     ],
     "currentRelease": "0.4.30",
     "status": "Four groups complete, two partial, 21 pending. Raw-ingredient expiry review complete; production and broader procurement remain pending."
+  },
+  "receivingDevelopment": {
+    "sourceVersion": "0.4.31",
+    "status": "implemented-verification-not-released",
+    "feature": "Q89 paid-order replacement",
+    "checklist": "docs/Q89_PAID_REPLACEMENT.md",
+    "baselineCommit": "775355a8e7a94bd86d5623f02881c368930934d5",
+    "vercelProject": "prem-2230/dinerdost-web",
+    "localBackendPassed": 263,
+    "baselineReproducedBackendPassed": 254,
+    "isolatedPostgresQ89Passed": 9,
+    "localDesktopPhoneWorkflowPassed": true,
+    "typecheckPassed": true,
+    "buildPassed": true,
+    "pendingMigration": [
+      "051_web_paid_replacements.sql"
+    ],
+    "productionBaselineHandoff": "User explicitly selected a new empty database on 2026-10-23; old restaurant data stays in the original deployment. QA and receiving Production use separate new Neon resources.",
+    "originalDeploymentUnchanged": true,
+    "petpoojaCountsUnchanged": true
   }
 }

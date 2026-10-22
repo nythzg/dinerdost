@@ -1,4 +1,5 @@
 import {settledRefundsRead} from './web-refunds';
+import {replacementAdjustmentsRead} from './web-replacements';
 import { z } from "zod";
 import type { Database } from "@dinerdost/database";
 import {
@@ -102,14 +103,18 @@ export async function financialReport(
       )
     ).rows;
     const refunds=await settledRefundsRead(tx,params[0] as string[],data.from,data.to);
+    const replacements=await replacementAdjustmentsRead(tx,params[0] as string[],data.from,data.to);
+    const replacementRows=(await tx.query(`SELECT r.id,r.amount,r.source_order_id,r.target_order_id,r.reason,r.snapshot->>'number' AS number,o.source,(r.created_at AT TIME ZONE 'Asia/Kolkata')::date::text AS day FROM web_replacements r JOIN orders o ON o.id=r.source_order_id AND o.restro_id=r.restro_id WHERE r.outlet_id=ANY($1::uuid[]) AND r.snapshot->>'recognized'='true' AND (r.created_at AT TIME ZONE 'Asia/Kolkata')::date BETWEEN $2::date AND $3::date ORDER BY r.created_at,r.id`,params)).rows;
+    const creditedMethods=(await tx.query(financialPeriod+` SELECT p.method,sum((a->>'amount')::bigint) AS amount,count(*) AS payments FROM issued i JOIN web_replacements r ON r.target_order_id=i.order_id AND r.restro_id=i.restro_id CROSS JOIN LATERAL jsonb_array_elements(r.allocations) a JOIN payment_attempts p ON p.id=(a->>'paymentId')::uuid AND p.restro_id=i.restro_id WHERE NOT EXISTS(SELECT 1 FROM invoices f WHERE f.order_id=p.order_id AND f.document_type='FINAL_TAX_INVOICE') GROUP BY p.method`,params)).rows;
+    for(const credited of creditedMethods){const method=methods.find(m=>m.method===credited.method);if(method){method.amount=num(method.amount)+num(credited.amount);method.payments=num(method.payments)+num(credited.payments)}else methods.push(credited)}
     const refundRows=(await tx.query(`SELECT r.id,r.amount,r.mode,r.reason,r.invoice_id,r.order_id,r.created_at,r.snapshot->>'number' AS number,o.source,(greatest(r.created_at,f.created_at) AT TIME ZONE 'Asia/Kolkata')::date::text AS day
       FROM web_refunds r JOIN invoices f ON f.order_id=r.order_id AND f.restro_id=r.restro_id AND f.document_type='FINAL_TAX_INVOICE' JOIN orders o ON o.id=r.order_id AND o.restro_id=r.restro_id
       WHERE r.outlet_id=ANY($1::uuid[]) AND (greatest(r.created_at,f.created_at) AT TIME ZONE 'Asia/Kolkata')::date BETWEEN $2::date AND $3::date ORDER BY r.created_at,r.id`,params)).rows;
     const dayKey=(value:unknown)=>value instanceof Date?[value.getFullYear(),String(value.getMonth()+1).padStart(2,'0'),String(value.getDate()).padStart(2,'0')].join('-'):String(value).slice(0,10);
-    for(const refund of refundRows){const channel=channels.find(c=>c.source===refund.source);if(channel)channel.amount=num(channel.amount)-num(refund.amount);else channels.push({source:refund.source,orders:0,amount:-num(refund.amount)});const day=dayKey(refund.day),entry=daily.find(d=>dayKey(d.date)===day);if(entry)entry.amount=num(entry.amount)-num(refund.amount);else daily.push({date:day,orders:0,amount:-num(refund.amount)});}
+    for(const refund of [...refundRows,...replacementRows]){const channel=channels.find(c=>c.source===refund.source);if(channel)channel.amount=num(channel.amount)-num(refund.amount);else channels.push({source:refund.source,orders:0,amount:-num(refund.amount)});const day=dayKey(refund.day),entry=daily.find(d=>dayKey(d.date)===day);if(entry)entry.amount=num(entry.amount)-num(refund.amount);else daily.push({date:day,orders:0,amount:-num(refund.amount)});}
     daily.sort((a,b)=>dayKey(a.date).localeCompare(dayKey(b.date)));
-    const netSales = num(summary.net_sales)-num(refunds.net_sales),
-      cogs = num(summary.cogs),
+    const netSales = num(summary.net_sales)-num(refunds.net_sales)-num(replacements.net_sales),
+      cogs = num(summary.cogs)+num(replacements.cogs),
       operatingExpenses = num(expenses.total);
     return {
       from: data.from,
@@ -117,10 +122,11 @@ export async function financialReport(
       outlets,
       orders: num(summary.orders),
       grossReceipts:num(summary.receipts),refunds:num(refunds.amount),refundRows,
-      receipts: num(summary.receipts)-num(refunds.amount),
+      replacementCredits:num(replacements.amount),replacementRows,
+      receipts: num(summary.receipts)-num(refunds.amount)-num(replacements.amount),
       netSales,
-      tax: num(summary.tax)-num(refunds.tax),
-      charges: num(summary.charges)-num(refunds.charges),
+      tax: num(summary.tax)-num(refunds.tax)-num(replacements.tax),
+      charges: num(summary.charges)-num(refunds.charges)-num(replacements.charges),
       cogs,
       expenses: operatingExpenses,
       grossMargin: netSales - cogs,
@@ -131,7 +137,7 @@ export async function financialReport(
       daily,
       distribution,
       basis:
-        "Issued final invoices less immutable manual refund adjustments, plus approved expenses. Receipt-method rows retain original collections; refund outflows are listed separately.",
+        "Issued final invoices less immutable refund and paid-replacement credit adjustments, plus approved expenses and unbilled replaced-food costs. Receipt-method rows retain actual collections; payment credits are not new receipts.",
     };
   });
 }

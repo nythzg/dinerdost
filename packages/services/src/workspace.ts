@@ -1,4 +1,5 @@
 import {settledRefundsRead} from './web-refunds';
+import {replacementAdjustmentsRead} from './web-replacements';
 import {isPlatformLoyaltyAdmin} from './web-loyalty';
 import type { Database } from "@dinerdost/database";
 import {
@@ -192,7 +193,7 @@ export async function workspace(db: Database, actor: Actor, outletId?: string) {
           [selected, stream],
         )
       ).rows;
-    if(result.metrics){const refunds=await settledRefundsRead(tx,[selected],businessDate(),businessDate());result.metrics.gross_settled=result.metrics.settled;result.metrics.refunds=num(refunds.amount);result.metrics.settled=num(result.metrics.settled)-num(refunds.amount);}
+    if(result.metrics){const refunds=await settledRefundsRead(tx,[selected],businessDate(),businessDate()),replacements=await replacementAdjustmentsRead(tx,[selected],businessDate(),businessDate());result.metrics.gross_settled=result.metrics.settled;result.metrics.refunds=num(refunds.amount);result.metrics.replacementCredits=num(replacements.amount);result.metrics.settled=num(result.metrics.settled)-num(refunds.amount)-num(replacements.amount);}
     if (can(actor, "inventory") || can(actor, "procurement")) {
       if (can(actor, "inventory"))
         result.stockAlerts = await stockAlertsRead(tx, actor, selected);
