@@ -223,3 +223,8 @@ Baseline: 254 backend cases, build/typecheck and desktop/phone refund workflow r
 Q89 credit is traced to actual receipts without copying collections; old invoices, money and FIFO costs stay preserved. New food requires ordinary stock/KOT and explicit service; unserved originals require explicit discard. Lower final totals, duplicate/concurrent allocations, stale quotes, cross-role/outlet/tenant/native access and stock failures are guarded. [Implementation](Q89_PAID_REPLACEMENT.md) · [Acceptance](../verification/production-0431-acceptance.json).
 
 Client queue: **100 released on the receiving project; Q111/Q114 unanswered**. Separate Petpooja queue: **4 complete / 2 partial / 21 pending**. No Petpooja group or deferred native/provider/package/client-data behavior is completed by this release.
+
+
+## Discord priority review · 23 October 2026
+
+The receiving user's exact Q114–Q119 range was reviewed in the signed-in authorized DM; contact ID 1486270666444636250 and all five screenshots were confirmed. Q115–Q119 already match the local source: 15 affected backend tests and four desktop/phone workflows passed, with the four workflows also passing on localhost:5090 in synthetic QA tenants. No original restaurant records or hosted databases were changed. The user then requested Q114 APK extraction: ColorOS Calculator 16.4.2 functions, unit tables and code paths were extracted, including an enabled relative-percentage path that differs from the current web calculator. See docs/DISCORD_PRIORITY_REVIEW.md and docs/CALCULATOR_APK_REFERENCE.md (paths relative to repository root). Q114 implementation/parity remain pending. PP06 stays separate and paused; released client/PP counts and provider/native deferrals do not change.

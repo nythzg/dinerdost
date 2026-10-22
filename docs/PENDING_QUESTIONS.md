@@ -28,6 +28,10 @@ Prem requests next-visit bill queuing at 8:32 pm. Confirm: should only an unpaid
 
 Client supplied Calculator.apk and asks for its exact functionality/properties with only theme/notes/history differences. Static archive inspection can identify resources but cannot verify gestures, modes or calculations. Obtain calculator name/version and screenshots/video or the required operation list if the archive does not establish a complete observable spec. Do not install/run an unfamiliar APK or silently substitute scientific/financial behavior. [Source](https://discord.com/channels/@me/1491679750610096259/1562846352743071805) · [Checklist](CLIENT_FEEDBACK.md). **Static reference inspected, app never installed/run.** It identifies ColorOS com.coloros.calculator; resources include Scientific, unit/number-base conversion, currency exchange, mortgage and voice/floating-window options. Which of those are required in the web calculator, and can the client provide screens/video to verify their interactions and numeric rules? Live rates/mortgage defaults and native OS floating-window properties cannot be inferred. [Static evidence](../verification/calculator-reference/static-review.json). Exact parity remains unverified.
 
+## Receiving-device investigation · 23 October 2026
+
+The user requested downloading and extracting the Q114 APK. Manifest, operation resources, physical conversion tables and calculation code were inspected locally. The supplied app is ColorOS Calculator **16.4.2**. [Extracted functionality and limits](CALCULATOR_APK_REFERENCE.md) now document scientific/base/unit modes, code-derived formulas and the enabled relative-percentage path. The APK was not installed/run. Q114 implementation and exact parity remain pending; currency/mortgage defaults, provider/native features and Q111 are not inferred.
+
 ## Original questions and historical status notes
 
 The status paragraphs below describe the earlier checkpoint before the 9:31 answer attachment and are superseded by the confirmed decisions above. They are retained for traceability.
