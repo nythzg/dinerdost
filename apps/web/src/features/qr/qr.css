@@ -1,0 +1,164 @@
+.qr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 22px;
+}
+.qr-grid-item {
+  min-width: 0;
+}
+.qr-grid-item.qr-filtered {
+  display: none;
+}
+.qr-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+}
+.qr-card.is-selected {
+  border-color: #b6c7a8;
+  box-shadow: 0 0 0 1px #b6c7a8;
+}
+.qr-print-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 25px 18px;
+  gap: 8px;
+  background: #fff;
+  color: #193f30;
+  overflow-wrap: anywhere;
+}
+.qr-restaurant {
+  font-family: Manrope, sans-serif;
+  font-size: 17px;
+  font-weight: 750;
+}
+.qr-outlet {
+  font-size: 10px;
+  color: #6e7e62;
+}
+.qr-print-card h2 {
+  font-size: 28px;
+  margin: 7px 0 0;
+}
+.qr-print-card > img {
+  width: 224px;
+  height: 224px;
+  max-width: 100%;
+  object-fit: contain;
+}
+.qr-print-card > strong {
+  font-size: 20px;
+}
+.qr-print-card > p {
+  font-size: 10px;
+  line-height: 1.5;
+  color: #6e7e62;
+  margin: 0 0 12px;
+}
+.qr-print-card > .logo {
+  font-size: 13px;
+  gap: 7px;
+  opacity: 0.8;
+}
+.qr-print-card .logomark {
+  font-size: 24px;
+  width: 25px;
+  height: 25px;
+  line-height: 24px;
+  border-radius: 7px 3px;
+}
+.qr-placeholder {
+  height: 224px;
+  display: grid;
+  place-items: center;
+  color: #7e897e;
+  font-size: 12px;
+}
+.table-qr .qr-print-card {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+@media (max-width: 650px) {
+  .qr-grid {
+    grid-template-columns: 1fr;
+  }
+  .qr-print-card > img {
+    width: 240px;
+    height: 240px;
+  }
+}
+@media print {
+  @page tableCards {
+    size: A4;
+    margin: 12mm;
+  }
+  body:has(.qr-page) .sidebar,
+  body:has(.qr-page) .topbar,
+  body:has(.qr-page) .page-heading,
+  body:has(.qr-page) .mobile-menu,
+  body:has(.qr-page) .toast,
+  body:has(.qr-page) .saving-indicator,
+  body:has(.qr-page) .sidebar-scrim {
+    display: none !important;
+  }
+  body:has(.qr-page) .app-shell,
+  body:has(.qr-page) .main-shell,
+  body:has(.qr-page) .main-content {
+    display: block;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: auto;
+    min-height: 0;
+  }
+  .qr-page {
+    page: tableCards;
+  }
+  .qr-page .qr-grid {
+    display: grid !important;
+    grid-template-columns: 85mm 85mm;
+    gap: 8mm;
+    align-items: start;
+  }
+  .qr-page .qr-grid-item {
+    display: contents !important;
+  }
+  .qr-page .qr-card {
+    display: none !important;
+  }
+  .qr-page .qr-card.is-selected {
+    display: block !important;
+    width: 85mm;
+    height: 119mm;
+    border: 1px dashed #aab6a2;
+    border-radius: 0;
+    box-shadow: none;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .qr-page .qr-print-card {
+    height: 100%;
+    padding: 7mm 4mm;
+    gap: 2mm;
+  }
+  .qr-page .qr-print-card > img {
+    width: 56mm;
+    height: 56mm;
+  }
+  .qr-page .qr-print-card h2 {
+    font-size: 24px;
+  }
+  .qr-page .qr-print-card > .qr-restaurant {
+    font-size: 15px;
+  }
+  .qr-page .qr-print-card > strong {
+    font-size: 18px;
+  }
+  .qr-page .qr-print-card > p {
+    font-size: 9px;
+    margin-bottom: 2mm;
+  }
+}

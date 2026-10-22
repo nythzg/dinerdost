@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import {readFile,writeFile,readdir} from 'node:fs/promises';
+import {createPostgresDatabase} from '@dinerdost/database';
+const tag=process.argv[2];assert.match(tag??'',/^\d{4}$/);
+process.loadEnvFile('.env.production.local');
+const read=async(p:string)=>JSON.parse(await readFile(p,'utf8'));
+const plan=await read(`verification/release-${tag}-plan.json`),deploy=await read(`verification/vercel-${tag}-ready.json`),release=await read('docs/RELEASE.json');
+assert.equal(deploy.readyState,'READY');assert.equal(release.productionVersion,plan.previousVersion);
+assert.match(await readFile(`verification/web-${tag}-browser.log`,'utf8'),new RegExp(`${plan.localBrowserPassed} passed`));
+assert.match(await readFile(`verification/production-${tag}-browser.log`,'utf8'),new RegExp(`${plan.productionBrowserPassed} passed`));
+assert.match(await readFile(`verification/web-${tag}-backend.log`,'utf8'),new RegExp(`pass ${plan.affectedBackendPassed}\\b`));
+assert.match(await readFile(`verification/web-${tag}-build.log`,'utf8'),/Compiled successfully/);
+assert.doesNotMatch(await readFile(`verification/web-${tag}-typecheck-final.log`,'utf8'),/error TS\d/);
+if(plan.fullBackendPassed)assert.match(await readFile(`verification/web-${tag}-backend-full.log`,'utf8'),new RegExp(`pass ${plan.fullBackendPassed}\\b`));
+if(plan.hostedPostgresPassed)assert.match(await readFile(plan.hostedLog,'utf8'),new RegExp(`pass ${plan.hostedPostgresPassed}\\b`));
+const root='https://dinerdost-app.vercel.app',checks=[];
+for(const [path,status,method,origin] of [
+ ['/signin',200,'GET',''],['/api/workspace',401,'GET',''],['/api/service-board?outletId=00000000-0000-4000-8000-000000000000',401,'GET',''],['/api/calculator',401,'GET',''],['/api/active-orders?outletId=00000000-0000-4000-8000-000000000000',401,'GET',''],['/api/inventory-tools?kind=expiry-outlet&outletId=00000000-0000-4000-8000-000000000000',401,'GET',''],['/api/commands',401,'POST',root],['/api/commands',403,'POST','https://invalid.example']
+] as const){const r=await fetch(root+path,{method,headers:origin?{Origin:origin,'Content-Type':'application/json'}:undefined,...(method==='POST'?{body:JSON.stringify({action:'floorPlan',input:{}})}:{})});assert.equal(r.status,status,path);checks.push({path,status,method,...(origin?{origin}:{})});}
+const db=createPostgresDatabase(process.env.DATABASE_MIGRATION_URL||process.env.DATABASE_URL_UNPOOLED||process.env.POSTGRES_URL_NON_POOLING||process.env.DATABASE_URL!);
+let pending:string[]=[];try{const applied=(await db.query('SELECT name FROM schema_migrations')).rows.map(r=>r.name);pending=(await readdir('packages/database/migrations')).filter(n=>n.endsWith('.sql')&&!applied.includes(n));assert.deepEqual(pending,[]);assert.equal((await db.query("SELECT tgenabled FROM pg_trigger WHERE tgname='enforce_kot_authority'")).rows[0].tgenabled,'O');assert.equal((await db.query("SELECT count(*)::int AS n FROM pg_database WHERE datname LIKE 'dd_verify_%'")).rows[0].n,0);}finally{await db.close();}
+const remaining=release.latestReviewQueue.pendingImplementationIds.filter((id:string)=>!plan.releasedClientItems.includes(id));
+const evidence={...plan,accepted:true,verifiedAt:new Date().toISOString(),productionUrl:root,deploymentId:deploy.id,deploymentUrl:'https://'+deploy.url,pendingImplementation:remaining,pendingQuestions:['Q111','Q114'],publicChecks:checks,pendingMigrations:pending,kotGateEnabled:true,temporaryHostedDatabasesRemaining:0,discordMessagesSent:0};
+await writeFile(`verification/production-${tag}-acceptance.json`,JSON.stringify(evidence,null,2)+'\n');
+Object.assign(release,{version:plan.version,productionVersion:plan.version,deploymentId:evidence.deploymentId,deploymentUrl:evidence.deploymentUrl,verifiedAt:evidence.verifiedAt,acceptanceEvidence:`verification/production-${tag}-acceptance.json`,featureUpdate:plan.featureUpdate,currentReleaseHostedCasesPassed:plan.hostedPostgresPassed,hostedIntegrationTestsPassed:plan.hostedPostgresPassed,hostedVerificationScope:plan.hostedVerificationScope,productionBrowserWorkflowsPassed:plan.productionBrowserPassed,productionPublicChecksPassed:8});
+for(const migration of plan.appliedMigrations??[])if(!release.appliedReleaseMigrations.includes(migration))release.appliedReleaseMigrations.push(migration);
+Object.assign(release.localVerification,{currentFullBackendPassed:plan.fullBackendPassed??null,...(plan.fullBackendPassed?{lastFullBackendVersion:plan.version,lastFullBackendPassed:plan.fullBackendPassed}:{}),currentTargetedBackendPassed:plan.affectedBackendPassed,currentReleaseBrowserWorkflowsPassed:plan.localBrowserPassed,finalAffectedBrowserWorkflowsPassed:plan.localBrowserPassed,typecheckPassed:true,optimizedBuildPassed:true});
+Object.assign(release.latestReviewQueue,{implemented:102-remaining.length-2,pendingImplementation:remaining.length,pendingImplementationIds:remaining,status:`${102-remaining.length-2} released; ${remaining.length} confirmed pending; Q111/Q114 awaiting details`});release.petpoojaImplementation.currentRelease=plan.version;
+await writeFile('docs/RELEASE.json',JSON.stringify(release,null,2)+'\n');
+for(const name of ['CLIENT_FEEDBACK.md','V2_CHECKLIST.md','VERIFICATION.md']){let s=await readFile('docs/'+name,'utf8');if(name==='CLIENT_FEEDBACK.md'){for(const id of plan.releasedClientItems)s=s.replace('- [ ] **'+id+' ·','- [x] **'+id+' ·');s=s.replace(/Production 0\.4\.\d+ is verified: \d+ Q-series requests released, \d+ confirmed requirements pending/,`Production ${plan.version} is verified: ${102-remaining.length-2} Q-series requests released, ${remaining.length} confirmed requirements pending`);}s+=`\n## Production checkpoint ${plan.version}\n\n${plan.checkpoint}\n\n[Acceptance](../verification/production-${tag}-acceptance.json). Client queue: **${102-remaining.length-2} released, ${remaining.length} confirmed pending, Q111/Q114 awaiting details**. Petpooja is tracked separately.\n`;await writeFile('docs/'+name,s);}
+const monitor=await read('verification/discord-monitor-latest.json');Object.assign(monitor,{currentProductionVersion:plan.version,implementationPending:remaining.length,pendingImplementationIds:remaining,deploymentNeeded:false});monitor.additionalWebQueue.currentRelease=plan.version;await writeFile('verification/discord-monitor-latest.json',JSON.stringify(monitor,null,2)+'\n');
+console.log(`Accepted ${plan.version}: ${plan.releasedClientItems.join(', ')}; ${remaining.length} confirmed client updates remain.`);

@@ -1,0 +1,22 @@
+{
+  "name": "@dinerdost/web",
+  "version": "0.4.30",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 5090",
+    "build": "next build",
+    "start": "next start --port 5090"
+  },
+  "dependencies": {
+    "@dinerdost/core": "*",
+    "@dinerdost/database": "*",
+    "@dinerdost/services": "*",
+    "next": "16.4.2",
+    "qrcode": "^1.5.4",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "sharp": "^0.35.5",
+    "sweetalert2": "11.26.25",
+    "zod": "4.6.7"
+  }
+}

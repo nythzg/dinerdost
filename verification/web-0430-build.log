@@ -1,0 +1,79 @@
+
+> dinerdost@0.4.30 build
+> npm run build --workspace=@dinerdost/web
+
+
+> @dinerdost/web@0.4.30 build
+> next build
+
+▲ Next.js 16.4.2 (Turbopack)
+✓ Running next.config.ts took 109ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 9.2s
+  Running TypeScript ...
+  Finished TypeScript in 10.3s ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/28) ...
+  Generating static pages using 11 workers (7/28) 
+  Generating static pages using 11 workers (14/28) 
+  Generating static pages using 11 workers (21/28) 
+✓ Generating static pages using 11 workers (28/28) in 675ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/active-orders
+├ ƒ /api/activity/[kind]
+├ ƒ /api/auth/[action]
+├ ƒ /api/calculator
+├ ƒ /api/commands
+├ ƒ /api/customers
+├ ƒ /api/customers/[id]
+├ ƒ /api/customers/search
+├ ƒ /api/dish-report
+├ ƒ /api/guest/[key]
+├ ƒ /api/internal/push/dispatch
+├ ƒ /api/inventory-tools
+├ ƒ /api/invites/[token]
+├ ƒ /api/invoices/[id]
+├ ƒ /api/loyalty
+├ ƒ /api/menu-images/[id]
+├ ƒ /api/notifications
+├ ƒ /api/order-refunds
+├ ƒ /api/orders/[id]
+├ ƒ /api/prep
+├ ƒ /api/push
+├ ƒ /api/receipt-images/[id]
+├ ƒ /api/records/[kind]
+├ ƒ /api/reports
+├ ƒ /api/service-board
+├ ƒ /api/staff-files/[id]
+├ ƒ /api/staff/[id]
+├ ƒ /api/stock-counts
+├ ƒ /api/stock-reports
+├ ƒ /api/stock-summary
+├ ƒ /api/store/[slug]
+├ ƒ /api/tables/[id]/billing
+├ ƒ /api/uploads
+├ ƒ /api/workspace
+├ ƒ /app/[[...path]]
+├ ƒ /invite/[token]
+├ ƒ /invoice/[id]
+├ ƒ /kot/[orderId]/[roundId]
+├ ƒ /preview
+├ ƒ /q/[key]
+├ ƒ /refund/[id]
+├ ○ /signin
+├ ○ /signup
+├ ƒ /store/[slug]
+├ ƒ /v2/orders
+├ ƒ /v2/orders/[id]/[operation]
+├ ƒ /v2/orders/[id]/rounds/[roundId]/[operation]
+└ ƒ /v2/sessions/open
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

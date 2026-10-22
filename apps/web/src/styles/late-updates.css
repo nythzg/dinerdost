@@ -1,0 +1,244 @@
+@media screen {
+  .stock-alert-tools {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .attention-list .attention-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .attention-list .attention-open {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+    border-bottom: 0;
+  }
+  .attention-list .attention-dismiss {
+    flex: 0 0 40px;
+    width: 40px;
+    min-height: 40px;
+    padding: 8px;
+    justify-content: center;
+    border: 0;
+    border-radius: 8px;
+  }
+  .attention-list .attention-dismiss:hover,
+  .attention-list .attention-dismiss:focus-visible {
+    background: #eaf1e6;
+  }
+  .attention-list .attention-dismiss > .icon:last-child {
+    display: block;
+    color: #193f30;
+  }
+  .stock-alerts-panel {
+    margin-bottom: 20px;
+  }
+  .stock-alert-list {
+    padding: 0 20px;
+  }
+  .stock-alert-row {
+    display: grid;
+    grid-template-columns: 120px minmax(120px, 1fr) minmax(140px, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid #dce3d5;
+  }
+  .stock-alert-row:last-child {
+    border-bottom: 0;
+  }
+  .stock-alert-row strong small {
+    display: block;
+    font-weight: 400;
+    margin-top: 4px;
+  }
+  .stock-alert-phase {
+    display: inline-flex;
+    justify-content: center;
+    padding: 7px 10px;
+    border-radius: 7px;
+    background: #fff2d8;
+    color: #885719;
+    font-size: 12px;
+    font-weight: 650;
+  }
+  .stock-alert-phase.expired,
+  .stock-alert-phase.no_stock {
+    color: #9d3434;
+    background: #fbe9e7;
+  }
+  .stock-alert-phase.unknown {
+    background: #edf1e8;
+    color: #51634b;
+  }
+  .stock-alert-more {
+    padding: 14px 20px;
+    border-top: 1px solid #dce3d5;
+  }
+  .stock-alert-more summary {
+    cursor: pointer;
+  }
+  .report-tabs {
+    margin-bottom: 20px;
+  }
+  .round-kot-print {
+    margin-left: auto;
+  }
+  .kot-print-frame {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    width: 1px;
+    height: 1px;
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .waste-report .panel-tools {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+}
+@media screen and (max-width: 650px) {
+  .stock-alert-row {
+    grid-template-columns: 100px minmax(0, 1fr);
+    gap: 8px 12px;
+  }
+  .stock-alert-row > span:nth-child(3) {
+    grid-column: 2;
+    font-size: 12px;
+  }
+  .stock-alert-row > span:nth-child(4) {
+    grid-column: 2;
+    font-size: 12px;
+  }
+  .stock-alerts-panel .panel-heading {
+    flex-wrap: wrap;
+  }
+  .round-kot-print {
+    margin-left: 0;
+  }
+}
+.kot-receipt {
+  box-sizing: border-box;
+  width: 74mm;
+  margin: 3mm auto;
+  padding: 0;
+  color: #000;
+  background: #fff;
+  font:
+    13px/1.45 ui-monospace,
+    Consolas,
+    monospace;
+}
+.kot-receipt h1 {
+  font:
+    700 18px/1.3 ui-monospace,
+    Consolas,
+    monospace;
+  text-align: center;
+  margin: 0 0 12px;
+}
+.kot-receipt h2 {
+  font:
+    700 15px/1.4 ui-monospace,
+    Consolas,
+    monospace;
+  margin: 10px 0;
+}
+.kot-receipt p {
+  margin: 6px 0;
+}
+.kot-receipt hr {
+  border: 0;
+  border-top: 1px dashed #000;
+  margin: 12px 0;
+}
+.kot-station {
+  padding: 12px 0 18px;
+  border-bottom: 2px dashed #000;
+  overflow-wrap: anywhere;
+}
+.kot-station:last-child {
+  border-bottom: 0;
+}
+.kot-item {
+  margin: 12px 0;
+}
+.kot-note {
+  font-weight: 700;
+}
+@media print {
+  @page kitchenTicket {
+    size: 80mm 250mm;
+    margin: 3mm;
+  }
+  body:has(.kot-receipt) {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+  }
+  .kot-receipt {
+    page: kitchenTicket;
+    width: 74mm;
+    max-width: none;
+    margin: 0;
+  }
+  .kot-item {
+    break-inside: avoid;
+  }
+}
+.table-actions-menu {
+  margin-left: auto;
+}
+.table-actions-menu summary {
+  border: 0;
+  background: #f0f2ef;
+  color: #34443d;
+  font-size: 25px;
+}
+.table-card-title {
+  flex-wrap: wrap;
+}
+.dish-details:has(.dish-description) > strong {
+  min-height: 0;
+  line-height: 1.3;
+}
+.dish-details > .dish-description {
+  margin-top: -5px;
+  line-height: 1.4;
+}
+.recipe-editor {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+.recipe-editor-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(80px, 0.6fr) 40px;
+  gap: 8px;
+  align-items: end;
+}
+.recipe-editor-row label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.menu-portions-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.menu-portions-toggle input {
+  flex: 0 0 19px;
+}
+.menu-portions-toggle span {
+  min-width: 0;
+  line-height: 1.4;
+}

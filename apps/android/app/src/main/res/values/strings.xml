@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Diner Dost</string>
+    <string name="back">Back</string>
+    <string name="alerts_title">Alerts &amp; sound</string>
+    <string name="enable_notifications">Enable notifications</string>
+    <string name="test_alert">Test alert</string>
+    <string name="test_alert_body">Sound test · no order created</string>
+    <string name="sound_settings">Sound &amp; vibration settings</string>
+    <string name="foreground_alert_note">Alerts appear for new activity while the app is open. Your phone controls sound, vibration and Do Not Disturb.</string>
+    <string name="connect_firebase">Connect Firebase on this phone</string>
+    <string name="copy_test_token">Copy Firebase installation ID</string>
+    <string name="connect_first">Connect Firebase first.</string>
+    <string name="token_copied">Copied for Firebase testing.</string>
+    <string name="notifications_on">Notifications enabled</string>
+    <string name="notifications_off">Notifications off</string>
+    <string name="firebase_configured">Firebase configured. Connecting this phone to staff alerts.</string>
+    <string name="firebase_required">Background alerts: Firebase setup required.</string>
+    <string name="firebase_registered">Phone registered for staff alerts.</string>
+    <string name="firebase_unavailable">Firebase registration unavailable. Check Google Play services and network.</string>
+</resources>

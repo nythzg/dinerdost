@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-10-22T18:16:27.660Z",
+  "migrations": [
+    "050_web_refunds.sql"
+  ],
+  "pendingBefore": [
+    "050_web_refunds.sql"
+  ],
+  "applied": true,
+  "immutableHistory": {
+    "invoices": {
+      "priorCount": 54,
+      "preserved": true
+    },
+    "payments": {
+      "priorCount": 54,
+      "preserved": true
+    },
+    "itemCosts": {
+      "priorCount": 146,
+      "preserved": true
+    },
+    "stockMovements": {
+      "priorCount": 33,
+      "preserved": true
+    },
+    "stockBatches": {
+      "priorCount": 21,
+      "preserved": true
+    },
+    "rounds": {
+      "priorCount": 186,
+      "preserved": true
+    },
+    "loyalty": {
+      "priorCount": 116,
+      "preserved": true
+    },
+    "outlets": {
+      "priorCount": 67,
+      "preserved": true
+    }
+  },
+  "kotAuthorityUnchanged": true,
+  "tenantRlsEnforced": true,
+  "refundRecordsInitiallyEmpty": true,
+  "scope": "Add only web manual-refund approval and immutable credit records. No existing financial, stock, loyalty, outlet or kitchen policy row changed."
+}

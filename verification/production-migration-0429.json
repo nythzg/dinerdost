@@ -1,0 +1,43 @@
+{
+  "checkedAt": "2026-10-22T17:51:37.936Z",
+  "migrations": [
+    "049_web_loyalty_cap.sql"
+  ],
+  "pendingBefore": [
+    "049_web_loyalty_cap.sql"
+  ],
+  "applied": true,
+  "immutableHistory": {
+    "invoices": {
+      "priorCount": 54,
+      "preserved": true
+    },
+    "payments": {
+      "priorCount": 54,
+      "preserved": true
+    },
+    "itemCosts": {
+      "priorCount": 144,
+      "preserved": true
+    },
+    "stockMovements": {
+      "priorCount": 33,
+      "preserved": true
+    },
+    "stockBatches": {
+      "priorCount": 21,
+      "preserved": true
+    },
+    "rounds": {
+      "priorCount": 184,
+      "preserved": true
+    },
+    "outlets": {
+      "priorCount": 67,
+      "preserved": true
+    }
+  },
+  "kotAuthorityUnchanged": true,
+  "tenantRlsEnforced": true,
+  "scope": "Add only an outlet future-web-claim cap defaulting to 5000 paise; no existing bill, receipt, round, stock or value changed."
+}

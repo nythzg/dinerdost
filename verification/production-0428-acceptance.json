@@ -1,0 +1,90 @@
+{
+  "version": "0.4.28",
+  "previousVersion": "0.4.27",
+  "releasedClientItems": [
+    "Q76",
+    "Q90"
+  ],
+  "featureUpdate": "Owner/manager future round-down default and guarded web discount/owner charge edits for unpaid or part-paid pre-settlement rounds at every kitchen stage.",
+  "affectedBackendPassed": 12,
+  "fullBackendPassed": 245,
+  "hostedPostgresPassed": 4,
+  "hostedLog": "verification/hosted-0428-bill-policy.log",
+  "hostedVerificationScope": "Four bill-policy integration cases in one disposable PostgreSQL database; expiry/rounding, all kitchen stages, partial receipts, roles, tenant, stale and native guards.",
+  "localBrowserPassed": 1,
+  "productionBrowserPassed": 1,
+  "schemaChanged": true,
+  "appliedMigrations": [
+    "048_web_bill_defaults.sql"
+  ],
+  "browserViewports": [
+    1440,
+    390
+  ],
+  "migrationEvidence": "verification/production-migration-0428.json",
+  "checkpoint": "Q76/Q90 released: owner/manager can save outlet-wide Round down to ₹1 for future web staff/QR/D2C rounds only; no discount default and no existing-round recalculation. Billing staff can change eligible discounts/rounding at any kitchen stage before full payment/final settlement; named charge editing stays owner-only. Verified partial receipts remain immutable, unresolved receipts block edits, and the new total cannot fall below money already received. Quotes/estimated earn and actual payment status refresh after a valid change; stock history is preserved. Fully paid/issued bills require separate refund/replacement. 245 full backend tests, 12 focused tests, four hosted PostgreSQL cases, and local/production desktop/phone workflows passed, along with typecheck/build and eight anonymous auth/CSRF checks. Migration 048 adds only a future preference defaulting false; before/after digests preserved all existing invoices, receipts, costs, stock, rounds and outlet policies.",
+  "accepted": true,
+  "verifiedAt": "2026-10-22T17:40:14.415Z",
+  "productionUrl": "https://dinerdost-app.vercel.app",
+  "deploymentId": "dpl_G9QCoUbJtEUFunsiYvTpgnz2DAFo",
+  "deploymentUrl": "https://dinerdost-pov7pic47-nythz.vercel.app",
+  "pendingImplementation": [
+    "Q74",
+    "Q89",
+    "Q91",
+    "Q95",
+    "Q96"
+  ],
+  "pendingQuestions": [
+    "Q111",
+    "Q114"
+  ],
+  "publicChecks": [
+    {
+      "path": "/signin",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/workspace",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/service-board?outletId=00000000-0000-4000-8000-000000000000",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/calculator",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/active-orders?outletId=00000000-0000-4000-8000-000000000000",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/inventory-tools?kind=expiry-outlet&outletId=00000000-0000-4000-8000-000000000000",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/commands",
+      "status": 401,
+      "method": "POST",
+      "origin": "https://dinerdost-app.vercel.app"
+    },
+    {
+      "path": "/api/commands",
+      "status": 403,
+      "method": "POST",
+      "origin": "https://invalid.example"
+    }
+  ],
+  "pendingMigrations": [],
+  "kotGateEnabled": true,
+  "temporaryHostedDatabasesRemaining": 0,
+  "discordMessagesSent": 0
+}

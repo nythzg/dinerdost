@@ -1,0 +1,70 @@
+import { after, before, test } from "node:test";
+import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
+import { createEmbeddedDatabase, createPostgresDatabase, type Database } from "@dinerdost/database";
+import type { Actor } from "@dinerdost/core";
+import * as s from "@dinerdost/services";
+import { audit } from "../packages/services/src/shared";
+let db: Database, owner: Actor, outletId: string, menu: any, token: string;
+const key = () => randomUUID();
+const fid = () => randomUUID().replaceAll("-", "").slice(0, 22);
+const password = "push-owner-password-123";
+before(async () => {
+  db = process.env.TEST_DATABASE_URL ? createPostgresDatabase(process.env.TEST_DATABASE_URL) : await createEmbeddedDatabase();
+  await db.migrate();
+  const reply = await s.signup(db, { name: "Push owner", email: `push-${key()}@example.test`, password, restaurant: "Push QA", outlet: "Main", qrEnabled: true, demo: true }, "push");
+  token = reply.token; owner = await s.authenticate(db, token);
+  const data = await s.workspace(db, owner); outletId = data.outletId; menu = data.menu[0];
+  assert.equal(data.actor.sessionHash, undefined);
+});
+after(async () => { await db?.close(); });
+async function order() {
+  return s.createRound(db, owner, key(), { outletId, type: "TAKEAWAY", customer: { name: "Push guest", phone: "9123456789" }, items: [{ itemId: menu.id, quantity: 1 }] });
+}
+test("durable push sends only a scoped hint once and requires the bound session to read its event", async () => {
+  const target = fid();
+  const registration = await s.registerPushDevice(db, owner, { outletId, fid: target });
+  assert.equal((await s.registerPushDevice(db, owner, { outletId, fid: target })).bindingId, registration.bindingId);
+  await order();
+  const hints: s.PushHint[] = [];
+  await s.dispatchPush(db, async hint => { hints.push(hint); return { status: "SENT" }; });
+  assert.equal(hints.length, 1);
+  assert.deepEqual(Object.keys(hints[0]).sort(), ["application", "bindingId", "eventId", "fid"]);
+  const event = await s.pushEvent(db, owner, { bindingId: registration.bindingId, eventId: hints[0].eventId });
+  assert.equal(event.event?.kind, "NEW_ORDER");
+  assert.ok(!JSON.stringify(event).includes("9123456789"));
+  await s.dispatchPush(db, async () => { throw new Error("Duplicate send"); });
+  const otherSession = await s.login(db, { email: (await db.query("SELECT email FROM users WHERE id=$1", [owner.userId])).rows[0].email, password }, "push-again");
+  const other = await s.authenticate(db, otherSession.token);
+  await assert.rejects(s.pushEvent(db, other, { bindingId: registration.bindingId, eventId: hints[0].eventId }), { code: "PUSH_BINDING_CHANGED" });
+  await s.unregisterPushDevice(db, owner, { bindingId: registration.bindingId });
+});
+test("retries keep the event identity; read alerts, changed bindings and revoked access cancel delivery", async () => {
+  const registration = await s.registerPushDevice(db, owner, { outletId, fid: fid() });
+  await order();
+  let first: s.PushHint | undefined;
+  await s.dispatchPush(db, async hint => { first = hint; return { status: "RETRY", code: "UNAVAILABLE" }; });
+  assert.ok(first);
+  await db.query("UPDATE push_deliveries SET available_at=now()-interval '1 minute' WHERE binding_id=$1", [registration.bindingId]);
+  await s.readNotifications(db, owner, { outletId, ids: [first.eventId] });
+  const cancelled = await s.dispatchPush(db, async () => { assert.fail("A read alert must not be sent"); });
+  assert.equal(cancelled.cancelled, 1);
+  await order();
+  await s.dispatchPush(db, async () => ({ status: "RETRY" }));
+  await s.unregisterPushDevice(db, owner, { bindingId: registration.bindingId });
+  await db.query("UPDATE push_deliveries SET available_at=now()-interval '1 minute' WHERE binding_id=$1", [registration.bindingId]);
+  assert.equal((await s.dispatchPush(db, async () => { assert.fail("A disabled binding must not send"); })).cancelled, 1);
+});
+test("a different tenant cannot enter the worker's owner inbox and invalid FIDs are disabled", async () => {
+  const registration = await s.registerPushDevice(db, owner, { outletId, fid: fid() });
+  const other = await s.signup(db, { name: "Other push owner", email: `push-other-${key()}@example.test`, password, restaurant: "Other Push QA", outlet: "Main", qrEnabled: false, demo: false }, "push-other");
+  const otherActor = await s.authenticate(db, other.token);
+  await db.transaction(otherActor.restroId, tx => audit(tx, otherActor, { action: "OTHER_TENANT_CRITICAL", entityType: "RESTAURANT", entityId: otherActor.restroId, risk: "CRITICAL" }));
+  const sent: s.PushHint[] = [];
+  await order();
+  await s.dispatchPush(db, async hint => { sent.push(hint); return { status: "INVALID", code: "UNREGISTERED" }; });
+  assert.equal(sent.length, 1);
+  assert.equal((await db.query("SELECT enabled FROM push_devices WHERE binding_id=$1", [registration.bindingId])).rows[0].enabled, false);
+  await s.logout(db, token);
+  assert.equal(Number((await db.query("SELECT count(*) AS n FROM push_devices WHERE session_hash=$1", [owner.sessionHash])).rows[0].n), 0);
+});

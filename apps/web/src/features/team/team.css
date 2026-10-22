@@ -1,0 +1,45 @@
+.team-outlet-choices {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.team-outlet-choices legend {
+  font-size: 13px;
+  padding: 0 5px;
+}
+.team-outlet-choices label,
+.team-access-toggle {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  font-size: 14px;
+}
+.team-outlet-choices input,
+.team-access-toggle input {
+  width: 18px;
+  height: 18px;
+}
+.invite-shell {
+  max-width: 520px;
+  margin: 80px auto;
+  padding: 0 16px;
+}
+.invite-panel {
+  margin-top: 28px;
+  padding: 28px;
+}
+.invite-panel h1 {
+  font-size: 28px;
+  margin-bottom: 14px;
+}
+.invite-panel p {
+  margin-bottom: 14px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.invite-panel .form {
+  margin-top: 24px;
+}

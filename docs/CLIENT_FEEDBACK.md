@@ -1,0 +1,774 @@
+# Client feedback queue — 19 October 2026
+
+Source: the Diner Dost feedback in the [linked Discord conversation](https://discord.com/channels/@me/1491679750610096259/1561763166927585371), starting at 8:59 pm through the 10:19 pm message. All attached screenshots relevant to the new requests were inspected. Version 0.3.4 was deployed on 19 October 2026 after the user's deployment instruction. No unrelated redesign or feature work is included.
+
+This is the working checklist. **Tested** means the change has passed the relevant checks; **Implemented, checks pending** is not a completion claim. **Needs setup details** means a named external dependency must be supplied before its live operation can be verified.
+
+Unanswered decisions are saved in [PENDING_QUESTIONS.md](PENDING_QUESTIONS.md). On 22 October the user deferred all open answers until later and requested Discord checks every **15 minutes**. Record new questions in that note; leave dependent features unchecked and unreleased while continuing confirmed web changes.
+
+**New comparison work authorized on 22 October:** add the missing web capabilities from the saved Petpooja review, keep the interface simple and document additions. The separate [Petpooja checklist](PETPOOJA_ADDITIONS.md) records PP01–PP27, sources, safeguards and dependencies. Its pending rows are excluded from Q-series completion counts.
+
+**Latest review: 22 October 2026, through 9:09 pm IST.** All nine original answers have been reviewed. Production 0.4.30 is verified: 99 Q-series requests released, 1 confirmed requirements pending and Q111/Q114 awaiting details. The current remaining IDs are in RELEASE.json; Petpooja additions retain their separate checklist. Android/provider/configuration/client-data deferrals remain.
+
+40 requests recorded: **36 implemented and deployed; 4 live integrations deferred by the user.** Every request has been reviewed. The four deferred rows retain unchecked boxes because their external connections have not been implemented or verified; their requirement-labelled setup buttons are complete.
+
+- [x] **8:59** Temporary customer device ban — Tested locally, including role/scope enforcement, expiry, lifting and customer-browser denial
+- [x] **9:02** Delete round items; whole portion quantities; cleaner editor — Tested: delete/undo/cancel/save, integer validation, desktop and mobile
+- [x] **9:03** Staff activation before a QR order can open an inactive table — Backend tested, including no session created on browsing or denied ordering
+- [x] **9:05** Owner/manager switch for automatic QR table activation — Tested: role enforcement, saved switch and code-free QR flow
+- [x] **9:06** Move guests to another table, including swapping occupied tables — Tested through both UI forms; backend checks preserve split sessions/orders and revoke old visits
+- [x] **9:08** Guest message explicitly says QR ordering is paused — Tested in the customer browser after pausing QR ordering
+- [x] **9:08** Close-table option on the Table QR screen — Tested through the QR close form; outstanding-order guard retained
+- [x] **9:11** Active, accepted, pending, voided, cancelled, rejected order filters — Tested: matching pending/accepted/rejected records, Active/All and empty terminal-state views
+- [x] **9:12** Keep navigation scroll position when opening Menu — Tested across Recipes-to-Menu navigation with nonzero sidebar scroll
+- [x] **9:14** Owner/manager can manage custom menu segments/categories — Tested: manager permissions, add/rename/delete, safe dish reassignment
+- [x] **9:15** Customer name and phone fields in Cashier POS — Tested: form values persist on the created order
+- [x] **9:16** Reject table service requests with a reason — Tested: rejection form saves the reason on the exact request; backend enforces reason and ownership
+- [x] **9:28** Choose the outlet's available payment methods under Payments — Tested: saved choices, disabled methods rejected, digital receipt verification
+- [x] **9:44** Darker menu cards for dishes already added to the POS cart — Tested and visually inspected
+- [x] **9:47** Edit existing recipes with their current ingredient quantities — Tested: existing values prefill, edited values save and persist when reopened
+- [x] **9:50** Explain and resolve the specific steps blocking settlement — Tested: pending-round checklist and full paid/served final-invoice workflow
+- [x] **9:52** Category dropdown in dish editing; category control at the left of Menu — Tested through category creation and dish saving
+- [x] **9:53** Add/remove custom categories such as Indian and Chinese — Tested: safe reassignment prevents orphaned dishes
+- [x] **9:54** Separate cash, online, QR, phone-number and card payment records — Tested: cash record appears in Cash/All and is excluded by every other method tab; recording/verification checks cover configured digital methods
+- [x] **9:56** Table dropdown in reservations — Tested through the saved reservation form
+- [x] **9:56** Modernize the reservation date/time form shown in the screenshot — Tested and visually inspected at desktop/mobile widths
+- [x] **9:57** Reserve the selected table for the guest at the booked time — Tested: table selection, conflicts, reserved seating and closure
+- [x] **9:58** In-app reminders to waiters/managers when a reserved table is occupied before the booking — Backend role coverage tested; actual occupied-table popup, reservation link and dismissal tested and visually inspected
+- [x] **10:00** Vendor supply category/header and description — Tested through the form and saved list
+- [x] **10:01** One customer name per phone; different names rejected — Tested across staff and QR ordering; user confirmed one name per phone
+- [x] **10:03** Remove the purchase approval reason popup shown in the screenshot — Tested: direct approval without a modal; approval permissions retained. Also fixed opening the purchase form before its vendor list finishes loading
+- [x] **10:03** Purchases automatically appear in Expenses without duplicate entries — Tested on approval, including idempotent replay
+- [x] **10:06** Checklist assignee dropdown; only existing active employees are eligible — Tested: dropdown matches actual active employees, selected employee persists and invalid assignments are rejected by the backend
+- [x] **10:06** Employee attendance system — Tested: actual employees, check-in/out, server timestamps and one record per shift/day
+- [x] **10:07** Attendance by shift; owner/manager can add shifts — Tested through shift creation and attendance forms; manual recording is labelled
+- [ ] **10:07** Fingerprint attendance support — Live connection deferred by user; requirement-labelled button added in Attendance (device model + SDK/API and employee mapping)
+- [x] **10:07** Liquor stock in Inventory — Tested through Liquor stock creation; litres enforced; backend stock reservation/consumption checks passed
+- [x] **10:08** Liquor menu items sold by pegs — Tested: menu form saves peg size, price and selected liquor stock; whole-peg quantities enforced
+- [x] **10:08** Calculate charges by peg quantity/size — Tested: whole pegs, per-peg charges, stock reservation and volume consumption
+- [ ] **10:09** WhatsApp and SMS automation in Campaigns — Live sending deferred by user; requirement-labelled button added (provider, approved sender/templates and consent)
+- [ ] **10:10** Automatically send WhatsApp when a customer receives order tokens — User confirmed order tokens; live sending deferred; dedicated setup button describes the trigger and WhatsApp requirements
+- [x] **10:11** Recipes accessible inside Menu — Tested: Menu link opens Recipes; separate sidebar entry hidden
+- [ ] **10:13** Connected Swiggy/Zomato orders flow into Orders and automatically create KOT/KDS entries — Live feed deferred by user; Connections button states official order-feed/API access is required
+- [x] **10:17** Connections setup (payment, messaging, delivery, hardware, invoice scan, offline service cards shown) — User deferred configuration and requested requirements in buttons instead; all six buttons and requirement dialogs tested. Editable provider settings/live adapters remain deferred
+- [x] **10:19** Customer interface follows the supplied concept — Tested: welcome, large Call waiter/Menu tiles and Water/Bill bar, menu/cart/order navigation, service requests and browser isolation; desktop/mobile screenshots inspected. Call waiter works before activation without opening a table; repeated active requests do not create duplicates
+
+Current verification: **TypeScript and the optimized Vercel production build passed**. All **34 integration tests passed both locally and on isolated Neon databases**. All **11 local browser workflows** passed across the full run and the affected purchase-form rerun; the purchase dropdown loading race found by the new test was fixed. **Three production browser workflows passed**: full cash order/payment/kitchen/final invoice, QR ordering/browser isolation/device bans, and the blocked local-preview route. Round-editor, reservation, customer welcome and Connections screenshots were inspected at desktop/mobile widths; POS selection, attendance and the reservation reminder were also inspected. Production customer welcome and QR screenshots were inspected. Migrations 007–010 are applied; the public alias resolves to the new deployment.
+
+## Clarifications and dependencies
+
+- Confirmed by the user: a phone number belongs to one customer name within a restaurant; reject a different name instead of silently creating a conflicting order identity.
+- Confirmed by the user: integrations will be configured later; show the requirements in their buttons now. No unverified connection or automatic delivery is claimed.
+- Confirmed by the user: the WhatsApp trigger refers to **order tokens**, not loyalty points or coupons.
+- Customer design reference supplied directly in chat: `codex-clipboard-a67258c3-ebaf-4633-a17f-68fad6b466ee.png`. It shows a restaurant welcome, large Call waiter and Menu tiles, and Water/Bill actions below. The drawing is used for layout; the existing green theme is retained.
+- Digital payment additions are staff-verified records. They do not claim to connect a live gateway or terminal.
+- A table move must preserve its existing orders and financial records. Closing a table must retain the existing outstanding-order checks.
+- The previous release was version 0.3.4 with migrations 007–010. The four deferred live integrations remain disabled. Temporary Neon verification databases and the downloaded production environment file were removed after use.
+
+Earlier authorized queue item retained: hide Table QR from the sidebar and use stacked Seat guests / Table QR actions on table cards. Already implemented and locally tested.
+
+## New batch — 20 October 2026
+
+Read Prem's new messages through **2:14 am IST**, including all four attached screenshots, plus the user's later clarifications. Rechecked the conversation before release: no later client messages were present. The user has now requested deployment before continuing Android. The previous 40 requests and their release evidence above are retained.
+
+- [x] **1:23, later superseded by the user** The earlier automatic-activation choice was replaced by customer requests and staff approval. See the latest revision below.
+- [x] **1:23, revised by user** Menu, Water, Bill and My order become available after automatic activation. A reserved/unavailable table still permits Call waiter; expired visits remain closed until reopening the QR. Tested in customer UI and backend; reserved-table Call waiter and idle revocation retained.
+- [x] **1:30** Give occupied table cards a dark green appearance while retaining the approved layout and clear borders.
+- [x] **1:30** Add Details on occupied tables, leading directly to that table's actual billing/order details, including separate bills.
+- [x] **1:33** Add an editable virtual seating plan using the restaurant's actual tables and live occupancy.
+- [x] **1:33** Include reception, washroom, entry and staircase fixtures in the seating plan.
+- [x] **1:41** Put virtual seating in its own **Floor plan** navigation tab.
+- [x] **User clarification** Automatically close tables after **10 minutes without activity**; retain outstanding-order safeguards. Polling alone must not reset the inactivity timer.
+
+- [x] **2:09** Replace the large Move / swap action with a small icon beside the table name. Tested: icon opens the existing move/swap form and both move/swap workflows pass.
+- [x] **2:14** Editable tax options in Bill summary — implemented: owner-only custom percentage or menu rates, audit reason, added-round persistence, reward recalculation, and payment/issued-bill guards. Tested in backend and browser; manager/cashier UI hides the controls and their direct API writes return 403.
+- [x] **User clarification** Remove the separate payment verification option. Recording cash/manual digital payment records and confirms in one step. Tested: cash final invoice, digital receipt form, partial amounts, duplicate-receipt protection and payment filters. Historical unresolved receipts retain Resolve; they are not silently confirmed.
+
+- [x] **User clarification** Remove the extra cashier payment password prompt, including above the old high-value threshold. Tested: one-step receipt above the old threshold needs no additional password; payment form has no password input.
+
+- [x] **User clarification** Owner-only named charges such as packaging fees — tested: add/edit/remove fixed rupee amounts, round selection, recalculation, immutable bill snapshots and bill rendering. Changes lock after payment/kitchen release; managers/cashiers cannot access the controls or write through the API.
+
+Latest activation clarification: the user removed **Activate my table** and explicitly selected **Scanning the QR activates it automatically**. This supersedes the earlier tap-to-activate choice and the old staff/automatic switch. Idle interval selected from the user's requested 5–10 minutes: 10 minutes. The 2:06 message only asks to proceed and adds no separate feature.
+
+- [x] **User clarification** Owner, Cashier, Waiter and Chef have individual accounts and role-scoped access. Tested: separate passwords/sign-ins and employee identities; existing sessions respect current permissions.
+- [x] **User clarification** Owner can invite staff. Tested: owner-only invitation creation, seven-day one-use links, staff-selected passwords, revocation, expiry, duplicate emails and tenant isolation. The owner copies/shares the link; automatic invitation email delivery is not claimed.
+- [x] **User clarification** Owner can update roles, outlet assignments and account access. Tested: access editor, stale-update protection, immediate changes on existing sessions, disabling/restoring accounts and owner/self-lockout guards.
+
+Current batch: **16 tracked items implemented; all 55 backend tests, 17 browser workflows, TypeScript and the optimized build passed locally**. Version 0.3.5 is deployed and verified: all 55 backend cases also passed on isolated Neon databases and all six production browser workflows passed. Migrations 011–013 are applied; core record counts are unchanged. Across both batches: 56 requests, 52 implemented, four external integrations still deferred by the user.
+
+Expiry runs on server reads/writes. An active page normally checks every 15 seconds; with all browsers closed, cleanup occurs on the next request. Business writes and trusted customer/table-specific staff input refresh activity. Automatic refresh does not. Outstanding orders prevent automatic closure.
+
+Other charges are named fixed amounts attached to a selected round and added after item tax. Charge changes clear reward selections for recalculation. Tax and charge controls are owner-only; the existing owner-only menu/outlet tax settings stay restricted.
+
+## Latest user revision · native app and staff activation
+
+The later direct user request supersedes the earlier automatic scan activation choice. Scanning now creates a device-bound visit only. The customer sees **Request table activation**; Menu/Water/Bill/My order stay locked while Call waiter remains available. Repeated requests reuse one pending task. Staff approve from Tables or Service; only an actual staff-opened session unlocks ordering. Staff rejection, retry, reservations, separate bills and outlet/role guards are tested. The existing 10-minute idle policy remains.
+
+The rejected Android 0.1.0 browser wrapper has been replaced in source with a 0.2.0 native preview. A notification bell opens a native inbox with persistent per-account read state and history. Native scope, test evidence and Firebase/background limitations are in [ANDROID.md](ANDROID.md). This does not mark the deferred external integrations complete or claim full native parity.
+
+## Client screenshot · 20 October, 3:58 am
+
+- [x] Editable member data: owner can edit member name and monthly base salary, including their own profile. Role/outlet/access controls retain their existing restrictions. Tested: saved values, existing account sign-in, stale-update rejection, idempotent retries, owner-only access and tenant isolation.
+- [x] Editable vendors: existing details prefill and save in Draft, Approved and Completed states. Status and referenced purchase values are preserved. Tested: browser edit/reload, stale-update rejection, permissions, tenant isolation and audit-chain integrity.
+
+These two requests are included in source version 0.3.7. Native editing uses the same guarded commands. The deployment and final APK verification are recorded in VERIFICATION.md.
+
+Both screenshot requests are deployed in version 0.3.7 and passed the production browser workflow. The overall client checklist now tracks 58 items: 54 implemented and four external integrations still deferred by the user.
+
+## New messages · 20 October, 4:16–4:23 am
+
+The conversation was read through the 4:23 am workflow attachment. The 3:58 member and 4:01 vendor messages are already deployed. New requests cover editable total floor area, Ctrl+C/Ctrl+V arrangement, smoking/liquor rooms, walls, entry/exit and kitchen. The attached 11-page v2 document and master workflow expand the target to two web platforms and five native operational apps. The user explicitly confirmed **include everything**. The complete new scope and truthful implementation/setup status are tracked in [V2_CHECKLIST.md](V2_CHECKLIST.md); the earlier completed list is not evidence that v2 is complete.
+
+## Web-only release queue · 20 October, through 6:06 am
+
+The latest direct user instruction is to finish the new requests **for the web app only and push/deploy them**. Android and Firebase setup are deferred. Existing green layout, large navigation, default staff-approved activation, owner-only tax/charge access and one customer name per phone remain in force. Management can now explicitly choose automatic activation using the requested switch. Prem's screenshots are product references, not permission to change unrelated data or contact anyone.
+
+- [x] **5:37–5:39** Edit existing table seating capacity, including 3, 8 and 10 seats; preserve table/QR identity, sessions, reservations and bills.
+- [x] **5:41** Show the total cart quantity on each selected POS menu card; keep the existing dark selected state and reflect variants/removal accurately.
+- [x] **5:49, edited 5:51** Named tax settings available before creating a POS order. Owner saves them once; names/rates persist for future orders and continue through the bill/invoice. Issued documents remain immutable.
+- [x] **5:50** Registered-customer autocomplete by either name or phone while entering customer identity; choosing a result fills both fields. Scope search to authorized restaurant/outlet records.
+- [x] **5:51** Bill summary is read-only; remove tax/charge editing controls from that summary.
+- [x] **5:53** Separate food and bar tickets/displays, including same-station mixed orders; enforce scope on reads and direct writes.
+- [x] **5:57** Customer profile phone/name details editable by authorized management. Screenshot refers to the Customers directory. Keep the individual customer ID/points/history; prevent collisions with another registered phone and reset changed-phone verification.
+- [x] **5:58** Points/tokens belong to the individual customer account, not the table/device. Verify identity continuity and show an unambiguous customer account identifier.
+- [x] **6:06** Customer QR menu uses picture-based tall/square item cards. Support saved menu pictures and preserve menu search, categories, variants, quantity controls and responsive layout.
+- [x] **Latest user revision** Management ON/OFF switch for auto activation: OFF requires customer request and staff approval; ON activates available tables on a QR scan. Keep reservations, device bans, idle expiry and existing sessions protected. This supersedes the earlier staff-only and auto-only instructions.
+- [x] **Latest user request** Custom named multiple floors; add and rename floors independently of tables, assign new/existing tables to a chosen floor. Preserve table IDs, QR links, sessions and bills. Remove old map placements when a table changes floors.
+- [x] **Latest user request** Nonrectangular floors: rectangle/L/U presets plus editable corner points, saved per floor; validate closed outlines and keep objects inside their boundary.
+- [x] **Latest user simplification** Remove X/Y coordinate fields. Use shape presets, Rotate, draggable corners and Add/Remove corner controls; table/fixture positioning remains visual drag-and-drop. Keep underlying layout validation and saved data unchanged.
+- [x] **Release** Relevant backend tests, full browser regression, TypeScript, optimized build, isolated hosted-database checks, production migration/deployment and production browser verification. Update this list only with actual evidence.
+
+Local acceptance: all 13 web requests above are implemented. The 85 backend cases passed locally and on isolated Neon databases. All 25 browser workflows passed across the full run and affected reruns, including visual-only outline editing and fixture dragging. The production build passed. Production migration 015–028 preserved record counts, round totals and all issued invoice snapshots. All five selected production browser workflows passed on the simplified 0.4.1 deployment: custom floors/visual outline/activation, POS quantity and customer profiles, mixed food/bar cash-to-final-invoice, saved named taxes/manual digital receipts, and owner-only charges/permissions.
+
+Menu photographs are illustrative samples generated with built-in image_gen; sample labels are shown in demo menus. Saved assets: `apps/web/public/images/menu/samples/*.webp`. Exact prompts, original files and output mapping: [menu-photo-assets.json](../verification/menu-photo-assets.json). Restaurant photo URLs replace sample pictures.
+
+Deployed and verified: **0.4.1**, https://dinerdost-app.vercel.app/, `dpl_FAxtDK6vhh7FD1wUVb1tbfnqK3hR`. All **13 current web items plus release acceptance** are complete. The larger v2 checklist remains separate and incomplete; Android, Firebase, external providers and the other open v2 features are not marked complete by this release.
+
+## Web update queue · 20 October, afternoon
+
+Sources: the user's five screenshots (two duplicates), Prem's Discord messages read through **4:35 pm IST**, and the user's filter clarifications. This batch changes only the requested web features. The earlier summary restriction is superseded for owner tax editing only; issued documents stay immutable. Provider/Firebase/native work remains deferred.
+
+- [x] **WhatsApp 3:19** Move the POS tax edit entry to the Tax row; restore owner-only per-bill tax editing in Bill summary, retaining payment/kitchen/issued-document guards and saved defaults for future orders.
+- [x] **WhatsApp 3:25** Circle floor preset and visual edge dragging, with valid saved boundaries.
+- [x] **WhatsApp 3:29–3:30** Resize selected fixtures and tables using visible drag handles, without numeric width/height entry.
+- [x] **WhatsApp 3:31** Keep compact object labels visible outside their boxes.
+- [x] **Discord 3:44** Picture-based staff POS menu cards, preserving selection and quantity badges.
+- [x] **Discord 3:49** Half/Full portions configurable while adding/editing menu items; correct prices and selection in ordering.
+- [x] **Discord 3:49–3:52** Durable image uploads in food/liquor Add and Edit forms; show saved pictures and label liquor name correctly.
+- [x] **Discord 3:54** Rename Floor plan to Explore and place it above Tables, preserving existing routes and permissions.
+- [x] **Discord 3:58** Remove duplicate center All stations / Bar kitchen filters; retain Food/Bar display separation.
+- [x] **Discord 4:02** Daily/weekly/monthly/custom date filters on Bills/Invoices, Payments, Inventory movements, Purchases, Expenses and Checklists; amount/quantity filters where meaningful, including older records beyond the workspace's recent-record limits. Current stock balances remain visible.
+- [x] **Discord 4:04** Reservation customer autocomplete and server-enforced name/phone consistency with the registered customer account.
+- [x] **Discord 4:05** Hide Table QR actions when disabled at the outlet; prevent QR display/printing while disabled and retain owner re-enable controls.
+- [x] **Discord 4:17** Add/edit staff photo, phone, address, pincode and one government document (Aadhaar/PAN/Voter ID/Driving licence). Keep these private and owner-restricted, separate from public menu photos.
+- [x] **Discord 4:18** Include purchases in Expenses without duplicate costs; preserve links to the original purchases. The live audit found one historical approved purchase without its expense; backfill that missing entry idempotently and retain the approval date where available.
+- [x] **Discord 4:20** Make Activity log actions understandable and show exact changed fields/values instead of relying on raw JSON. The attached screenshot is an audit event, not a cash-change request.
+- [x] **Discord 4:23** Header order: Search, notification bell, Demo/package button. Open Trial/Bronze/Silver/Gold/Platinum package panel. User confirmed prices, trial duration and entitlements will be configured later; show pending details without activating subscriptions.
+- [x] **Discord 4:33** Add a Loyalty leaderboard using actual individual customer points, scoped to authorized outlets.
+- [x] **Discord 4:35** Edit existing inventory item details with permissions, versions and stock/recipe unit safeguards; preserve recorded stock movements and costs.
+- [x] **Acceptance/release** Relevant backend and browser workflows, desktop/mobile inspection, typecheck/build, hosted migration and production verification; deploy only after checks pass.
+
+User clarifications: recurring activities means **Expenses and Checklists**; Inventory periods filter **stock movements**, not current balances. Further messages after the recorded cutoff require another review; unchecked items are not completion claims.
+
+Local acceptance: all 18 afternoon web requests are implemented. All 96 backend cases passed across the full and targeted runs. The 11 new backend cases and five affected existing cases passed on isolated Neon PostgreSQL databases. All 32 local browser workflows passed across the main run and corrected/affected reruns; pointer dragging of circle edges and resize handles, save/reload, uploads, permissions and desktop/mobile layouts were checked. TypeScript and optimized build passed. Migration 029–031 is applied: core counts, round payable/paid totals and all issued invoice snapshot digests are unchanged. One missing historical purchase expense was added; zero approved purchases now lack an expense. Production deployment and acceptance are complete, as recorded below.
+
+Deployed and verified: **0.4.2**, https://dinerdost-app.vercel.app, `dpl_EUkNpYeoA3MbwLGv8evm3kr4yrqi`. All **18 afternoon web requests plus release acceptance** are complete. All **seven production browser workflows** passed using one isolated synthetic demo workspace. Public sign-in/sample images return 200; anonymous workspace, inbox, loyalty, activity and staff-file reads return 401; local preview returns 404; no anonymous session cookie is issued. Package prices, trial duration and entitlements remain deferred by explicit user choice. Temporary hosted verification databases, the production environment download and the synthetic browser session file were removed after use. Full v2/native/provider work remains separate and incomplete.
+
+## Evening and overnight web release · 0.4.3
+
+Reviewed Prem's messages and images through **21 October 2026, 12:37 am IST**, plus the user's receipt photographs. The 12:28 am postpaid message repeats the 20 October 5:32 pm request and is counted once. This batch contains the **17 requested pending features**, plus the previously completed thermal receipt layout. Checkmarks below mean implemented and locally accepted; hosted release acceptance is recorded separately. Later Discord requests remain in the separate Q queue below. Web-only scope remains in force.
+
+- [x] **20 Oct 5:27 · Kitchen segment** Remember Food/Bar per account/outlet across navigation and reload. Restricted Kitchen/Bartender streams remain enforced.
+- [x] **20 Oct 5:32 + 21 Oct 12:28 · Postpaid form** Remove Approval reason and Confirm your password from the web Authorize postpaid action. Staff roles, configured policy, active dining session, versions, reconciliation, reward locks and audit remain enforced. Native API behavior and sign-in are unchanged.
+- [x] **20 Oct 5:34 · Ready alerts for all outlet waiters** All authorized active waiters receive one ready event per kitchen transition, with order/table and a link to Ready to serve. Unassigned waiters do not gain access to customer/payment details or another waiter's order. Two actual waiter accounts, retries and outlet denial passed backend checks.
+- [x] **20 Oct 5:38 · Editable checklists** Existing approved/completed tasks have a prefilled editor. Permissions, assignee/outlet validation, versions, identity and current completion state are retained.
+- [x] **20 Oct 5:40 · Loyalty periods** Overall/year/month/week ranking uses actual posted points and India calendar periods. Current balances remain visible; pending earnings are excluded. Search and pagination retained.
+- [x] **20 Oct 5:44 · Half/Full boxes** Shared customer/staff portion picker has selectable Half/Full radio cards with saved prices. Quantity, notes, add-ons, totals and custom variants retained.
+- [x] **20 Oct 5:48 · Bill adjustments and savings** Unpaid held rounds support a manual discount and nearest-rupee rounding; Bill summary shows Saved amount below Total. Server quotes, tax/charges, payments and new issued snapshots reconcile. Roles, versions, uncertain-payment locks and immutable issued documents are tested. Manual discount replaces a coupon/points selection rather than stacking them.
+- [x] **N01 · 20 Oct 7:30 pm + 21 Oct 12:13 am · Rotation** Selected Explore objects rotate in 15-degree steps. Rotation persists, drag/resize handles follow it, and rotated corners/edges remain validated against rectangular, concave and circular boundaries. No X/Y entry added.
+- [x] **N02 · 20 Oct 11:38 pm, edited 11:49 pm · Table menu** Three-dot Merge, Move/swap and Delete actions reuse guarded operations. Owner deletion archives idle tables and revokes their QR access; active sessions/reservations block it, and historical orders/payments/bills remain intact.
+- [x] **N03 · 21 Oct 12:04 am · Explore canvas** Rounded static header/edit controls and footer surround a viewport-filling canvas. Drag/wheel pan, Ctrl-wheel zoom, zoom buttons and Fit reach the whole floor. View/Arrange, desktop/mobile and floor switching verified.
+- [x] **N04 · 21 Oct 12:13 am · Delete while arranging** Selected fixtures/copies can be deleted from the draft. Actual table removal is staged until Save, using N02's guarded server path in the same transaction. Cancel restores the draft; concurrent table activity rolls back the save.
+- [x] **N05 · 21 Oct 12:13 am · Boundary appearance** Saved clean Stroke/Walls display choices preserve the existing outline, floor size and containment checks while zooming and arranging.
+- [x] **N06 · 21 Oct 12:16 am · Overview stock** Real per-item opening, movements and closing quantities use the selected India business date and authoritative ledger. Current balances remain unchanged. Date/search/pagination, food/bar stream and inventory permissions checked.
+- [x] **N07 · 21 Oct 12:17 am · Header language** User confirmed English/Hindi. Dropdown immediately left of Search changes staff interface labels, navigation, headings and common controls and persists per account. Customer/menu/staff-entered data and printed bill language are retained as entered. No external translation service added.
+- [x] **N08 · 21 Oct 12:24 am · Optional descriptions** Cashier POS displays saved optional menu descriptions. Existing add/edit field reused; absent descriptions stay clean, with food/liquor and responsive picker coverage.
+- [x] **N09 · 21 Oct 12:36 am · Staff acceptance** Authenticated web staff submissions accept atomically and idempotently, including additional rounds; customer orders still require staff Accept. Accepted staff items remain editable only while unpaid/held. Stock reservations, payment policy and actual KOT authorization remain enforced; auto-acceptance does not imply payment.
+- [x] **N10 · 21 Oct 12:37 am · Remove Void round** Removed the pictured round action. Existing historical voids, invoice cancellation and separate Edit/Reject/acceptance safeguards remain intact.
+- [x] **User + 20 Oct 5:56 · Thermal bill** Owner-configured logo/name, address/GSTIN/phone, customer, date/time/table/cashier/bill metadata, Item/Qty./Price/Amount, quantities/taxes, discount/round-off, bold Grand Total, FSSAI/contact/footer. New snapshots freeze branding and metadata; existing issued data is immutable. 80mm content-length PDF, provisional/phone layout and rendered print checked. Physical printer output is not claimed.
+- [x] **Hosted release acceptance** Version **0.4.3** is deployed and verified at https://dinerdost-app.vercel.app, deployment **dpl_4BffFWXdep5EBqskTk6rJxfZeTFG**. All **113 backend cases**, **40 local browser workflows**, **65 selected hosted PostgreSQL cases** and **8 production browser workflows** passed. Typecheck and optimized local/Vercel builds passed. Migrations 032–033 preserve all core counts, payable/paid totals and all 17 pre-existing invoice digests; the KOT authority gate remains enabled. All 11 anonymous access checks passed. No temporary hosted verification databases remain. Later Q01–Q10 are separately pending, not included in the completed 17.
+
+Local evidence: [backend log](../verification/web-043-backend-final.log), [browser main](../verification/web-043-browser.log), [affected reruns](../verification/web-043-browser-rerun.log), [filter rerun](../verification/web-043-filter-rerun.log), [portions](../verification/overnight-portions.png), [bill adjustments](../verification/overnight-bill-adjustments.png), [Explore desktop](../verification/overnight-explore-desktop.png), [Explore phone](../verification/overnight-explore-mobile.png), [Hindi](../verification/overnight-hindi.png), [thermal PDF](../verification/thermal-receipt.pdf). Browser failures in the initial run were old control/scale/state assertions; corrected tests now exercise the new requested UI. The stock summary also received an additional food/bar ingredient scope regression after review. Final charge/reward audits reconcile the rounded payable difference. Hosted pagination was stopped deliberately; the full pagination case passed locally and the two affected inbox access cases passed separately on PostgreSQL. [Live acceptance](../verification/production-043-acceptance.json), [migration proof](../verification/production-migration-043.json), [live browser log](../verification/production-043-browser.log).
+
+## Further messages · 21 October, 12:39–1:08 am
+
+Read during implementation of the authorized 17-item release, after the user asked to keep checking Discord. All five new messages and all four new screenshots were inspected, including the 1:02 am edit at 1:03 am. These six additional requirements are tracked separately from that original batch. No reply was sent to Prem. The user confirmed **English and Hindi** for N07. A thread follow-up checks this conversation every 30 minutes; it does not authorize messaging anyone or mark unfinished work complete.
+
+- [x] **Q01 · 12:39 am · Linked customer suggestions throughout** Keep one customer name linked to each normalized phone throughout staff and customer flows; suggest matching saved identities when either field is entered and fill the linked pair. Reuse existing staff autocomplete and server identity enforcement. Public customer suggestions must stay within that customer's/device's authorized identity context rather than exposing the restaurant's private customer directory.
+- [x] **Q02 · 12:51 am · Printable KOT** Offer automatic KOT receipt printing when a round is actually released to Kitchen, plus a manual printable/offline ticket entry below the round controls at the lower right. The two pictures show Kitchen tickets and the Order details placement, not a new receipt template. Keep Food/Bar/station separation, quantities, notes and round identity; printing must not falsely mark an order paid or release an unauthorized KOT. Browser printing needs its normal print dialog; silent hardware printing and true offline LAN order processing remain separate hardware/v2 work.
+- [x] **Q03 · 12:57 am · Outlet KOT print switch** Let the outlet enable/disable offline/physical KOT generation. Keep this preference separate from payment policy, customer QR availability and digital KDS operation.
+- [x] **Q04 · 12:57 am · Remove pictured Kitchen authorization setting** Remove the **Kitchen authorization** dropdown from Manage outlet. The screenshot shows the existing payment-policy field with “Manager-approved postpaid at tables.” Preserve stored policy and server payment/kitchen safeguards; the unfinished “and” in the message is not treated as an additional instruction.
+- [x] **Q05 · 1:02 am, edited 1:03 am · Daily waste tab** Add a daily waste view listing wasted items/ingredients using actual recorded stock wastage, with the business date, quantities/units and existing outlet/access scope. Keep current stock movements and costs authoritative; do not infer historical waste.
+- [x] **Q06 · 1:08 am · Inventory purchase rate** The picture is **Edit inventory item** with Ingredient name, Unit and Reorder level; Prem says “no value option added.” The user confirmed this means **purchase rate per kg/unit**. Add an editable purchase-rate default for future receipts; preserve existing FIFO batch costs, stock balances and historical accounting.
+
+Latest Discord cutoff: **21 October 2026, 1:08 am IST**. These six later requirements are not part of the original 17-item completion count. Their implementation/verification status will be recorded separately.
+
+### Further stock/report requests · 21 October, 1:15–1:23 am
+
+Read all three new messages directly; there were no new attachments. These extend the separate later queue, not the original 17-item release.
+
+- [x] **Q07 · 1:15 am · Reports: waste and daily stock** Expose Q05's actual daily wastage and N06's reconciled daily opening/closing stock under Reports as well. Reuse authoritative movements, date/unit and outlet permission rules.
+- [x] **Q08 · 1:15 am · Dish profit and demand** Add dish-level sales/demand and profit reporting from actual settled sales and recorded recipe/FIFO consumption. Identify unavailable costs rather than inventing margins; reconcile allocated discounts and costs to source rounds.
+- [x] **Q09 · 1:15 am · Stock availability alerts** Show alerts for unavailable ingredients/stock with outlet and food/bar access restrictions. Distinguish zero usable available stock from quantities reserved or expired.
+- [x] **Q10 · 1:15 + 1:22 + 1:23 am · Expiry and alerts for food and liquor** Require expiry for future stock receipts, including liquor. The 1:23 am clarification specifies **48h, 24h, 12h and 6h** warnings pinned on Overview; use these four explicit thresholds despite the phrase “3 phase.” Sub-day thresholds need a known expiry time, not an invented timestamp for historical date-only batches. Preserve missing historic expiry as explicitly unknown and retain recorded costs. Cover direct receipts and purchase deliveries with scoped, deduplicated warnings.
+
+Latest Discord cutoff: **21 October 2026, 1:23 am IST**. Ten distinct later-queue requirements (Q01–Q10) are recorded, including consolidation of the repeated daily-waste and stock requests. Q06 is clarified as purchase rate per kg/unit. These items remain pending implementation and acceptance.
+
+## Additional review · 21 October, 1:53–2:03 am
+
+Read five new Prem messages and inspected the 2:02 am screenshot. The 1:54 am fragment about analysing stock reports does not define a new automated analysis feature; it is linked to the usage/stock requirement. A later message from nihh mentioning WhatsApp was not treated as a client requirement or authorization for other conversations.
+
+- [ ] **Q11 · 1:53–1:54 am · Menu recipes and daily consumption** Every menu item must have its stock recipe so actual food/liquor usage can be deducted and analysed with daily opening/closing balances. Reuse the recipe/BOM and authorized KOT consumption path; expose recipe setup beside menu editing and daily usage reporting. Never invent the client’s ingredient quantities; clearly flag missing recipes.
+- [x] **Q12 · 2:02 am · Table action appearance** Move the three-dot menu to the far right, use vertical dots, remove its outline and use a very pale grey box. Move Available/Occupied beside the table label. Preserve all action guards and the rest of the card design.
+- [x] **Q13 · 2:03 am · Shared table identity** Additions/deletions through Tables and Explore must appear in both views after save/refresh. Reuse the same table records and QR identities, keep Save/Cancel semantics, and preserve active-session/reservation/history protections.
+
+Latest Discord cutoff: **21 October 2026, 2:03 am IST**. Thirteen later requests (Q01–Q13) are now captured; implementation/acceptance is being recorded individually.
+
+## Additional review · 21 October, 2:12–2:15 am
+
+Both messages and screenshots were inspected. The rounding picture is the existing Bill adjustments dialog; the description picture is the Mint cooler POS card.
+
+- [x] **Q14 · 2:12 am · Round down** Change new web bill adjustments to round down to the lower whole rupee, with matching preview, tax/charge/reward recalculation and invoices. Preserve previous rounds’ recorded rounding rules and all issued documents.
+- [x] **Q15 · 2:15 am · Description placement** Put the saved optional description directly beneath the POS item name with a compact gap. Keep pictures, category, price, cart selection and quantity behavior.
+
+**User clarification for Q11:** “will add later.” Recipe setup remains available, and missing recipes are flagged; client ingredient quantities and any rule blocking unconfigured dishes are deferred. Existing items remain orderable. No recipes or historical costs are fabricated.
+
+Latest Discord cutoff: **21 October 2026, 2:15 am IST**. Fifteen distinct later web requests are captured. New implementation is not yet a deployment or acceptance claim.
+
+## Additional review · 21 October, 2:22 am
+
+- [x] **Q16 · 2:22 am · Half/Full editor layout** Inspected Prem’s “fix half and full proportions” screenshot. It shows the **Edit menu item** checkbox on the left and “Half / Full portions” squeezed into a narrow column at the far right, with horizontal scrolling. Keep the checkbox and label together in a readable row on desktop/mobile and retain the saved Half/Full price behavior. This screenshot requests a layout correction, not invented recipe quantities or price ratios.
+
+Latest Discord cutoff: **21 October 2026, 2:22 am IST**. Sixteen distinct later web requests are recorded. The user asked to include any missing new checklist entries; this new request is added separately.
+
+- [x] **Q17 · Direct user request, 21 October · Upload only** Remove the Photo URL field from food/liquor menu editors. Keep the simple image upload control, durable image storage, existing pictures and upload validation. Do not alter existing menu records or require clients to enter file paths.
+
+### Local acceptance for the later queue
+
+Q01–Q10 and Q12–Q15 are implemented and locally verified. Q11’s recipe editor and daily food/liquor consumption reports are implemented and tested, while client recipe quantities and missing-recipe enforcement remain deferred by the user. Q16’s layout correction passed desktop/mobile checks with the original Half/Full prices preserved. Q17’s upload-only editor passed menu upload/reload, new food and liquor form checks. Checkmarks mean local acceptance; migrations 034–036 are applied and the final deployment including Q17 has passed live acceptance, as recorded below. The full backend run and affected reruns cover 128 passing cases. The browser regression has 44 passing cases; the corrected menu-row assertion then passed its affected rerun. All 22 selected hosted PostgreSQL cases passed across three isolated databases; the final print-scope recheck passed. Production migration preserves all counts/totals, 19 issued invoice digests, stock costs/expiry, recipes and payment policies. There are 17 later requests: 16 implemented and Q11 prepared with client configuration deferred.
+
+### Latest read · 21 October, 2:43 am IST
+
+Read three later messages asking for progress/checking status. They add no product requirement and are not counted as duplicates or new work. No reply was sent. Latest Discord cutoff: **21 October 2026, 2:43 am IST**; latest client feature request remains Q16 at 2:22 am, plus the direct user Q17 upload-only request.
+
+## Later queue production acceptance · 0.4.4
+
+- [x] **Release Q01–Q10 and Q12–Q17:** Deployed and verified at https://dinerdost-app.vercel.app, deployment **dpl_DekayYPgKjbembrQmHhazVyUt847**. These are **16 completed later requests**. Q11’s recipe editor and actual daily food/liquor usage/opening/closing reports are also implemented and tested; its checkbox remains open for the client recipe configuration and missing-recipe policy explicitly deferred by the user.
+- [x] **Verification:** 128 backend cases and 46 local browser workflows passed across full/affected runs; all 22 selected hosted cases plus the final KOT scope recheck passed; all nine production browser workflows and 14 anonymous access checks passed. Typecheck and optimized local/Vercel builds passed. Q17 upload-only food/liquor forms passed locally and on production.
+- [x] **Data preservation and cleanup:** Migrations 034–036 preserve counts, payable/paid totals, all 19 existing issued invoice digests, stock quantities/costs/expiry, recipes, prior rounding and payment policies. KOT authority remains enabled. No temporary hosted verification databases remain; downloaded production environment and temporary QA session files were removed. Three labelled synthetic demo workspaces were used for live testing.
+
+Evidence: [production acceptance](../verification/production-044-acceptance.json), [migration preservation](../verification/production-migration-044.json), [live browser checks](../verification/production-044-browser.log), [public access checks](../verification/production-public-044.json), [Half/Full layout](../verification/late-half-full-mobile.png), [upload-only editor](../verification/afternoon-menu-editor.png). Physical printer delivery, offline LAN, Android/Firebase/provider/package work and full v2 completion are not claimed.
+
+## New web requests · 21 October, 2:51–3:01 am
+
+Read seven messages and inspected all seven screenshots after the previous 2:43 am cutoff. The first 2:51 am message approves the available-table card and is not a new feature; preserve that design. The following six requests are new, separate from the released 0.4.4 queue. Web-only scope remains in force.
+
+- [x] **Q18 · 2:51 am · Occupied-card tint** The second screenshot shows the occupied table’s dark green background. Reduce that background to a pale **15% green tint** within the requested 10–20% range, keeping text/actions readable and the approved available-table card unchanged. Do not fade the entire card.
+- [x] **Q19 · 2:52 am · Click-away table menu** Close the three-dot table action menu when clicking/tapping elsewhere; retain Escape, keyboard access and guarded Merge/Move/Delete actions.
+- [x] **Q20 · 2:54 am · Reuse deleted table names** Reproduce and fix adding T13 after deleting the previous T13. Keep the archived table/history and old QR revoked; a newly created table gets a new identity/QR. Active table names remain unique, including copies created in Explore.
+- [x] **Q21 · 2:56 am · Resize Explore controls** The user confirmed this means **Explore’s floor/edit controls panel**, not the main app header. Allow expanding/squeezing it by dragging its edge, with accessible keyboard control and desktop/mobile fit; preserve floor dimensions and saved arrangements.
+- [x] **Q22 · 2:57 am · Remove Voided tab** Remove the pictured **Voided** tab from Orders. Preserve historical voided transactions and existing All/history access; do not delete financial records.
+- [x] **Q23 · 3:01 am · Inventory value and deletion** The picture is the Ingredients table, showing Value separately from Purchase rate. The user confirmed **edit current stock total value through an audited adjustment, preserving past sales/costs**. Keep original receipt rates/movements and issued costs immutable; apply corrected remaining value only to current stock and future consumption/waste, with concurrency/reservation guards and exact money reconciliation. Add guarded inventory deletion using archive semantics: no loss of ledger/history, no stranded stock or recipe references.
+
+Latest Discord cutoff: **21 October 2026, 3:01 am IST**. Six new requested updates (Q18–Q23) are pending implementation and acceptance. The earlier recipe-data/provider/native/package deferrals remain unchanged. No message was sent to Prem.
+
+## Additional payment-flow request · 21 October, 3:17 am
+
+- [x] **Q24 · 3:17 am · QR and staff payment gates** Inspected Prem's order #83 screenshot and message. New web staff rounds skip Accept and Authorize postpaid, enter the kitchen without fabricating a receipt, and retain actual unpaid balances and settlement/reconciliation checks. Customer QR rounds still require staff acceptance. Add an outlet QR menu selector immediately below Enable customer QR: **Order only** releases accepted customer orders without a second payment approval; **Order & payment** retains payment or manager postpaid authorization. Show and enforce web postpaid only for customer QR payment rounds. Keep old rounds, issued documents, native flows and existing payment policies unchanged. Bill tax/charges/discount/rewards must remain usable on the new deferred-payment rounds before any payment, with costs/history retained. Provider setup remains deferred; selecting the mode must not claim a live gateway connection.
+
+Latest Discord cutoff: **21 October 2026, 3:17 am IST**. Seven new requests Q18–Q24 are recorded. Q18–Q23 passed focused local acceptance; Q24 is being implemented. No Discord message was sent.
+
+## Additional interface requests · 21 October, 3:24–3:27 am
+
+Both new screenshots were inspected directly.
+
+- [x] **Q25 · 3:24 am · Four visible table rows** Show up to four body rows in each shared data table, with the remaining records available by scrolling. Keep the header visible in contrasting dark green. Preserve complete rows, filters, pagination, permissions and printable documents; calculate the viewport from actual row heights for wrapping content and mobile widths.
+- [x] **Q26 · 3:27 am · POS card footer and quantity** Align prices and add controls at the bottom of POS menu cards, including cards with descriptions. Move selected quantity from the image corner into a contrasting **− quantity +** group beside the price. Keep variant/modifier selection on add; decreasing removes one unit from the last matching cart configuration, with the cart still supporting direct line edits. Retain approved colours and whole/fractional unit rules.
+
+Latest Discord cutoff: **21 October 2026, 3:27 am IST**. Nine new requests Q18–Q26 are recorded; current web release acceptance is in progress. Earlier recipe-data/provider/native/package deferrals remain unchanged. No message was sent to Prem.
+
+### Local acceptance for Q18–Q26
+
+All nine requested web changes are implemented. All 138 backend cases and 17 selected hosted PostgreSQL cases passed. The eight new browser workflows passed across the full regression and affected runs, including the two latest table/POS requests and the corrected rapid-key resize behavior. Migrations 037–039 are applied: counts/totals, all 23 prior invoices, stock quantities/receipt costs/expiry, recipes, table identities, ingredient details, previous rounding, per-item costs and existing payment policy are preserved. Existing rounds remain on their recorded legacy payment gate; the new QR mode applies to newly submitted web QR rounds. No old order is silently released or marked paid. Native source/APKs were not changed. This checkpoint was followed by the production acceptance below.
+
+Q24 safety acceptance: zero-total deferred bills require current reward authorization before settlement. Authorized zero bills lock further financial edits; expired coupon/points reservations are checked against the database clock. No synthetic receipt is created for a zero balance. All 54 local browser workflows passed across the full run and affected reruns.
+
+## New screenshot · 21 October, 3:48 am
+
+- [x] **Q27 · 3:48 am · Compact receipt expiry controls.** The user clarified: “The picker covers too much of the form.” Replace the combined date/time popup with compact separate date and time controls for stock/purchase receiving. Preserve required future expiry, India-time conversion and saved batch dates; no expiry backfill or accounting changes.
+
+Latest Discord cutoff: **21 October 2026, 3:48 am IST**. Historical 0.4.5 cutoff: nine implemented and Q27 awaiting clarification at that time. Q27 is clarified in the later 0.4.6 batch. No message was sent to Prem.
+
+## Production acceptance · 0.4.5
+
+- [x] **Q18–Q26 released:** nine requested updates are deployed and verified at https://dinerdost-app.vercel.app, deployment **dpl_HaLyEgWfafRDHtyNFwucHqsHP2Dr**. Q27 is a separate later screenshot awaiting user clarification.
+- [x] **Checks:** 138 clean backend cases, 54 unique local browser workflows across full/affected runs, 17 unique selected hosted cases, all 10 live workflows and all 16 public access checks passed. The two older browser fixtures were corrected for draft editing and immediate staff kitchen release; the final draft/payment/zero-total rerun passed. Typecheck and optimized local/Vercel builds passed.
+- [x] **Preservation:** migrations 037–039 retain financial totals, all 23 pre-existing invoice digests, stock balances/receipt costs/expiry, recipes, previous rounding/payment policy, table identities, ingredient details and issued item costs. Existing rounds remain legacy-gated; no old order was silently reclassified, released or paid. KOT authority remains enabled.
+- [x] **Cleanup:** zero temporary hosted databases; downloaded production environment and QA authentication state removed. 2 labelled synthetic production workspaces used. No Android source/APK or provider configuration was changed.
+
+Evidence: [acceptance](../verification/production-045-acceptance.json), [backend](../verification/web-045-backend-release.log), [browser main](../verification/web-045-browser-verified.log), [affected browser](../verification/web-045-browser-acceptance.log), [final browser rerun](../verification/web-045-browser-final-rerun.log), [hosted](../verification/web-045-postgres.log), [final hosted zero-total check](../verification/web-045-postgres-zero-rerun.log), [live workflows](../verification/production-045-browser.log), [public access](../verification/production-public-045.json), [migration preservation](../verification/production-migration-045.json), [cleanup](../verification/production-045-cleanup.json).
+
+Latest Discord cutoff: **21 October 2026, 3:48 am IST**. Nine of ten new requests are released; Q27 requires clarification. Earlier client recipe/provider/native/package deferrals remain open.
+
+## Latest web review · 21 October, 3:53–4:39 am
+
+Read all ten new messages and inspected all nine screenshots. The two expiry requests are consolidated. The 4:30 picture is the **customer QR menu**, so its quantity/footer request extends Q26 beyond staff POS. The 4:20 instruction explicitly corrects the earlier Q18 interpretation; preserve the approved dark occupied card. No Discord message was sent.
+
+- [x] **Q28 · 3:53 am · Report tabs** The screenshot shows Sales / Stock / Waste / Usage / Dish profit. Use distinct modern rounded rectangular tabs, preserving report selection and access restrictions.
+- [x] **Q29 · 3:53 + 4:15 + 4:26 am · Compact tables and spacing** Make shared tabular information compact and clean; keep a clear gap between adjacent report panels and between Service's Ready to serve and Table requests panels. Preserve four-row scrolling, complete data, filters and print output.
+- [x] **Q30 · 3:54 am · Remove reorder-level UI** Remove reorder-level inputs, columns, summary count and reorder alerts throughout the web app. Preserve existing stored thresholds, stock records and historical audit data; retain actual unavailable-stock and expiry alerts.
+- [x] **Q31 · 4:17 + 4:39 am · Ingredient and liquor expiry** Show expiry beside every inventory ingredient/stock item, using its remaining FIFO batches. Show the nearest recorded expiry; identify unknown historical expiry rather than inventing dates. Retain detailed batch dates, empty-stock handling, food/bar scope and required expiry on future receipts.
+- [x] **Q32 · 4:20 am · Correct occupied table appearance** Supersedes Q18's pale whole-card background: restore the pictured approved dark green occupied card. Only the three-dot button background is black at 15% opacity (within 10–20%); keep the dots/text legible, no outline and the available card unchanged.
+- [x] **Q33 · 4:30 am · Customer menu footer and quantities** Align price and add controls at the bottom of all QR menu cards. Show a contrasting − quantity + control beside the price; selected cards use the approved dark green. Preserve variant/modifier choices, cart editing and valid quantities. Staff POS behavior from Q26 remains covered.
+- [x] **Q34 · 4:33 am · Table heading hierarchy** The picture shows Round 1 above the column headings. Use dark green for the section header, a slightly darker-than-body subheader for column labels, and retain the table body. Apply consistently to shared data-table panels while keeping controls readable and printed bills unchanged.
+
+Latest Discord cutoff: **21 October 2026, 4:39 am IST**. This batch has seven new distinct requests Q28–Q34 plus clarified Q27. Implementation and release acceptance remain pending. Earlier recipe-data/provider/native/package deferrals remain unchanged.
+
+- [x] **Q35 · Direct user request, 21 October · Merge/demerge glitch** Reproduce unreliable table demerging after a merge; fix only the affected flow. Verify visible table/session assignments, repeat cycles, child/parent handling, permissions and preservation of linked orders, payments and bills. The user has not specified a narrower symptom; reproduce before attributing a cause.
+
+- [x] **Q36 · Direct user request, 21 October · Fixed Explore frame, scrollable contents** Keep the outer border/frame fitted to the available screen while tables/fixtures remain readable inside a scrollable, draggable and swipeable viewport. Do not shrink all tables to fit by default. Keep explicit Fit/zoom, saved positions, custom outlines and Arrange behavior; prevent a swipe from opening a table accidentally. For new unsaved large floors, avoid progressively shrinking the starter tables.
+
+### Local acceptance · 0.4.6
+
+All ten latest web requests **Q27–Q36** are implemented and locally accepted. **141 backend cases passed**, including three new merge/demerge cases also passing on isolated hosted PostgreSQL. All **59 unique local browser workflows** passed across the 57-pass main regression and the two corrected fixture reruns. The final affected run passed all eight workflows, including desktop/mobile expiry, customer variants/quantities, both demerge entry points, fixed-frame wheel/drag/touch panning and prior floor controls. The older fixtures were updated to assert the requested removal of Reorder level and to identify the cart quantity input exactly after adding the new menu stepper. Typecheck and the final optimized build passed. A visual mobile footer wrapping issue was caught and corrected; explicit price-size assertions now pass.
+
+No schema migration is needed. The release preservation baseline contains **26 existing issued invoices**. The reported live merge was checked read-only: T02 and T06 are already linked to T01; the previous version omitted their visible group status and provided no demerge path. Q35 adds guarded unlinking, visible group labels, stale-state/ownership/outlet/tenant checks and prevents nested merge chains. Orders, payments, bill snapshots and QR identities remain attached to their original visits. Production deployment/acceptance is in progress; the following record will state its result.
+
+## Production acceptance · 0.4.6
+
+- [x] **Q27–Q36 released:** all ten latest requested web updates deployed at https://dinerdost-app.vercel.app, deployment **dpl_Cmc3hE986f82ciH9u1wXFL9kRm7t**.
+- [x] **Verification:** 141 backend cases; 59 unique local browser workflows across main/corrected runs; eight final affected workflows; three isolated hosted PostgreSQL merge/demerge cases; all eight live browser workflows and all 17 anonymous-access checks passed. Typecheck and optimized local/Vercel builds passed.
+- [x] **Preservation:** no schema migration. All 26 previously issued invoice digests are unchanged; schema and KOT authority remain intact. Isolated financial tests retain orders, paid bills, QR identities and the audit chain through repeated merge/demerge cycles.
+- [x] **Live user verification:** refreshed the user's Tables page and opened T02's three-dot menu. T01 visibly lists T06/T02 as merged; T02 shows its parent and the Demerge tables control. No user table group was modified during this inspection.
+
+Evidence: [backend](../verification/web-046-backend.log), [browser regression](../verification/web-046-browser-full.log), [corrected fixtures](../verification/web-046-browser-fixture-rerun.log), [final affected checks](../verification/web-046-browser-final.log), [hosted checks](../verification/web-046-postgres-final.log), [live checks](../verification/production-046-browser.log), [anonymous checks](../verification/production-public-046.json), [preservation](../verification/production-046-preservation.json). Temporary credential cleanup is tracked with the active release work.
+
+- [x] **Q37 · Direct user request, 21 October · One merged table card** A merged group must appear as one card labelled **T01 & T02 (Merged)** rather than separate cards with a small association label. Keep group bills, visits, individual QR identities and demerge accessible; demerge restores separate cards without moving or rewriting financial records. Apply to the Tables page shown by the user; preserve actual saved physical positions in Explore.
+
+- [x] **Q38 · Direct user screenshot, 21 October · Invisible Menu header buttons** Correct the white-on-white action labels introduced by the 0.4.6 dark table-header styling. Give white header buttons explicit dark text and preserve primary/tab contrast. Verify Menu action names/icons and other affected table header actions on desktop/mobile.
+
+- [x] **Q39 · Direct user phone screenshot, 21 October · Inventory Ingredient control contrast** Check the Inventory Ingredient button on a phone in normal, focus and hover/tap states. Keep the label dark/readable against its background and verify the Add ingredient form opens. Reuse the Q38 contrast correction where it already applies; do not change stock data or other layouts.
+
+- [x] **Q40 · Direct user Explore screenshot, 21 October · Two-finger zoom** Add two-finger pinch zoom in/out inside the fixed Explore viewport, centred on the gesture midpoint. Preserve wheel, one-finger pan, zoom buttons and keyboard controls. A pinch must not open a table or move/resize saved objects, including Arrange mode.
+
+
+## Production acceptance · 0.4.7
+
+**Q37–Q38 are deployed and verified** at https://dinerdost-app.vercel.app, deployment **dpl_EX5DX3Pc5AnGEStoX9GH92YUFrEp**. Together with 0.4.6, all **12 latest requests Q27–Q38** are released. The original recipe/provider/native/package deferrals remain unchanged.
+
+The new grouped card combines current visible members, seats and guests, provides all linked bills, and preserves each physical table's QR, capacity and session. Demerge restores the individual cards. Explore retains the saved physical positions. Group billing enforces the current waiter/outlet/tenant scope; financial records are not consolidated or rewritten. Menu buttons, category selection and search have explicit readable colours; desktop/mobile controls were visually checked.
+
+All **12 affected backend cases**, the **new isolated hosted group-billing case**, **six affected local browser workflows**, **three final affected workflows**, **six production workflows** and **18 public-access checks** passed. The previous release's full 141 backend/59 browser baseline remains recorded separately. An incorrect test selector for physical Explore objects was corrected; the final group restoration check passes. Typecheck and optimized local/Vercel builds passed. No schema migration; all **28 prior invoice digests** are unchanged and KOT authority remains enabled.
+
+Evidence: [acceptance](../verification/production-047-acceptance.json), [backend](../verification/web-047-backend.log), [hosted](../verification/web-047-postgres.log), [local affected](../verification/web-047-browser-acceptance.log), [final local](../verification/web-047-browser-final.log), [live](../verification/production-047-browser.log), [public checks](../verification/production-public-047.json), [preservation](../verification/production-047-preservation.json). Latest Discord cutoff remains **21 October 2026, 4:39 am IST**; the last review found no newer client requests. Direct user requests through Q38 are included. No Discord message was sent.
+
+- [x] **Q41 · Direct user request, 21 October · Premium dotted Explore frame** Use a subtle dotted green border for the fixed Explore viewport. Preserve its rounded frame, panning, pinch/keyboard/wheel zoom, saved outlines and other app layouts.
+
+- [x] **Q42 · Direct user screenshot and clarification, 21 October · Actual-layout bounding box** The user confirmed a visible box around the actual floor layout. Keep a dotted bounding box visible in both View and Arrange, separate from the fixed viewport frame. It follows pan/zoom while its stroke stays readable; saved shapes, dimensions and placements are unchanged.
+
+
+## Production acceptance · 0.4.8
+
+All **Q39–Q42** are deployed and verified at https://dinerdost-app.vercel.app, deployment **dpl_7c2bKXkQLC2uCo3a3cDwAGgHYN6T**. All **16 latest requests Q27–Q42** are now released across 0.4.6–0.4.8. The Ingredient phone button reuses the corrected 0.4.7 contrast; its normal, hover and keyboard-focus colours and form opening passed. Pinch zoom works around the midpoint with a fixed dotted frame; the actual floor has a visible dotted bounding box in View/Arrange. Pinching does not open a table, change browser-page zoom, move/resize objects or leave an unintended selection. Existing pan, wheel, keyboard, Fit and saved-outline/rotation behavior passed.
+
+All **four affected local** and **four live browser workflows** passed, with explicit multi-touch events and phone viewport checks. The initial pinch check caught selection changing under the first finger; selection is now restored and the final assertion passes. Final typecheck and optimized local/Vercel builds passed. All **18 public-access checks** passed. No backend/schema change; all **30 prior invoice digests** are unchanged, with KOT authority retained. Physical phone acceptance is not claimed by browser touch emulation.
+
+For 0.4.7's six unique live workflows, five passed in the main run; its final separate-bill case initially reached the existing signup limit and then passed using an existing synthetic QA account and a fresh QA table. No rate limit was weakened. See the [affected live rerun](../verification/production-047-billing-rerun.log).
+
+Evidence: [acceptance](../verification/production-048-acceptance.json), [local](../verification/web-048-final-acceptance.log), [live](../verification/production-048-browser.log), [access](../verification/production-public-048.json), [preservation](../verification/production-048-preservation.json), [phone Ingredient](../verification/ingredient-phone-contrast.png), [pinch](../verification/explore-pinch-phone.png). Recipe data/blocking policy, Android/Firebase, providers, packages and remaining offline/native v2 work remain deferred. No Discord messages were sent.
+
+Final cleanup verified: zero temporary hosted test databases; downloaded production environment and temporary 0.4.6/0.4.7 QA authentication-state files removed. Synthetic QA transaction history was retained. See [cleanup evidence](../verification/production-048-cleanup.json).
+
+- [x] **Q43 · Direct user screenshots and clarification, 21 October · Outer frame is a hard clipping boundary** The user explicitly selected the **outer fixed dotted frame** as the limit. Clip all moving floor content, tables, fixtures, selection handles and the inner layout box inside that frame during wheel/drag/swipe/pinch zoom and Arrange. Preserve the fixed frame, saved floor geometry and existing navigation; do not constrain the floor's actual size to the screen.
+
+
+## Production acceptance · 0.4.9
+
+**Q43 is deployed and verified**, deployment **dpl_DNtqYSfuZreXsXiVEXcBF51ND8KN**, at https://dinerdost-app.vercel.app/app/floor-plan. The user clarified the outer fixed dotted frame as the hard boundary. A separate stationary rounded clipping layer now contains every moving floor element, including tables, fixtures, handles and the inner layout box, leaving the main dotted border visible. Actual floor geometry and saved positions are unchanged. Scrolling, panning, pinch, zoom and Arrange remain available.
+
+Two affected local browser workflows passed: four-edge clipping at 1440px and 390px in View/Arrange at normal and 400% zoom (32 placements), unchanged object geometry, and two-finger pinch regression. The first boundary test was corrected to wait for tables to load and to explicitly exercise both magnifications. Final typecheck and optimized local/Vercel builds passed. Live verification used the existing authorized in-app browser: clipping installed, dotted frame retained, all 36 sampled border points clear after zoom/scroll. The separate new synthetic signup run timed out before reaching a boundary assertion, so it is not counted as a passing live automated workflow. No authentication/rate-limit setting was changed. Three anonymous smoke checks passed.
+
+This is a UI-only change, with no backend/schema/data mutation. The prior 0.4.8 invoice hash preservation evidence remains historical; no new invoice hash audit is claimed for 0.4.9. Existing recipe/provider/native/package deferrals remain unchanged. No client table was modified and no Discord message was sent.
+
+Evidence: [acceptance](../verification/production-049-acceptance.json), [local edge/pinch checks](../verification/web-049-browser-acceptance.log), [phone frame](../verification/explore-hard-frame-390-view.png), [desktop frame](../verification/explore-hard-frame-1440-view.png).
+
+## New Discord request · 21 October 2026, 8:36 pm IST
+
+- [x] **Q44 · 8:36 pm · Larger rounded menu category buttons** Prem's screenshot shows the Cashier POS category strip (All, Beverages, Breads, Desserts, Mains, Starters and Chinese starters). Increase the category label/button size and retain a rounded box around every category, including unselected ones. Preserve the approved green selected state and category filtering; keep the strip scrollable on phones rather than shrinking labels. Scope this to the pictured POS controls; preserve customer menu and unrelated report tabs. [Source message](https://discord.com/channels/@me/1491679750610096259/1562482293409452092). Screenshot inspected in Discord's media viewer.
+
+Latest Discord cutoff: **21 October 2026, 8:36 pm IST**. One new distinct request, Q44, added for web-only implementation and acceptance. Earlier recipes/native/Firebase/provider/package deferrals remain unchanged. No Discord message was sent.
+
+
+## Production acceptance · 0.4.10
+
+**Q44 is deployed and verified** on https://dinerdost-app.vercel.app/app/pos, deployment **dpl_6jDe5iwP97zSNFeNcVLQ4Cr4jQrq**. Prem's 8:36 pm screenshot matches Cashier POS's category strip. Every category now has a rounded box, larger 16px label and at least 48px touch target; the active category retains the approved dark green. The strip remains horizontally scrollable on phones. Changes are scoped to the pictured POS controls; customer menu and unrelated tab styling remain unchanged. Category selection is exposed accessibly to keyboard/screen-reader users.
+
+One affected local browser workflow and the same production workflow passed at **1440px and 390px**: box size, readable contrast, untruncated labels, horizontal reachability, keyboard focus/activation, category filtering, search and unchanged cart contents. The test uses an isolated synthetic workspace and an unsent cart; it creates no order, payment or invoice. Read-only inspection of the existing client's live POS confirmed the requested design. Typecheck and optimized local/Vercel builds passed, along with three anonymous smoke checks. Temporary QA authentication state was removed. No backend/schema change or client-record mutation. Earlier financial-preservation checks remain historical; no new invoice hash audit or physical-phone acceptance is claimed for this UI-only release.
+
+Latest Discord cutoff: **21 October 2026, 8:36 pm IST**. Recipe data/policy, Android/Firebase, providers and package setup remain deferred. No Discord message was sent.
+
+Evidence: [acceptance](../verification/production-0410-acceptance.json), [local](../verification/web-0410-categories.log), [production](../verification/production-0410-categories.log), [desktop strip](../verification/pos-category-strip-1440.png), [phone](../verification/pos-category-boxes-390.png).
+
+## New Discord requests · 21 October 2026, 9:26–9:28 pm IST
+
+- [x] **Q45 · 9:26 pm · Daily physical opening/closing counts and stock variance** Add manual daily opening and closing stock entry in Inventory and compare counted stock with recorded receipts, waste and actual recipe consumption. Produce a dated variance report for review; a discrepancy is not proof of theft. Preserve ledger quantities/costs and historical documents. Use only configured client recipes; retain missing-recipe warnings and the earlier recipe-data deferral. [Source](https://discord.com/channels/@me/1491679750610096259/1562494888954822697). User confirmed: allow staff/customer ordering with a staff reminder; no blocking gate.
+- [x] **Q46 · 9:28 pm · Mark as served from Service** Prem's screenshot shows Service → Ready to serve. Add the action in that list beside View order, using the existing audited round-serving workflow. Preserve outlet/tenant/waiter permissions and the rule that every station in the round must be ready before serving. Refresh the list without visiting order details. [Source](https://discord.com/channels/@me/1491679750610096259/1562495197785358447). Screenshot inspected in Discord's media viewer.
+
+Latest Discord cutoff: **21 October 2026, 9:28 pm IST**. Two new distinct web requests recorded. The user clarified Q45: **allow ordering with a reminder**, including customer QR orders; do not add an order-blocking gate. Physical count/report entry and Service-list serving are deployed and verified in 0.4.11. Native/Firebase/provider/package setup remains deferred. No Discord message was sent.
+
+
+## Production acceptance · 0.4.11
+
+**Q45–Q46 are deployed and verified**, deployment **dpl_5B7iadJMK1fH5YRAEExCDNrnCjx1**. Inventory → **Daily counts** records physical opening/closing quantities, including zero. Reports → **Stock variance** provides dated/searchable results and a full matching CSV export. Expected closing uses frozen opening/closing movement snapshots for receipts, actual configured-recipe consumption and waste. Later movements/recipe edits do not rewrite a closed report. Corrections append an audited version and keep the original movement window; opening is locked after closing. Past days are read-only. Counts do not alter stock balances, costs, reservations or financial documents. Missing recipe data is flagged, not invented; a variance is a review signal, not proof of theft.
+
+As directly clarified by the user, **missing opening counts never block staff or customer QR ordering**. Staff receive a compact POS reminder linking directly to Daily counts. **Service → Ready to serve** now includes **Mark as served** beside View order. It uses the existing audited round workflow, enforces all-station readiness and tenant/outlet/waiter access, refreshes the list and leaves order/payment values unchanged.
+
+Verification: **151 full backend cases**, **10 final targeted cases** including explicit nonblocking QR submission, **9 isolated hosted PostgreSQL cases**, **2 local and 2 production desktop/phone browser workflows**, typecheck and optimized local/Vercel builds, plus **6 anonymous access checks**. Migration **040** adds only the append-only observation table/index/policy/grants/trigger. All **30 prior invoice snapshots, 40 recorded item costs and 15 stock movements** matched before/after migration; tenant RLS and the existing KOT authority gate were verified. Isolated PostgreSQL test databases were removed. Live workflows used one synthetic QA workspace; client records were inspected read-only. Temporary QA authentication and the downloaded environment file were removed. No physical-phone acceptance is claimed.
+
+Latest Discord cutoff: **21 October 2026, 9:28 pm IST**. No newer messages were present at the final review, and no Discord message was sent. Client recipe data and the earlier missing-recipe blocking decision, Android/Firebase, external providers and package configuration remain deferred.
+
+Evidence: [acceptance](../verification/production-0411-acceptance.json), [full backend](../verification/web-0411-backend-full.log), [final targeted](../verification/web-0411-stock-counts-final.log), [PostgreSQL](../verification/hosted-0411-stock-counts.log), [local browser](../verification/web-0411-browser-final.log), [production browser](../verification/production-0411-browser.log), [migration](../verification/production-migration-0411.json), [daily counts](../verification/daily-counts-desktop.png), [Service phone](../verification/service-inline-served-phone.png).
+
+
+## New Discord request · 22 October 2026, 5:01 am IST
+
+- [x] **Q47 · Clear table from Table billing** Prem’s screenshot shows a settled, served bill while the table remains occupied. Add a Clear table button to the pictured Table billing toolbar, returning the table to Available for new customers. Keep outstanding-order, staff ownership, outlet and tenant guards; clear merged members atomically and reject stale visit confirmations. Preserve bill/payment/stock history. [Source](https://discord.com/channels/@me/1491679750610096259/1562609181746405386). Screenshot inspected in Discord’s media viewer. Deployed and verified in 0.4.12.
+
+Latest Discord cutoff: **22 October 2026, 5:01 am IST**. No Discord message sent. Existing deferrals remain unchanged.
+
+
+## Additional Discord requests · 22 October 2026, 5:02–5:07 am IST
+
+- [x] **Q48 · 5:02 am · Close Stock alerts panel** Add an accessible close icon in the top-right of the pictured Stock alerts panel. Dismiss the current view without changing stock conditions or deleting warnings. [Source](https://discord.com/channels/@me/1491679750610096259/1562609552392855672).
+- [x] **Q49 · 5:03 am · Close individual Overview alerts** Add a close action at the end of each pictured Overview alert row; dismiss the current view while preserving underlying notifications, audit records and payment state. [Source](https://discord.com/channels/@me/1491679750610096259/1562609762884001812).
+- [x] **Q50 · 5:04 am · Dine-in and takeaway counts** Add separate numeric order counts beside Overview’s existing Orders today metric, with the same India business-day/outlet/access scope. Count orders rather than rounds; preserve settled-sales calculations. [Source](https://discord.com/channels/@me/1491679750610096259/1562610159841316924).
+- [x] **Q51 · 5:07 am · One-click whole-group demerge** The pictured Tables → Demerge tables action should separate every member into individual tables immediately, without a selection/reason popup. Preserve each visit, order, payment, QR identity, ownership and access; reject stale group snapshots and apply the unlink atomically. Retain the legacy individual demerge API for other clients. [Source](https://discord.com/channels/@me/1491679750610096259/1562610804572950600).
+
+All four screenshots inspected in Discord’s media viewer. Latest cutoff: **22 October 2026, 5:07 am IST**. Q47–Q51 are deployed and verified in 0.4.12. No Discord message sent.
+
+
+## Production acceptance · 0.4.12
+
+**Q47–Q51 are deployed and verified**, deployment **dpl_7xXWPmHHZuHWx41srzikGaRYCnEh**. **Table billing → Clear table** closes the current visit after every bill is settled/rejected/voided and returns to Tables with Available status. Merged members clear in one transaction. A cancelled dialog does nothing; stale visit/group confirmations cannot clear a later customer’s visit. Existing owner/manager/staff ownership, tenant and outlet guards remain. Bills, payments, cost snapshots and stock history are retained.
+
+**Stock alerts** has a close icon at its top-right. **Overview Alerts** has an individual close control at each row’s end. These dismiss the current view; reload restores the display, and changed stock conditions resurface. They never delete notifications/audit rows, alter stock or mark payments received. **Dine-in orders today** and **Takeaway orders today** use the same outlet and India-day scope as Orders today, count each order once and leave settled sales unchanged.
+
+**Tables → Demerge tables** now immediately separates every member without a popup. Unlinking is atomic and audited, enforces ownership over every visit and rejects changed group snapshots. Each visit/order/bill/QR identity remains on its original table. The earlier individual demerge API remains available to its existing callers.
+
+Verification: **159 full backend cases**, **11 targeted backend cases**, **7 hosted PostgreSQL cases in two disposable databases**, **3 local and 3 production browser workflows** at 1440px/390px, typecheck, optimized local/Vercel builds and **6 anonymous access checks**. QA used two isolated synthetic production workspaces; no client records changed. No schema/data migration was needed. Temporary environment/authentication files and isolated hosted databases were removed. No physical-phone acceptance or new production financial-hash audit is claimed.
+
+Latest Discord cutoff: **22 October 2026, 5:07 am IST**. All five source screenshots were inspected. No Discord message was sent. Existing client-recipe, native/Firebase, provider and package deferrals remain.
+
+Evidence: [acceptance](../verification/production-0412-acceptance.json), [full backend](../verification/web-0412-backend-full-final.log), [targeted](../verification/web-0412-new-backend.log), [hosted clear](../verification/hosted-0412-clear-table.log), [hosted demerge/counts](../verification/hosted-0412-new-requests.log), [local browser](../verification/web-0412-browser-final.log), [production browser](../verification/production-0412-browser.log), [Overview](../verification/overview-updates-1440.png), [Clear table](../verification/clear-table-settled-1440.png).
+
+
+## New Discord request · 22 October 2026, 5:17 am IST
+
+- [x] **Q52 · Rounded Orders counters** Add top rounded numeric boxes for Active, Accepted, Pending, Cancelled, Rejected, Settled, Reallocated and All orders, with usable filtering and phone layout. [Source](https://discord.com/channels/@me/1491679750610096259/1562613341644394506). Screenshot inspected. Latest user clarification: **Reallocated means cooked-food reallocation from unpaid orders only**; count each source order once. Table moves do not count. Use complete authorized outlet counts while retaining the latest-200 list boundary. Preserve existing financial records and staff scope. In progress.
+
+Latest Discord review: **22 October 2026, 5:17 am IST**. The intervening 5:15 am messages from nihh are status/pings, not client web requirements. Q47–Q51 are released in 0.4.12; Q52 is the next web update. No message sent by this agent.
+
+
+## New billing, stock and customer batch · 22 October 2026, 5:28–5:39 am IST
+
+- [x] **Q53 · Order action controls and selected-step completion** Add Reallocate and Cancel between Review rewards and Receive cash, and Clear all actions before KOT. User confirmed this performs **selected eligible steps together**, retaining every step’s permission, payment, readiness and version checks. [Source](https://discord.com/channels/@me/1491679750610096259/1562616017824260128).
+- [x] **Q54 · Separate Settle and Invoice** Split the web actions: settle using existing immutable final-settlement rules; open/print the issued invoice separately. Preserve historical financial documents. [Source](https://discord.com/channels/@me/1491679750610096259/1562616017824260128).
+- [x] **Q55 · Remove provisional-bill creation option** Remove provisional-bill creation options throughout the web interface; retain stored historical documents and deferred native compatibility. [Source](https://discord.com/channels/@me/1491679750610096259/1562616017824260128).
+- [x] **Q56 · Prepared-food reallocation / Ready to serve** Prepared food from cancelled orders becomes available at the top of the menu with a Ready to serve tag. **User’s latest clarification supersedes table-move meaning: use prepared-food reallocation only, for unpaid orders only for now.** Keep ingredient consumption and recorded item costs; do not consume raw ingredients twice when the prepared food is ordered again. Require actual staff food-availability/use-by input; do not invent quantities or safe holding times. [Source](https://discord.com/channels/@me/1491679750610096259/1562616508683784338). Q52’s Reallocated count/filter must now represent this workflow.
+- [x] **Q57 · Customer total visits on order details** Add the actual recorded settled-visit count beside the pictured customer profile, on its right. [Source](https://discord.com/channels/@me/1491679750610096259/1562616800754016347).
+- [x] **Q58 · Automatic expired-stock wastage** Move expired remaining ingredients to audited waste automatically, retaining prior ledger/cost/document history and safely handling held reservations. Do not backdate financial documents. [Source](https://discord.com/channels/@me/1491679750610096259/1562618129115389992).
+- [x] **Q59 · Daily counts directly below Inventory metrics** Present daily counts in the pictured Inventory style directly below Stock value and Ingredients, preserving existing count/correction/report behavior. [Source](https://discord.com/channels/@me/1491679750610096259/1562618129115389992).
+- [x] **Q60 · Customer visits sort and name/phone search** Default Customers to most settled visits first and add name/phone search without exposing extra phone data or cross-outlet/customer information. [Source](https://discord.com/channels/@me/1491679750610096259/1562618614253748276); edited at 5:39 am.
+
+All relevant screenshots inspected in Discord media viewer. Latest review: **22 October 2026, 5:39 am IST**. Q47–Q51 remain verified/live in 0.4.12. The table-movement version of Q52 (0.4.13) was built/deployed but superseded by the user’s prepared-food clarification before acceptance; production was restored to verified 0.4.12 while Q52–Q60 are completed. No client record changed and no message was sent by the agent.
+- [x] **Q61 · Useful report charts** Add bar comparisons, sales trend lines, bill-value distribution histograms and payment-share pie charts where the recorded web report data supports them. Keep source tables, filters and access controls; no illustrative figures. [Source](https://discord.com/channels/@me/1491679750610096259/1562619590029086783), **22 October 2026, 5:42 am IST**. Native ecosystem remains deferred under the user's web-only instruction.
+
+## New client batch · 22 October 2026, 5:57–6:16 am IST
+
+- [x] **Q62 · Persistent stock/Overview dismissal** Closing the pictured stock panel or Overview alerts must survive navigation/reload/sign-in on the same account; retain source records and surface genuinely changed stock conditions. Supersedes Q48/Q49's current-view-only dismissal. [Source](https://discord.com/channels/@me/1491679750610096259/1562623329905676470), 5:57 am. Screenshot inspected.
+- [x] **Q63 · Three horizontal table-card icons** Replace Details, Separate bill and Table QR text buttons with three clear horizontal icons, with accessible labels/tooltips and the same actions/permissions. [Source](https://discord.com/channels/@me/1491679750610096259/1562623758911672330), 5:58 am; [placement clarification](https://discord.com/channels/@me/1491679750610096259/1562624389504176139), 6:01 am. Both screenshots inspected; one deduplicated requirement.
+- [x] **Q64 · Floor-area contrast** Slightly distinguish the actual floor shape from the surrounding mapping area, retaining the approved green UI, dotted borders, clipping and gestures. [Source](https://discord.com/channels/@me/1491679750610096259/1562624553560047826), 6:02 am. Screenshot inspected.
+- [x] **Q65 · Outlet kitchen-stage switch** Configure whether an outlet uses Released → Preparing → Ready kitchen KOT stages or proceeds without them. Snapshot the policy for new rounds, preserve existing orders, stock/payment rules and permissions. **Released 0.4.23:** owner/manager switch affects only new web rounds; explicit Mark served remains required. Migration 047 leaves old/native round policies unchanged. Confirmed answer and scope recorded in [decision notes](PENDING_QUESTIONS.md). [Source](https://discord.com/channels/@me/1491679750610096259/1562625059359690754), 6:04 am, edited.
+- [x] **Q66 · Service count boxes** Rounded numeric boxes above Service: Total services, Table requests, Serve requests, Completed services and Awaiting services. Use complete authorized counts and avoid double-counting multi-station rounds. **Released 0.4.22:** answered round-deduplicated counts, active unresolved requests and completed day/shift totals; waiter coordination and assignment scope verified in 0.4.23. [Source](https://discord.com/channels/@me/1491679750610096259/1562626147227934870), 6:08 am. Screenshot inspected.
+- [x] **Q67 · Bulk kitchen forwarding** Forward all or selected eligible Released tickets to Preparing and Preparing tickets to Ready, preserving station/outlet/tenant permissions, state checks and audit history. [Source](https://discord.com/channels/@me/1491679750610096259/1562628203065901156), 6:16 am. Screenshot inspected.
+
+Latest Discord review: **22 October 2026, 6:16 am IST**. No client messages were sent. Q52–Q61 passed 172 local backend cases, 4 local browser workflows and the hosted verification batch; release remains in preparation while this newly captured batch is completed. Native/provider/package and missing client recipe/policy deferrals remain.
+
+## New client batch · 22 October 2026, 6:32–6:43 am IST
+
+- [x] **Q68 · Named charge lines in bill summary** Replace the generic Other charges aggregate with the actual recorded charge names and amounts, combining identical names across eligible rounds without changing totals or historical snapshots. Keep a fallback for any legacy amount without recorded names. [Source](https://discord.com/channels/@me/1491679750610096259/1562632116775157790), 6:32 am. Bill-summary screenshot inspected.
+- [x] **Q69 · Kitchen All view** Add All beside Food/Bar to show both streams already authorized for the account; retain kitchen/bartender stream isolation and existing transitions. [Source](https://discord.com/channels/@me/1491679750610096259/1562632467477962833), 6:33 am. Kitchen screenshot inspected.
+- [x] **Q70 · Floor camera lock** Add an accessible lock icon beside the zoom percentage to freeze the current map scale and position until unlocked. Cover zoom/Fit, wheel, pan, keyboard and two-finger gestures; preserve layout editing and fixed clipping boundaries. Reset the view lock when changing floors so another floor remains navigable. [Source](https://discord.com/channels/@me/1491679750610096259/1562634894453112962), 6:43 am, edited. Explore screenshot inspected.
+
+Latest Discord cutoff: **22 October 2026, 6:43 am IST**. Three new unambiguous web requests recorded, with all three screenshots inspected. Q65/Q66 remain awaiting later answers in [PENDING_QUESTIONS.md](PENDING_QUESTIONS.md). Release acceptance remains pending. No Discord message was sent.
+
+## Requests received during release · 22 October 2026, 6:52–6:59 am IST
+
+- [x] **Q71 · Piece menu unit** Add piece to the menu unit selector beside portion/kg/L. Treat piece as a whole-count selling unit, retain the entered unit in new item snapshots/receipts, and preserve existing menu/order units and recipe quantities. [Source](https://discord.com/channels/@me/1491679750610096259/1562637303275462676), 6:52 am. Unit-selector screenshot inspected.
+- [x] **Q72 · Ready notification opens Service** Clicking an Order ready notification should refresh current readiness and open the authorized Service ready-to-serve section for marking the round served, retaining ordinary all-station readiness and staff ownership guards. Keep the served action fully inside the phone table panel. Do not auto-serve on notification click. [Source](https://discord.com/channels/@me/1491679750610096259/1562639002937327626), 6:59 am. Notification screenshot inspected. Browser verification found and fixed the stale-workspace case instead of relying on the next poll.
+
+Latest Discord cutoff: **22 October 2026, 6:59 am IST**. Two further requests captured while the reviewed Q52–Q64/Q67–Q70 release was building. These are a separate follow-up batch and do not inherit its acceptance. Q65/Q66 remain awaiting answers. No Discord message sent.
+
+
+## Production acceptance · 0.4.14
+
+**17 confirmed requests Q52–Q64 and Q67–Q70 are deployed and verified**, deployment **dpl_5MxXJatU4sKDxpbfMHU6Q3ouc8Z6**, at https://dinerdost-app.vercel.app. **Q65/Q66 remain unchecked pending the user's later answers in [PENDING_QUESTIONS.md](PENDING_QUESTIONS.md).** 17 confirmed requests Q52–Q64 and Q67–Q70: prepared-food reallocation, order counts/actions, separate settlement/invoice, visits/search, stock expiry/daily counts/charts, persistent alert dismissal, table icons/floor contrast, bulk kitchen forwarding, named charges, authorized Kitchen All view and floor camera lock. Q65/Q66 await answers.
+
+Reallocated counts unique source orders with an audited cooked-food transfer; table moves do not count. Counts cover all authorized outlet orders while the list retains its latest-200 boundary. Reallocation is manager-authorized, version-checked and limited to wholly unpaid orders without unresolved payments/final invoices, with all stations ready and no served food. Original ingredient movements and recorded item costs remain; resale consumes prepared stock and its proportional cost without a second raw-ingredient deduction. Staff supplies the use-by deadline, which cannot extend an existing deadline. Cancellation during preparation records cooked waste without raw-stock restoration.
+
+Clear all actions performs only selected eligible steps through ordinary checks, refreshing state between steps and stopping on failure with completed steps shown. Cash selection explicitly confirms the displayed receipt amount. Settlement stays on the order page; Invoice opens the issued document separately. Historical provisional documents remain viewable/printable without creating a new document. Bill summaries display saved charge names/amounts, with a legacy fallback; no historical financial value is rewritten.
+
+Expired raw/prepared stock moves to audited current-time waste through scoped workspace/stock polling and menu/order requests. Held reservations are invalidated while their cached ingredient needs remain. This is event-driven expiry, not an always-running background worker. Daily counts sit below Inventory metrics; visits/search use actual settled outlet orders with masked list phones. The four report charts use real issued-invoice/received-payment data and existing report permissions/date filters.
+
+Stock/Overview dismissals persist per employee/outlet across reload, navigation and sign-in, retaining source records; a changed stock episode resurfaces. Table cards retain their original actions as horizontal accessible icons. Floor fill has a slight approved-green contrast. The camera lock freezes zoom/Fit/wheel/pan/keyboard/touch movement until unlocked; actual floor editing and fixed dotted clipping boundaries remain. Kitchen All combines only authorized Food/Bar tickets; restricted roles remain isolated. Bulk selected/all forwarding uses batches of up to 20, sorted locks and ordinary audited transitions; a stale selection rolls back its entire batch and the UI reports completed batches on failure.
+
+Verification: **180 full backend cases**, **44 hosted PostgreSQL cases across five disposable databases**, **7 local browser workflows** and **4 production browser workflows** covering desktop/390px layouts. Typecheck, optimized local/Vercel builds and **8 anonymous access checks** passed. Additive migrations **041/042** preserved all prior invoice snapshots, item costs and stock movements; tenant RLS, append-only grants and KOT authority were verified. No unanswered kitchen-policy migration was applied. Production browser tests used four synthetic workspaces. Temporary environment/auth files and hosted databases were removed.
+
+Latest Discord cutoff: **22 October 2026, 6:43 am IST**. All relevant screenshots inspected, no Discord messages sent. Checks continue every **15 minutes**; unresolved questions remain in the linked notes. The superseded 0.4.13 table-move counter build was never accepted; this release replaces verified 0.4.12. Original Q11 client recipes/policy and native/Firebase/provider/package work remain deferred.
+
+Evidence: [acceptance](../verification/production-0414-acceptance.json), [backend](../verification/web-0414-backend-latest.log), [latest hosted checks](../verification/hosted-0414-latest-batch.log), [local browser](../verification/web-0414-browser-confirmed.log), [production workflow](../verification/production-0414-latest-browser.log), [migration preservation](../verification/production-migration-0414.json).
+
+
+## Production acceptance · 0.4.15
+
+**Q71/Q72 are deployed and verified**, deployment **dpl_BM5YaZhcYMoTgxbQ5xRTK3oHtGWf**, at https://dinerdost-app.vercel.app. The Menu Sell by selector now includes **piece**, with whole-count inputs and server validation in staff/customer ordering. New order lines preserve the chosen unit, price and recipe usage. Existing menu units, weighted order snapshots, invoices, item costs and stock movements were preserved during migration **043_menu_piece_unit.sql**.
+
+Web staff with Service/order access now open **Service → Ready to serve** from an Order ready notification. Clicking it marks the notification read, refreshes current workspace readiness, and navigates; it does not serve food or record payment. This prevents a newly ready ticket from being absent until the next poll. Staff still explicitly selects Mark as served, with all-station readiness, waiter ownership, role/outlet/tenant checks intact. The ready-to-serve table wraps only within its phone layout so that action remains fully inside its panel. Kitchen-only roles and native application destinations remain unchanged.
+
+Verification: **184 full backend cases**, **4 hosted PostgreSQL cases in one disposable database**, **one local and one production browser workflow**, each covering **1440px and 390px**. The browser verifies actual Menu editing, POS whole-count input, fractional API rejection, notification navigation, explicit serving and unchanged payment/totals. Typecheck, optimized local/Vercel builds and **5 anonymous access checks** passed. Migration preservation includes all prior menu/order units and immutable financial/stock history. Temporary environment/auth files and the test database were removed. Production tests used one synthetic workspace.
+
+All confirmed web requests through **Q72 / 22 October 2026, 6:59 am IST** are released. **Q65/Q66 remain unchecked pending the user's later answers** in [PENDING_QUESTIONS.md](PENDING_QUESTIONS.md). Checks continue every 15 minutes. No Discord messages sent; client recipe, native/Firebase, provider, package and full offline/native v2 dependencies remain deferred.
+
+Evidence: [acceptance](../verification/production-0415-acceptance.json), [backend](../verification/web-0415-backend.log), [hosted database](../verification/hosted-0415-piece-service.log), [local browser](../verification/web-0415-browser-accepted.log), [production browser](../verification/production-0415-browser.log), [migration preservation](../verification/production-migration-0415.json).
+
+## New client batch · 22 October 2026, 7:14–7:23 am IST
+
+- [x] **Q73 · Clear all kitchen interactions** Extend Clear all actions to kitchen interactions. This changes the earlier selected-eligible-step instruction and overlaps Q65; save the exact stage/physical-confirmation/role question in [pending notes](PENDING_QUESTIONS.md#q73--what-clear-all-actions-should-do-to-kitchen-stages). **Released 0.4.23:** selected authorized stages may complete only after explicit confirmation that food is actually prepared and served; existing kitchen/service permissions remain required. [Source](https://discord.com/channels/@me/1491679750610096259/1562642850548818023), 7:14 am. Round/action screenshot inspected.
+- [x] **Q74 · Configurable loyalty claim cap** Add a claim-loyalty choice with a default ₹50 upper limit and smaller eligible claims; cap control requested as “set by us.” **Answered 9:31 am:** default cap is per order/final bill; Diner Dost platform admins configure it. Implementation and actual platform-admin setup remain pending. Confirmed decision in [pending notes](PENDING_QUESTIONS.md#q74--loyalty-claim-limit-and-who-controls-it). Preserve actual balances, normal redemption rules and historical values. Same 7:14 am [source](https://discord.com/channels/@me/1491679750610096259/1562642850548818023); distinct requirement.
+- [x] **Q75 · Clear table beside Invoice** Add the existing guarded Clear table action beside Invoice in order details; clearing makes the current visit available for new customers and preserves bills. Reuse the settled-all-bills, merged-group, ownership and stale-visit safeguards. An old order must never clear a later visit. Avoid duplicate controls when order details is embedded in Table billing. [Source](https://discord.com/channels/@me/1491679750610096259/1562643467585331310), 7:17 am. Toolbar screenshot inspected.
+- [x] **Q76 · Future bill-adjustment defaults** Persist the pictured adjustment setting for future transactions. Screenshot shows Discount (₹) and Round down to ₹1. **Answered 9:31 am:** save only outlet-wide Round down to ₹1 for future transactions, controlled by owner/manager; no discount default. Pending implementation. Confirmed decision in [pending notes](PENDING_QUESTIONS.md#q76--which-bill-adjustment-settings-become-future-defaults). Do not guess a recurring discount or rewrite existing adjustments. [Source](https://discord.com/channels/@me/1491679750610096259/1562644147716751440), 7:19 am. Full adjustment dialog inspected.
+- [x] **Q77 · Prominent order table label** Display the real table label prominently below Order details, retaining historical order/receipt data and correct takeaway behavior. [Source](https://discord.com/channels/@me/1491679750610096259/1562644449413308466), 7:21 am. Heading-placement screenshot inspected.
+- [x] **Q78 · Fixture contrast** Increase contrast of mapped fixtures such as Reception and Entry against the floor background while retaining the approved green palette, dotted borders, geometry and interaction. This is fixture contrast, distinct from Q64's floor-area fill. [Source](https://discord.com/channels/@me/1491679750610096259/1562644943531417710), 7:23 am. Fixture screenshot inspected.
+
+Latest Discord cutoff: **22 October 2026, 7:23 am IST**. Five new messages yield six distinct requirements Q73–Q78. All five relevant screenshots inspected. Q73/Q74/Q76 join Q65/Q66 in the notes for later answers; Q75/Q77/Q78 continue as confirmed web changes. No Discord message sent.
+
+## Follow-up batch · 22 October 2026, 7:28–7:45 am IST
+
+- [x] **Q79 · Visible round cancellation/reallocation controls** Place Cancel and Reallocate between Review rewards and Clear all actions. The screenshot shows a paid/preparing round: retain the user's **unpaid-only** reallocation instruction, existing cancellation/refund restrictions and eligibility checks; show unavailable controls with the reason rather than silently hiding them. This does not authorize paid-food reallocation/refunds. [Source](https://discord.com/channels/@me/1491679750610096259/1562646386464391238), 7:28 am. Screenshot inspected.
+- [x] **Q80 · Separate Orders counters and filter tabs** Keep the original table/filter-tab structure and add the count boxes above it in a contrasting dark-green rounded row. Preserve all requested real counters, authorized results, filtering and the latest-200 list; allow horizontal scrolling on narrow screens. [Source](https://discord.com/channels/@me/1491679750610096259/1562647344594423898), 7:32 am. Both before/after screenshots inspected.
+- [x] **Q81 · Explore dot-grid background** Add the reference's subtle evenly spaced mapping dots; preserve all other floor geometry, fixtures, gestures, clipping, bounds, locks and approved colours. [Source](https://discord.com/channels/@me/1491679750610096259/1562648408928550953), 7:36 am. Screenshot inspected.
+- [x] **Q82 · Persistent calculator dock** Add a contrasting minimized calculator at the extreme right; expansion extends left. Keep it open across navigation until explicitly minimized. Allow a note on each calculation and durable per-account history until explicitly deleted. Preserve tenant/account isolation; use safe arithmetic parsing. [Source](https://discord.com/channels/@me/1491679750610096259/1562649287140311080), 7:40 am, edited 7:41 am. Screenshot inspected (Orders placement reference).
+- [x] **Q83 · Active-orders dock** Add a minimized Active orders panel at the bottom right. Its expanded list shows actual table number, preparation stage, amount payable and links to the corresponding orders; clicking outside minimizes this panel. Retain ordinary role/outlet/tenant visibility and actual current amounts. [Source](https://discord.com/channels/@me/1491679750610096259/1562650552557371414), 7:45 am. Screenshot inspected (Orders placement reference).
+
+Latest reviewed source cutoff: **22 October 2026, 7:45 am IST**. Five follow-up messages and all six screenshots inspected. Q79–Q83 are a separate pending web batch; 0.4.16 remains limited to Q75/Q77/Q78. Q65/Q66/Q73/Q74/Q76 still await answers. No Discord message sent.
+
+
+## Production acceptance · 0.4.16
+
+**Q75/Q77/Q78 are deployed and verified**, deployment **dpl_5xLxNYnsM6uQMsFFLjMN6kT2FVLp**, at https://dinerdost-app.vercel.app. **Clear table** now appears immediately beside Invoice in order details and uses the same server command and confirmation as Table billing. Embedded order details show one clearing control; empty visits retain the toolbar control. Every current bill must be settled/rejected/voided. The complete merged group, session ownership, role/outlet/tenant scope and exact visit snapshot are checked. A historical order never offers clearing for a later visit, and stale confirmations still fail. The action releases the visit for new customers while retaining its bills and financial history.
+
+The actual table label appears prominently below Order details. It is read through the already-authorized order's session/table relationship, including closed historical visits; takeaways without a table show no invented number. Invoice snapshots remain unchanged. Mapped fixtures now have a slightly darker green fill, outline and text against the floor; saved positions, sizes, floor/table colours, dotted bounds, pan/pinch/zoom/lock and Arrange behavior are retained.
+
+Verification: **185 full backend cases**, **11 hosted PostgreSQL cases in one disposable database**, **3 local browser workflows** and **one production workflow** at **1440px and 390px**. Coverage includes unpaid sibling-bill blocking, merged clearing, cancellation, stale/new-visit protection, concurrent entry, role/outlet/tenant/ownership, preserved order/invoice/payment/stock data, correct heading placement, no duplicate embedded control and unchanged saved floor geometry. Typecheck, optimized local/Vercel builds and **5 anonymous access checks** passed. **No schema migration** was needed; the KOT authority gate remains enabled and no temporary hosted databases remain. Production checks used one synthetic tenant, provisioned by the existing signup service and signed into through the normal UI; public authentication/rate limits were unchanged. Temporary fixture/auth/environment files were removed.
+
+Latest source cutoff: **22 October 2026, 7:23 am IST**. Five messages and all five screenshots yielded six distinct requests Q73–Q78. **Q73 kitchen completion, Q74 loyalty-cap scope/authority and Q76 future bill-adjustment defaults remain awaiting later answers**, alongside Q65/Q66, in [PENDING_QUESTIONS.md](PENDING_QUESTIONS.md). No financial policy or kitchen-state bypass was guessed. Checks continue every 15 minutes; no Discord message was sent. Client recipe/native/Firebase/provider/package/offline-v2 deferrals remain.
+
+Evidence: [acceptance](../verification/production-0416-acceptance.json), [backend](../verification/web-0416-backend.log), [hosted checks](../verification/hosted-0416-clear-table.log), [local browser](../verification/web-0416-browser.log), [production browser](../verification/production-0416-browser.log), [schema](../verification/production-schema-0416.json).
+
+
+## Production acceptance · 0.4.17
+
+**Q79–Q83 are deployed and verified**, deployment **dpl_DeFdwVBUvF2kZ1YdNGP6KuUNpev2**, at https://dinerdost-app.vercel.app. Cancel/Reallocate now remain visible to managers between Review rewards and Clear all actions on an active accepted round. Paid orders show the unpaid-only eligibility reason; existing financial/cancellation/refund guards and actual-preparation requirements are unchanged. No paid-food reallocation was authorized or introduced.
+
+Orders retains its compact filter tabs and table, with a separate dark-green rounded row of the eight actual counters above it. The row scrolls on phones; counts and filtering remain scoped. Explore has a subtle dot-grid floor fill, retaining geometry, fixture colours, dotted clipping boundaries, pan/pinch/zoom and lock behavior.
+
+The web workspace has a right-side Calculator that stays open across navigation/reload until explicitly minimized. Its bounded arithmetic grammar never evaluates code; results are recomputed on the server. Calculations, optional notes, later note edits and explicit deletions use durable history scoped to the current employee/tenant, with pagination and no automatic expiry. Invalid arithmetic is not saved. The separate bottom-right Active orders panel shows authorized current table/type, actual kitchen stages and outstanding amounts, links to the actual order and minimizes on outside click. It polls while open and pages through active orders independently of the latest-200 workspace list; kitchen/accountant/native roles gain no order-page access.
+
+Verification: **192 full backend tests**, **7 final targeted tests**, **7 hosted PostgreSQL cases in one disposable database**, **four local and one production browser workflows** at **1440px and 390px**. Checks cover account/tenant/outlet/waiter isolation, durable history/notes/deletion, safe arithmetic/idempotency, pagination, round-control visibility without paid mutation, counter filtering/contrast, outside-click/navigation behavior and unchanged saved floor geometry. Typecheck, optimized local/Vercel builds and **6 anonymous/CSRF checks** passed. Additive migration **044_calculator_history.sql** preserves all prior issued invoice snapshots, item costs and raw/prepared stock movements; forced RLS and the KOT authority gate remain. Production tests used one synthetic tenant with normal sign-in. Temporary fixture/auth/environment files and the hosted test database were removed.
+
+All confirmed web requests through **Q83 / 22 October 2026, 7:45 am IST** are released. **Q65/Q66/Q73/Q74/Q76 remain awaiting later answers** in [PENDING_QUESTIONS.md](PENDING_QUESTIONS.md). Client recipe/native/Firebase/provider/package/offline-v2 deferrals remain. Checks continue every 15 minutes; no Discord messages were sent.
+
+Evidence: [acceptance](../verification/production-0417-acceptance.json), [backend](../verification/web-0417-backend.log), [hosted](../verification/hosted-0417-tools-final.log), [local browser](../verification/web-0417-browser-final.log), [production browser](../verification/production-0417-browser.log), [migration preservation](../verification/production-migration-0417.json).
+
+## Petpooja additions checkpoint · 0.4.18
+
+First comparison additions are released: ingredient planning (PP05), saved order ingredient usage/cost inspection (PP18), and partial expiry/export tools (PP23/PP20). See [the additions log](PETPOOJA_ADDITIONS.md) for routes, tests and remaining work: **2 complete, 2 partial, 23 pending**. Q-series status and its five unanswered questions remain separate.
+
+**Discord access checkpoint:** The authorized conversation now requests “Please log in again.” User sign-in requested; messages newer than 22 October, 7:45 am IST remain unverified. Local authorized comparison work continues; the source cutoff has not been advanced.
+
+## New visual feedback · 22 October 2026, 8:33–8:35 am IST
+
+Sign-in restored in the user's existing Discord tab. The exact authorized Diner Dost conversation was reviewed through 8:35 am; all three screenshots inspected. The earlier login checkpoint is superseded.
+
+- [x] **Q84 · Prepared-food timer input** Remove the calendar/date from the reallocation use-by field and provide a modern timer. The screenshot identifies the prepared-food expiry entry. **Released 0.4.21:** Hours:Minutes countdown stores an exact deadline; zero duration and extensions are rejected. [Source](https://discord.com/channels/@me/1491679750610096259/1562662555300921355), 8:33 am. See [pending notes](PENDING_QUESTIONS.md#q84--prepared-food-timer-meaning).
+- [x] **Q85 · Ready-to-serve text contrast** Correct the faint Ready to serve badge/text on selected customer menu cards. Retain quantities, prices, expiry and add/remove behavior. [Source](https://discord.com/channels/@me/1491679750610096259/1562662823337795614), 8:34 am. Screenshot inspected.
+- [x] **Q86 · Floor-background tint at 25%** Reduce only the mapped floor's green background tint to 25%; retain readable dots, tables, fixture contrast, strokes/bounds, geometry and all gestures. [Source](https://discord.com/channels/@me/1491679750610096259/1562663282668609576), 8:35 am. Screenshot inspected.
+
+Latest reviewed source cutoff: **22 October 2026, 8:35 am IST**. Three new requirements Q84–Q86; two confirmed visual fixes, one saved timer question. No Discord message sent.
+
+## Follow-up batch · 22 October 2026, 8:40–8:55 am IST
+
+Six messages and all seven screenshots inspected; four new deduplicated requirements and a clarification on existing Q76. This batch is separate from the frozen 0.4.19 release.
+
+- [x] **Q87 · Calculator history overlay and separate Calculate/Save** Replace the inline history with a header history icon that opens a panel covering the calculator. Calculate first, then enter a note and explicitly save. Increase readable text/numeral size and contrast. The follow-up asks for a cross to minimize; keep current account isolation, durable history, safe parser and navigation persistence. [Source 8:40](https://discord.com/channels/@me/1491679750610096259/1562664303369261076), [cross-icon follow-up](https://discord.com/channels/@me/1491679750610096259/1562664473389441065). Both screenshots inspected. Released and verified in 0.4.20.
+- [x] **Q88 · QR acceptance by ordering/payment mode** For menu-order-only QR without integrated payment, accepting a round should release the KOT. In integrated-payment mode, accept first and offer a separate Authorize postpaid action for paying after food; retain paid release and current role/outlet/tenant checks. [Source](https://discord.com/channels/@me/1491679750610096259/1562665842280505356), 8:46 am. Screenshot inspected. Released and verified in 0.4.20; actual payment-provider integration stays deferred.
+- **Q76 follow-up · Only the Round down to ₹1 choice should persist** The 8:47 screenshot explicitly identifies that checkbox; deduplicate into Q76 instead of inventing another request. Do not persist the per-customer discount. Who controls the default and its outlet/restaurant/account scope remain in [pending questions](PENDING_QUESTIONS.md#q76--which-bill-adjustment-settings-become-future-defaults). [Source](https://discord.com/channels/@me/1491679750610096259/1562666166206337046). Screenshot inspected.
+- [ ] **Q89 · Prepaid replacement/reallocation** Client proposes choosing replacement items worth at least the previous amount; reject a smaller total. This conflicts with the user's earlier direct unpaid-only instruction and needs explicit payment/invoice allocation rules. **Answered 9:31 am:** separate linked paid replacement may credit the original receipt only when the new final payable is equal or higher. Pending implementation; current unpaid-only prepared cancellation guard remains. [Source](https://discord.com/channels/@me/1491679750610096259/1562667009962156034), 8:50, edited 8:52 am. Screenshot inspected. [Question](PENDING_QUESTIONS.md#q89--paid-order-replacement-and-the-earlier-unpaid-only-instruction).
+- [x] **Q90 · Bill Adjustments availability** Client reports Adjustments missing on some bills and asks for editing in all scenarios. Screenshots show an unpaid ready round without the control and a separate summary with Adjustments. **Answered 9:31 am:** eligible unpaid/partial-paid pre-settlement edits at every kitchen stage, never below actual paid; fully-paid/settled bills need separate refund/replacement records. Pending implementation. [Source](https://discord.com/channels/@me/1491679750610096259/1562668286653767701), 8:55 am. Both screenshots inspected. [Question](PENDING_QUESTIONS.md#q90--which-bill-edits-are-allowed-at-each-stage).
+
+Latest reviewed source cutoff: **22 October 2026, 8:55 am IST**. Q87/Q88 pending confirmed work; eight questions Q65/Q66/Q73/Q74/Q76/Q84/Q89/Q90 saved for later. No Discord message sent; no unrelated chat used as requirements.
+
+## Production acceptance · 0.4.19
+
+Q85/Q86 are deployed and verified. Material categories/codes/HSN/filtering (PP01) and partial buying-pack conversions (PP02) are also released, with optional measured yield remaining reference only. Material categories/codes/HSN and filters; exact buying-pack receipts with frozen conversion/cost snapshots; optional measured-yield reference. Q85 Ready-to-serve contrast and Q86 25% floor tint. New Q87/Q88 work remains queued; policy questions saved.
+
+205 backend, seven hosted PostgreSQL and two local/two production browser workflows passed at desktop and phone sizes. Migration 045 preserves prior financial/stock records, units and deadlines; RLS/KOT gates remain. See [verification](VERIFICATION.md) and [Petpooja additions](PETPOOJA_ADDITIONS.md). Q18–Q90: **63 implemented, 2 queued, 8 questions**. Comparison: **3 complete, 3 partial, 21 pending**. No Discord messages sent.
+
+## Follow-up batch · 22 October 2026, 9:03–9:08 am IST
+
+Three source messages and all four screenshots inspected. Three new requirements plus a repeated Q73 instruction; no chat messages or reactions sent.
+
+- [x] **Q91 · Refund taken with reason** **Answered 9:31 am:** record-only manual full/partial refunds capped by actual paid, with reason/method, original receipt/invoice link and immutable adjustments. Owner/manager authority; cashier requires manager approval. **Released and verified in 0.4.30**, no gateway reversal. [Source](https://discord.com/channels/@me/1491679750610096259/1562670081240989739), 9:03 am. Both order-list/dock screenshots inspected. [Question](PENDING_QUESTIONS.md#q91--meaning-of-refund-taken).
+- [x] **Q92 · Contrasting order menu and VIP pinning** Add a contrasting vertical three-dot menu in Orders and Active orders, with Pin/unpin. Pinned VIP orders appear before other eligible orders with a dark-green treatment. Retain role/outlet/tenant visibility, real amounts/stages and financial restrictions; the Refund taken action remains dependent on Q91. [Same source](https://discord.com/channels/@me/1491679750610096259/1562670081240989739). Released and verified in 0.4.20; no new VIP/customer personal data inferred.
+- **Q73 follow-up · Include kitchen interactions in Clear all actions** Client repeats Released/Preparing/Ready to serve. Deduplicated into Q73, which still awaits one-stage-versus-all-stage/service completion and authority. [Source](https://discord.com/channels/@me/1491679750610096259/1562671115942363308), 9:07 am. Screenshot inspected. Existing guarded actions stay unchanged.
+- [x] **Q93 · Optional Review loyalty** Rename Review rewards to Review loyalty. The client’s 9:12 edit permits claiming through the existing guarded workflow; show current available rewards and what this order may earn. Preserve actual saved/unknown values and existing claim paths outside this panel; do not decide Q74's cap or authority here. [Source](https://discord.com/channels/@me/1491679750610096259/1562671397724225627), 9:08 am. Screenshot inspected. Released and verified in 0.4.20.
+
+Latest reviewed source cutoff: **22 October 2026, 9:08 am IST**. Q18–Q93: **63 released, four confirmed requirements queued, nine decisions awaiting later answers**. The user asked to receive the saved questions; Q91 is included with the previous eight. Production remains 0.4.19; this section records requirements, not completed behavior.
+
+## Clarified loyalty request · 22 October 2026, 9:12–9:13 am IST
+
+- **Q93 superseding edit:** At 9:12 am the client edited the 9:08 message to say Review loyalty **may also claim rewards and is optional**. This supersedes that message's original read-only wording. Keep current available/estimated points, existing redemption and eligibility rules; no Q74 cap/authority decision is inferred. [Edited source](https://discord.com/channels/@me/1491679750610096259/1562671397724225627). Existing screenshot remains the Review rewards button.
+- [x] **Q94 · Claim loyalty points label and size** Rename the pictured Choose reward action to **Claim loyalty points**, with larger readable text. Preserve actual redemption rules, totals and owner tax authority. [Source](https://discord.com/channels/@me/1491679750610096259/1562672670645162096), 9:13 am. Screenshot inspected.
+
+The user's copied pending-questions note in the DM was not treated as an answer or implementation instruction. Source cutoff: **22 October, 9:13 am IST**. Q18–Q94 totals **63 released, five confirmed updates in verification, nine decisions open**. The later user instruction explicitly defers those questions and authorizes finishing/testing/deploying the other web changes.
+
+**Resumed-run access checkpoint:** The interrupted local run was resumed after the user's START instruction. Discord is signed out in the available tab, so sign-in was requested while independent local testing/release continues. No messages newer than the saved cutoff have been verified; no messages/reactions sent.
+
+## Client answers and latest screenshots · 22 October, 9:17–10:12 am IST
+
+The user restored sign-in and explicitly said the client had supplied answers and asked to check them. The complete 9:31 answer attachment was downloaded through its visible Discord link, read in full, and saved as [source evidence](../verification/client-answers-20261022-0931.txt), SHA256 `4a5b72e33e9a94c83804c53dc137278f27b72892b4ff295afbb9754731e1c786`. It resolves Q65/Q66/Q73/Q74/Q76/Q84/Q89/Q90/Q91 at the requirements level. **Answers are not deployed functionality.** See the decision table in [PENDING_QUESTIONS.md](PENDING_QUESTIONS.md). Preserve direct user restrictions and existing permissions; do not invent platform-admin accounts, PIN identities, refunds or gateway integrations.
+
+- [x] **Q95 · Separate loyalty redemption UI** Remove the coupon chooser from the loyalty form. Show the maximum allowed loyalty redemption and permit a smaller amount up to that maximum. Uses Q74's now-confirmed per-order ₹50 default/admin-controlled cap and balance/payable-subtotal bounds. [Source](https://discord.com/channels/@me/1491679750610096259/1562673648249085982), 9:17 am. Screenshot inspected.
+- [x] **Q96 · Separate coupon-code action in bill summary** Add a Coupon action below Received, opening a code-entry popup and applying the existing eligible coupon benefit. Coupon and loyalty redemption remain mutually exclusive and version/identity/payment guards stay. [Source](https://discord.com/channels/@me/1491679750610096259/1562674147656466533), 9:19 am. Screenshot inspected.
+- [x] **Q97 · Align the bottom docks with bill summary** The screenshot shows Calculator/Active orders beneath the white bill-summary card. Align/fill these controls with that upper card where present, retaining phone bounds and panel navigation. This request is not a floor-map or Explore toolbar change. [Source](https://discord.com/channels/@me/1491679750610096259/1562677531021287515), 9:32 am, edited 9:33. Screenshot inspected.
+- [x] **Q98 · Dark Ready to serve badge with light text** Reverse the customer ready-food badge contrast to a darker rounded rectangle with lighter text, including normal/selected cards. Supersedes the pale-badge visual direction of Q85 while retaining its readability fix. [Source](https://discord.com/channels/@me/1491679750610096259/1562678135986589736), 9:35 am. Screenshot inspected.
+- [x] **Q99 · Distinct Split table icon** Replace the split control's payment/card icon with a distinguishable split-table symbol; preserve split/merge/session behavior. [Source](https://discord.com/channels/@me/1491679750610096259/1562678592473796668), 9:36 am. Screenshot inspected.
+- [x] **Q100 · Ready-service elapsed timers and bulk service** Add time since Ready to the relevant ready notifications/service entries. Align Mark served/View order actions right. Add selection, Select all and Serve selected, deduplicating rounds across kitchen stations and retaining all-station readiness and waiter/outlet/tenant permissions. Connect counter behavior to answered Q66; do not fabricate readiness times. [Source](https://discord.com/channels/@me/1491679750610096259/1562679842678378576), 9:41 am. Screenshot inspected.
+- [x] **Q101 · Remove ready-food card subtexts** Remove the pictured repeated portion/use-by and “Prepared portions available now” subtexts from the ready-food menu cards. Preserve actual stored deadlines, availability/quantity guards and expiry handling; this is presentation cleanup, not a change to food validity. [Source](https://discord.com/channels/@me/1491679750610096259/1562687454631436368), 10:12 am. Screenshot inspected.
+
+Latest source cutoff: **22 October 2026, 10:12 am IST**. Seven new screenshot requirements and nine answered decisions are queued separately from the frozen 0.4.20 batch. Q18–Q101 totals **84 requests: 63 already released, five currently deploying, sixteen further confirmed requirements pending implementation**. No unrelated conversation was read as requirements; no Discord message/reaction sent.
+
+## Production checkpoint 0.4.20
+
+Q87/Q88/Q92/Q93/Q94 and PP23 are live. 216 backend, 11 hosted PostgreSQL cases in two disposable databases, eight local and five production browser workflows passed at 1440/390px. Typecheck/build and seven public authorization/CSRF checks passed. Migration 046 adds only pin metadata; invoices, costs, stock, deadlines, round policies and KOT function preserved. [Acceptance](../verification/production-0420-acceptance.json). Screenshot review identified a VIP View-label contrast correction for the following UI batch. Q18–Q101: **68 released, 16 confirmed pending, zero unanswered original decisions**. PP: **4 complete, 2 partial, 21 pending**. No Git checkout/remote is present, so this is a Vercel release, not a Git push.
+
+## Evening table edits — 22 October
+
+- [x] **Q102 · 7:48 pm · Serial table naming** Suggest the next serial name in Add table, allowing a custom name; generate atomically when left automatic, without renaming existing tables or reusing retired identities. [Source](https://discord.com/channels/@me/1491679750610096259/1562832418396704778). Screenshot inspected.
+- [x] **Q103 · 7:57 pm · Rename in both table views** Owner-controlled Rename table in Tables and Explore; preserve QR/session/order identity, permissions, version conflicts and issued snapshots. [Source](https://discord.com/channels/@me/1491679750610096259/1562834691373932666). Both screenshots inspected.
+- [x] **Q104 · 7:57 pm · Keep bottom floor controls accessible** Calculator/Active orders must not cover the selected floor-object rotation/delete controls. Preserve the fixed dotted frame, clipping and gestures. [Source](https://discord.com/channels/@me/1491679750610096259/1562834842138443857). Screenshot inspected.
+
+Latest exact DM cutoff 22 October, **7:57 pm IST**. Three new requests/four screenshots. Q18–Q104: **87 requests, 68 released, 19 pending**. No messages sent.
+
+## Production checkpoint 0.4.21
+
+Q84/Q97/Q98/Q99/Q101/Q102/Q103/Q104 released. Includes the VIP View-label contrast correction. Countdown zero and exact duration, clean ready-card subtexts, selected badge contrast, bill-width docks, auto names, owner rename in Tables/Explore, preserved QR/session identity and uncovered floor rotation controls verified. **219 backend, 3 hosted PostgreSQL, 8 distinct local and 5 production workflows passed** at 1440/390px; typecheck/build and seven public auth/CSRF checks passed. No schema migration. Initial stale selectors/fixtures were corrected; final production reruns used a fresh isolated table tenant and base sample item identity. [Acceptance](../verification/production-0421-acceptance.json). Q18–Q104: **76 released, 11 confirmed pending, zero unanswered original decisions**. PP remains **4 complete, 2 partial, 21 pending**. No native/provider work or Discord messages.
+
+## Floor editor and next-visit billing — 22 October evening
+
+Nine newer messages and all eight screenshots inspected in the authorized DM. Requirements are not release claims.
+
+- [x] **Q105 · 8:05 · Table/private-room options in the fixture selector.** Reuse real table creation with independent identity/QR; private room is an editable fixture. [Source](https://discord.com/channels/@me/1491679750610096259/1562836756615659590).
+- [x] **Q106 · 8:10, 8:20, 8:22 · Rotation-aware fixture resizing and flush wall movement.** Keep Rotate accessible for selected fixtures. Resize along rotated local axes and allow a rotated wall to reach the actual floor edge without an artificial gap; preserve physical boundary validation and fixed-frame clipping. Repeated wall/resize screenshots deduplicated. [Initial](https://discord.com/channels/@me/1491679750610096259/1562838016786170088), [wall](https://discord.com/channels/@me/1491679750610096259/1562840701069299782), [resize](https://discord.com/channels/@me/1491679750610096259/1562840981416579092).
+- [x] **Q107 · 8:10/8:15 · Readable map labels without description space.** Keep names readable at object sizes; auxiliary new-copy/seat/status descriptions must not consume map/object layout space. Preserve accessible identity/state. [Source](https://discord.com/channels/@me/1491679750610096259/1562839438080483408).
+- [x] **Q108 · 8:10 · Entry/exit gates.** Show gates movable by dragging along the floor boundary and rotatable; retain outline/outer-frame safeguards. [Source](https://discord.com/channels/@me/1491679750610096259/1562838016786170088).
+- [x] **Q109 · 8:10 · Arrange undo/redo.** Ctrl+Z and Ctrl+Shift+Z plus simple buttons; do not intercept text editing or issue destructive server operations while undoing a draft. [Source](https://discord.com/channels/@me/1491679750610096259/1562838016786170088).
+- [x] **Q110 · 8:30 · Persistent Explore floor/view lock.** Return to the same outlet/floor and preserve fitted zoom/pan/lock until explicitly unlocked; scope preferences per account and outlet, handle removed floors. [Source](https://discord.com/channels/@me/1491679750610096259/1562842976479215709).
+- [ ] **Q111 · 8:32 · Queue bill for next visit.** Add to the order/active-order menu, recognize the same customer and offer optional inclusion on a later bill. Financial carry-forward/eligibility rules saved in PENDING_QUESTIONS.md before implementation. [Source](https://discord.com/channels/@me/1491679750610096259/1562843644787036265).
+- [x] **Q112 · 8:35 · Ctrl multi-select and group movement.** Select several fixtures/tables and drag together without altering identities, collisions/outline policies or non-selected objects; offer touch selection. [Source](https://discord.com/channels/@me/1491679750610096259/1562844378530193579).
+- [x] **Q113 · 8:39 · Calculator numeric/arithmetic-only entry and equals.** Reject letters in typing/paste, retain legitimate numbers/operators/parentheses, add = to calculate. Safe server parser/history remain. [Source](https://discord.com/channels/@me/1491679750610096259/1562845301583118388).
+
+Source cutoff **22 October, 8:39 pm IST**. Q18–Q113: **96 requests, 76 released, 19 confirmed pending, one new clarification (Q111)**. Q66/Q100 Service work is in progress; not yet released. No Discord messages sent.
+
+## Production checkpoint 0.4.22
+
+Q66/Q100/Q113 live: complete per-round Service counters (including day/overnight-shift completions), actual ready elapsed time in notifications/Service, one row per round across stations, right-aligned responsive actions, Select/Select all/Serve selected with explicit confirmation and atomic guarded batches, and calculator arithmetic-only input/equals. Counts use complete authorized data; old unresolved table requests remain visible across completion-date filters. **224 backend, 5 hosted PostgreSQL, 6 local and 3 production workflows passed** at 1440/390px. Typecheck/build and eight anonymous auth/CSRF checks passed. No migration or financial-history change. [Acceptance](../verification/production-0422-acceptance.json). Q18–Q113: **79 released, 16 confirmed pending, Q111 awaiting one new billing decision**. PP remains **4 complete, 2 partial, 21 pending**.
+
+## Calculator reference and latest presentation/menu revisions
+
+Source through **22 October, 9:09 pm IST**. Seven newer messages reviewed, all five screenshots inspected. APK is a reference attachment, not permission to run/install an unfamiliar application.
+
+- [ ] **Q114 · 8:43 · Match the supplied calculator reference.** Match its actual functions/properties using the approved theme, retaining Diner Dost notes/history. Reference APK supplied; static inspection may identify it, but exact interaction parity requires observable reference screens/functions. Keep this as a reference-dependent clarification until established; do not claim parity from a filename. [Reference](https://discord.com/channels/@me/1491679750610096259/1562846350469627924), [instruction](https://discord.com/channels/@me/1491679750610096259/1562846352743071805).
+- [x] **Q115 · 8:51 · Investigate table rename collision.** Client renamed a table to 3 and reports another rename blocked. Screenshot shows Another table already uses this name. Audit current active/retired/floor label handling and stale UI; do not merge identities, bypass an active-name collision or rewrite historical bills to hide the error. [Source](https://discord.com/channels/@me/1491679750610096259/1562848253790134312).
+- [x] **Q116 · 8:51 · Compact order-action dropdown.** Replace the large order/active-order action modal with a small contrasting dropdown beside the three-dot button. Retain pin and actual refund eligibility; no new financial authority. [Source](https://discord.com/channels/@me/1491679750610096259/1562848412775481466).
+- [x] **Q117 · 8:52 · Visible menu-card action text.** Correct the pictured dark button/text contrast in unselected/selected menu cards, preserving the green palette and actions. [Source](https://discord.com/channels/@me/1491679750610096259/1562848596431470633).
+- [x] **Q118 · 8:59 · SweetAlert2 action confirmations.** Use SweetAlert2 for existing action-confirmation dialogs with appropriate API/classes, approved green theme, keyboard/accessibility and cancellation semantics. Do not add unrelated actions or automatic approvals. Verify official API before adding the dependency. [Source](https://discord.com/channels/@me/1491679750610096259/1562850504566898859).
+- [x] **Q119 · 9:09 · Keep reallocated ready-food items out of customer QR and Menu management.** Supersedes the earlier customer-menu publication request for those synthetic items. Keep their real stock/deadline/traceability and staff POS ready-food workflow; remove customer QR/management-menu exposure with appropriate server-side ordering checks for stale customer menus. Screenshot is /app/menu. Public-storefront scope must follow the same customer offering boundary, without deleting historical batches/orders. [Source](https://discord.com/channels/@me/1491679750610096259/1562853027382042818).
+
+Q18–Q119: **102 requests: 79 released, 21 confirmed pending, Q111/Q114 awaiting clarification/reference details**. Frozen current 0.4.23 kitchen batch remains separate pending acceptance. No Discord message/reaction sent.
+
+**Q115 read-only triage:** The pictured outlet named N1 (code OUT01) contains an active table named 3 on La Cafe. No identity, financial or session data was changed. Keep the duplicate-name guard; improve numeric table-card ordering and conflict guidance so the existing saved table is discoverable. [Evidence](../verification/table-name-115-triage.json). Q115 remains pending presentation verification, not a data-repair claim.
+
+## Production checkpoint 0.4.23
+
+Q65/Q73 released: new-round kitchen-stage switch, explicit prepared/served completion and preserved waiter coordination with assignment-scoped serving. Existing rounds retain their previous policy. 230 backend, 26 targeted regressions, seven hosted cases in three disposable PostgreSQL databases, eight distinct local and four production browser workflows passed at 1440/390px. Typecheck/build and eight public auth/CSRF checks passed. Migration 047 preserves financial/stock history and KOT authority. [Acceptance](../verification/production-0423-acceptance.json). Q18–Q119: **81 released, 19 confirmed pending, Q111/Q114 awaiting details**. PP remains four complete/two partial/21 pending. No native/provider work or Discord messages.
+
+## Current verification batch 0.4.24
+
+Q115–Q119 are implemented and in verification, not yet accepted in production. Numeric table-card ordering and inline collision guidance retain identity uniqueness; anchored order dropdowns retain financial authority; explicit contrast covers customer/POS quantity controls; SweetAlert2 replaces the two existing native confirmation prompts. Synthetic ready food is hidden from customer web catalogs and Menu management, with stale QR/storefront submissions rejected server-side; staff POS and native/default-false catalog contracts remain unchanged. Official [SweetAlert2 API types](https://github.com/sweetalert2/sweetalert2/blob/main/sweetalert2.d.ts) reviewed; exact npm version 11.26.25 installed. Production remains 0.4.23 until acceptance.
+
+## Production checkpoint 0.4.24
+
+Q115–Q119 released: numeric table-card ordering with inline collision guidance, compact anchored order menus, explicit menu-control contrast, SweetAlert2 native/confirmation-only prompts with Cancel focus and visible stale errors, and staff-only reallocated-food availability. Customer QR/storefront catalogs omit synthetic ready items and stale submissions are rejected; staff POS, FIFO/prepared stock, immutable history and native/default-false catalog behavior remain. **232 backend, two hosted cases in two disposable PostgreSQL databases, 12 distinct local and six production workflows passed** at 1440/390px. Final affected local run: six passed; earlier fixture/portal/type issues corrected and retained in logs. Typecheck/build and eight anonymous auth/CSRF checks passed. No migration. [Acceptance](../verification/production-0424-acceptance.json). Q18–Q119: **86 released, 14 confirmed pending, Q111/Q114 awaiting details**. PP remains four complete/two partial/21 pending. No native/provider work or Discord messages.
+
+## Floor verification batch 0.4.25
+
+Q106/Q107 implementation in verification: signed rotated bounds allow walls to reach the actual edge, anchored pointer/keyboard resizing follows local axes and stays within real geometry. Fractional placement is permitted only when actual corners remain inside the floor/outline; permissions and fixed dotted-frame clipping remain. Selecting an object freezes camera auto-fit during the gesture, preventing the inspector from shifting the canvas mid-drag. Table seat/status/copy descriptions are removed from visible map content and retained in titles/accessibility; fixture names remain inside their boxes. No new coordinate inputs or schema migration. Ten affected backend cases and one isolated hosted geometry case passed; final browser verification pending. Production remains 0.4.24.
+
+## Production checkpoint 0.4.25
+
+Q106/Q107 released: rotated walls reach the actual edge; pointer/keyboard resizing holds the opposite world corner/edge and enforces actual geometry. Selection freezes auto-fit during the gesture. Map labels omit auxiliary seat/status/copy descriptions while retaining accessible details; fixed dotted-frame clipping and current outline/role safeguards remain. **Ten affected backend cases, one hosted PostgreSQL case, three distinct local workflows and one production workflow with six angle/viewport scenarios passed** (15°, 90°, 345°; 1440/390px). Latest complete backend baseline is 232 passes from 0.4.24; this floor-only batch uses affected verification. Typecheck/build and eight anonymous auth/CSRF checks passed. No migration. [Acceptance](../verification/production-0425-acceptance.json). Q18–Q119: **88 released, 12 confirmed pending, Q111/Q114 awaiting details**. PP remains four complete/two partial/21 pending.
+
+## Floor fixture verification batch 0.4.26
+
+Q105/Q108 passed verification and are released in 0.4.26. Table and Private room are offered in the fixture selector. New tables are reviewed placements until Save layout; cancellation creates no table, successful atomic save creates an independent empty table/QR, and role/version/label failures roll back. Entry/Exit use gate symbols and drag to usable boundary positions with independent rotation, including concave/circular geometry; existing saved interior gates are preserved until edited. No new coordinate inputs or migration. Production acceptance is recorded below.
+
+## Production checkpoint 0.4.26
+
+Q105/Q108 released: the fixture selector offers Table and Private room. New tables remain draft placements until an authorized atomic layout save creates an independent empty table and QR identity; cancel, label conflicts and stale/unauthorized saves create nothing. Entry/Exit use gate symbols, drag along usable floor boundaries and retain rotation and actual outline bounds. Small-target pointer routing distinguishes the visible resize knob from body dragging. **Thirteen affected backend cases, one isolated hosted PostgreSQL case, three local and three production browser workflows passed**, including fixture/gate checks at 1440/390px and six rotated-geometry regression scenarios. The latest complete backend baseline remains 232 passes from 0.4.24. Typecheck/build and eight anonymous auth/CSRF checks passed. No migration. [Acceptance](../verification/production-0426-acceptance.json). Q18–Q119: **90 released, 10 confirmed pending, Q111/Q114 awaiting details**. PP remains four complete/two partial/21 pending.
+
+## Production checkpoint 0.4.27
+
+Follow-up Discord refresh after the user's latest checklist question: the authorized DM still ends at **22 October, 9:09 pm IST**, message `1562853027382042818`. No newer requirements were found; existing Q105–Q119 coverage remains current. No messages sent.
+
+Q109/Q110/Q112 released: bounded draft undo/redo (buttons and Ctrl+Z/Ctrl+Shift+Z), one history entry per pointer gesture, text editing excluded, and separately saved table renames retained. Ctrl-click or Select multiple works on desktop/touch; one common constrained movement preserves selected identities/relative geometry and non-selected objects. Selected floor plus zoom/pan/lock are stored per account/outlet/floor, validated on restore, with explicit unlock and removed-floor fallback. Seven pure backend geometry/storage cases, four local and four production workflows passed at 1440/390px, including fixture/gate/rotation regressions. Typecheck/build and eight anonymous auth/CSRF checks passed. No migration or client financial/stock data changes. Latest full backend baseline remains 232 passes from 0.4.24.
+
+[Acceptance](../verification/production-0427-acceptance.json). Client queue: **93 released, 7 confirmed pending, Q111/Q114 awaiting details**. Petpooja is tracked separately.
+
+## Production checkpoint 0.4.28
+
+Q76/Q90 released: owner/manager can save outlet-wide Round down to ₹1 for future web staff/QR/D2C rounds only; no discount default and no existing-round recalculation. Billing staff can change eligible discounts/rounding at any kitchen stage before full payment/final settlement; named charge editing stays owner-only. Verified partial receipts remain immutable, unresolved receipts block edits, and the new total cannot fall below money already received. Quotes/estimated earn and actual payment status refresh after a valid change; stock history is preserved. Fully paid/issued bills require separate refund/replacement. 245 full backend tests, 12 focused tests, four hosted PostgreSQL cases, and local/production desktop/phone workflows passed, along with typecheck/build and eight anonymous auth/CSRF checks. Migration 048 adds only a future preference defaulting false; before/after digests preserved all existing invoices, receipts, costs, stock, rounds and outlet policies.
+
+[Acceptance](../verification/production-0428-acceptance.json). Client queue: **95 released, 5 confirmed pending, Q111/Q114 awaiting details**. Petpooja is tracked separately.
+
+## Production checkpoint 0.4.29
+
+Q74/Q95/Q96 released: a default ₹50 cap is shared by all web loyalty claims on one order/final bill. Smaller rupee claims respect actual balance, existing eligibility and point-value increments; concurrent separate-round claims cannot multiply the cap. Coupon code entry is separate below Received, replaces loyalty on that round, and shows the saved code in the summary. Invalid rewards stay in the new dialogs with inline validation. Only an explicitly provisioned platform identity may configure an outlet cap; ordinary restaurant roles cannot grant themselves that access. Actual platform-account provisioning remains an operator setup dependency in PLATFORM_LOYALTY_SETUP.md and no human account was auto-granted access. Thirty-three affected local backend cases, four hosted PostgreSQL cases and local/production desktop/phone workflows passed; typecheck/build and eight auth/CSRF checks passed. Browser workflow covers the zero-balance claim and invalid-code path; positive claims, valid coupons, concurrency and configuration are covered by real backend/PostgreSQL tests. Migration 049 adds only a future-web-claim cap; prior financial/stock rows remain unchanged. Latest complete backend baseline is 245 passes from 0.4.28.
+
+[Acceptance](../verification/production-0429-acceptance.json). Client queue: **98 released, 2 confirmed pending, Q111/Q114 awaiting details**. Petpooja is tracked separately.
+
+## Production checkpoint 0.4.30
+
+Q91 released: owner/manager may record an already-returned manual full or partial refund; a cashier can request a scoped manager approval with no financial effect until approval. Amounts are capped by remaining actual verified receipts and the chosen issued bill; concurrent/duplicate/stale requests cannot create excess refunds. Reason, mode, original invoice/receipt links and explicit confirmation are required. Immutable refund documents retain allocation and credit-component snapshots; original invoices, receipts, round amounts, stock costs and reward history stay unchanged. Reports show original gross collections and separate refunds with net receipts/sales; a provisional-bill refund is recognized once when the final sale is issued. No gateway reversal is triggered. Eight affected cases, all 254 backend cases, five isolated hosted PostgreSQL cases and desktop/phone local/production refund workflows passed, alongside typecheck/build and eight anonymous/CSRF checks. Migration 050 adds only new refund/request tables and preserves prior financial, loyalty, stock, outlet and KOT records. Q89 paid replacement remains pending; Q111/Q114 remain unanswered. Petpooja counts are unchanged.
+
+[Acceptance](../verification/production-0430-acceptance.json). Client queue: **99 released, 1 confirmed pending, Q111/Q114 awaiting details**. Petpooja is tracked separately.

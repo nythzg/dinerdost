@@ -1,0 +1,85 @@
+{
+  "version": "0.4.30",
+  "previousVersion": "0.4.29",
+  "releasedClientItems": [
+    "Q91"
+  ],
+  "featureUpdate": "Audited full/partial manual refund records with original receipt/bill links, cashier manager approval, immutable credit documents and net financial reporting.",
+  "affectedBackendPassed": 8,
+  "fullBackendPassed": 254,
+  "hostedPostgresPassed": 5,
+  "hostedLog": "verification/hosted-0430-refunds.log",
+  "hostedVerificationScope": "Five manual refund, approval, immutable history, concurrency, authorization and recognition cases in one isolated PostgreSQL database.",
+  "localBrowserPassed": 1,
+  "productionBrowserPassed": 1,
+  "schemaChanged": true,
+  "appliedMigrations": [
+    "050_web_refunds.sql"
+  ],
+  "browserViewports": [
+    1440,
+    390
+  ],
+  "migrationEvidence": "verification/production-migration-0430.json",
+  "checkpoint": "Q91 released: owner/manager may record an already-returned manual full or partial refund; a cashier can request a scoped manager approval with no financial effect until approval. Amounts are capped by remaining actual verified receipts and the chosen issued bill; concurrent/duplicate/stale requests cannot create excess refunds. Reason, mode, original invoice/receipt links and explicit confirmation are required. Immutable refund documents retain allocation and credit-component snapshots; original invoices, receipts, round amounts, stock costs and reward history stay unchanged. Reports show original gross collections and separate refunds with net receipts/sales; a provisional-bill refund is recognized once when the final sale is issued. No gateway reversal is triggered. Eight affected cases, all 254 backend cases, five isolated hosted PostgreSQL cases and desktop/phone local/production refund workflows passed, alongside typecheck/build and eight anonymous/CSRF checks. Migration 050 adds only new refund/request tables and preserves prior financial, loyalty, stock, outlet and KOT records. Q89 paid replacement remains pending; Q111/Q114 remain unanswered. Petpooja counts are unchanged.",
+  "accepted": true,
+  "verifiedAt": "2026-10-22T18:19:29.941Z",
+  "productionUrl": "https://dinerdost-app.vercel.app",
+  "deploymentId": "dpl_DUemt3FneNKUJQofg2waNiPZCDkk",
+  "deploymentUrl": "https://dinerdost-a287hdc6t-nythz.vercel.app",
+  "pendingImplementation": [
+    "Q89"
+  ],
+  "pendingQuestions": [
+    "Q111",
+    "Q114"
+  ],
+  "publicChecks": [
+    {
+      "path": "/signin",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/workspace",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/service-board?outletId=00000000-0000-4000-8000-000000000000",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/calculator",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/active-orders?outletId=00000000-0000-4000-8000-000000000000",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/inventory-tools?kind=expiry-outlet&outletId=00000000-0000-4000-8000-000000000000",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/commands",
+      "status": 401,
+      "method": "POST",
+      "origin": "https://dinerdost-app.vercel.app"
+    },
+    {
+      "path": "/api/commands",
+      "status": 403,
+      "method": "POST",
+      "origin": "https://invalid.example"
+    }
+  ],
+  "pendingMigrations": [],
+  "kotGateEnabled": true,
+  "temporaryHostedDatabasesRemaining": 0,
+  "discordMessagesSent": 0
+}

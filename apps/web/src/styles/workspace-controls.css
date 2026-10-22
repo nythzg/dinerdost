@@ -1,0 +1,190 @@
+/* Page search and shared workspace controls. Navigation always keeps full labels. */
+@media screen {
+  .page-search-trigger {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-left: auto;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: #8e9d8b;
+    font-size: 12px;
+    min-height: 36px;
+    cursor: pointer;
+  }
+  .page-search-trigger > .icon {
+    width: 16px;
+    height: 16px;
+  }
+  .page-search-trigger > kbd,
+  .page-search-input > kbd {
+    border: 1px solid #ebf1ea;
+    background: #f8f9f4;
+    border-radius: 4px;
+    color: #93a091;
+    font-family: inherit;
+    font-size: 9px;
+    padding: 3px 5px;
+    white-space: nowrap;
+  }
+  .profile {
+    border-top: 1px solid #365c44;
+  }
+  .modal:has(.page-search) {
+    max-width: 520px;
+    padding: 0;
+    overflow: hidden;
+  }
+  .modal:has(.page-search) .modal-header {
+    margin: 0;
+    padding: 18px 22px 13px;
+    border-bottom: 0;
+  }
+  .modal:has(.page-search) .modal-header > h2 {
+    font-size: 13px;
+    color: #8e9d8b;
+    font-weight: 550;
+  }
+  .modal:has(.page-search) .modal-header > .icon-button {
+    width: 27px;
+    height: 27px;
+  }
+  .page-search {
+    padding: 0 12px 12px;
+  }
+  .page-search-input {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin: 0 10px 12px;
+    padding: 0 0 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .page-search-input > .icon {
+    color: #8da189;
+    width: 21px;
+    height: 21px;
+  }
+  .page-search-input > input {
+    border: 0;
+    border-radius: 0;
+    background: none;
+    padding: 4px 0;
+    font-size: 20px;
+    font-weight: 550;
+    box-shadow: none;
+    min-width: 0;
+  }
+  .page-search-input > input:focus-visible {
+    outline-offset: 5px;
+  }
+  .page-search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    max-height: 420px;
+    overflow: auto;
+  }
+  .page-search-results > button {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    text-align: left;
+    padding: 14px;
+    border: 0;
+    border-radius: 9px;
+    min-height: 47px;
+    background: #fff;
+    font-size: 13px;
+    color: #5b6f57;
+  }
+  .page-search-results > button.is-active {
+    background: #edf3e8;
+    color: var(--accent);
+  }
+  .page-search-results > button > .icon {
+    width: 18px;
+    height: 18px;
+  }
+  .page-search-empty {
+    padding: 35px 15px;
+    text-align: center;
+    color: #8e9d8b;
+    font-size: 13px;
+  }
+  .main-content .table-scroll {
+    max-height: calc(100dvh - 300px);
+    scrollbar-width: thin;
+    scrollbar-color: #d5ded3 transparent;
+  }
+  .main-content .table-scroll th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  td {
+    font-variant-numeric: tabular-nums;
+  }
+}
+@media screen and (min-width: 851px) {
+  .saving-indicator {
+    left: 260px;
+  }
+}
+@media screen and (max-width: 850px) {
+  .page-search-trigger {
+    border: 0;
+    padding: 0;
+    width: 34px;
+    justify-content: center;
+    margin-left: auto;
+  }
+  .page-search-trigger > span,
+  .page-search-trigger > kbd {
+    display: none;
+  }
+  .main-content .table-scroll {
+    max-height: none;
+  }
+}
+@media screen and (max-width: 650px) {
+  .topbar {
+    gap: 8px;
+  }
+  .topbar > .icon-button {
+    margin-left: 0;
+  }
+  .page-search-input > input {
+    font-size: 18px;
+  }
+}
+@media print {
+  .page-search-trigger {
+    display: none !important;
+  }
+}
+
+@media screen {
+  .staff-language {
+    margin-left: auto;
+    width: auto;
+    max-width: 120px;
+    min-height: 36px;
+  }
+  .staff-language + .page-search-trigger {
+    margin-left: 0;
+  }
+}
+@media screen and (max-width: 650px) {
+  .staff-language {
+    max-width: 94px;
+    padding: 6px;
+    min-width: 76px;
+    font-size: 12px;
+  }
+  .topbar .outlet-switch {
+    min-width: 0;
+  }
+}

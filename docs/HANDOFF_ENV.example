@@ -1,0 +1,9 @@
+# Variable names only. Configure real values privately in the chosen destination.
+DATABASE_URL=
+DATABASE_MIGRATION_URL=
+APP_ORIGIN=
+# Optional, requires explicit platform-operator identity provisioning.
+DD_PLATFORM_ADMIN_USER_IDS=
+# Local development only; omit DATABASE_URL to use isolated PGlite.
+LOCAL_DATABASE_PATH=.data/postgres
+# Firebase/providers/packages are deferred; no keys are included or required now.

@@ -1,0 +1,51 @@
+Here are the confirmed answers for the open questions:
+
+### Q91 — Meaning of Refund taken
+1. **Action type:** Record-only (manual/offline refund log) for now. Do not trigger live payment gateway reversals yet.
+2. **Scope:** Support both **full and partial refunds**, capped at the total paid amount for that order/bill.
+3. **Permissions:** Only **Outlet Managers, Restaurant Owners, and Admins** may record or approve a "Refund taken" entry (Cashiers require Manager PIN/approval).
+4. **Financial & Invoice link:** Link the refund record directly to the original payment entry and issued invoice ID. Require selecting the refund mode (Cash, UPI, Card, Other) and a brief reason. Keep the original issued invoice immutable and record a linked Refund/Credit adjustment so net settled revenue reflects the refund accurately.
+
+### Q89 — Paid-order replacement and unpaid-only instruction
+1. **Expand to paid orders:** Yes, allow item replacement on paid orders when the replacement items cost **greater than or equal to** the original amount.
+2. **Comparison basis:** Compare against the round/order's **final payable amount (including applicable taxes, discounts, and charges)** so a replacement never results in a negative balance or stealth refund.
+3. **Payment & Invoice linkage:** Retain the original payment as credited toward the updated bill.
+   - If the new total equals the already-paid amount, keep the order status as **Paid**.
+   - If the new total is higher, mark the bill as **Partially Paid** and collect only the **extra difference** as an additional linked payment record.
+   - Do not overwrite the original payment log; issue an updated/revised bill (or supplementary adjustment linked to the original invoice reference).
+
+### Q90 — Which bill edits are allowed at each stage
+1. **Stage eligibility:** Make the **Adjustments** control available and editable at **all stages prior to final settlement/payment**—including when order rounds are Released, Preparing, Ready, or Served.
+2. **Post-settlement lock:** Once a bill is fully **Paid/Settled**, lock standard bill adjustments (any post-payment change must go through the authorized Refund or Paid-Replacement flow).
+3. **Permitted adjustments & safeguards:** Before final settlement, staff with billing permissions may edit bill-level discounts, rounding, and additional charges, which should dynamically recalculate taxes on the payable total. If a partial payment has already been collected, disallow any adjustment that drops the final bill total below the amount already paid. Do not alter kitchen stock consumption or prepared-food logs from bill adjustments.
+
+### Q84 — Prepared-food timer meaning
+1. **Control type:** Use a **countdown duration picker (`Hours : Minutes` from now)** as the primary input (e.g., setting `02:30` sets the expiry timestamp to `now + 2 hours 30 minutes`).
+2. **Fallback if clock-time is used:** If a clock-time picker is shown alongside or instead, any selected time earlier than the current clock time must roll over to the **next calendar day (post-midnight)**—never allow saving a timestamp in the past.
+3. **Safeguards:** Store the resulting exact `use_by` timestamp on the backend and retain all existing expiry and no-extension safeguards.
+
+### Q65 — Service when kitchen stages are switched off
+1. **Service behavior:** When an outlet disables `Released → Preparing → Ready`, bypass those three kitchen stages so new rounds go directly to an actionable service state, but **still require staff to explicitly mark the round `Served`** before or during settlement (do not silently mark physical service complete on order creation).
+2. **Safeguards:** Existing active rounds, stock consumption triggers, payment checks, and role permissions remain unchanged.
+
+### Q66 — Definitions for the new Service counters
+1. **Deduplication rule:** Yes—combine table requests and order rounds, counting **each order round once** regardless of how many station/kitchen tickets it split into.
+2. **Counter definitions (within the staff member's authorized outlet/table scope):**
+   - **Table requests:** Active/unresolved customer table requests (e.g., call waiter, water, bill request).
+   - **Serve requests:** Order rounds currently in **Ready (Ready to serve)** status waiting to be delivered to the table (1 per round).
+   - **Awaiting services:** `Active Table requests` + `Serve requests (Ready rounds not yet marked Served)`.
+   - **Completed services:** `Resolved Table requests` + `Order rounds marked Served` (for the active shift/day filter).
+   - **Total services:** `Awaiting services` + `Completed services`.
+
+### Q73 — What Clear all actions should do to kitchen stages
+1. **Behavior:** When `Released`, `Preparing`, and `Ready to serve` are selected in **Clear all actions**, allow the action to **complete all stages through to `Served`** in one step, **only after an explicit confirmation modal** where staff confirms that the food has actually been prepared and served.
+2. **Authorized roles:** **Outlet Manager, Captain/Steward, Cashier, and Kitchen Lead** (any staff role with both kitchen/service progression permissions for that outlet).
+
+### Q74 — Loyalty claim limit and who controls it
+1. **Cap scope:** The ₹50 default maximum applies **per order (final bill)**, not per round.
+2. **Who controls it:** Controlled by **Diner Dost Admins** (with per-restaurant/outlet configuration support), and yes, authorized admins may raise or lower the cap above or below ₹50.
+3. **Partial redemption:** Yes, allow staff/customers to redeem a **smaller rupee amount** up to the minimum of: (a) customer's available loyalty balance, (b) the configured per-order cap, and (c) the bill's payable subtotal.
+
+### Q76 — Which bill-adjustment settings become future defaults
+1. **Saved field:** Save only the **Round down to ₹1** toggle state for future transactions; never carry forward the per-bill **Discount (₹)** amount.
+2. **Scope & Permissions:** Apply the saved default at the **Outlet level** so all billing terminals at that outlet behave consistently. Only **Outlet Managers, Restaurant Owners, and Admins** may change and save this default.

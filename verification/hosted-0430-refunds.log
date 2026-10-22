@@ -1,0 +1,14 @@
+✔ manual partial and full refunds link real receipts and immutable issued documents without changing original payments, stock, amounts or customer rewards (94149.1325ms)
+✔ refunds reduce recognized net receipts and sales while original gross invoices, payment methods and consumed costs remain traceable (32746.6048ms)
+✔ cashier requests have no financial effect until action-scoped manager approval; rejections and stale/duplicate decisions cannot post another refund (40198.0154ms)
+✔ concurrent refunds cannot exceed verified receipts and all foreign, native, role, confirmation and invoice guards roll back (31798.6873ms)
+✔ a refund linked to an unsettled provisional bill is recognized once only when the original sale receives a final invoice (33332.8642ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 234110.3002
+PostgreSQL suite passed: tests/web-refunds.test.ts

@@ -1,0 +1,57 @@
+import { after, before, test } from "node:test";
+import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
+import { createEmbeddedDatabase, createPostgresDatabase, type Database } from "@dinerdost/database";
+import type { Actor } from "@dinerdost/core";
+import * as s from "@dinerdost/services";
+let db: Database, owner: Actor, w: any, brand: any, token: string, token2: string;
+const slug = "storefront-test", key = () => randomUUID(), device = "store-device";
+before(async () => {
+  db = process.env.TEST_DATABASE_URL ? createPostgresDatabase(process.env.TEST_DATABASE_URL) : await createEmbeddedDatabase(); await db.migrate();
+  const a = await s.signup(db, { name: "Store owner", email: "store-owner@example.test", password: "store-owner-password-123", restaurant: "Store QA", outlet: "Main", qrEnabled: true, demo: true }, "store");
+  owner = await s.authenticate(db, a.token); w = await s.workspace(db, owner);
+  brand = await s.saveRecord(db, owner, key(), "brands", { outletId: w.outletId, title: "QA Kitchen", data: { description: "Pickup food", active: true } });
+});
+after(async () => { await db?.close() });
+test("only published active storefronts are public and public models omit identities and internal QR keys", async () => {
+  await assert.rejects(s.storefrontCatalog(db, slug));
+  await assert.rejects(s.saveStorefront(db, { ...owner, role: "CASHIER" }, key(), { outletId: w.outletId, brandId: brand.id, slug, published: true }), { code: "FORBIDDEN" });
+  await s.saveStorefront(db, owner, key(), { outletId: w.outletId, brandId: brand.id, slug, published: false });
+  await assert.rejects(s.storefrontCatalog(db, slug));
+  await s.saveStorefront(db, owner, key(), { outletId: w.outletId, brandId: brand.id, version: 1, slug, published: true });
+  const catalog = await s.storefrontCatalog(db, slug);
+  assert.equal(catalog.menu.length, 6); assert.equal(catalog.tables.length, 12);
+  const raw = JSON.stringify(catalog); assert.equal(raw.includes("public_key"), false); assert.equal(raw.includes("password"), false); assert.equal(raw.includes("phone"), false);
+  token = (await s.connectStorefront(db, slug, device, "store-one")).token;
+  token2 = (await s.connectStorefront(db, slug, "device-two", "store-two")).token;
+  assert.equal((await s.connectStorefront(db, slug, device, "store-one", token)).token, token);
+});
+test("customer reservations bind identity, serialize overlapping tables, stay device-private and can be cancelled only by their visitor", async () => {
+  const input = { name: "Store guest", phone: "9123456789", tableId: w.tables[0].id, guests: 2, at: new Date(Date.now() + 3600000).toISOString(), durationMinutes: 90 };
+  const request = key();
+  const booking = await s.reserveStorefrontTable(db, slug, token, device, request, input);
+  assert.equal((await s.reserveStorefrontTable(db, slug, token, device, request, input)).id, booking.id);
+  await assert.rejects(s.reserveStorefrontTable(db, slug, token2, "device-two", key(), input), { code: "TABLE_ALREADY_RESERVED" });
+  await assert.rejects(s.reserveStorefrontTable(db, slug, token2, "device-two", key(), { ...input, name: "Different guest", tableId: w.tables[1].id }), { code: "CUSTOMER_NAME_MISMATCH" });
+  const own = await s.storefrontCatalog(db, slug, token, device), other = await s.storefrontCatalog(db, slug, token2, "device-two");
+  assert.equal(own.bookings.length, 1); assert.equal(other.bookings.length, 0);
+  assert.equal((await s.workspace(db, owner)).reservations.length, 1);
+  assert.equal(JSON.stringify(other).includes("Store guest"), false);
+  await assert.rejects(s.cancelStorefrontReservation(db, slug, token2, "device-two", key(), { id: booking.id }));
+  await s.cancelStorefrontReservation(db, slug, token, device, key(), { id: booking.id });
+  assert.equal((await s.storefrontCatalog(db, slug)).reservations.length, 0);
+});
+test("D2C orders use server prices, remain pending with no KOT, are private, idempotent and obey device bans", async () => {
+  const input = { name: "Store guest", phone: "9123456789", items: [{ itemId: w.menu[0].id, quantity: 2 }] };
+  const request = key();
+  const order = await s.submitStorefrontOrder(db, slug, token, device, request, input);
+  assert.equal((await s.submitStorefrontOrder(db, slug, token, device, request, input)).id, order.id);
+  assert.equal(order.status, "PENDING"); assert.equal(Number(order.rounds[0].payable), Number(w.menu[0].price) * 2);
+  assert.equal((await s.workspace(db, owner)).orders.length, 1); assert.equal((await s.workspace(db, owner)).tickets.length, 0);
+  assert.equal((await s.storefrontCatalog(db, slug, token2, "device-two")).orders.length, 0);
+  await assert.rejects(s.submitStorefrontOrder(db, slug, token, "wrong-device", key(), input));
+  const orderDetail = await s.getOrder(db, owner, order.id);
+  await s.setCustomerDeviceBan(db, owner, key(), order.id, { mode: "BAN", minutes: 15, version: orderDetail.deviceAccess.version, reason: "Customer browser test ban" });
+  await assert.rejects(s.submitStorefrontOrder(db, slug, token, device, key(), input), { code: "DEVICE_TEMPORARILY_BANNED" });
+  assert.equal((await s.verifyAudit(db, owner)).valid, true);
+});

@@ -1,0 +1,10 @@
+@media screen {
+ .plan-table,.plan-table.compact-object{gap:0;padding:6px;overflow:hidden}
+ .plan-table .plan-table-name{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;max-width:100%;overflow-wrap:anywhere;line-height:1.15;text-align:center;font-size:22px}
+ .plan-table.compact-object .plan-table-name{font-size:18px}
+ .plan-object.plan-fixture:not(.plan-kind-wall){gap:6px;padding:6px;overflow:hidden}
+ .plan-object.plan-fixture:not(.plan-kind-wall) .icon{flex:none;width:18px;height:18px}
+ .plan-object.plan-fixture:not(.plan-kind-wall)>strong{position:static;transform:none;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;white-space:normal;max-width:100%;padding:0;border:0;background:transparent;color:inherit;font-size:16px;line-height:1.2;overflow-wrap:anywhere}
+ .plan-object.compact-object.plan-kind-wall>strong{display:none}
+ .plan-gate-symbol{display:grid;place-items:center;flex:none;width:26px;height:26px}.plan-gate-symbol svg{width:100%;height:100%}
+}

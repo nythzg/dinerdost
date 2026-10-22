@@ -1,0 +1,16 @@
+{
+  "all66TranscriptsReviewed": true,
+  "all66SourceLinksInPdf": true,
+  "pages": 13,
+  "matrixRows": 66,
+  "statusCounts": {
+    "Overview": 3,
+    "Partial": 20,
+    "Missing": 27,
+    "External ecosystem": 7,
+    "Core present": 8,
+    "Policy difference": 1
+  },
+  "visualReview": "contact sheet plus full-size cover, matrix and last page; widened index column after initial review",
+  "applicationChanged": false
+}

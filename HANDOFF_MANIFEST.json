@@ -1,0 +1,2808 @@
+{
+  "preparedAt": "2026-10-22T18:32:30.413Z",
+  "sourceVersion": "0.4.30",
+  "sourceDeployment": "dpl_DUemt3FneNKUJQofg2waNiPZCDkk",
+  "latestClientPending": [
+    "Q89"
+  ],
+  "unanswered": [
+    "Q111",
+    "Q114"
+  ],
+  "petpooja": {
+    "authorizedAt": "2026-10-22",
+    "checklist": "docs/PETPOOJA_ADDITIONS.md",
+    "scope": "web-only",
+    "groups": 27,
+    "completed": 4,
+    "pending": 21,
+    "sourceBaseline": "0.4.11",
+    "implementationBaseline": "0.4.17",
+    "completeIds": [
+      "PP01",
+      "PP05",
+      "PP18",
+      "PP23"
+    ],
+    "partial": 2,
+    "partialIds": [
+      "PP02",
+      "PP20"
+    ],
+    "currentRelease": "0.4.30",
+    "status": "Four groups complete, two partial, 21 pending. Raw-ingredient expiry review complete; production and broader procurement remain pending."
+  },
+  "sourceFiles": 552,
+  "totalBytes": 5358526,
+  "excluded": [
+    "real env/account/QA credentials",
+    ".vercel project binding",
+    "databases and dumps",
+    "dependencies/build caches",
+    "Android generated builds/SDK paths/keys/Firebase config",
+    "unrelated global Codex memories and raw session state"
+  ],
+  "knownCredentialScanPassed": true,
+  "files": [
+    {
+      "path": ".env.example",
+      "size": 554,
+      "sha256": "d906af2610f9183fed8b0f53418c2a9b21b68a0137c27a2889a54e9adf63148e"
+    },
+    {
+      "path": ".gitignore",
+      "size": 395,
+      "sha256": "d80aaf8cfb89e897acb6366f434b126f4ba2c16e75f7491b08e3a25699927581"
+    },
+    {
+      "path": ".vercelignore",
+      "size": 298,
+      "sha256": "83cfea99e480580de1737e260781f6d68c45620630d85e99e3360ded87c03872"
+    },
+    {
+      "path": "AGENTS.md",
+      "size": 2277,
+      "sha256": "2ccc06a5b3d886591ebed7a13e0c13e5fa5f01f336e5372d6a2f30553948f9c3"
+    },
+    {
+      "path": "CONTINUE_IN_CODEX.txt",
+      "size": 2016,
+      "sha256": "59269f028349ab78660cd39e41b4410f21f327355392976fc75001eec6bdd1ab"
+    },
+    {
+      "path": "HANDOFF.md",
+      "size": 15982,
+      "sha256": "62f4b57881fc32881749458b437ef0d15b4d422561bff4784aec3e4b70040c97"
+    },
+    {
+      "path": "README.md",
+      "size": 4891,
+      "sha256": "f2376bca448e8ea461827abc63a49d00d89fd6c0f54a0ef90248a1931f9f918d"
+    },
+    {
+      "path": "apps/android/.gitignore",
+      "size": 107,
+      "sha256": "cba23fb433e5cc3f8bfdbe221427adde7a7eef714560c9ce7e4e59a12e2a7d75"
+    },
+    {
+      "path": "apps/android/README.md",
+      "size": 2788,
+      "sha256": "e0d65623bd4cb5b487d15d74c233091878830bab022e20d780c92c788c56c776"
+    },
+    {
+      "path": "apps/android/app/build.gradle.kts",
+      "size": 3112,
+      "sha256": "547a77439f602898b2d2e878fd5e260bf91e1d0088675ca3f64736f9fafdcacb"
+    },
+    {
+      "path": "apps/android/app/src/androidTest/java/com/dinerdost/app/NativeWorkflowTest.kt",
+      "size": 8483,
+      "sha256": "731e2db3d3bacccb8354456f30df0ca0ef9585469587e030adc915e314712827"
+    },
+    {
+      "path": "apps/android/app/src/main/AndroidManifest.xml",
+      "size": 1980,
+      "sha256": "f4d1e31a878a493bb3c0b1081f7f2e19eefc1200a9b7886c27033bde0dfcb461"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/DinerDostApplication.kt",
+      "size": 273,
+      "sha256": "82f5b3ee24a6a9a0eed5ac267609eed6202c3366bcc16e78d8668d848f4b6a5e"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/MainActivity.kt",
+      "size": 28311,
+      "sha256": "1fa1923526296fa4cee9031d1a8637a3baddd70eeab5da18d45fce626b3c205e"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/data/ApiClient.kt",
+      "size": 5438,
+      "sha256": "bf002b9262011d6923bb10ea7a92f1df7a6be86ffddc7723c2dd8d3598edd898"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/data/SessionStore.kt",
+      "size": 2971,
+      "sha256": "1d17889083eacd65d1b0495c9e83e6cc4a395ef2b065dcba255e8d87e62b9b8f"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/notifications/AlertNotifications.kt",
+      "size": 3636,
+      "sha256": "9bbbb3d94bb8df6d57b8d7854e925fa3d957ad9c4f91dd759cc867641b6897b7"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/notifications/DinerMessagingService.kt",
+      "size": 1703,
+      "sha256": "0e185cf54122722d7f791a60fca3bbaf1524505f350f5b364246215a9123efeb"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/notifications/PushRegistration.kt",
+      "size": 4607,
+      "sha256": "6de13dda94b00197b4b757a9948cb21a931831b1e3bca24650648f9a790eb7d8"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/settings/AlertSettingsActivity.kt",
+      "size": 6373,
+      "sha256": "5d9b76e645287075e98fe9c7ff12fdf690146002d78b3cecd84c61248d105b44"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/BellView.kt",
+      "size": 1726,
+      "sha256": "1bb1dc02b7875ce5c722ca7e42320a495fc6acd481bd939af3332d9acb067b66"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/DocumentScreens.kt",
+      "size": 6928,
+      "sha256": "c2322930ff926a825525dade3d2b711f3317b7bf6ce379962a1e85414e32680d"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/FloorPlanScreen.kt",
+      "size": 12139,
+      "sha256": "637fe3e4d26cd10e9b06448d4a9f965134ed8ef45e85dbc4a26c3a79b9dfca50"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/InventoryScreen.kt",
+      "size": 4045,
+      "sha256": "3d6a4025ed6ccf401917f8fe658fa0eba951536f482e54fef119409753dc9be7"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/ManagementScreens.kt",
+      "size": 3443,
+      "sha256": "8475949a9e13ba357832062c30f297d58638f58238e09fb7870e8b9d2793e0ee"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/MenuScreen.kt",
+      "size": 6654,
+      "sha256": "1f2dcd92831cbb63d9c32376884b8a639d014758b9b5a3b0d5983fe94ff642b0"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/NativeRoute.kt",
+      "size": 4780,
+      "sha256": "2a0075f0149d6c85be12a46093b93479c50c9c4d9b18d0d2bc0991047ee70bea"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/NativeUi.kt",
+      "size": 7067,
+      "sha256": "5e9eb4a21b8041c6bf76f884b7213ba91d1b01406fcc9ae22cd4f1f2fd2b2741"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/OperationsScreens.kt",
+      "size": 14590,
+      "sha256": "2bdfecdfe96db9e1df38af6a1518063c7599e70d5a15c132bebe337e63ddf6c0"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/OrderScreens.kt",
+      "size": 29843,
+      "sha256": "0c88b9ef79d8fbfaf577aa1b6478bf1e2d76863b9d77c2b2212e39c7a5b6e042"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/RecordScreens.kt",
+      "size": 12495,
+      "sha256": "73562d15d03d1820766fd92e20d5ef4cce3f189581e3888c613acd3ee427e62a"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/ReportScreens.kt",
+      "size": 6204,
+      "sha256": "16d9c9546c1ace1ffbc130ecdd4e81141948535743a080aa4c12e3d4e0d8ad37"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/SettingsScreens.kt",
+      "size": 7454,
+      "sha256": "4e039c4b05e277c3cb338be8fe4b56c53a976f69b2006f4ee9186cada413e747"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/dinerdost/app/ui/TeamScreen.kt",
+      "size": 8623,
+      "sha256": "9859b4bf53aead2c8884d7fd225f78ab05f7bdbd10528b0cb314b145242e08fb"
+    },
+    {
+      "path": "apps/android/app/src/main/res/drawable/ic_launcher.xml",
+      "size": 489,
+      "sha256": "473e6a4c0cbaab99f03f1e12c95c4fef405009b89ddfcb9d1d29c8c3f76ec00b"
+    },
+    {
+      "path": "apps/android/app/src/main/res/drawable/ic_notification.xml",
+      "size": 377,
+      "sha256": "2db7f6fc17408774755b98eb67a8d9f1fda677ef576519fa8e42e92c0e9bf186"
+    },
+    {
+      "path": "apps/android/app/src/main/res/raw/order_alert.wav",
+      "size": 44144,
+      "sha256": "08745579a7586dca21770818f6e328438cfaed72cb69b0643d3aac799397dfca"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values-v27/styles.xml",
+      "size": 154,
+      "sha256": "ec194a97c90c5475a1cdfcacc3cc6131c8b1f427f856c76a1ed97d0a5d6197cf"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/strings.xml",
+      "size": 1423,
+      "sha256": "c2af49f7c08333f9ad512c4cd226c747dfaf4bd34ebff54111cc13f6a379992e"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/styles.xml",
+      "size": 596,
+      "sha256": "73e8a0a6b727b8118160aefd609e59d2005bf02759780625d45e3d5c6f10bf92"
+    },
+    {
+      "path": "apps/android/app/src/main/res/xml/backup_rules.xml",
+      "size": 254,
+      "sha256": "6235c99aeedc4702f2738276dfe65a70523cfd7f8796e29f7054b5b332135f2d"
+    },
+    {
+      "path": "apps/android/app/src/main/res/xml/data_extraction_rules.xml",
+      "size": 591,
+      "sha256": "f2f358d89c06fa712f6887b9bac1d9859b8843ec79f614084d32029efb76db5c"
+    },
+    {
+      "path": "apps/android/app/src/test/java/com/dinerdost/app/NativeRouteTest.kt",
+      "size": 853,
+      "sha256": "bcfcea437ce2cc581ff4e2363dcedcb25f84cc884f118d3676992621346a5840"
+    },
+    {
+      "path": "apps/android/build.gradle.kts",
+      "size": 143,
+      "sha256": "54186c3a2ee672da877e008a0645c2c707d1e7848d0784090db3ac21f93bc67b"
+    },
+    {
+      "path": "apps/android/build.ps1",
+      "size": 1452,
+      "sha256": "3dbf7d06371d5be9827faec6b4ddaf343c248f40e07ba19cc377f8bf55eb7b48"
+    },
+    {
+      "path": "apps/android/gradle.properties",
+      "size": 103,
+      "sha256": "fa078c27c9e4bde28a029d673875b028884505efa436b68cf60e1ac0be5b679b"
+    },
+    {
+      "path": "apps/android/gradle/wrapper/gradle-wrapper.jar",
+      "size": 45457,
+      "sha256": "76805e32c009c0cf0dd5d206bddc9fb22ea42e84db904b764f3047de095493f3"
+    },
+    {
+      "path": "apps/android/gradle/wrapper/gradle-wrapper.properties",
+      "size": 339,
+      "sha256": "6c3a0b5c6ed4ce965a571eddbdfad75da8a2f46c9c6a36abdb29271a9592f691"
+    },
+    {
+      "path": "apps/android/gradlew",
+      "size": 8618,
+      "sha256": "fb68debc1b1acf8ec55dc0d5e5495e1dedd0bd6b61f304bee61613eeb2bd9b92"
+    },
+    {
+      "path": "apps/android/gradlew.bat",
+      "size": 2896,
+      "sha256": "fedad02c18e266ec094995a5751b7fe1eb6e74f66bf75db64fae2e50eb22c234"
+    },
+    {
+      "path": "apps/android/settings.gradle.kts",
+      "size": 330,
+      "sha256": "02c0f16deba373b5b7654188597b3dc933070162f7ec2c36f5871c98be915e0a"
+    },
+    {
+      "path": "apps/web/AGENTS.md",
+      "size": 679,
+      "sha256": "063098f6cb31bb44c6f8fbea25b3876de7ee1e5f7d00a50dbab506f6415eb7f0"
+    },
+    {
+      "path": "apps/web/next.config.ts",
+      "size": 1656,
+      "sha256": "67f4d3eee9634378feaa0cea0de71b4da11a52f1c70e6092434226dda658e6db"
+    },
+    {
+      "path": "apps/web/package.json",
+      "size": 480,
+      "sha256": "ab0a92cf5baa04e3c00bf1cfc8f905dc8c67bf59a6950bcacf372df457440dc1"
+    },
+    {
+      "path": "apps/web/public/images/menu/samples/butter-naan.webp",
+      "size": 68406,
+      "sha256": "50a1373ef2179fa2b7830acf651b884183e0a740e81442bdce0b7551a31059fe"
+    },
+    {
+      "path": "apps/web/public/images/menu/samples/dal-makhani.webp",
+      "size": 61948,
+      "sha256": "f6f6b858c865a1d462b3afd2792b0fd4f514847beed34ba052a6706cf66d2ea1"
+    },
+    {
+      "path": "apps/web/public/images/menu/samples/dum-biryani.webp",
+      "size": 69542,
+      "sha256": "1f487ed7b04b77ecefbe5ea4331bee72bdd822dc30dcd00a6c243eb52153a944"
+    },
+    {
+      "path": "apps/web/public/images/menu/samples/mint-cooler.webp",
+      "size": 49816,
+      "sha256": "5dff901fffbd27a1b3acd766d11d0ed8e5de106521d34c07c885aa40973e45c1"
+    },
+    {
+      "path": "apps/web/public/images/menu/samples/paneer-tikka.webp",
+      "size": 73098,
+      "sha256": "12708e3b80ad043edb940cb94803b5f3a97dfd3595fc52add1d6cd7d1a32bcce"
+    },
+    {
+      "path": "apps/web/public/images/menu/samples/saffron-cheesecake.webp",
+      "size": 58904,
+      "sha256": "6a2871ecfb7183afca619c7b670f06ed8a7e635b605a3e3e38405258d0bce254"
+    },
+    {
+      "path": "apps/web/src/app/api/active-orders/route.ts",
+      "size": 478,
+      "sha256": "21c5b9f4aeca009d1c152bf2e2da5044589f617aab3a6b77b8a63e536d9a245f"
+    },
+    {
+      "path": "apps/web/src/app/api/activity/[kind]/route.ts",
+      "size": 538,
+      "sha256": "b467fa1d6ad24bd728373147fb1f3f35f8ab8d385b3d8ab92b892f7858cc78ab"
+    },
+    {
+      "path": "apps/web/src/app/api/auth/[action]/route.ts",
+      "size": 1317,
+      "sha256": "5d3d7cbb8ccc54c2b3733cd72c47c9dbe247aa21614134848625fd7e8af4f070"
+    },
+    {
+      "path": "apps/web/src/app/api/calculator/route.ts",
+      "size": 723,
+      "sha256": "13518e40b804532f347e375768a15c1448395f534eceaff2384cb9d40074bd4a"
+    },
+    {
+      "path": "apps/web/src/app/api/commands/route.ts",
+      "size": 13332,
+      "sha256": "4717c70661e8bcb9ee6abf6b3cd495af04f28b761954728dcfbb71cce65639c9"
+    },
+    {
+      "path": "apps/web/src/app/api/customers/[id]/route.ts",
+      "size": 470,
+      "sha256": "0ac8dc80ddce16ca94f475f509a8bba15c7fc06d38c6f444604f02d8e6019c75"
+    },
+    {
+      "path": "apps/web/src/app/api/customers/route.ts",
+      "size": 510,
+      "sha256": "4d55548f9ac37dc3402cd6e8d647af8c340cfe3864bae216417813e10b9b1f15"
+    },
+    {
+      "path": "apps/web/src/app/api/customers/search/route.ts",
+      "size": 456,
+      "sha256": "610f32c817ed8ee285049c0337b113f78544bd1293f1bb0ff46e00f4d5dbc49e"
+    },
+    {
+      "path": "apps/web/src/app/api/dish-report/route.ts",
+      "size": 508,
+      "sha256": "e5ea0fd3771d35ff350e0a5d7130da0ce5c79f8e629d214f7199ed7ca4cce0b7"
+    },
+    {
+      "path": "apps/web/src/app/api/guest/[key]/route.ts",
+      "size": 3821,
+      "sha256": "09edefeedb2fcfa73ac5076bc148083f97293571371bd99e378b10682dad92fd"
+    },
+    {
+      "path": "apps/web/src/app/api/internal/push/dispatch/route.ts",
+      "size": 1089,
+      "sha256": "e7a7adbb93702ff5fc4d05465ee94578e96fdd8b33139c666b1985cb9964a1ad"
+    },
+    {
+      "path": "apps/web/src/app/api/inventory-tools/route.ts",
+      "size": 1016,
+      "sha256": "bea50b3d39dd1516b478081d853afa55d43b500864fbf89a2cd03f0ecad826f5"
+    },
+    {
+      "path": "apps/web/src/app/api/invites/[token]/route.ts",
+      "size": 1122,
+      "sha256": "fba93f7b27413ff9c2ab38ff4c81dac856ee8c94fb98e4e73c3c98438dff42ea"
+    },
+    {
+      "path": "apps/web/src/app/api/invoices/[id]/route.ts",
+      "size": 439,
+      "sha256": "7781499539be154fa0fd2665ab0a0573296909ac132844820d085b190ab8f953"
+    },
+    {
+      "path": "apps/web/src/app/api/loyalty/route.ts",
+      "size": 468,
+      "sha256": "2ae57fe66ce2d0dd2d3f733e25de4fde22decad00e9bec90ed323fbcd483c3eb"
+    },
+    {
+      "path": "apps/web/src/app/api/menu-images/[id]/route.ts",
+      "size": 665,
+      "sha256": "eba068b3f55284181d0b0c92f6a652b10609c4fac8045f217e7a16eb5d1e0fa3"
+    },
+    {
+      "path": "apps/web/src/app/api/notifications/route.ts",
+      "size": 878,
+      "sha256": "bce6465fc46e653ff73504da0578050cec07363bed8c3caa32faa3c8c1079b0c"
+    },
+    {
+      "path": "apps/web/src/app/api/order-refunds/route.ts",
+      "size": 492,
+      "sha256": "2c6c3a430e196bb5ab16050e8318043efa04fdd916273c1d85b86dd10650a181"
+    },
+    {
+      "path": "apps/web/src/app/api/orders/[id]/route.ts",
+      "size": 435,
+      "sha256": "8f77e26cb57e7bafb7520bc585b70834bf9595e55843e7d18c3bae0d7532c511"
+    },
+    {
+      "path": "apps/web/src/app/api/prep/route.ts",
+      "size": 457,
+      "sha256": "645e8d16b00f26595883cac502c45b7260f60a66f491618ee75133d335824061"
+    },
+    {
+      "path": "apps/web/src/app/api/push/route.ts",
+      "size": 838,
+      "sha256": "51c1b2fa7e21f3674b5d8084ea631445cbf30904114e8fedc1df63fe27ba7616"
+    },
+    {
+      "path": "apps/web/src/app/api/receipt-images/[id]/route.ts",
+      "size": 692,
+      "sha256": "5cf728c0ac73bab7a2599dcfbc6a5aff53a18791af4c7edcd64ed23d333ba8e7"
+    },
+    {
+      "path": "apps/web/src/app/api/records/[kind]/route.ts",
+      "size": 576,
+      "sha256": "a230548886afff2d9386ac50613b72817267230e33b90f681288ac37fbf9b304"
+    },
+    {
+      "path": "apps/web/src/app/api/reports/route.ts",
+      "size": 492,
+      "sha256": "c037d165ca50f3905c348401b08810be18669e8d4cddd373d487aa951f3800db"
+    },
+    {
+      "path": "apps/web/src/app/api/service-board/route.ts",
+      "size": 502,
+      "sha256": "265e0db76ca5c60e2a508899ca416e671ec22622f9791bfbcc56b0de3db0ef11"
+    },
+    {
+      "path": "apps/web/src/app/api/staff-files/[id]/route.ts",
+      "size": 815,
+      "sha256": "2510f68e2fa0c1a5ea22a3198f0e583bf8077ff25edbcabf1c90460967756e27"
+    },
+    {
+      "path": "apps/web/src/app/api/staff/[id]/route.ts",
+      "size": 397,
+      "sha256": "c31270f5705d9eb8496661576a6898a33bbc00a1f06af4a7fbfa7a5d721e1aaf"
+    },
+    {
+      "path": "apps/web/src/app/api/stock-counts/route.ts",
+      "size": 464,
+      "sha256": "70d9f33e00ffaed8dc5abf87018a82621834faebd0a97375912e2387eac7449f"
+    },
+    {
+      "path": "apps/web/src/app/api/stock-reports/route.ts",
+      "size": 626,
+      "sha256": "f331c6a4c7d35cf66b1246507399196fa179003963b1ff26ba72d5c55c9d02e8"
+    },
+    {
+      "path": "apps/web/src/app/api/stock-summary/route.ts",
+      "size": 456,
+      "sha256": "17a057e98d47845612aef4d70b0b9bde2e87464c96f93118359eecf342f8c3ab"
+    },
+    {
+      "path": "apps/web/src/app/api/store/[slug]/route.ts",
+      "size": 2151,
+      "sha256": "d471ff1816207430904045079ae79a6385be242dda4b4e72de69bfe7833ddfde"
+    },
+    {
+      "path": "apps/web/src/app/api/tables/[id]/billing/route.ts",
+      "size": 502,
+      "sha256": "2a7758bc36041cc16cf02a11bf0bf5ddd05f9bbcbc94ce12dd9da5a72263464e"
+    },
+    {
+      "path": "apps/web/src/app/api/uploads/route.ts",
+      "size": 2968,
+      "sha256": "969aaabcadd5c974135c2f16cc75a1a6a6310a00dbc463ba6c827fd02f597812"
+    },
+    {
+      "path": "apps/web/src/app/api/workspace/route.ts",
+      "size": 544,
+      "sha256": "8550e8a826b8bc18234c52e4cd4108eafe0829093c23e5f215411995a934c963"
+    },
+    {
+      "path": "apps/web/src/app/app/[[...path]]/page.tsx",
+      "size": 264,
+      "sha256": "b19f7986617ba5c3fe3e448cc6a7702080713255151424dc6bcd87f655e20bf3"
+    },
+    {
+      "path": "apps/web/src/app/app/layout.tsx",
+      "size": 429,
+      "sha256": "e026244c77ff90088bd4fd1b8a46e3bc80ea5069aeb5a2af706e823753591d13"
+    },
+    {
+      "path": "apps/web/src/app/globals.css",
+      "size": 50100,
+      "sha256": "f15a8cad555c26390b991e5cc01210d582a3cc52fe2a650ecba12f445d58c848"
+    },
+    {
+      "path": "apps/web/src/app/invite/[token]/page.tsx",
+      "size": 403,
+      "sha256": "b0e877e73ce9acfcc2237baf9c9cba9e746c9832475e765298832782bef0ce48"
+    },
+    {
+      "path": "apps/web/src/app/invoice/[id]/page.tsx",
+      "size": 1108,
+      "sha256": "faf77f3a5239205086ae2646c34ef6160f9468870e0792cf7169542c8357eb28"
+    },
+    {
+      "path": "apps/web/src/app/kot/[orderId]/[roundId]/page.tsx",
+      "size": 1980,
+      "sha256": "4670adb4d033aaca2276e9a1d493f97f9024a1cae36669b65f5315f2098ff453"
+    },
+    {
+      "path": "apps/web/src/app/layout.tsx",
+      "size": 1068,
+      "sha256": "649de941dfbfa9376cec4bd48e2a331b9711104abda2e5da957a97f9725d55f1"
+    },
+    {
+      "path": "apps/web/src/app/page.tsx",
+      "size": 108,
+      "sha256": "f5584f702bad3018f1fd56196f5ef91e5989e9c6ba03ddc16e0213d52599c55b"
+    },
+    {
+      "path": "apps/web/src/app/preview/route.ts",
+      "size": 2925,
+      "sha256": "d6401d265a11d76a0b193e46e69110907f558634703e92853d53c092c8b0382b"
+    },
+    {
+      "path": "apps/web/src/app/q/[key]/page.tsx",
+      "size": 238,
+      "sha256": "5ad1cc2e44abf996c88d29145da29a2e1ad085008350836ddbc70f77adcbaeb4"
+    },
+    {
+      "path": "apps/web/src/app/refund/[id]/page.tsx",
+      "size": 2171,
+      "sha256": "d5beaa2adf4d547f08def8ce3183ab71063a691a318e90ca82999b3e3a8c0127"
+    },
+    {
+      "path": "apps/web/src/app/signin/page.tsx",
+      "size": 114,
+      "sha256": "ef4401961016b98f07d70257b792df3e9d1770d2aad8d88babe88360d840104e"
+    },
+    {
+      "path": "apps/web/src/app/signup/page.tsx",
+      "size": 121,
+      "sha256": "edfa72bcf2d49ae8b9f957747eb00b72bcf3eac84382a9d3e98c74d56d70387d"
+    },
+    {
+      "path": "apps/web/src/app/store/[slug]/page.tsx",
+      "size": 218,
+      "sha256": "0a17499ea7c5f173d4479fda0922d5ab0be9433dda83b88423e8887721c4a6fa"
+    },
+    {
+      "path": "apps/web/src/app/v2/orders/[id]/[operation]/route.ts",
+      "size": 877,
+      "sha256": "c07c459d72dd4901ae3402a3d33123f40120f46f4c6fcf2bb515c2a958335e4a"
+    },
+    {
+      "path": "apps/web/src/app/v2/orders/[id]/rounds/[roundId]/[operation]/route.ts",
+      "size": 973,
+      "sha256": "2694523b771551e3359fe2beab0aaca37a9a24d21431a39e525a84e51cc3a234"
+    },
+    {
+      "path": "apps/web/src/app/v2/orders/route.ts",
+      "size": 237,
+      "sha256": "6fc713b976563cc7d1ccff8f4d51a64ee0dccd1d6d7bdd7ebd7ae1fb3f898f63"
+    },
+    {
+      "path": "apps/web/src/app/v2/sessions/open/route.ts",
+      "size": 237,
+      "sha256": "52dccbf9169ee972a6aff0831e4550e865b6fc66e1dc2ea2623488c28a69538f"
+    },
+    {
+      "path": "apps/web/src/components/activity-filter.tsx",
+      "size": 7362,
+      "sha256": "551989ead58c95a25f66c1d6a696c06d3553b79e0f7ca1526b79697a02c5c935"
+    },
+    {
+      "path": "apps/web/src/components/expiry-input.tsx",
+      "size": 1399,
+      "sha256": "89cec73c1ffab89e35a5ed88239e75562fd68e11cf1cc0a050940d2389430d59"
+    },
+    {
+      "path": "apps/web/src/components/file-upload.tsx",
+      "size": 2820,
+      "sha256": "516f2cd5bf86fc6a88827c6ed39c93a3c079d5ef0abb29ecd415210803fac82a"
+    },
+    {
+      "path": "apps/web/src/components/menu-picture.tsx",
+      "size": 753,
+      "sha256": "4ae8660128ab863ef2e7373651e685d7202e0bf0636901a01fdbe7d17302b031"
+    },
+    {
+      "path": "apps/web/src/components/page-search.tsx",
+      "size": 3273,
+      "sha256": "156ecbae4a9db944399bf1e2c84b452ed83b59d05402b480ae87ae700e15afb6"
+    },
+    {
+      "path": "apps/web/src/components/ready-elapsed.tsx",
+      "size": 766,
+      "sha256": "238c585b6a69c1c0f31b783c314ba5a427e939e7da1b1f214500b447a8088593"
+    },
+    {
+      "path": "apps/web/src/components/table-qr.tsx",
+      "size": 3718,
+      "sha256": "cf1627c5a9f9647cfd4766f1823dd9cd391b3a2448b9b932f388181b779bb7af"
+    },
+    {
+      "path": "apps/web/src/components/ui.tsx",
+      "size": 12775,
+      "sha256": "ef7528276359135b644448c78383c05726c2a147037ccc993176874af7cb3b43"
+    },
+    {
+      "path": "apps/web/src/features/auth/auth-form.tsx",
+      "size": 3939,
+      "sha256": "2aca4b3aa79c686878fb72510c0b4c19d6fa94911783aea8056c12e6541f2b87"
+    },
+    {
+      "path": "apps/web/src/features/customers/customer-fields.tsx",
+      "size": 4830,
+      "sha256": "66205b0766127d7221ded302bd0ecb51e85ab2cd9b54d7344d7223a2801eea26"
+    },
+    {
+      "path": "apps/web/src/features/customers/customer-profile.tsx",
+      "size": 3068,
+      "sha256": "08396b8e5a994268f9eeb588fce825947afcb0c5f794e1207b9cfb7ea07ace7a"
+    },
+    {
+      "path": "apps/web/src/features/customers/identity-form.tsx",
+      "size": 1485,
+      "sha256": "9596fc887927ecf2d8c6817de73b3cd55d986a0fb260a45c179549b0ac1f25c9"
+    },
+    {
+      "path": "apps/web/src/features/customers/loyalty-leaderboard.tsx",
+      "size": 3235,
+      "sha256": "d6d3f3d5ba4f62de29514b2cf7cbb27513b3c3a646562e80560ac70d1876683a"
+    },
+    {
+      "path": "apps/web/src/features/guest/guest-page.tsx",
+      "size": 21554,
+      "sha256": "00ce6fadb0b6e3c76df7cda605f5060b5ed6a85ebdf979dbb99487f0e9d624a6"
+    },
+    {
+      "path": "apps/web/src/features/guest/guest.css",
+      "size": 4528,
+      "sha256": "077bf3e407f5ffddcd62691a5e860609461449076082fc4bd286d919f316be6f"
+    },
+    {
+      "path": "apps/web/src/features/management/attendance-page.tsx",
+      "size": 5823,
+      "sha256": "d90e05a12e055758f0c9ec471be20807439c9dc23d0fa5450a23aa412a8d8606"
+    },
+    {
+      "path": "apps/web/src/features/management/audit-changes.tsx",
+      "size": 5994,
+      "sha256": "2799055390a94da23e32d53f1fa4ac0acbe46307fd46c3106a05d35df53c21e9"
+    },
+    {
+      "path": "apps/web/src/features/management/category-manager.tsx",
+      "size": 2347,
+      "sha256": "cfdc2d0d722510baa46922f7139175608f1ce3af3bf788ff3209ac83c82b0052"
+    },
+    {
+      "path": "apps/web/src/features/management/daily-stock-counts.tsx",
+      "size": 12156,
+      "sha256": "6c56f1cead26a4b0f4982b0202220c1b5f18e1229d407a18c1b732fd6157a807"
+    },
+    {
+      "path": "apps/web/src/features/management/dish-report.tsx",
+      "size": 3274,
+      "sha256": "f7f2226857375305557068530e9c9b65877db030261e2d834296c1b17a1c3a95"
+    },
+    {
+      "path": "apps/web/src/features/management/ingredient-expiry.tsx",
+      "size": 1621,
+      "sha256": "856a8e1333a5aaa51222557c29ca5da4b1598eab1719d873576de8cef7c804da"
+    },
+    {
+      "path": "apps/web/src/features/management/integration-requirements.tsx",
+      "size": 2894,
+      "sha256": "4383cf0624f235da9d70053fcb42e0d5e42025e8e3d4e1fcba7b4c5f1d27152a"
+    },
+    {
+      "path": "apps/web/src/features/management/inventory-actions.tsx",
+      "size": 3310,
+      "sha256": "86e3e11f34ade046bb5e0295cf07afa9a19f83ded9ab0c7c919931987edd4c38"
+    },
+    {
+      "path": "apps/web/src/features/management/inventory-csv.ts",
+      "size": 422,
+      "sha256": "75f13ccaf412e58646c71b7ae6c4619a906c28e9db3350e676d6016b46e1684f"
+    },
+    {
+      "path": "apps/web/src/features/management/inventory-tools.tsx",
+      "size": 9161,
+      "sha256": "379634d8f008130223b43fbe236d9b7396fd10902cad09f63161c0e99de6e7c9"
+    },
+    {
+      "path": "apps/web/src/features/management/management-pages.tsx",
+      "size": 34096,
+      "sha256": "abd88f58b8c39c06294f9b048b698707ba1b09e834fcf03b0ec4e6b184313375"
+    },
+    {
+      "path": "apps/web/src/features/management/material-setup.tsx",
+      "size": 3544,
+      "sha256": "03af0deccf82a7c84d0bf77ca66931d47dcf652566d7e44a766d937ed6ba7fa7"
+    },
+    {
+      "path": "apps/web/src/features/management/menu-editor.tsx",
+      "size": 6732,
+      "sha256": "433e4790a06afd943bbc553743fe545eec5604bef811af30b5adeaf0b1d9b944"
+    },
+    {
+      "path": "apps/web/src/features/management/menu-options.tsx",
+      "size": 3863,
+      "sha256": "9083994c749c7d1eccf335a6e22a4d7f36b9086c40cb4099aff474c55fafd240"
+    },
+    {
+      "path": "apps/web/src/features/management/outlet-expiry-review.tsx",
+      "size": 3586,
+      "sha256": "68db8a475618f66b9d890dfd0cbfacf795c7a6399d0272e46c9a981fd76f5127"
+    },
+    {
+      "path": "apps/web/src/features/management/prep-plan.tsx",
+      "size": 1382,
+      "sha256": "08f9e83e47bd43acf1cdab28509714decd89c1ffc17db1a4cb0538219affc2ac"
+    },
+    {
+      "path": "apps/web/src/features/management/purchase-receipt.tsx",
+      "size": 5688,
+      "sha256": "1d309932cc193bdd21c56b26f1be19c4e745b10a8b2103f96b80d90e77992774"
+    },
+    {
+      "path": "apps/web/src/features/management/receipt-settings.tsx",
+      "size": 2659,
+      "sha256": "83a47b860eedd4d4f08a84c56649fb98afbf53b9a736be459c4208fd4f665a73"
+    },
+    {
+      "path": "apps/web/src/features/management/record-pages.tsx",
+      "size": 18016,
+      "sha256": "57c8dfc2b278de576d9da63ecbd106320012c20a36acf05aa791352dc177c2fd"
+    },
+    {
+      "path": "apps/web/src/features/management/report-charts.tsx",
+      "size": 5879,
+      "sha256": "7a8de7d03bb7f5eaf0209aec9b01a2c8a2e121a9c3ec249395e578f946968028"
+    },
+    {
+      "path": "apps/web/src/features/management/reports-page.tsx",
+      "size": 9750,
+      "sha256": "9e138223cb5f12c734381b1bb3349e07eb8e7f39ecb3bf485f64ea5c4ee8b082"
+    },
+    {
+      "path": "apps/web/src/features/management/reservation-editor.tsx",
+      "size": 7385,
+      "sha256": "f93ebb3c23f71046b56bea0279d824107541b4360dee1ef93a3effc100b63102"
+    },
+    {
+      "path": "apps/web/src/features/management/stock-receipt.tsx",
+      "size": 4623,
+      "sha256": "f3e9d4c1d8c56e860b9a0452bf67aaab01a074458a599227c672ec64e0651866"
+    },
+    {
+      "path": "apps/web/src/features/management/waste-report.tsx",
+      "size": 3313,
+      "sha256": "34470e8c01fa9b639ca29c0a04aead8bbc3f49b5c73f8f0d83bfc225fdcc2cb9"
+    },
+    {
+      "path": "apps/web/src/features/orders/adjustments-editor.tsx",
+      "size": 4262,
+      "sha256": "fa5f68a8affdd85a1a78ba822e262147f8782de8c63679960aeab2c7635b521e"
+    },
+    {
+      "path": "apps/web/src/features/orders/charges-editor.tsx",
+      "size": 4523,
+      "sha256": "824465f3b27a6b4b79c59e47a15d010d81e059252fb002596351051e683bbf8b"
+    },
+    {
+      "path": "apps/web/src/features/orders/device-ban-control.tsx",
+      "size": 2445,
+      "sha256": "189146db81c2e0a0b0bdd48b431928d454f5abc00a081397fa78c82a6bbdaf0c"
+    },
+    {
+      "path": "apps/web/src/features/orders/kot-printer.tsx",
+      "size": 4033,
+      "sha256": "1f633d3c35d0da7e77f6a5bcdce652ce1a1d9bec63c9144666140e798e4ebbc6"
+    },
+    {
+      "path": "apps/web/src/features/orders/order-actions-menu.tsx",
+      "size": 3427,
+      "sha256": "5671ae8d39813939efbd672e32d8a6622ed1d455a07d9bb55f32a40d59171a43"
+    },
+    {
+      "path": "apps/web/src/features/orders/order-pages.tsx",
+      "size": 48498,
+      "sha256": "d9fc29df7dc4955cfb3461bcf9b2d2a1e60d8460086cf78c074894160408e521"
+    },
+    {
+      "path": "apps/web/src/features/orders/payment-method-settings.tsx",
+      "size": 1866,
+      "sha256": "465c57ca40d60087b0622e4e83cd2807c566e33057ea818f90681d66c127664f"
+    },
+    {
+      "path": "apps/web/src/features/orders/payment-recorder.tsx",
+      "size": 2500,
+      "sha256": "a147a67955049ef1249a00233c607050d509e367ef920d08b980d671d682874c"
+    },
+    {
+      "path": "apps/web/src/features/orders/print-button.tsx",
+      "size": 2170,
+      "sha256": "b5f06c4a048f746e721d500a56dab5b2c8c4b6aa94e0e484e41070ba871cd0c8"
+    },
+    {
+      "path": "apps/web/src/features/orders/refund-print.tsx",
+      "size": 137,
+      "sha256": "0a4573a732287c80fd2449a6c3dea3531ab7061f12d99fb7d8c190483299a7ae"
+    },
+    {
+      "path": "apps/web/src/features/orders/refunds.tsx",
+      "size": 4534,
+      "sha256": "6675e5acdda6a13a8c37008621fa9df060818a9ba31199ab21220e9cd7b80c1e"
+    },
+    {
+      "path": "apps/web/src/features/orders/reward-entry.tsx",
+      "size": 848,
+      "sha256": "18d4c950b03021b64955070464c4d481e37093e77b3783bce861a9c4a9a0105d"
+    },
+    {
+      "path": "apps/web/src/features/orders/round-editor.tsx",
+      "size": 8339,
+      "sha256": "85c8d52f01195d98410d6d536f6774e0e4e422049fa129086363a3610aac2587"
+    },
+    {
+      "path": "apps/web/src/features/orders/selected-round-actions.tsx",
+      "size": 7794,
+      "sha256": "07020345831ad942f5f8beac8e2bec0424e8d2eee9d592377ff3b377f3497721"
+    },
+    {
+      "path": "apps/web/src/features/orders/tax-editor.tsx",
+      "size": 2455,
+      "sha256": "b728fa0d6010542f0e2842d75a30c57a347e4d8fd16d1fce62b70948e1a96b71"
+    },
+    {
+      "path": "apps/web/src/features/orders/tax-settings.tsx",
+      "size": 4205,
+      "sha256": "0e2fad6d2226d944028231d499e929421311da7535cf308b55eb8cdd1dc7f37f"
+    },
+    {
+      "path": "apps/web/src/features/orders/thermal-receipt.css",
+      "size": 4350,
+      "sha256": "6a33e11d057ab6eafb09deb45d784699b0c9724f939c429441e51da71c943208"
+    },
+    {
+      "path": "apps/web/src/features/orders/thermal-receipt.tsx",
+      "size": 7525,
+      "sha256": "ad3f6cd223fa49bd01416154f46a3621c9d420af89d87c3028bf4771274fc9e7"
+    },
+    {
+      "path": "apps/web/src/features/qr/qr-page.tsx",
+      "size": 9817,
+      "sha256": "7b85e4352037425cc90801e1be8a367ce7f74f89b69a040a267c12f77f528818"
+    },
+    {
+      "path": "apps/web/src/features/qr/qr-workspace.css",
+      "size": 5581,
+      "sha256": "e323c98d7d7e15ff8168a9647a846316305bb608d666775c7b6876f45939133a"
+    },
+    {
+      "path": "apps/web/src/features/qr/qr.css",
+      "size": 3117,
+      "sha256": "6948b0f2daa9228c1b37b16ddc74bbdd51d38b60768b61c47f00092953c402db"
+    },
+    {
+      "path": "apps/web/src/features/storefront/storefront-page.tsx",
+      "size": 16668,
+      "sha256": "3d97b68bb12762830b1ff1116ebc5f2ff9ca91bc510cbb2f0767b36b135ee941"
+    },
+    {
+      "path": "apps/web/src/features/storefront/storefront.css",
+      "size": 2245,
+      "sha256": "cfbfdb702c8381497d2c9e5fc8716a6ad9e06fe357640e6a441521f3f96cfeb4"
+    },
+    {
+      "path": "apps/web/src/features/tables/activation-switch.tsx",
+      "size": 1351,
+      "sha256": "46350de9635eab3ed93cd31066e64b878632c5913c1062782f214e1c85fd3a2c"
+    },
+    {
+      "path": "apps/web/src/features/tables/clear-table-button.tsx",
+      "size": 1855,
+      "sha256": "85147b021b6fa1de81bbbb5f5854fd792e17871e566daa6ecd7e83c41b960241"
+    },
+    {
+      "path": "apps/web/src/features/tables/explore-header.tsx",
+      "size": 3310,
+      "sha256": "1403d9e7d498eb996edab52036b6e06a93216d0574e4662b903eb4528f08ebe8"
+    },
+    {
+      "path": "apps/web/src/features/tables/floor-editor-state.ts",
+      "size": 2167,
+      "sha256": "f95057b73bab7028e9b4974cfcdd44503ce909f5ca031fa8ab217c9ab8caf3cc"
+    },
+    {
+      "path": "apps/web/src/features/tables/floor-plan.tsx",
+      "size": 53386,
+      "sha256": "a3fc2b9426a0469f90efedc17a3448c71f95e0def65f912c6fdb0ddd4ee1e04b"
+    },
+    {
+      "path": "apps/web/src/features/tables/group-controls.tsx",
+      "size": 3087,
+      "sha256": "6cc1ef1f948fa34936d16822852d9f43922c49e4cb60c5d4c32515f24884d1ad"
+    },
+    {
+      "path": "apps/web/src/features/tables/outline-editor.tsx",
+      "size": 11229,
+      "sha256": "c01d39a71de073fdb79a5c79168516c42013c42ec791c232cc18bf6371c034b3"
+    },
+    {
+      "path": "apps/web/src/features/tables/rename-table.tsx",
+      "size": 990,
+      "sha256": "606ecc03b8a3a07015c91839aad4f63beaf9de6fabbc00e170d0d80a27b4b953"
+    },
+    {
+      "path": "apps/web/src/features/tables/table-actions.tsx",
+      "size": 5459,
+      "sha256": "c267ef74dfe509459de9e638dfafdb16c5e0184710f5d76b49b92c6bfe91d508"
+    },
+    {
+      "path": "apps/web/src/features/tables/table-billing.tsx",
+      "size": 3655,
+      "sha256": "d368cb575150daca2401b2d1befb681b74ba6f8b22ec3124b2b70152bb700ae3"
+    },
+    {
+      "path": "apps/web/src/features/tables/tables.css",
+      "size": 10760,
+      "sha256": "45a25f146123028ad8b74f992ebea2baf8f29dfb5966f51ae8c0be67e892f325"
+    },
+    {
+      "path": "apps/web/src/features/tables/use-table-activity.ts",
+      "size": 354,
+      "sha256": "f87f7b6af9d5bfb369085954e9b3e209a032a43cf7cd0b6983bd597d28fba6da"
+    },
+    {
+      "path": "apps/web/src/features/team/accept-invitation.tsx",
+      "size": 3415,
+      "sha256": "d42bd8f9d9f042332f2b20fb2678b0a2b1d41a5338ee433d76859252478ddcea"
+    },
+    {
+      "path": "apps/web/src/features/team/member-editor.tsx",
+      "size": 5227,
+      "sha256": "4977faf9c2cfaedee68d80d1dacfca2c1bdc71efd37953a3b9e8f890477cd5ca"
+    },
+    {
+      "path": "apps/web/src/features/team/team-access.tsx",
+      "size": 4845,
+      "sha256": "9ad141fd01145c62d9fe81e1a46918583549b48ce1bbe03268e1ae3e7463ee53"
+    },
+    {
+      "path": "apps/web/src/features/team/team-page.tsx",
+      "size": 4768,
+      "sha256": "074216a156ee3f1528f54a5bf4cd72101c9846454cc3a912ce84e573a1b3d5d6"
+    },
+    {
+      "path": "apps/web/src/features/team/team.css",
+      "size": 761,
+      "sha256": "867ef73e1cf9028f96986f1fcc0df9e5ff96ca5222e35c60b0587adfdc46b0b8"
+    },
+    {
+      "path": "apps/web/src/features/workspace/context.tsx",
+      "size": 801,
+      "sha256": "ce3e8050b6b4545c0585aa7c1d6682e22fdf82d65bde8b15fd35670ae4b1e6d9"
+    },
+    {
+      "path": "apps/web/src/features/workspace/dish-picker.tsx",
+      "size": 4576,
+      "sha256": "9eeaf09487d44a91a8dbc6a1cf7cdd10324771988687e3c5889e998a491bf275"
+    },
+    {
+      "path": "apps/web/src/features/workspace/kitchen-stage-switch.tsx",
+      "size": 1257,
+      "sha256": "ef97fdbce67528b2be3af1ab3c15feea622e5bde7dd659ad2faf20d01898bb7f"
+    },
+    {
+      "path": "apps/web/src/features/workspace/notification-bell.tsx",
+      "size": 4867,
+      "sha256": "ac72dfdc545b6849a1720f2a1dca111714d57604b43712ee17a66c078c26d226"
+    },
+    {
+      "path": "apps/web/src/features/workspace/package-panel.tsx",
+      "size": 909,
+      "sha256": "e1ea234cc599ca4de88422fc2409514f0e00bf7031b7ac03c43480ce4edf94bc"
+    },
+    {
+      "path": "apps/web/src/features/workspace/reservation-reminders.tsx",
+      "size": 1854,
+      "sha256": "b9d91fc43359d93cc39db2bae88c138fcd65fbb6e46f7704c3115d70f9abb932"
+    },
+    {
+      "path": "apps/web/src/features/workspace/service-board.tsx",
+      "size": 5542,
+      "sha256": "06cfd9181c0ddc0d5c3b9254e1d978d4ec630759bab2686efae061d4d97325ed"
+    },
+    {
+      "path": "apps/web/src/features/workspace/service-pages.tsx",
+      "size": 47848,
+      "sha256": "1e7bf97966d7817da173b369c087ff4706672a6bacb76b06b92a72085083c1b1"
+    },
+    {
+      "path": "apps/web/src/features/workspace/stock-alerts.tsx",
+      "size": 3300,
+      "sha256": "d1ba47d0d90fb684db2add3075ada71b42a7843d8661a6a0476ed3e8caa17d9a"
+    },
+    {
+      "path": "apps/web/src/features/workspace/stock-count-reminder.tsx",
+      "size": 672,
+      "sha256": "81bf92f178b1e92a9885a917adcfc596afb18b7d55a88fdc0afc4294ed529b10"
+    },
+    {
+      "path": "apps/web/src/features/workspace/stock-summary.tsx",
+      "size": 3490,
+      "sha256": "d3ec5352d9662c1a6851bec596cc22859e8bd40cb34cb2fc90e9010b035b97a1"
+    },
+    {
+      "path": "apps/web/src/features/workspace/workspace-tools.tsx",
+      "size": 11498,
+      "sha256": "a37c73f103842fe3a417cfe790efef8b1dce8139a360b982d39a51ad80f56c5d"
+    },
+    {
+      "path": "apps/web/src/features/workspace/workspace.tsx",
+      "size": 21062,
+      "sha256": "2e74569f746bf2489cf7fbb7a6d12367866e6c6a3b69ded73f6a6399d0f430f6"
+    },
+    {
+      "path": "apps/web/src/lib/client.ts",
+      "size": 2610,
+      "sha256": "86b8988bb32e38697d032516d233448a139e93357ecde05340037e9052eb3dcb"
+    },
+    {
+      "path": "apps/web/src/lib/confirm-action.ts",
+      "size": 1315,
+      "sha256": "690b2b62b45aa4d61ccec489ba652a2daa10b709ab410a33524783064ef9d08a"
+    },
+    {
+      "path": "apps/web/src/lib/server.ts",
+      "size": 2349,
+      "sha256": "521917f5b7201da2de832964b108ee0e607e9b9bf84f739b2077853ac918961c"
+    },
+    {
+      "path": "apps/web/src/lib/staff-language.tsx",
+      "size": 16486,
+      "sha256": "2a684b293ff52f7cd0e0216b587d4e3383952851a79bbc258ddf81487beb9922"
+    },
+    {
+      "path": "apps/web/src/lib/use-activity-heartbeat.ts",
+      "size": 1087,
+      "sha256": "a43672abc83633cb3781ea8c7646f3ca14f4de8e35e3236e1818be53f9541868"
+    },
+    {
+      "path": "apps/web/src/lib/versioned-command.ts",
+      "size": 749,
+      "sha256": "37b464b4d30dd032437122352f93baeb6b24d21a9eb35a033235b0366b5ec68c"
+    },
+    {
+      "path": "apps/web/src/styles/client-feedback.css",
+      "size": 17962,
+      "sha256": "7d6461fe349accda17d4157b9789aa0d6f96f2e36353da5df669519232fa23b3"
+    },
+    {
+      "path": "apps/web/src/styles/interface.css",
+      "size": 27151,
+      "sha256": "ec114701f13f69c55d326932c55cbd3bcf3f544173ac62490c4f25129eb2c164"
+    },
+    {
+      "path": "apps/web/src/styles/inventory-tools.css",
+      "size": 1930,
+      "sha256": "bad81b654dfe4913a6b6d24ac621aab5a87745369f9053a0f8c660b4b2883110"
+    },
+    {
+      "path": "apps/web/src/styles/late-updates.css",
+      "size": 4523,
+      "sha256": "7fe03021497463235bc66f9d0d6738d29bf11ce6efbb935b0c0e57994aea6b89"
+    },
+    {
+      "path": "apps/web/src/styles/review-045.css",
+      "size": 2678,
+      "sha256": "174895d48163e4383999ccc4797cccca93716f25eb38d4108bbda9c9a17fbbeb"
+    },
+    {
+      "path": "apps/web/src/styles/review-046.css",
+      "size": 12031,
+      "sha256": "7b87db16ecc18520db70f356760ab7e9c5b6b1ae5bdccadd7e429f6e3446234d"
+    },
+    {
+      "path": "apps/web/src/styles/review-048.css",
+      "size": 2115,
+      "sha256": "8e91086e6baf979e7b9db2887a42f6c25b79ffdf7a0cf322cd2d3839d55eff8f"
+    },
+    {
+      "path": "apps/web/src/styles/review-049.css",
+      "size": 1042,
+      "sha256": "27c5d8db76b7c68ef81997ccae7c663319042c112fd92e4879356e0fca4bd6f4"
+    },
+    {
+      "path": "apps/web/src/styles/workspace-controls.css",
+      "size": 3798,
+      "sha256": "1f7b51ae51a00551e9f67bd61b39e7d221e819d801b3741f883610f1f3fd8ad3"
+    },
+    {
+      "path": "apps/web/src/styles/workspace-tools.css",
+      "size": 9296,
+      "sha256": "f41e4fd1b575bf6102777256ace90ce694c66ab25f7bbf78835988a9cbf81155"
+    },
+    {
+      "path": "apps/web/src/types/sweetalert2.d.ts",
+      "size": 114,
+      "sha256": "ef65e38bc6e36afd755bab73afd2acadcb3935cfc733244f0360bbee6a4105fe"
+    },
+    {
+      "path": "apps/web/tsconfig.json",
+      "size": 255,
+      "sha256": "2cbc526b97506d9636c1a58335e0df3486a3522aee91733f4d6a4d2f11380a97"
+    },
+    {
+      "path": "apps/web/verification/native-v2/emulator-error.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/verification/native-v2/emulator.log",
+      "size": 15261,
+      "sha256": "01fb71a8f4d0809dcd39c3e3575629b9f4936451db7c6089a919b8723cd984a9"
+    },
+    {
+      "path": "docs/ANDROID.md",
+      "size": 5164,
+      "sha256": "d4cbe72f66deb883c822228eef13f95ff1b56f248454e0991f7a1f1dc579b730"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "size": 8550,
+      "sha256": "df2b36140b6cb24a143442ff144b2065e768e9bcf0975cfa98f9ba2c0d4879ff"
+    },
+    {
+      "path": "docs/CLIENT_FEEDBACK.md",
+      "size": 152601,
+      "sha256": "45dfb08b93d39351da59e151e2feaf2390ee74287ccf298db38cf6cc6e354fb5"
+    },
+    {
+      "path": "docs/COVERAGE.md",
+      "size": 10652,
+      "sha256": "e00d7dfe3a3f99716154f1e9e809ec15916ccaba9fbd0659aa679522baa206c5"
+    },
+    {
+      "path": "docs/DEPLOYMENT.md",
+      "size": 5073,
+      "sha256": "352eb6432df7c15f661129fd672d5526a65015d214d3e3059bdfab4558109abf"
+    },
+    {
+      "path": "docs/GITHUB_HANDOFF.md",
+      "size": 2437,
+      "sha256": "d743adee63faee187a6a032ee4125e0810f1192c6dba5d80536f64431914c413"
+    },
+    {
+      "path": "docs/HANDOFF_ENV.example",
+      "size": 416,
+      "sha256": "d703463e21b4fa6c694814b6ffa90690953425d0aceb4e3d7595ec1609567bf5"
+    },
+    {
+      "path": "docs/LOCAL_PREVIEW.md",
+      "size": 2446,
+      "sha256": "9647cc4a1da1dc8c92b0d52fbb43e8b0343cf56ab46d51888873278f057130af"
+    },
+    {
+      "path": "docs/MONITOR_HANDOFF.md",
+      "size": 1820,
+      "sha256": "19c80f721e3e3a28e193e5e408e4f28b672299839bb60690df6bac1d69040c72"
+    },
+    {
+      "path": "docs/NEW_DEVICE_SETUP.md",
+      "size": 8004,
+      "sha256": "ca77a764dfef77196d0c78d5b6b0cf8c77e204a4f15b96fb7c7aa060db6ea90d"
+    },
+    {
+      "path": "docs/PENDING_QUESTIONS.md",
+      "size": 16486,
+      "sha256": "c8568405d60365060949031b92c6f50bc68756b877e7fd669df979d4232ce9e5"
+    },
+    {
+      "path": "docs/PETPOOJA_ADDITIONS.md",
+      "size": 15146,
+      "sha256": "217a2a9950532218c8c4b6eb584b36524ac975ea162d9d90edf0292bc2fca387"
+    },
+    {
+      "path": "docs/PLATFORM_LOYALTY_SETUP.md",
+      "size": 1455,
+      "sha256": "ace892850dc6802de43fbe5c7fd84d318610c93cb7b7b359e68e97dc2d6e5519"
+    },
+    {
+      "path": "docs/RELEASE.json",
+      "size": 7669,
+      "sha256": "7d907b05f9a7306d19db290d7b1a965f9de5af3e63a640d295bc97b866dc70c0"
+    },
+    {
+      "path": "docs/V2_CHECKLIST.md",
+      "size": 34574,
+      "sha256": "319c977a26b77607fcebf99e587b2aea6418667ad0ea0d347e395bd1c08e85d7"
+    },
+    {
+      "path": "docs/VERIFICATION.md",
+      "size": 72811,
+      "sha256": "920f1bfba778afed3d504331e3829091ac689774192448344f08c9873935cc56"
+    },
+    {
+      "path": "output/pdf/DinerDost_Petpooja_66_Video_Inventory_Gap_Review.pdf",
+      "size": 139685,
+      "sha256": "36711c1ed2b9cbfa24c810a3e017ba44fc3885dfdf48b11e081815fbcafc03f6"
+    },
+    {
+      "path": "output/pdf/DinerDost_Petpooja_Inventory_Gap_Review.html",
+      "size": 41567,
+      "sha256": "a7b8866e12302bf81e6206d50620bffb16f0d19616413e392450b2f8ab1e1398"
+    },
+    {
+      "path": "package-lock.json",
+      "size": 81099,
+      "sha256": "1ec413f0761846ab5e5594a80059167d4df7693cb6b154bcae7301d747cc5b79"
+    },
+    {
+      "path": "package.json",
+      "size": 825,
+      "sha256": "ef5e2f49c603349085782d02a04cb3a9c02e6a65ed5c844ca344117bff52bebc"
+    },
+    {
+      "path": "packages/core/package.json",
+      "size": 125,
+      "sha256": "879185aec98acaca1848596c894979ced663d0d37fb086edf037535aa8e6c83c"
+    },
+    {
+      "path": "packages/core/src/allocation.ts",
+      "size": 1090,
+      "sha256": "03a5447d271743b05ccdd1ea6ec11548a07a660bb6223fb45e156475f0e97ec7"
+    },
+    {
+      "path": "packages/core/src/applications.ts",
+      "size": 1581,
+      "sha256": "d94355c61d629801571b1ce3eb13ad99611497103c71947d45a52ebf36dd452b"
+    },
+    {
+      "path": "packages/core/src/calculator.ts",
+      "size": 1734,
+      "sha256": "234ba6efb30c7455c84d0b5869e7dd5d1dc3dc567a9cd13332d6ce1ebdbc080c"
+    },
+    {
+      "path": "packages/core/src/errors.ts",
+      "size": 376,
+      "sha256": "72385ce37a9f58887f5b17a64b6141189ad43ddb352bbad47aeb92acb56f0778"
+    },
+    {
+      "path": "packages/core/src/floor-gates.ts",
+      "size": 2074,
+      "sha256": "727d468a5f0e3fee53bbcf782ada0ce17a1dc4af922f336704bdf724e76a013f"
+    },
+    {
+      "path": "packages/core/src/floor-outline.ts",
+      "size": 6255,
+      "sha256": "e89f8dca4c2d4cd4e26ff2b6947e113e9830ce092cc73511bf15fb822a5eb77a"
+    },
+    {
+      "path": "packages/core/src/floor-placement.ts",
+      "size": 1576,
+      "sha256": "84b09ee0ef22811a3e3c5e5b4dbe0fa77133c1e5422ce266320930861777c0d6"
+    },
+    {
+      "path": "packages/core/src/floor-plan.ts",
+      "size": 5365,
+      "sha256": "2e49a5d743ce42f675b23f13b903c59505a5f34d297052bf2abfdcd5309f32b8"
+    },
+    {
+      "path": "packages/core/src/identity.ts",
+      "size": 792,
+      "sha256": "3ea02a546a3f1bdb2e77f113827ad8e04200148cd579096b8197fd829e72346d"
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "size": 477,
+      "sha256": "599e11c707cf382fd6cc3bb486c39b0661d3c751bcb4ce9d67d6466ccd679bfe"
+    },
+    {
+      "path": "packages/core/src/money.ts",
+      "size": 3648,
+      "sha256": "ce944a0f4f53400973af168b723075ba099a37f1507a7ce1542c3da929b44b01"
+    },
+    {
+      "path": "packages/core/src/payment-methods.ts",
+      "size": 394,
+      "sha256": "cbaa3ae9ec968f4c1c91732a0a8dfc30ac33efb04cfe56b7cbae965d8d6c055d"
+    },
+    {
+      "path": "packages/core/src/permissions.ts",
+      "size": 3623,
+      "sha256": "00a9cd61682e00f903991b69d1a6e10d3d78327ffa91ee6daac8c616c3f7c387"
+    },
+    {
+      "path": "packages/core/src/table-groups.ts",
+      "size": 1518,
+      "sha256": "ba2ad0460ba3f3b8a462ad789421052e6a8af6c03c222395c8ad5dddca15217c"
+    },
+    {
+      "path": "packages/core/src/table-name.ts",
+      "size": 1006,
+      "sha256": "d6da90cf704ae450428c776ed4e65b0780064d966dca4ab8028f2ba5523712a2"
+    },
+    {
+      "path": "packages/core/src/taxes.ts",
+      "size": 896,
+      "sha256": "a6dea45e3cf161deddad4a0a5f56a2589023476dd5a27ad8d4b2629abe1b7289"
+    },
+    {
+      "path": "packages/core/src/time.ts",
+      "size": 1166,
+      "sha256": "6ffddf4fe8d7ebf44895d4e6f6246e55df9ada6851c49fa6b9daefb2ae574415"
+    },
+    {
+      "path": "packages/database/migrations/001_initial.sql",
+      "size": 18552,
+      "sha256": "c8d8ab2123b5fb3218a78d3d114fe81ab5a5df775ae568f6e61c35e71f7bf1cf"
+    },
+    {
+      "path": "packages/database/migrations/002_loyalty_and_quotes.sql",
+      "size": 1065,
+      "sha256": "1f8c58dd99f0973beae647e48dd0ef0d1923c5f560627994be2113442b85d949"
+    },
+    {
+      "path": "packages/database/migrations/003_scope_hardening.sql",
+      "size": 1206,
+      "sha256": "f1a8423261bf22190563d74cf6ce0d0e1dee72217b763587378d26a350aa3080"
+    },
+    {
+      "path": "packages/database/migrations/004_runtime_role_and_ledger.sql",
+      "size": 625,
+      "sha256": "d6a680955ec9f4edfe428b65acf4e2b555d92aee3ade4dc15b0006e1f4b5f151"
+    },
+    {
+      "path": "packages/database/migrations/005_receipt_deduplication.sql",
+      "size": 213,
+      "sha256": "325cab8db34815cac57af8936b1b521cf4dd93472e72f46fe0223ba3065878dd"
+    },
+    {
+      "path": "packages/database/migrations/006_scan_to_order.sql",
+      "size": 489,
+      "sha256": "332ea39d069a0d71274290b7c4a369a67bbefd7d0c5dc5a1935b3c0ba3406076"
+    },
+    {
+      "path": "packages/database/migrations/007_customer_device_bans.sql",
+      "size": 2932,
+      "sha256": "9231d11472920bc6ce17eceac52eb386a56cb2d0a40e7a0a1e20e7b448d44327"
+    },
+    {
+      "path": "packages/database/migrations/008_client_feedback.sql",
+      "size": 2741,
+      "sha256": "62f66c72eb4a357e44a26eeb41c605ec3212043bedffc2de7b9190addde621d9"
+    },
+    {
+      "path": "packages/database/migrations/009_attendance_and_liquor.sql",
+      "size": 3059,
+      "sha256": "6d63dd5e00be95f5f1f8b467980d381c18d765e04a4745a8b2b4d99e5d0438d6"
+    },
+    {
+      "path": "packages/database/migrations/010_unseated_table_service.sql",
+      "size": 756,
+      "sha256": "2a5e1aa7cdbf87906b01913fc5684db10962dc747582b2434da17f94103b9da4"
+    },
+    {
+      "path": "packages/database/migrations/011_floor_plans_and_table_activity.sql",
+      "size": 2652,
+      "sha256": "0bcb2d85bd72846a24c92b54d44c12d12959ef9cba7f66989865d5013fc4468d"
+    },
+    {
+      "path": "packages/database/migrations/012_order_tax.sql",
+      "size": 339,
+      "sha256": "94ca56f806b3973898fc0949e9269215ea5acf4a919d847c7746f2be7adfc4af"
+    },
+    {
+      "path": "packages/database/migrations/013_staff_invitations.sql",
+      "size": 1248,
+      "sha256": "ece902e40725ac6ce654adcd3f0f6387ec2e8810a9b8c28cfbf1909e40d716c0"
+    },
+    {
+      "path": "packages/database/migrations/014_notification_reads.sql",
+      "size": 792,
+      "sha256": "30690ba93fcc61c4c2d282ebbdcd8053840635fc310ae60508cdb376019555cf"
+    },
+    {
+      "path": "packages/database/migrations/015_resizable_floor_plans.sql",
+      "size": 193,
+      "sha256": "11c432d1a54887617f0c23e43ca1639be55c24973cfcc91a4dff3dfe76e15eec"
+    },
+    {
+      "path": "packages/database/migrations/016_application_sessions.sql",
+      "size": 598,
+      "sha256": "89cc404262b4fec1e6554fce3a1eaf6cc117b1624db3c7e4dd28a376db5cfca3"
+    },
+    {
+      "path": "packages/database/migrations/017_food_and_bar_streams.sql",
+      "size": 1043,
+      "sha256": "550ff28b87d5b9b737052c494c3815196259e1956bbbffdc0954a829f6c3c283"
+    },
+    {
+      "path": "packages/database/migrations/018_procurement_streams.sql",
+      "size": 266,
+      "sha256": "cffb3606cf7865542a60321e3566989032a51887db768386f20c40d82907fdf9"
+    },
+    {
+      "path": "packages/database/migrations/019_catalog_streams.sql",
+      "size": 411,
+      "sha256": "8d4a8824b8a0016ba6cc485d23724409a64edfa25df81535a5a025ff13845998"
+    },
+    {
+      "path": "packages/database/migrations/020_public_storefronts.sql",
+      "size": 2095,
+      "sha256": "e1a3901159c4f74e4be7a5b016e7a34d595ba7d644db6b28931f992f54d546d6"
+    },
+    {
+      "path": "packages/database/migrations/021_purchase_receipts.sql",
+      "size": 1028,
+      "sha256": "5aa6b7cdcd2e4f6d43ed0b7914849dc3062dbc2b98784ad0f20bc7509689fc85"
+    },
+    {
+      "path": "packages/database/migrations/022_android_push.sql",
+      "size": 2306,
+      "sha256": "2c715b0f770c6c0050b5fc1ab1ee3b4caf1f388b178037a1e83f51910a59860a"
+    },
+    {
+      "path": "packages/database/migrations/023_web_catalog_profiles.sql",
+      "size": 212,
+      "sha256": "69bb3db7d987e52ff7b5ed01a3de750a5a45e98685224e1360b5a2a11bf98680"
+    },
+    {
+      "path": "packages/database/migrations/024_named_taxes.sql",
+      "size": 779,
+      "sha256": "f4060fc2fd8f19f2c53b6261a22ef838ef141a5ffceba9762e049f7bcfe45b8c"
+    },
+    {
+      "path": "packages/database/migrations/025_split_legacy_kots.sql",
+      "size": 1597,
+      "sha256": "41b3c4acf60fc311fb3ce04c84a9b0ec455e8cf5f825898aa877177e0fefc12c"
+    },
+    {
+      "path": "packages/database/migrations/026_menu_photos.sql",
+      "size": 390,
+      "sha256": "087818da055351069a5c761d6e4b99033d738f15dfd5ececa266ab9eb8825321"
+    },
+    {
+      "path": "packages/database/migrations/027_floor_outlines.sql",
+      "size": 217,
+      "sha256": "564c7d9e8a500cf0406081444e7ffdfcbecd7c988a5c18b33029880715e1fbf4"
+    },
+    {
+      "path": "packages/database/migrations/028_explicit_activation_policy.sql",
+      "size": 239,
+      "sha256": "8c4a400cdec2bb29f8badfaf214deb1259f6d869a7b91c86d867d7c08d6f792e"
+    },
+    {
+      "path": "packages/database/migrations/029_uploaded_assets_staff_details.sql",
+      "size": 1873,
+      "sha256": "f67191135eed89bd79e341d5d067ebe398c81efb6dbc3b517d5969d8f5b350bb"
+    },
+    {
+      "path": "packages/database/migrations/030_inventory_versions.sql",
+      "size": 71,
+      "sha256": "5d003e8b591301c254761874cf17f0fbbf03e96763133b977a5ac5496788781e"
+    },
+    {
+      "path": "packages/database/migrations/031_backfill_purchase_expenses.sql",
+      "size": 1334,
+      "sha256": "16045118746d1e592a57a810f0fccc6d03a52418c140d07bdfe09e6140cd57ac"
+    },
+    {
+      "path": "packages/database/migrations/032_receipt_layout.sql",
+      "size": 307,
+      "sha256": "6fb793e6ee881650377c8ce288a60114f6797fa2003e0f1fc79f09958a4029d1"
+    },
+    {
+      "path": "packages/database/migrations/033_web_feedback.sql",
+      "size": 574,
+      "sha256": "2276ac62ef5fa241df8347f93882be66b85d70e1e70bab0993f4453a19d2f07f"
+    },
+    {
+      "path": "packages/database/migrations/034_web_stock_kot.sql",
+      "size": 446,
+      "sha256": "42dda594d170a1a0e868f88b51a4608403f09ee8e44f9c1908a781727a2ad10f"
+    },
+    {
+      "path": "packages/database/migrations/035_dish_costs.sql",
+      "size": 2061,
+      "sha256": "0fa283c6059d0e9109623288b33493ba4d95b0b48cba5ffb9bc2bb701d14e4e7"
+    },
+    {
+      "path": "packages/database/migrations/036_rounding_direction.sql",
+      "size": 491,
+      "sha256": "b9459183c572ca6f268ad4d7c7092be0955412ce0d59659a38b4150ea4c78a1f"
+    },
+    {
+      "path": "packages/database/migrations/037_active_table_labels.sql",
+      "size": 273,
+      "sha256": "8ef3e619ba345538212108939cfdbc842730abba9bafacd6052a702fba6bda8f"
+    },
+    {
+      "path": "packages/database/migrations/038_inventory_value_and_archive.sql",
+      "size": 1508,
+      "sha256": "89cb96944b162d89ef32cddc474d0e64afa8c608e5f65c8a950eb857baddc7c9"
+    },
+    {
+      "path": "packages/database/migrations/039_web_order_payment_flow.sql",
+      "size": 1190,
+      "sha256": "5085677e45d98d1670cd224deaa07440e5ae3d4d0edb98cc806e558be487a2f9"
+    },
+    {
+      "path": "packages/database/migrations/040_daily_stock_counts.sql",
+      "size": 1667,
+      "sha256": "0edc9746ddb76893706605da7bf69f0715bc0c913d58478605c9f3964916d78f"
+    },
+    {
+      "path": "packages/database/migrations/041_prepared_food.sql",
+      "size": 3561,
+      "sha256": "b8abb74cc2022520e59f4a7591fa01958fef8d47246cf006c43b467301da1958"
+    },
+    {
+      "path": "packages/database/migrations/042_alert_dismissals.sql",
+      "size": 861,
+      "sha256": "6a5a3e5da97882983925a8ed1d29e617eeae0676d4414375e38ec05c6bfa9de3"
+    },
+    {
+      "path": "packages/database/migrations/043_menu_piece_unit.sql",
+      "size": 258,
+      "sha256": "214a24b359cdeff662f6bc2af499721d042755b78405a236f73a09b8d680c683"
+    },
+    {
+      "path": "packages/database/migrations/044_calculator_history.sql",
+      "size": 917,
+      "sha256": "d1c26c27b516757ff8209d00d5ee7b995feee099755f367e59d657a6c4a36670"
+    },
+    {
+      "path": "packages/database/migrations/045_material_setup_and_packs.sql",
+      "size": 1731,
+      "sha256": "8b7fca01e3d67a06959e2863c27b93c02ef737c671ca3be2914236ddd4ce2d4f"
+    },
+    {
+      "path": "packages/database/migrations/046_order_pins.sql",
+      "size": 712,
+      "sha256": "7bdb4f0bbbc7f696652d2f54e05700de51dd281da1276f388574cf46ed9d380e"
+    },
+    {
+      "path": "packages/database/migrations/047_web_kitchen_policy.sql",
+      "size": 244,
+      "sha256": "ef5935f658db3ae0dc20c3e3e72c5720434d5d66caa8fcecb434472593a96256"
+    },
+    {
+      "path": "packages/database/migrations/048_web_bill_defaults.sql",
+      "size": 178,
+      "sha256": "9d10f810cada232b0eabd6a73080c7218abe878b243766a07dd71fc866a1b211"
+    },
+    {
+      "path": "packages/database/migrations/049_web_loyalty_cap.sql",
+      "size": 227,
+      "sha256": "b4382531e1ad8f382f97dfd68dcda05d370271c835b372d7e1fb0e710baa9be2"
+    },
+    {
+      "path": "packages/database/migrations/050_web_refunds.sql",
+      "size": 2708,
+      "sha256": "fb7b396ff7070dd4812f8828a00e2bc9587601415e4638392d21309922c98216"
+    },
+    {
+      "path": "packages/database/package.json",
+      "size": 239,
+      "sha256": "aba05981e5b44b551a303152ba8ac3548cc7b83c51c3baccd9afc5aacfbd55e8"
+    },
+    {
+      "path": "packages/database/src/index.ts",
+      "size": 5157,
+      "sha256": "5bf10bb6d9a43cd6aadebc93e6de57a4d9e29305d79d78889e9876c444993acd"
+    },
+    {
+      "path": "packages/services/package.json",
+      "size": 271,
+      "sha256": "3e0c5e5357c2f1e94bafc5b60b2c10177a4952994665938659427a554a8adc73"
+    },
+    {
+      "path": "packages/services/src/activity.ts",
+      "size": 6104,
+      "sha256": "99f64f7051a5a68e3d1433b1a2d122d553194ba2880b4b4629de894c04c8e041"
+    },
+    {
+      "path": "packages/services/src/alert-dismissals.ts",
+      "size": 892,
+      "sha256": "cf782ab10c053badd7e8e9735d27109f5ea4992a125932e2d5df2da07e7647fe"
+    },
+    {
+      "path": "packages/services/src/application-commands.ts",
+      "size": 2394,
+      "sha256": "a8ff71d40f03e0bfb7ed5f099ea78dd41e40269d3c712dd8f539c273287a2fdc"
+    },
+    {
+      "path": "packages/services/src/assets.ts",
+      "size": 5714,
+      "sha256": "044e074f8d4c5ff0b3d6e0bdde180e91949e8d6aabec22ef84ab700014021a44"
+    },
+    {
+      "path": "packages/services/src/attendance.ts",
+      "size": 6676,
+      "sha256": "98a02c676223723c8ace89280579c88a5687755e9abd798305bb68e372d0dc16"
+    },
+    {
+      "path": "packages/services/src/auth.ts",
+      "size": 8257,
+      "sha256": "493568a5862a63f7ee9e2ea2983e83266c28d1a62c9f9dec1b7a33bccb2a495b"
+    },
+    {
+      "path": "packages/services/src/billing.ts",
+      "size": 9785,
+      "sha256": "11fe49744f5316d6adb34ba785ccf8bc3dc6676faf89cbf069b1ef28228582c6"
+    },
+    {
+      "path": "packages/services/src/catalog.ts",
+      "size": 19771,
+      "sha256": "f77cee30cdab55b0a320b7ff1c2bc3dc86599103d865125d3999b8267904d1b3"
+    },
+    {
+      "path": "packages/services/src/customer-devices.ts",
+      "size": 3742,
+      "sha256": "4e111fcd64f1e8db130b9ef6e6b507875728635a2c0a7e917ff1e1220dc06e31"
+    },
+    {
+      "path": "packages/services/src/customer-identity.ts",
+      "size": 1166,
+      "sha256": "800f1e7cca5c5e61374bdcdf08f1d8f2c93ded54573ed794bacdbbfa97732b41"
+    },
+    {
+      "path": "packages/services/src/customers.ts",
+      "size": 7035,
+      "sha256": "494126cd94d61843125c161a10e043d5d4834e17c04f9871637ff848189ac582"
+    },
+    {
+      "path": "packages/services/src/dish-report.ts",
+      "size": 3689,
+      "sha256": "3c27f426e5fc9084e6f5702ef89fc2638a6832fe2e06ba8ab7283f64150e8841"
+    },
+    {
+      "path": "packages/services/src/firebase-sender.ts",
+      "size": 2816,
+      "sha256": "557565664b9685dbaae41590e5ca8f4a0bdbc81c64bbb76ecee3035f0a6c8c98"
+    },
+    {
+      "path": "packages/services/src/floor-plans.ts",
+      "size": 14122,
+      "sha256": "48caaec28fea24c6f866002b18a2ba6d6b085657e57173ef5fb3f1d96bc17316"
+    },
+    {
+      "path": "packages/services/src/guest.ts",
+      "size": 21904,
+      "sha256": "fdbf75670f929948c457c603964e6292ad43d8c3f042c98e7b653ba3181846d3"
+    },
+    {
+      "path": "packages/services/src/inbox.ts",
+      "size": 8138,
+      "sha256": "c381b4c8cc22ef7c718810f02861749e83aab769edff1d3b0f9e2d8c2f8bacad"
+    },
+    {
+      "path": "packages/services/src/index.ts",
+      "size": 1762,
+      "sha256": "6c361f8bc70d4cc9d9a8dc7906f29e38d1c5b321e1b7f08af52bb64c701b726b"
+    },
+    {
+      "path": "packages/services/src/inventory-tools.ts",
+      "size": 8870,
+      "sha256": "93ad95214764563e240a6b3907741f6831ee5a6a1d1544bd85a4df1f49fe1991"
+    },
+    {
+      "path": "packages/services/src/inventory.ts",
+      "size": 11351,
+      "sha256": "14f7e0b4848e86c5660dca7a26f2c55e3566e462b4c9e8c1332998254a291f2e"
+    },
+    {
+      "path": "packages/services/src/kitchen-policy.ts",
+      "size": 1782,
+      "sha256": "ef2bfd88a2faeb2aa18a3f73dfcc2fd32e87a793136394c9a942a70c230a494a"
+    },
+    {
+      "path": "packages/services/src/kitchen.ts",
+      "size": 9169,
+      "sha256": "48af492f9e14c76455e0ee1cb7252dc9228d7e932a3e0b3a7cdf64d79730a0a1"
+    },
+    {
+      "path": "packages/services/src/kot-print.ts",
+      "size": 4341,
+      "sha256": "bf6bb1d3f0b2c80f0a308aea97bdcd386862642ebe3415c6490dac87d838babc"
+    },
+    {
+      "path": "packages/services/src/leaderboard.ts",
+      "size": 2015,
+      "sha256": "ee666b8c7c3fdbf7967b5c468ad0fdc78cb20d7d6c4dbaaa098c3a9510138bed"
+    },
+    {
+      "path": "packages/services/src/material-setup.ts",
+      "size": 3618,
+      "sha256": "892849513429476a9dacbd89323f5625777f19e9ea915b48f087af23e2af94fb"
+    },
+    {
+      "path": "packages/services/src/menu-categories.ts",
+      "size": 4121,
+      "sha256": "a1ee48c81644c29f1eddf7f4858a510c5dd20c7cd13f9bc29a5462364b4f8af1"
+    },
+    {
+      "path": "packages/services/src/operational-access.ts",
+      "size": 785,
+      "sha256": "0a303aa30b852792181171b9895fbf301180926f35146531a299bd320ba3b33e"
+    },
+    {
+      "path": "packages/services/src/operations.ts",
+      "size": 8194,
+      "sha256": "aa75b69e5ef396eac29d2597f2562d8d58171fd4727e86968368222b815f15b1"
+    },
+    {
+      "path": "packages/services/src/order-adjustments.ts",
+      "size": 4961,
+      "sha256": "8a33cad5405bfa9576e68c474de2807d6474672768e3c58e43bb03d5c529f512"
+    },
+    {
+      "path": "packages/services/src/order-charges.ts",
+      "size": 5115,
+      "sha256": "4d2ce474570b23c1112661a5d2958d9fcbebe664523f926d93981e2cc58011e2"
+    },
+    {
+      "path": "packages/services/src/order-state.ts",
+      "size": 1152,
+      "sha256": "36d316cbff4739d4522f01bfc6105a340ed374165858c3e7284c3ab298e68f63"
+    },
+    {
+      "path": "packages/services/src/order-summary.ts",
+      "size": 1655,
+      "sha256": "a8c798fbf89e36b4ef3474c4cb8e3a8de0b42d9dbb8f8d72239e3c38613fda2c"
+    },
+    {
+      "path": "packages/services/src/order-tax.ts",
+      "size": 5355,
+      "sha256": "bd368c0abe04168261404e100d8870e8cca651b9f072ef54c0c58f77e66f1304"
+    },
+    {
+      "path": "packages/services/src/orders.ts",
+      "size": 39264,
+      "sha256": "22798e39c5d4a9dbd517e64bbbec341a0abfd179d5ecdf29c9bc98a394aff65c"
+    },
+    {
+      "path": "packages/services/src/payments.ts",
+      "size": 17149,
+      "sha256": "aebcdbca33c4ecf6711d15a9a68b8e779e4ebca6f3c5e16e203b409d361b4f83"
+    },
+    {
+      "path": "packages/services/src/prepared-food.ts",
+      "size": 7713,
+      "sha256": "98f422ad7cd133374f9863cbcc862893d174c6ef62f29af47734ee34021c7715"
+    },
+    {
+      "path": "packages/services/src/prepared-stock.ts",
+      "size": 4407,
+      "sha256": "76f01b3b34e4c281d12b4754fd45b31246daa48365e05230a534ce377b92c236"
+    },
+    {
+      "path": "packages/services/src/procurement.ts",
+      "size": 5521,
+      "sha256": "845f2a3bff7f2b8a56dd72c7decab02f854c936c9e25873a26b5e5347141d7b1"
+    },
+    {
+      "path": "packages/services/src/public-identities.ts",
+      "size": 833,
+      "sha256": "e40f97ae630856c3a4c7e649ed1cd059d13c129d14e25ea749dd5b5e7ba6af5a"
+    },
+    {
+      "path": "packages/services/src/public-menu.ts",
+      "size": 1931,
+      "sha256": "35ac34849401273b5a97290839c0acde4d0ebcdb764ac3d88ae4f35688fb4696"
+    },
+    {
+      "path": "packages/services/src/push.ts",
+      "size": 8966,
+      "sha256": "fcafb3c5164eebd219c6d338b9683559aa72364b29a21970025f95ca7161f76e"
+    },
+    {
+      "path": "packages/services/src/qr.ts",
+      "size": 1731,
+      "sha256": "ac4597369e49ee3b8758f3321def7e37cc5c2f08722272773810bf92e2b049f9"
+    },
+    {
+      "path": "packages/services/src/receipt-settings.ts",
+      "size": 2034,
+      "sha256": "4f778fd7344fffd9066239ca5f30fdeb47f37bac36f0c060a80cec853f538abb"
+    },
+    {
+      "path": "packages/services/src/records.ts",
+      "size": 14494,
+      "sha256": "6bfa7a277173c2d3be4b4f202a35230e3fda08dfe6d805efd8aa09882ee50a42"
+    },
+    {
+      "path": "packages/services/src/reports.ts",
+      "size": 9770,
+      "sha256": "7e48cbc1c146b9af2a2c60223408e0c2fb2f85deeb855ad43130aa87293b0e38"
+    },
+    {
+      "path": "packages/services/src/reservations.ts",
+      "size": 2477,
+      "sha256": "201d442431e118dda3f3fbf6d34a094eb8db9e20e6bc68239d1f529e6fbe64f1"
+    },
+    {
+      "path": "packages/services/src/rewards.ts",
+      "size": 4280,
+      "sha256": "6ddd663eba5ed4e2b12bcf2592f1276e5f3944d22b72e7874d909a0dd952f19d"
+    },
+    {
+      "path": "packages/services/src/service-board.ts",
+      "size": 4788,
+      "sha256": "1c6b851ce1dd99d3f10a5fcceaa043a24a0b41a1c53092a3dc5d81e84029ad6c"
+    },
+    {
+      "path": "packages/services/src/sessions.ts",
+      "size": 15048,
+      "sha256": "9787d88c0a646046c7ae7ca0e6f22e089cac3196aad4c1a74c411d8cfd1687ee"
+    },
+    {
+      "path": "packages/services/src/shared.ts",
+      "size": 9400,
+      "sha256": "bff071dc63ed91a20a076e0eeaa939e66ea467a220534193b839f8e291ab337b"
+    },
+    {
+      "path": "packages/services/src/stock-counts.ts",
+      "size": 12701,
+      "sha256": "2984644e59f4604f1cf068984097952205ed882afcfe22fbe9a47d2db74a64f3"
+    },
+    {
+      "path": "packages/services/src/stock-expiry.ts",
+      "size": 4568,
+      "sha256": "e36f14bd9cb215331eb0c7b927f2cce0aa1844bc8f61be70a57ec615e35abe01"
+    },
+    {
+      "path": "packages/services/src/stock-reports.ts",
+      "size": 6847,
+      "sha256": "c792112aff8cc6c80c3a8a310670c49455fca7466e40892dcfd4174c9e8ce9bc"
+    },
+    {
+      "path": "packages/services/src/stock-summary.ts",
+      "size": 2239,
+      "sha256": "b786612d88dd3d53d95af7c11bf77c194d18668000805ec9d443ff0ba31269e2"
+    },
+    {
+      "path": "packages/services/src/stock-valuation.ts",
+      "size": 6888,
+      "sha256": "b2a870cd892843d1e7f0b1782896bb88e486cbac7bdbc7a651d0d0c6aa10fa03"
+    },
+    {
+      "path": "packages/services/src/stock.ts",
+      "size": 8140,
+      "sha256": "6ff5f544ed4aa247ff994744cfe5cc19414f6a28557bc46a375c016a7b8d4900"
+    },
+    {
+      "path": "packages/services/src/storefronts.ts",
+      "size": 16291,
+      "sha256": "288f345c64c53e58c03b3ef6a2f0c8f5d65ebe94583bbb08a728d2c2daa820d3"
+    },
+    {
+      "path": "packages/services/src/table-activity.ts",
+      "size": 4463,
+      "sha256": "2738a088b08edeacdd86d007034627ffc87f0e93dd2d1c01ec36466c990c77fc"
+    },
+    {
+      "path": "packages/services/src/table-capacity.ts",
+      "size": 5706,
+      "sha256": "d6a112439eb364a5a8599e993e0d8cad30989ae316260eeecaef27e4de482cb1"
+    },
+    {
+      "path": "packages/services/src/table-controls.ts",
+      "size": 8008,
+      "sha256": "0352ac9733f6294276c1013e95fe41f4baf791f7c486c179236d2f955b31968c"
+    },
+    {
+      "path": "packages/services/src/table-placement.ts",
+      "size": 1579,
+      "sha256": "efaa1b72454b0a1b8a9d74d15292afd9811dde5d55352eabcc61e65c12d13bd3"
+    },
+    {
+      "path": "packages/services/src/table-removal.ts",
+      "size": 3085,
+      "sha256": "682789cec057a9f23a97a26ef8b708e929bc32d408b0956112e44fa7aadfe64c"
+    },
+    {
+      "path": "packages/services/src/tax-settings.ts",
+      "size": 2090,
+      "sha256": "9e48fb94347222d4fb6281cdf6bb8d7149693d3cb2b0a6caca1a40680d6d1210"
+    },
+    {
+      "path": "packages/services/src/team.ts",
+      "size": 11033,
+      "sha256": "95f31ae554ef505d35038dd471622ce84f0c6ce7928e6ded78dc3d814d8d69f0"
+    },
+    {
+      "path": "packages/services/src/web-bill-policy.ts",
+      "size": 3092,
+      "sha256": "4990eb3339ed07c1ec6532b11c9bfedef98dd24887bbb59fa57ac4c08c74bb36"
+    },
+    {
+      "path": "packages/services/src/web-loyalty.ts",
+      "size": 2988,
+      "sha256": "a09db496c1170473559063948e4f3582312f1b3bffb1040f3c7589d6120ae757"
+    },
+    {
+      "path": "packages/services/src/web-refunds.ts",
+      "size": 10565,
+      "sha256": "ff212f3a4a5419b974c0bae46dcfad1c7101d075e44e130b018a95ec59e256fc"
+    },
+    {
+      "path": "packages/services/src/workspace-tools.ts",
+      "size": 5542,
+      "sha256": "245cfc6b3b798e2645427cc2c29cea790c2424985fe34d277ca91f7459108cfa"
+    },
+    {
+      "path": "packages/services/src/workspace.ts",
+      "size": 20328,
+      "sha256": "b6103681adb4cf0ea307b4617dd7769e398d2d8511ee537767003347c63bb406"
+    },
+    {
+      "path": "playwright.config.ts",
+      "size": 890,
+      "sha256": "3c290442ee2c6b649424e3fc54c484c1dae53fab8685f3b4a9623a8b82522514"
+    },
+    {
+      "path": "scripts/accept-0420.ts",
+      "size": 3320,
+      "sha256": "6dfc5f382d7c028194ae115e6c2e1e3ca4d317a413dd8598ec032852f11d2ccf"
+    },
+    {
+      "path": "scripts/accept-0421.ts",
+      "size": 3395,
+      "sha256": "def681e62a38cedff78f7ee1916d12c22f2348bd6ebfb0893713678aa87eac3d"
+    },
+    {
+      "path": "scripts/accept-0422.ts",
+      "size": 3580,
+      "sha256": "9215f4f69296b0009b95c399c541b80122610768d3337dde306bc94d8094bb8c"
+    },
+    {
+      "path": "scripts/accept-0423.ts",
+      "size": 6406,
+      "sha256": "6e2c803acdb05d92d00ebf9bd9ffbcc03258a40b64c696df6b0115aa2c52aa70"
+    },
+    {
+      "path": "scripts/accept-0424.ts",
+      "size": 7719,
+      "sha256": "4d606ac031d12440c4b8f7afd314bfb3b34ed7d60d34f864c7e8d8609c8d5d1c"
+    },
+    {
+      "path": "scripts/accept-0425.ts",
+      "size": 7161,
+      "sha256": "4b60b6a806c0d1f95425c627f2d116da37ebcd0c0fd0276767f4b669b2317a88"
+    },
+    {
+      "path": "scripts/accept-0426.ts",
+      "size": 8104,
+      "sha256": "7ec6ed18b46be993a20ad991d5208152f262c70f0c32b4e6af6387bc9452a010"
+    },
+    {
+      "path": "scripts/accept-release-0414.ts",
+      "size": 13357,
+      "sha256": "f2e5d78a4c1ef28cfa084a39caf65d35eada9429af041b6b0c67fc01969e237f"
+    },
+    {
+      "path": "scripts/accept-release-0415.ts",
+      "size": 11043,
+      "sha256": "2ff87db1b6ed1768b783ddc26774640cf469ab2383eb2f627c1113cf70580488"
+    },
+    {
+      "path": "scripts/accept-release-0416.ts",
+      "size": 13696,
+      "sha256": "c65a6852cf6967ba0dc22f95f4cd7e8da1a0910ff46de51f0a03800e6122be7d"
+    },
+    {
+      "path": "scripts/accept-release-0417.ts",
+      "size": 12191,
+      "sha256": "b5923d0d218b80552952b29c90737e9d8037190f0bade8652a864b326027506b"
+    },
+    {
+      "path": "scripts/accept-release-0418.ts",
+      "size": 11771,
+      "sha256": "ece46900d672151b31c2215caa20bc1a2febe1af4216c415977d9173caf4638f"
+    },
+    {
+      "path": "scripts/accept-release-0419.ts",
+      "size": 13006,
+      "sha256": "f3ff2cd68ca9b6d035a7f495c7491104dd86c97bafec5c966a6136b17c232727"
+    },
+    {
+      "path": "scripts/accept-web-release.ts",
+      "size": 6480,
+      "sha256": "707c00faca8c7ed2291be7c7524a87559a2e005a4c11235f7b64c0acec058587"
+    },
+    {
+      "path": "scripts/cleanup-release-047.ts",
+      "size": 1561,
+      "sha256": "1fcfce1f586e65fbd871cac0bcbf0ef9cba1bf74141f0f8487058095657b1dbc"
+    },
+    {
+      "path": "scripts/cleanup-release-048.ts",
+      "size": 1561,
+      "sha256": "cb7fe4235f56e72040cdd9b090014a46f1843062051f04427460eaedec5f135f"
+    },
+    {
+      "path": "scripts/database.ts",
+      "size": 1003,
+      "sha256": "8f5520eda2605253e033846993420fb4c0377174763327c6f7439f66ae878ab5"
+    },
+    {
+      "path": "scripts/edit-bill-0428.mjs",
+      "size": 5136,
+      "sha256": "22d99cfdabde404555647e876beadb5ac2474aa59ce199480b253459419f22c3"
+    },
+    {
+      "path": "scripts/edit-floor-0425.mjs",
+      "size": 2353,
+      "sha256": "e4422f108fb5ae48a85734a5b6232dfc323c3971611d5679bfa6273e68ebdf63"
+    },
+    {
+      "path": "scripts/edit-floor-0427.mjs",
+      "size": 10914,
+      "sha256": "430835295a3e489fce51ab0cb441ea4f1db737ecc5a2dec5aabcdc03e2a8764d"
+    },
+    {
+      "path": "scripts/edit-loyalty-0429.mjs",
+      "size": 6982,
+      "sha256": "ccc0039dca9dbcb40ff7dceea2a575975b9672d7f3b146f06f3d16cf8cd8efcc"
+    },
+    {
+      "path": "scripts/edit-refunds-0430.mjs",
+      "size": 6313,
+      "sha256": "7afb7cdeb9c23642cd5fd90bfeedfe4d1f5b4b28f7c580508a9cd3f47b5d6c06"
+    },
+    {
+      "path": "scripts/edit-ui-0421.mjs",
+      "size": 8564,
+      "sha256": "5b09465a58ec0c01580927c178855b7d9fd95c30c567303008505edf9259b51c"
+    },
+    {
+      "path": "scripts/edit-ui-0424.mjs",
+      "size": 4475,
+      "sha256": "0b537304a0d131712727ced30cecdcee14f96340f925895ea4f72de4cc312ab2"
+    },
+    {
+      "path": "scripts/finish-reward-entry-0429.mjs",
+      "size": 981,
+      "sha256": "664d969b0d9f0219de9218b66379df6cfbe6ee099561554f72c2a9c2f3edc26d"
+    },
+    {
+      "path": "scripts/inspect-calculator-reference.mjs",
+      "size": 2077,
+      "sha256": "3eb476dc0725926c253cedd90f9bdc9856bb0ffea6dc1f73047ad3a5c1f91dc1"
+    },
+    {
+      "path": "scripts/prepare-device-handoff.mjs",
+      "size": 5626,
+      "sha256": "e3c8afb085ea9e14f1464b9b9a33c2e2018ad9bc98375eff82a9a64735b49a13"
+    },
+    {
+      "path": "scripts/prepare-qa-0416.ts",
+      "size": 1427,
+      "sha256": "830d41b2fecad007fdfa830df7bd9f80ae9729e2341f7601ba8afb4222b89d80"
+    },
+    {
+      "path": "scripts/prepare-qa-0417.ts",
+      "size": 1424,
+      "sha256": "0eff9c0ad23f1dbf15ce35895818d1cc5f5a1d155e97e4277560646a0fce0b9c"
+    },
+    {
+      "path": "scripts/prepare-qa-0418.ts",
+      "size": 1454,
+      "sha256": "3ddf4b1ce1732773a3421df8f488f9c2be6afc46eefc7ce000f10ff9e700a63a"
+    },
+    {
+      "path": "scripts/prepare-qa-0419.ts",
+      "size": 1292,
+      "sha256": "09ea5013fd4b2ad8802668eb3786165cdbe7dce5fcc3aed4c022e452df95dd41"
+    },
+    {
+      "path": "scripts/prepare-qa-0420.ts",
+      "size": 2299,
+      "sha256": "e7bc2c99c9b314744038d6c26aff5bdec452db98b5ff418b9f11d499f99ac008"
+    },
+    {
+      "path": "scripts/prepare-qa-0421.ts",
+      "size": 883,
+      "sha256": "348e9dab9ae382691ad680805acd4cba916cefd82712f0122a4da1f357db4213"
+    },
+    {
+      "path": "scripts/record-0420.ts",
+      "size": 5850,
+      "sha256": "835d6eebd32c9b3468cbb2ae1b32f3cf52185dd7dd91514ded1ae06481c9cdc7"
+    },
+    {
+      "path": "scripts/record-release-0410.ts",
+      "size": 8694,
+      "sha256": "2baa61d8291b874c6a77b513fb29c519efee9c408d9c64c9e9484a4d6fcc4576"
+    },
+    {
+      "path": "scripts/record-release-0411.ts",
+      "size": 12879,
+      "sha256": "6f08ad7ed0e2539fa4c4973453e76b7c9697097ea30a88d5f9da0ace53e525fa"
+    },
+    {
+      "path": "scripts/record-release-0412.ts",
+      "size": 11651,
+      "sha256": "503d1c5e3634894086e648ee806b422d7c699f89e058736ef11a2e99f9d31610"
+    },
+    {
+      "path": "scripts/record-release-0413.ts",
+      "size": 10464,
+      "sha256": "d604ee6d2a9c7d334d97ef58654e316daeb64abf8b0f23c6e6e1b20070fcda93"
+    },
+    {
+      "path": "scripts/record-release-0414.ts",
+      "size": 33,
+      "sha256": "15c2964df1e44bebca7fa687534acb4c109bbd297f265b3d2f88b2d518fa6e88"
+    },
+    {
+      "path": "scripts/record-release-047.ts",
+      "size": 11002,
+      "sha256": "680d892cb9ef24eba645c7c64060d1acece1e544f21eaac16ab49df7a0fae6e6"
+    },
+    {
+      "path": "scripts/record-release-048.ts",
+      "size": 7502,
+      "sha256": "07c1895c016d1e2ab447bdb267a38833c5cde86b8c23366caa00adbf068409a5"
+    },
+    {
+      "path": "scripts/record-release-049.ts",
+      "size": 7923,
+      "sha256": "01858de34c46defb1ad281658681f2fb7ed037000c7db16255f736ef7059983d"
+    },
+    {
+      "path": "scripts/triage-table-name-115.ts",
+      "size": 980,
+      "sha256": "513e5c77cfc6314cbe3ec98269534c55a9e876810f1437de3f6bd18083796dae"
+    },
+    {
+      "path": "scripts/verify-migration-0411.ts",
+      "size": 3544,
+      "sha256": "a9db93f517e724c40d416f7cc05511fe0a3dfe324f8d73f73db82fda5152d2d3"
+    },
+    {
+      "path": "scripts/verify-migration-0414.ts",
+      "size": 4335,
+      "sha256": "128fe0df9f59d3c6a9dc4ef5b60fb078a6ccda73fa265070f3268490d048b2f9"
+    },
+    {
+      "path": "scripts/verify-migration-0415.ts",
+      "size": 4666,
+      "sha256": "78a09eed2e6db834f01264657f57e8dc5767a4ec35365835c7a7b71f372a9752"
+    },
+    {
+      "path": "scripts/verify-migration-0417.ts",
+      "size": 3124,
+      "sha256": "9fd465ecc02252bc2555cec46006150ebf9d66a8c814ac555e9d02df572c77dc"
+    },
+    {
+      "path": "scripts/verify-migration-0419.ts",
+      "size": 3668,
+      "sha256": "9837a2d0edbe6138ab487b30648ed6f1ecd22a6a0b89448f3298dd16f150d72b"
+    },
+    {
+      "path": "scripts/verify-migration-0420.ts",
+      "size": 3901,
+      "sha256": "05c19f580adedd114dd498772ffec34e2acb86b36c052a7ff860cf5f868edc27"
+    },
+    {
+      "path": "scripts/verify-migration-0423.ts",
+      "size": 4458,
+      "sha256": "ac385133d033527e0a0ff86347d3f754a14c0eb5fdad442df4f026fdca8aac92"
+    },
+    {
+      "path": "scripts/verify-migration-0428.ts",
+      "size": 3165,
+      "sha256": "828fb908209b6691dbdbd91e63f88732c132088709f442229458c47f96498298"
+    },
+    {
+      "path": "scripts/verify-migration-0429.ts",
+      "size": 3158,
+      "sha256": "4a63ec87e07c224b9a302d71c1987db4a672407952ea981959550f6a04e31eee"
+    },
+    {
+      "path": "scripts/verify-migration-043.ts",
+      "size": 2824,
+      "sha256": "9a262b26c51ac0a098e1277efbf8116d944aee002e8375d9f001f51ccea14aa9"
+    },
+    {
+      "path": "scripts/verify-migration-0430.ts",
+      "size": 3582,
+      "sha256": "8d3d5204b5b17bff162afb95ef8180299cd72fe726a93aa08ee81a76f714bac6"
+    },
+    {
+      "path": "scripts/verify-migration-044.ts",
+      "size": 3996,
+      "sha256": "aacc7dde0b35d85f30dc0bb954dd657eb3f90aede3d1bce4552d98a1421d90b3"
+    },
+    {
+      "path": "scripts/verify-migration-045.ts",
+      "size": 5393,
+      "sha256": "ff445d4ba64a2dc681af592aa926297c58d1470b590d2b8388064e6800385a62"
+    },
+    {
+      "path": "scripts/verify-postgres.ts",
+      "size": 3579,
+      "sha256": "1eccdca7d8e16d8f40195d05cbcfbfc5b7cdf57bc8907be40c852df17d401483"
+    },
+    {
+      "path": "scripts/verify-public-044.ts",
+      "size": 2187,
+      "sha256": "1685de0a472ab12e13d4c216af482aacfda5a7a4472d035fd93f0bdd63a6b6c3"
+    },
+    {
+      "path": "scripts/verify-public-045.ts",
+      "size": 2973,
+      "sha256": "d8008804e073e48476959c69106c1d737ff45e78d1b9f70965d5efd544d5cd8c"
+    },
+    {
+      "path": "scripts/verify-public-046.ts",
+      "size": 2984,
+      "sha256": "c58ba82dbc93962451e2acc5ba2fa1cd396ae34ac9977d9d7dfc0904d7eb0408"
+    },
+    {
+      "path": "scripts/verify-public-047.ts",
+      "size": 3049,
+      "sha256": "a4033bdf1eb605d710be25be97e571643cee3bb2b88e1d04eab2ec50187930e1"
+    },
+    {
+      "path": "scripts/verify-public-048.ts",
+      "size": 3049,
+      "sha256": "1bf6e3be540828cbecffab484acb64378bc3e4cdd10416ff7ea6bd4ef35bc77d"
+    },
+    {
+      "path": "scripts/verify-release-046.ts",
+      "size": 2285,
+      "sha256": "95275eb69fed0344b695c25eecd1e80f281efccb18b784128ab1933eaba0ec6d"
+    },
+    {
+      "path": "scripts/verify-release-047.ts",
+      "size": 2285,
+      "sha256": "f92c3485732888a06cd3e24f0c260740f8a1c27e99c162182478a835f88147de"
+    },
+    {
+      "path": "scripts/verify-release-048.ts",
+      "size": 2285,
+      "sha256": "e3c1414796ad57a9012aeb49e18f5f828df7debc38c7d862f35237a5ea23102b"
+    },
+    {
+      "path": "scripts/verify-schema-0416.ts",
+      "size": 1379,
+      "sha256": "012fe1825c9c9f1f3a772332ff2a126bb058883f9bc59f7ebb8b014193ae3dc9"
+    },
+    {
+      "path": "scripts/verify-schema-0418.ts",
+      "size": 1379,
+      "sha256": "d9417daa934a9f6546e9aacf05479cb59fcd6eba9938c03be26292cd4b0bd0cf"
+    },
+    {
+      "path": "scripts/verify-schema-0419.ts",
+      "size": 1443,
+      "sha256": "161c56ef68a2f6de84b559bf28b184750a95a1e9228e055293655c5af2b7d274"
+    },
+    {
+      "path": "tests/afternoon-updates.test.ts",
+      "size": 19691,
+      "sha256": "a8100338d6a16babcb0444c878fc2b56e1cd07df1955ce284860e620a02d9504"
+    },
+    {
+      "path": "tests/applications.test.ts",
+      "size": 8027,
+      "sha256": "635954feb062e330122ff7d3dee99e759da23f749f2c75392edef23ad7ef2104"
+    },
+    {
+      "path": "tests/billing-updates.test.ts",
+      "size": 16932,
+      "sha256": "e466412b12e8a4895016d9d5e3a21b261929e391373ddc49ce4acfc6435640fa"
+    },
+    {
+      "path": "tests/browser/afternoon.spec.ts",
+      "size": 22109,
+      "sha256": "dbb3397c1d8e49d9728571b215e0d387aa6a1ebd8f813c49b74e93c35fdabbd7"
+    },
+    {
+      "path": "tests/browser/clear-table.spec.ts",
+      "size": 9821,
+      "sha256": "a58fe65b4ff0db007885e900a36e872f1c79d22632cc2e473a0347092cee165b"
+    },
+    {
+      "path": "tests/browser/floor-editor-ui.spec.ts",
+      "size": 5868,
+      "sha256": "ee2cfedd3f2ff19a0285a375f40d6a37f97a2f9588c0d24136205a6bffb6b0e8"
+    },
+    {
+      "path": "tests/browser/floor-fixtures-ui.spec.ts",
+      "size": 7378,
+      "sha256": "b03956040535933bc92f34568641caea6be387a1c6c2c19947e10588af22b1b1"
+    },
+    {
+      "path": "tests/browser/floor-geometry-ui.spec.ts",
+      "size": 6098,
+      "sha256": "2bc3e9227014f6ecdd632e0c03ce952816d31a33976d946d64f9b34ffc2c0a6f"
+    },
+    {
+      "path": "tests/browser/grouped-tables.spec.ts",
+      "size": 19230,
+      "sha256": "fe634c69d22beb1f727035983245560c29e049f7ca33d2e4097743270403b164"
+    },
+    {
+      "path": "tests/browser/header-floor-feedback.spec.ts",
+      "size": 7896,
+      "sha256": "35e9d4875931aadb440bd9a811413ee461a6c104aec95b4a99501c6b0a4f4813"
+    },
+    {
+      "path": "tests/browser/inventory-tools.spec.ts",
+      "size": 5950,
+      "sha256": "a127da00c3a190654f687dd4c55aa937914186193ee66d2fc177d5fa4877f425"
+    },
+    {
+      "path": "tests/browser/kitchen-policy.spec.ts",
+      "size": 5734,
+      "sha256": "80f4115eaea5169e83adea9e5952171f8051779a806f489d8e3e9f579eddc3a7"
+    },
+    {
+      "path": "tests/browser/late-updates.spec.ts",
+      "size": 20688,
+      "sha256": "287438f3440da9fae0cb2ae2582ca6dd4fcde7756efc358050a69d9c8c37b5f6"
+    },
+    {
+      "path": "tests/browser/latest-client-batch.spec.ts",
+      "size": 9685,
+      "sha256": "f70243384f232f4bf37d943a532878eeb441b2da1074124d0489df36f54beaf9"
+    },
+    {
+      "path": "tests/browser/latest-menu-ui.spec.ts",
+      "size": 12026,
+      "sha256": "dc175bcc7d787ee75d4cc111f9188e3ff19acfb558c06cc4918883e441d22f05"
+    },
+    {
+      "path": "tests/browser/latest-review.spec.ts",
+      "size": 17626,
+      "sha256": "c6ee17fb9756cfc70ac7897bcca49b53522bf4c12185ba1e20c88000b5a3b6e7"
+    },
+    {
+      "path": "tests/browser/legacy-qr-production.spec.ts",
+      "size": 2189,
+      "sha256": "3b6dc29b2f683202dd67fc99f1d76990d100a42756292d42c2e92731b703ac82"
+    },
+    {
+      "path": "tests/browser/material-setup.spec.ts",
+      "size": 8791,
+      "sha256": "f0d305c3a85a95764138c75a64b831390bcfd48cee0cd7a0aa61d3ab31fb754c"
+    },
+    {
+      "path": "tests/browser/order-counts.spec.ts",
+      "size": 6308,
+      "sha256": "f1ebd1f4d24878700cf3c40fac66ee20feecefe08fa9db0a09a01d33cbcbd9e2"
+    },
+    {
+      "path": "tests/browser/outlet-expiry-review.spec.ts",
+      "size": 4179,
+      "sha256": "2094a43d243724498bdcbf875f1d5d0df38eba84424f7e8c092699992e02e0ae"
+    },
+    {
+      "path": "tests/browser/overnight.spec.ts",
+      "size": 21763,
+      "sha256": "bb65bc13c43d091028983335d81c7a4e98dda5ea526f9bec40ea40c0b12a42b6"
+    },
+    {
+      "path": "tests/browser/piece-service.spec.ts",
+      "size": 6327,
+      "sha256": "b1904ead3bf3b9ccc12a469853bcf77b25f7eebf1c5174784c0e03aa0696f40a"
+    },
+    {
+      "path": "tests/browser/post-release-feedback.spec.ts",
+      "size": 25705,
+      "sha256": "f989c595e9531fd1bc27e4a49e56ba83ab37d10388e7c8d263d95fb0f5c657e3"
+    },
+    {
+      "path": "tests/browser/prepared-food.spec.ts",
+      "size": 9208,
+      "sha256": "828c3a971d059fc323e5ce05c3e0aef61fa47194691d899db4c8122f7f801902"
+    },
+    {
+      "path": "tests/browser/priority-qr-updates.spec.ts",
+      "size": 11935,
+      "sha256": "6858f09e8ac9c6dcf7ff9e9b5f196489ca09833e5ef78a58be037b7d12e49662"
+    },
+    {
+      "path": "tests/browser/receipt-layout.spec.ts",
+      "size": 9110,
+      "sha256": "99f1fa1a2071ec195c786a002178c85ae351dea55e9e3d502df470aeecfa2e00"
+    },
+    {
+      "path": "tests/browser/restaurant.spec.ts",
+      "size": 100876,
+      "sha256": "00ba5e0bb818f6b109d4343f7c0820da980b1aa923b38cf96601ff1abe586c90"
+    },
+    {
+      "path": "tests/browser/service-board.spec.ts",
+      "size": 8730,
+      "sha256": "4400300eea9b595051163284602c8816d3208deed8bc51f8d5e2454ff9ab3046"
+    },
+    {
+      "path": "tests/browser/stock-counts-service.spec.ts",
+      "size": 9441,
+      "sha256": "25d03664c0d3c5a8974b013e9a390aca56911add64edd9abfc7b9c93d8762a57"
+    },
+    {
+      "path": "tests/browser/table-name-ui.spec.ts",
+      "size": 6147,
+      "sha256": "92266b954e4d57cb0d1feb36d6415b11fe8ec5d84efa890a29e798a6cf4bcb25"
+    },
+    {
+      "path": "tests/browser/web-bill-policy.spec.ts",
+      "size": 5414,
+      "sha256": "f9b3ad48c983bfa07cef029e107a4c32b36d394ebad2238c9e4912c1c1ad1bdc"
+    },
+    {
+      "path": "tests/browser/web-loyalty.spec.ts",
+      "size": 4154,
+      "sha256": "969c12c292b647ed855a66a634b3b6bb296926936f6895320596e2430ab08694"
+    },
+    {
+      "path": "tests/browser/web-refunds.spec.ts",
+      "size": 5349,
+      "sha256": "52c70f34e631e61afc9f6cb508e5c3d2fbffde2be2e47ee245b615b8828b63d6"
+    },
+    {
+      "path": "tests/browser/workspace-tools.spec.ts",
+      "size": 9364,
+      "sha256": "eacfcebfee078fd7accef4415ef22de7ffb1dd175cd2753471bfdf4bd1612ead"
+    },
+    {
+      "path": "tests/clear-table.test.ts",
+      "size": 20632,
+      "sha256": "0fbc284150db1c1fa20dc177bc3303ec53f63fe04912ebd58c3f871b37e49511"
+    },
+    {
+      "path": "tests/client-feedback.test.ts",
+      "size": 26190,
+      "sha256": "ef23a3a6720ee858ed9ba15e4093b7b481e4ff4552717c07ee5e2f35356215ad"
+    },
+    {
+      "path": "tests/daily-stock-counts.test.ts",
+      "size": 16324,
+      "sha256": "d2d2f404b9f136f691b1530e910355a327c389ae08b4631ca3d4bf968c2c57fd"
+    },
+    {
+      "path": "tests/floor-controls.test.ts",
+      "size": 10685,
+      "sha256": "c1748201b1c6888666933bcd835538a7652b6dd9e0673cc98e6e6c3b8bce22e3"
+    },
+    {
+      "path": "tests/floor-editor-state.test.ts",
+      "size": 1935,
+      "sha256": "b60cac919fa4e5d4cda3cea60c58703bdc1812bc50ed40109983b4102e91542a"
+    },
+    {
+      "path": "tests/floor-gates.test.ts",
+      "size": 1692,
+      "sha256": "046a3f14b75527758fc5bf34b12801e56141c9f92b065736c08194873e427973"
+    },
+    {
+      "path": "tests/floor-geometry.test.ts",
+      "size": 2265,
+      "sha256": "5c0c58562e7605cd437fb9af2044f8a9c6a0179d921c5bd4c65eb68e128e9562"
+    },
+    {
+      "path": "tests/floor-plan.test.ts",
+      "size": 7679,
+      "sha256": "a72f10167e7c438f4e50c60676ceb5db5122f341be1aa4ce256db8a7548dc148"
+    },
+    {
+      "path": "tests/inbox.test.ts",
+      "size": 6266,
+      "sha256": "772abce20916f566e9e4047b2d698b497627bd3e87a8aa619fd3fdba9ee7e863"
+    },
+    {
+      "path": "tests/inventory-tools.test.ts",
+      "size": 7226,
+      "sha256": "3d0a14fcff225f7d31d856905476c10fe4ab5143d11eec70c309416182c9c6dc"
+    },
+    {
+      "path": "tests/kitchen-policy.test.ts",
+      "size": 10115,
+      "sha256": "59c197992a8493f0dd5e55e122ba6d128454d7e459917a1de76affc7865fa07e"
+    },
+    {
+      "path": "tests/late-web-updates.test.ts",
+      "size": 32873,
+      "sha256": "aac4bbed3c54a4ee34407077a25601800fa5bb102e750bc5f70e3d18a8cd35aa"
+    },
+    {
+      "path": "tests/latest-client-batch.test.ts",
+      "size": 9218,
+      "sha256": "2746c785e2979a9e3bbc4a80fd1a44379c01bdc522e596cbb3f156adf18439aa"
+    },
+    {
+      "path": "tests/material-setup.test.ts",
+      "size": 9173,
+      "sha256": "d125fc7ae011be0ea1642bab0b0d7e359ac8c062f184460b840e9393131e24e8"
+    },
+    {
+      "path": "tests/merge-demerge.test.ts",
+      "size": 8986,
+      "sha256": "dd1d5a1bd7f8075263d54563aaf84f79819357dadefe94faa3c4dcc19ef63c05"
+    },
+    {
+      "path": "tests/outlet-expiry-review.test.ts",
+      "size": 5725,
+      "sha256": "74fcfe833cd1a593133a348f6423c2a99c997fdbeb1060c8fb20a83858d1a1db"
+    },
+    {
+      "path": "tests/overnight-updates.test.ts",
+      "size": 28111,
+      "sha256": "2f32a44020f4ce213bda1eb33dea319741f666bbeef3c1c801ceebed71d39e30"
+    },
+    {
+      "path": "tests/piece-service.test.ts",
+      "size": 5634,
+      "sha256": "860ad3777978948ee7e4b005b991f554311ca6b75efaa77c813aff709d526f12"
+    },
+    {
+      "path": "tests/post-release-feedback.test.ts",
+      "size": 27961,
+      "sha256": "cad1081c26ca0f149e0f424d22fb686fec00cd3e2ae0a072d9f87d37dc2e0517"
+    },
+    {
+      "path": "tests/prepared-food.test.ts",
+      "size": 21428,
+      "sha256": "2c290f03fe690ca94fb02be63df32c00215c9341d67ab52b4a83b20d864067f4"
+    },
+    {
+      "path": "tests/priority-qr-updates.test.ts",
+      "size": 10969,
+      "sha256": "aaa07e0bfac6d88f08aaaf58fd00911a82bf123278ca62981af8e4ae8e5f4e46"
+    },
+    {
+      "path": "tests/procurement-reports.test.ts",
+      "size": 5622,
+      "sha256": "40b6c54e49d7acbfb58ba71389a1797dac7fe5ae9e3a223727471e4a97508396"
+    },
+    {
+      "path": "tests/profile-vendor.test.ts",
+      "size": 6983,
+      "sha256": "0e2b729cb021cfc7ed1629ea987bbd9ce099fba7a84b2233dd5825c32a46f670"
+    },
+    {
+      "path": "tests/push.test.ts",
+      "size": 5114,
+      "sha256": "ceff2ff52b2e1e3cdc1c0771b6389820675f422893f90172c72a33438141de1f"
+    },
+    {
+      "path": "tests/receipt-layout.test.ts",
+      "size": 6595,
+      "sha256": "08f8d92f18383906d8825d36fde570b0854a16fe4a52f8d49796a3218f098ff4"
+    },
+    {
+      "path": "tests/restaurant.test.ts",
+      "size": 36074,
+      "sha256": "a0d550768307195efc52e5be89dbb171a2b035720edb6b39b0511f49e5c1e0fb"
+    },
+    {
+      "path": "tests/service-board.test.ts",
+      "size": 7175,
+      "sha256": "252dbe45659d56e977dfaf450bb0a01a8a7a9fbe7451b93cdd93b42eb1bc90c7"
+    },
+    {
+      "path": "tests/storefronts.test.ts",
+      "size": 5180,
+      "sha256": "15084e27bedc365f64b4f3da09bec6c0b7468dc0d24a77bc7bfcfe38afa82620"
+    },
+    {
+      "path": "tests/table-names.test.ts",
+      "size": 5346,
+      "sha256": "b0e26efa40405eef8fb1681076476fe51a82360f3df850b4b60c871ad64d8ba3"
+    },
+    {
+      "path": "tests/tables.test.ts",
+      "size": 19664,
+      "sha256": "e0807994ad03271bf9661da1e56ddf156c7604bbc2788e3938bf0d2be65b0e0c"
+    },
+    {
+      "path": "tests/team.test.ts",
+      "size": 9250,
+      "sha256": "d91670b54c1e3138fcf62db6066d5e25997f59ce8efd81e9216d52ee5428282f"
+    },
+    {
+      "path": "tests/web-bill-policy.test.ts",
+      "size": 8260,
+      "sha256": "f08704329c281c92b0e4c3cd1e2e1fdcb6d9228ce61bfa57565e7f7f03b7d807"
+    },
+    {
+      "path": "tests/web-loyalty.test.ts",
+      "size": 7002,
+      "sha256": "0fc7b79a67596ba9081a6cbc600d182e7456f3e43d20f1a35c3bfee8921ba46e"
+    },
+    {
+      "path": "tests/web-refunds.test.ts",
+      "size": 9487,
+      "sha256": "a7530d15b45a2f43c9d2faf096826e5af51d00b4f8f82696f8d4747c6fcd3056"
+    },
+    {
+      "path": "tests/web-updates.test.ts",
+      "size": 12193,
+      "sha256": "9780534a20bb3775baeab1145b69fea083e82e286ed12b40f8fd6996b29a9586"
+    },
+    {
+      "path": "tests/workspace-tools.test.ts",
+      "size": 7397,
+      "sha256": "8325ac983bc5aa93f640b4a2b7c09faf0c5e4b8007b826820e74e3b05c99c91c"
+    },
+    {
+      "path": "tsconfig.json",
+      "size": 686,
+      "sha256": "c69ce1ae2e59922c01184ba3913cfa529d3defee94833628e40ec6235d64ae63"
+    },
+    {
+      "path": "vercel.json",
+      "size": 133,
+      "sha256": "b42bcb6c09e873dab02b7a69184baaf1650a9a092755c91043939f50705ec83c"
+    },
+    {
+      "path": "verification/client-answers-20261022-0931.txt",
+      "size": 6242,
+      "sha256": "4a5b72e33e9a94c83804c53dc137278f27b72892b4ff295afbb9754731e1c786"
+    },
+    {
+      "path": "verification/discord-monitor-latest.json",
+      "size": 1863,
+      "sha256": "ee1f52567f228d90c3c854a5b8daa0bff27563dde465f78eab23643007eeabcd"
+    },
+    {
+      "path": "verification/hosted-0430-refunds.log",
+      "size": 954,
+      "sha256": "474c722446192e1710d4ab58113d6ac516e25889b751887f9eb67a3ecf36b65d"
+    },
+    {
+      "path": "verification/petpooja-playlist-20261022/catalog.json",
+      "size": 14851,
+      "sha256": "35e5cd6627ec93bdd267738a9dce48ad1dee13d1da8ae75ecaba8afefaa41558"
+    },
+    {
+      "path": "verification/petpooja-playlist-20261022/report-acceptance.json",
+      "size": 434,
+      "sha256": "ff7414ba89e819a47e740f7b985b5b73a1c6f65f23fe6bc187c78dd8d91354b8"
+    },
+    {
+      "path": "verification/petpooja-playlist-20261022/review.json",
+      "size": 44050,
+      "sha256": "196ae757bc41933fde003f07f05af30d1c68bdcbb0189f017abdd8a60be89f3e"
+    },
+    {
+      "path": "verification/petpooja-playlist-20261022/transcripts.json",
+      "size": 876203,
+      "sha256": "8a2367fdfe74ae56ee32b64f43e3e2a1c36693de0e0a8a82946f8d78253ee85f"
+    },
+    {
+      "path": "verification/production-0427-acceptance.json",
+      "size": 3044,
+      "sha256": "4d92fb6a18a4ce82c98eb1edb2391af802da65f4447e933893a0311208f19724"
+    },
+    {
+      "path": "verification/production-0428-acceptance.json",
+      "size": 3390,
+      "sha256": "6041bd33030b0f3e69dd8ef8a6a0d614e14072abd1b2966dfcd1e08d40f78592"
+    },
+    {
+      "path": "verification/production-0429-acceptance.json",
+      "size": 3691,
+      "sha256": "266eacd210b226aeb1378e23bfa9ef37d7103c16e4ba2eed8e58344868ab8d3d"
+    },
+    {
+      "path": "verification/production-0430-acceptance.json",
+      "size": 3512,
+      "sha256": "171436eac0df58b6b3821e95f05ac930636bd078451cd4783ceddaad03aaf2de"
+    },
+    {
+      "path": "verification/production-0430-browser.log",
+      "size": 435,
+      "sha256": "1f1fa90667008f9755cd7a6469c9759ed023972d7e1ba95b7338050fc891965a"
+    },
+    {
+      "path": "verification/production-migration-0428.json",
+      "size": 926,
+      "sha256": "b10fef97572615845bff59763c17307daf0662ff57327b89dfcaba33059ab881"
+    },
+    {
+      "path": "verification/production-migration-0429.json",
+      "size": 923,
+      "sha256": "7ad7f08bdd7a4888d5308b825be0d880a0357659be426be1603c20a5bdca2c8f"
+    },
+    {
+      "path": "verification/production-migration-0430.json",
+      "size": 1046,
+      "sha256": "74824b898a05086325b28322c93618d76a46ba7e05e6542409f787b2ad604fbb"
+    },
+    {
+      "path": "verification/release-0427-plan.json",
+      "size": 1457,
+      "sha256": "06d1931566a73dae5a0943f656100b77d1a16364e23fdda624ed5b3a6cc5fe34"
+    },
+    {
+      "path": "verification/release-0428-plan.json",
+      "size": 1813,
+      "sha256": "15a53bf13302a3ca2500170eae7e19a4864ebf257cfc06ffb44c5018998e0dc9"
+    },
+    {
+      "path": "verification/release-0429-plan.json",
+      "size": 2121,
+      "sha256": "9e0dc4c178325bf37142f582cce89c17c4e1bcff7b642f518c2f42f2538b6d42"
+    },
+    {
+      "path": "verification/release-0430-plan.json",
+      "size": 1982,
+      "sha256": "73b98fe569a343a18bc84f3da968450cfcd4f8e0d086233b54fb1294bffaf87c"
+    },
+    {
+      "path": "verification/web-0430-backend-full.log",
+      "size": 29368,
+      "sha256": "5c84079e3c5e1355a6f80bd40421e0ffa088a98848d57127acfd727af8285e5f"
+    },
+    {
+      "path": "verification/web-0430-backend.log",
+      "size": 1200,
+      "sha256": "861ea6b3be719341924806680bba6bd27c6cc5ac1de43f6220599b84bc943ea7"
+    },
+    {
+      "path": "verification/web-0430-browser.log",
+      "size": 3093,
+      "sha256": "bcca4125a1868f16b27d8f475ae973c8e20788985b588c99ad2526a6836e1da5"
+    },
+    {
+      "path": "verification/web-0430-build.log",
+      "size": 2080,
+      "sha256": "762ba3e84a229a3885061a7d42c0245ecf1c61b77dc2076d1e10422539bf5504"
+    },
+    {
+      "path": "verification/web-0430-typecheck-final.log",
+      "size": 50,
+      "sha256": "b9e1edfcfbce659fd3ac112686e50c9b82ddbc092be043c4022dc876fd3909ab"
+    },
+    {
+      "path": "verification/web-refund-document-0430-1440.png",
+      "size": 63334,
+      "sha256": "533f33f5dd08c44d878b01ef149d58f4b4a6a743d23063ebcf666ef6ee916a7c"
+    },
+    {
+      "path": "verification/web-refund-document-0430-390.png",
+      "size": 49394,
+      "sha256": "7b09adff51f76e502eead1a81746bb9c330e86e7d0c3109c14a67cb69ed20086"
+    },
+    {
+      "path": "verification/web-refunds-0430-1440.png",
+      "size": 223786,
+      "sha256": "35aa8d8ddfaae27fdc6dfe23d4a06241fb778c99c6972719616f3c7c63ae3a17"
+    },
+    {
+      "path": "verification/web-refunds-0430-390.png",
+      "size": 47535,
+      "sha256": "daa3c70aae7cdb9ca12fade97bb5a113ccf10478167ca6d20c17cdba17f94d53"
+    }
+  ]
+}

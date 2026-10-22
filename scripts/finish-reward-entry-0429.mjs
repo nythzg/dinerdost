@@ -1,0 +1,11 @@
+import {readFile,writeFile} from 'node:fs/promises';
+const p='apps/web/src/features/orders/order-pages.tsx';let s=await readFile(p,'utf8');
+const replace=(a,b)=>{if(!s.includes(a))throw new Error('Missing '+a);s=s.replace(a,b)};
+s='import {RewardEntry} from "./reward-entry";\n'+s;
+replace("form('Claim loyalty points',[{name:'amount'","modal('Claim loyalty points',<RewardEntry fields={[{name:'amount'");
+replace("Replaces any coupon.'}],values=>action('reward'","Replaces any coupon.'}]} save={values=>action('reward'");
+replace("},extra),'Claim loyalty')}).catch","},extra)} submit=\"Claim loyalty\"/>) }).catch");
+replace("form('Apply coupon',[...(eligible.length","modal('Apply coupon',<RewardEntry fields={[...(eligible.length");
+replace("Replaces any loyalty claim on this round.'}],values=>{","Replaces any loyalty claim on this round.'}]} save={values=>{");
+replace("{roundId:r.id})},'Apply coupon')","{roundId:r.id})}} submit=\"Apply coupon\"/>)");
+await writeFile(p,s);

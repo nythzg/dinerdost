@@ -1,0 +1,10 @@
+{
+  "version":"0.4.27","previousVersion":"0.4.26",
+  "releasedClientItems":["Q109","Q110","Q112"],
+  "featureUpdate":"Draft undo/redo, Ctrl/touch multi-selection with bounded group movement, and per-account/outlet/floor camera and floor preferences.",
+  "affectedBackendPassed":7,"hostedPostgresPassed":0,"hostedVerificationScope":"No database/schema/service changes; pure geometry/storage validation and browser save/cancel/navigation regressions.",
+  "localBrowserPassed":4,"productionBrowserPassed":4,
+  "fullBackendBaseline":{"version":"0.4.24","passed":232},
+  "schemaChanged":false,"browserViewports":[1440,390],
+  "checkpoint":"Q109/Q110/Q112 released: bounded draft undo/redo (buttons and Ctrl+Z/Ctrl+Shift+Z), one history entry per pointer gesture, text editing excluded, and separately saved table renames retained. Ctrl-click or Select multiple works on desktop/touch; one common constrained movement preserves selected identities/relative geometry and non-selected objects. Selected floor plus zoom/pan/lock are stored per account/outlet/floor, validated on restore, with explicit unlock and removed-floor fallback. Seven pure backend geometry/storage cases, four local and four production workflows passed at 1440/390px, including fixture/gate/rotation regressions. Typecheck/build and eight anonymous auth/CSRF checks passed. No migration or client financial/stock data changes. Latest full backend baseline remains 232 passes from 0.4.24."
+}

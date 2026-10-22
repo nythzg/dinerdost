@@ -1,0 +1,59 @@
+{
+  "checkedAt": "2026-10-22T17:28:20.944Z",
+  "conversation": "https://discord.com/channels/@me/1491679750610096259",
+  "latestReviewedMessageAt": "2026-10-22T21:09:00+05:30",
+  "newRequirements": 6,
+  "currentProductionVersion": "0.4.30",
+  "currentChecklistThrough": "Q119",
+  "implementationPending": 1,
+  "pendingImplementationIds": [
+    "Q89"
+  ],
+  "pendingClarifications": [
+    "Q111",
+    "Q114"
+  ],
+  "questionsNote": "docs/PENDING_QUESTIONS.md",
+  "monitorIntervalMinutes": 15,
+  "checklistCrossReferenceCurrent": true,
+  "discordMessagesSent": 0,
+  "deploymentNeeded": false,
+  "method": "Fresh browser reload and rendered message review; no newer messages and no messages sent.",
+  "deferred": [
+    "Platform-admin/PIN role configuration",
+    "Client recipes",
+    "Android/Firebase",
+    "Providers/packages",
+    "Supplier marketplace/offline"
+  ],
+  "additionalWebQueue": {
+    "authorizedAt": "2026-10-22",
+    "checklist": "docs/PETPOOJA_ADDITIONS.md",
+    "scope": "web-only",
+    "groups": 27,
+    "completed": 4,
+    "pending": 21,
+    "sourceBaseline": "0.4.11",
+    "implementationBaseline": "0.4.17",
+    "completeIds": [
+      "PP01",
+      "PP05",
+      "PP18",
+      "PP23"
+    ],
+    "partial": 2,
+    "partialIds": [
+      "PP02",
+      "PP20"
+    ],
+    "currentRelease": "0.4.30",
+    "status": "Four groups complete, two partial, 21 pending. Raw-ingredient expiry review complete; production and broader procurement remain pending."
+  },
+  "discordAccess": "signed-in",
+  "signInRequested": false,
+  "latestReviewLimit": "Refreshed authorized DM; latest remains 22 October 9:09 pm IST, message 1562853027382042818",
+  "newSourceMessages": 7,
+  "allRelevantScreenshotsInspected": true,
+  "monitorStatus": "PAUSED - preserved existing app status; prompt updated to use confirmed answers",
+  "newRequirementsSinceLastCheck": 0
+}

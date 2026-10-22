@@ -1,0 +1,916 @@
+{
+  "date": "2026-10-22",
+  "baseline": "0.4.11",
+  "playlist": "https://www.youtube.com/playlist?list=PLJN6xufi3qM6_ga0xOUCvgu9AA5D10abM",
+  "videos": 66,
+  "durationSeconds": 18551,
+  "transcriptsRetrieved": 66,
+  "transcriptWords": 42259,
+  "statusCounts": {
+    "Overview": 3,
+    "Partial": 20,
+    "Missing": 27,
+    "External ecosystem": 7,
+    "Core present": 8,
+    "Policy difference": 1
+  },
+  "matrix": [
+    {
+      "index": 1,
+      "title": "Inventory Introduction (Raw Material Management)",
+      "status": "Overview",
+      "shown": "Inventory lifecycle: procure, receive, settle, convert, consume and compare physical stock.",
+      "finding": "We cover basic receiving, recipe consumption and physical counts; this overview also introduces the gaps detailed below.",
+      "code": "inventory.ts; stock.ts; stock-counts.ts",
+      "url": "https://www.youtube.com/watch?v=YwrUf0RQR-Y",
+      "duration": "5:23"
+    },
+    {
+      "index": 2,
+      "title": "Inventory Dashboard",
+      "status": "Partial",
+      "shown": "Inventory dashboard combines purchases, waste, COGS, pending approvals, category charts and stock-runway estimates.",
+      "finding": "Stock value, alerts and financial/usage reports exist separately. No comparable inventory dashboard, stock-days forecast or automatic suggested purchase order.",
+      "code": "workspace.ts; reports.ts; stock-reports.ts",
+      "url": "https://www.youtube.com/watch?v=Dc8_zmBpIAE",
+      "duration": "7:33"
+    },
+    {
+      "index": 3,
+      "title": "Item Recipes",
+      "status": "Partial",
+      "shown": "Recipe setup includes units, packaging conversion, intermediate goods, variants and add-ons.",
+      "finding": "Base ingredient recipes work. Custom pack conversions, intermediate production and separate option/channel recipes are absent.",
+      "code": "catalog.ts; stock.ts",
+      "url": "https://www.youtube.com/watch?v=3jFViCCtMPE",
+      "duration": "3:26"
+    },
+    {
+      "index": 4,
+      "title": "Units",
+      "status": "Missing",
+      "shown": "Create and edit custom units such as cartons, packets and pallets.",
+      "finding": "Ingredient input is restricted to kg, L and unit. No unit master or configurable purchase-to-consumption conversion.",
+      "code": "inventory.ts: unit enum",
+      "url": "https://www.youtube.com/watch?v=Uln1FfYOj5I",
+      "duration": "1:42"
+    },
+    {
+      "index": 5,
+      "title": "Raw Materials",
+      "status": "Partial",
+      "shown": "Detailed material master: categories, codes/HSN, multiple purchase units, yield loss, prices, thresholds, bulk tools and branch copy.",
+      "finding": "We have name/unit, purchase rate, food/bar stream, expiry, value and safe archive. Most master metadata, bulk operations, yield and pack controls are missing.",
+      "code": "inventory.ts; stock-valuation.ts; migrations",
+      "url": "https://www.youtube.com/watch?v=iVekKAZ4HiM",
+      "duration": "19:55"
+    },
+    {
+      "index": 6,
+      "title": "Conversion",
+      "status": "Missing",
+      "shown": "Convert several ingredients into stockable semi-finished goods, with input/output quantities and optional automatic conversion.",
+      "finding": "Recipes consume ingredients for a dish; no production transaction decreases input stock and creates a new output batch with inherited cost.",
+      "code": "stock.ts; migration inventory",
+      "url": "https://www.youtube.com/watch?v=V19lBHDCIJM",
+      "duration": "8:29"
+    },
+    {
+      "index": 7,
+      "title": "Recipe Management",
+      "status": "Partial",
+      "shown": "Base, size, add-on and area recipes; quick allocation, copying and branch/Excel upload.",
+      "finding": "One recipe is keyed by item and ingredient. Options alter price but do not select a separate recipe; no channel packaging or bulk recipe tooling.",
+      "code": "catalog.ts; orders.ts:60; stock.ts:13",
+      "url": "https://www.youtube.com/watch?v=SfLskCzvd7Y",
+      "duration": "16:14"
+    },
+    {
+      "index": 8,
+      "title": "Purchase",
+      "status": "Partial",
+      "shown": "Purchase suite includes indents, internal requisitions, approval, receipt, returns, production planning and rate cards.",
+      "finding": "Vendor purchase drafts, financial approval and a FIFO delivery receipt exist. The broader central-kitchen purchasing suite is absent.",
+      "code": "records.ts; procurement.ts",
+      "url": "https://www.youtube.com/watch?v=OfYF5auGmw4",
+      "duration": "3:15"
+    },
+    {
+      "index": 9,
+      "title": "Indent Management",
+      "status": "Missing",
+      "shown": "Enter dishes and planned servings to calculate an ingredient indent for purchasing.",
+      "finding": "Our historical prep forecast suggests dish quantities. It does not explode a proposed menu/serving plan into ingredient needs and purchase shortfalls.",
+      "code": "reports.ts: prepPlan; prep-plan.tsx",
+      "url": "https://www.youtube.com/watch?v=UolnXar8P4w",
+      "duration": "1:41"
+    },
+    {
+      "index": 10,
+      "title": "Request for Purchase",
+      "status": "Missing",
+      "shown": "Outlet requisition to a central kitchen or sister outlet, with item quantities, payment/delivery terms and recipient approval.",
+      "finding": "Ordinary vendor purchase drafts are not inter-outlet requisitions; no receiving-outlet request, acceptance or dispatch flow.",
+      "code": "records.ts: purchases schema",
+      "url": "https://www.youtube.com/watch?v=US3koWz0g24",
+      "duration": "6:48"
+    },
+    {
+      "index": 11,
+      "title": "Purchase Order Approval",
+      "status": "Partial",
+      "shown": "Head-office approval queue for purchase requests across outlets.",
+      "finding": "Owner/accountant can approve purchase records. No cross-outlet requisition inbox, assignable approval chain or line-quantity approval workflow.",
+      "code": "records.ts: recordDecision",
+      "url": "https://www.youtube.com/watch?v=hDEJasxr1I0",
+      "duration": "2:11"
+    },
+    {
+      "index": 12,
+      "title": "Stock Purchase",
+      "status": "Partial",
+      "shown": "Itemised purchase invoices with supplier invoice references, taxes/discounts/charges, payments, attachments and source-order links.",
+      "finding": "Approved amount and itemised delivery receipt work. Ordered lines, staged deliveries, supplier payment status, purchase tax breakdown and invoice attachments are missing.",
+      "code": "records.ts; procurement.ts",
+      "url": "https://www.youtube.com/watch?v=8lWbEfwWii0",
+      "duration": "8:27"
+    },
+    {
+      "index": 13,
+      "title": "Purchase Return",
+      "status": "Missing",
+      "shown": "Purchase returns/debit notes reduce returned stock and track supplier credit or refund.",
+      "finding": "No purchase-return document or supplier-credit ledger. Wastage is not an equivalent financial return.",
+      "code": "procurement.ts; migrations",
+      "url": "https://www.youtube.com/watch?v=b-HopBFi1e0",
+      "duration": "4:55"
+    },
+    {
+      "index": 14,
+      "title": "Generate Production Plan",
+      "status": "Missing",
+      "shown": "Central kitchen consolidates outlet purchase orders into production and ingredient procurement needs.",
+      "finding": "Existing same-weekday prep forecasting is a different tool; no central-kitchen demand consolidation or production-order generation.",
+      "code": "reports.ts: prepPlan",
+      "url": "https://www.youtube.com/watch?v=mCxFhTQVH9U",
+      "duration": "3:10"
+    },
+    {
+      "index": 15,
+      "title": "Rate Card",
+      "status": "Missing",
+      "shown": "Customer/outlet-specific rate cards for central-kitchen supply, with active status and bulk rate updates.",
+      "finding": "One purchase rate per ingredient is not a supplier/outlet rate card. No rate-card model, mapping or effective pricing periods.",
+      "code": "inventory.ts; catalog.ts",
+      "url": "https://www.youtube.com/watch?v=LFpEtAeidO8",
+      "duration": "5:50"
+    },
+    {
+      "index": 16,
+      "title": "Suppliers",
+      "status": "Partial",
+      "shown": "Separate third-party suppliers, central kitchens and restaurant suppliers.",
+      "finding": "Vendor profiles and outlets exist. Kitchens/outlets are not mapped as stock-trading suppliers with reciprocal inventory transactions.",
+      "code": "records.ts: vendors; catalog.ts: saveOutlet",
+      "url": "https://www.youtube.com/watch?v=yeVOe7noXIc",
+      "duration": "2:20"
+    },
+    {
+      "index": 17,
+      "title": "Suppliers/Third Party (Supplier Management)",
+      "status": "Partial",
+      "shown": "Vendor import/export, active status, allowed materials, buy/sell permissions, defaults and bulk invoice settlement.",
+      "finding": "Vendor contact/GSTIN/category/permit details are editable. No material-to-vendor restrictions, bulk onboarding or payable settlement.",
+      "code": "records.ts; record-pages.tsx",
+      "url": "https://www.youtube.com/watch?v=DfbA6pdEJ58",
+      "duration": "5:51"
+    },
+    {
+      "index": 18,
+      "title": "Purchase Invoice Settlement",
+      "status": "Missing",
+      "shown": "Supplier invoice balances, payment history and partial/full settlement by supplier.",
+      "finding": "Purchase approval creates an expense record; there is no supplier accounts-payable ledger or payment allocation across invoices.",
+      "code": "records.ts: approval expense; migrations",
+      "url": "https://www.youtube.com/watch?v=DQHXWD1-qSg",
+      "duration": "2:48"
+    },
+    {
+      "index": 19,
+      "title": "Suppliers Hub",
+      "status": "External ecosystem",
+      "shown": "Supplier directory with product prices, vendor discovery and sampling.",
+      "finding": "No supplier marketplace or real vendor network. This needs partners and operational supply data, beyond a settings button.",
+      "code": "V2_CHECKLIST.md: provider dependencies",
+      "url": "https://www.youtube.com/watch?v=h6nHQrPDs98",
+      "duration": "2:28"
+    },
+    {
+      "index": 20,
+      "title": "Search Products",
+      "status": "External ecosystem",
+      "shown": "Search products, compare supplier prices and contact local vendors.",
+      "finding": "No product/vendor discovery catalogue or real quotations. Requires an actual supplier data source/network.",
+      "code": "No supplier marketplace service",
+      "url": "https://www.youtube.com/watch?v=uTHFg5NDZwk",
+      "duration": "3:52"
+    },
+    {
+      "index": 21,
+      "title": "My Enquiries",
+      "status": "External ecosystem",
+      "shown": "Track product enquiries and leads sent to suppliers.",
+      "finding": "No supplier-marketplace enquiry pipeline. Standard vendor records do not implement this workflow.",
+      "code": "No supplier marketplace service",
+      "url": "https://www.youtube.com/watch?v=_4QX0ojzSOA",
+      "duration": "0:43"
+    },
+    {
+      "index": 22,
+      "title": "My Offers",
+      "status": "External ecosystem",
+      "shown": "Supplier promotional offers with product discounts and terms.",
+      "finding": "No supplier offer feed or supplier-side publishing. It depends on an actual marketplace ecosystem.",
+      "code": "No supplier marketplace service",
+      "url": "https://www.youtube.com/watch?v=g6Tw3AUh824",
+      "duration": "1:27"
+    },
+    {
+      "index": 23,
+      "title": "My Sample",
+      "status": "External ecosystem",
+      "shown": "Request samples and track fulfilment with supplier verification.",
+      "finding": "No sample ordering or fulfilment operation. Requires suppliers, stock/logistics and an agreed operating model.",
+      "code": "No supplier marketplace service",
+      "url": "https://www.youtube.com/watch?v=dt0XZDGyoTw",
+      "duration": "1:43"
+    },
+    {
+      "index": 24,
+      "title": "My Sample Enquiries",
+      "status": "External ecosystem",
+      "shown": "Sample enquiry list with request status.",
+      "finding": "No supplier sample request/status records. This belongs to a supplier-marketplace phase.",
+      "code": "No supplier marketplace service",
+      "url": "https://www.youtube.com/watch?v=DesUsUD8FWU",
+      "duration": "0:33"
+    },
+    {
+      "index": 25,
+      "title": "Price Discovery",
+      "status": "External ecosystem",
+      "shown": "Product watchlist and cross-supplier price discovery.",
+      "finding": "No comparable vendor-price watchlist or external comparison feed. A stored purchase rate is not price discovery.",
+      "code": "inventory.ts: purchaseRate only",
+      "url": "https://www.youtube.com/watch?v=bmHJ78Q_9-k",
+      "duration": "2:27"
+    },
+    {
+      "index": 26,
+      "title": "Consumption",
+      "status": "Partial",
+      "shown": "Consumption covers dish sales, raw-material sales/transfers, returns, expiry, waste and counts.",
+      "finding": "Recipe consumption, expiry guards, batch waste and counts exist; material trading, transfers, production and returns are missing.",
+      "code": "stock.ts; inventory.ts; stock-counts.ts",
+      "url": "https://www.youtube.com/watch?v=JU2IDDjZNOo",
+      "duration": "2:32"
+    },
+    {
+      "index": 27,
+      "title": "Sales (Raw Material)",
+      "status": "Missing",
+      "shown": "Sell raw materials with an invoice, payment tracking and a delivery challan.",
+      "finding": "POS sells menu items; there is no B2B raw-material sales document, receivable ledger or price-free dispatch challan.",
+      "code": "orders.ts; billing.ts; migrations",
+      "url": "https://www.youtube.com/watch?v=6b6mzWE9f_4",
+      "duration": "6:40"
+    },
+    {
+      "index": 28,
+      "title": "Transfer (Raw Material)",
+      "status": "Missing",
+      "shown": "Raw-material transfers between linked outlets/central kitchens with a transfer slip and challan.",
+      "finding": "Multi-outlet access exists but no linked source/destination stock-transfer transaction, transit status or receiving acknowledgement.",
+      "code": "inventory/procurement services; migrations",
+      "url": "https://www.youtube.com/watch?v=pz9BM7h8AwY",
+      "duration": "5:21"
+    },
+    {
+      "index": 29,
+      "title": "Sales Return (Raw Material)",
+      "status": "Missing",
+      "shown": "Raw-material sales returns with credit-note references, stock restoration and payments.",
+      "finding": "No raw-material sales-return or credit-note workflow. Cancellation of a dining order does not implement it.",
+      "code": "V2_CHECKLIST.md: credit notes unimplemented",
+      "url": "https://www.youtube.com/watch?v=o1phoDN7DXE",
+      "duration": "3:28"
+    },
+    {
+      "index": 30,
+      "title": "Request for (Raw Material) Sales Return",
+      "status": "Missing",
+      "shown": "Ask a sister outlet to return previously transferred stock, then record the accepted return.",
+      "finding": "No transfer recall request, recipient decision or linked physical return.",
+      "code": "No material transfer/return services",
+      "url": "https://www.youtube.com/watch?v=psysz-QWiJ4",
+      "duration": "3:43"
+    },
+    {
+      "index": 31,
+      "title": "Expired Materials (Raw Materials)",
+      "status": "Core present",
+      "shown": "Expiry per received material, upcoming/expired stock reporting and disposal into wastage.",
+      "finding": "Timestamped batch expiry, alerts and safe batch wastage exist. Gap: affected-dish lookup and a dedicated bulk expiry-to-waste action/export.",
+      "code": "stock-expiry.ts; stock-reports.ts; inventory.ts",
+      "url": "https://www.youtube.com/watch?v=oUTzFYgJbw4",
+      "duration": "3:14"
+    },
+    {
+      "index": 32,
+      "title": "Wastage",
+      "status": "Core present",
+      "shown": "Record raw-material or dish wastage and report losses.",
+      "finding": "Raw-batch wastage and daily quantity/cost reports work. Gap: waste an entire dish through its recipe, categories/reason templates and broader exports.",
+      "code": "inventory.ts: wasteStock; stock-reports.ts",
+      "url": "https://www.youtube.com/watch?v=Z0v5oie1dio",
+      "duration": "3:24"
+    },
+    {
+      "index": 33,
+      "title": "Closing Stock",
+      "status": "Core present",
+      "shown": "Physical closing counts, comments, variance and bulk count sheets.",
+      "finding": "Daily physical counts, zero quantities, audited corrections and frozen quantity variance/CSV are released. Bulk count import and printable count sheets are missing.",
+      "code": "stock-counts.ts; daily-stock-counts.tsx",
+      "url": "https://www.youtube.com/watch?v=7BoHRhPwYBU",
+      "duration": "4:40"
+    },
+    {
+      "index": 34,
+      "title": "Offline Stock Listing",
+      "status": "Missing",
+      "shown": "Offline stock entry on a local POS host and reconciliation with cloud stock/recipes.",
+      "finding": "Current web operations require the server connection. No restaurant LAN stock host or offline reconciliation; offline/native work remains deferred.",
+      "code": "V2_CHECKLIST.md: A07/S08",
+      "url": "https://www.youtube.com/watch?v=X7j_NWBHRgo",
+      "duration": "3:23"
+    },
+    {
+      "index": 35,
+      "title": "Email Template Setting",
+      "status": "Missing",
+      "shown": "Email inventory documents with branding, reply/contact address and CC/BCC configuration.",
+      "finding": "Receipt branding is available, but procurement email templates, delivery and attachment workflows are not implemented.",
+      "code": "receipt-settings.tsx; integration requirements",
+      "url": "https://www.youtube.com/watch?v=cyoTKkrZHwI",
+      "duration": "3:03"
+    },
+    {
+      "index": 36,
+      "title": "Manage Purchase Manager",
+      "status": "Partial",
+      "shown": "Assign a purchase manager access to the supplier hub.",
+      "finding": "Separate staff accounts and outlet/role access exist. No dedicated purchase-manager/supplier-hub role or supplier-hub module.",
+      "code": "team.ts; permissions.ts; records.ts",
+      "url": "https://www.youtube.com/watch?v=Jj8ezARsFqM",
+      "duration": "1:18"
+    },
+    {
+      "index": 37,
+      "title": "Outlet Type (Configuration)",
+      "status": "Partial",
+      "shown": "Company/franchise ownership and operating types with outlet-scoped administration.",
+      "finding": "Outlets and assigned access exist. No four-way ownership/operation type or operational policy driven by that type.",
+      "code": "catalog.ts: saveOutlet; permissions.ts",
+      "url": "https://www.youtube.com/watch?v=WK8iWms66co",
+      "duration": "2:33"
+    },
+    {
+      "index": 38,
+      "title": "Inventory Approval Flow",
+      "status": "Partial",
+      "shown": "Choose one or more named purchase approvers per outlet.",
+      "finding": "Financial approval is fixed to owner/accountant; no configurable outlet approvers, thresholds or staged authority.",
+      "code": "records.ts: APPROVAL_REQUIRED",
+      "url": "https://www.youtube.com/watch?v=F3VxVXEr-wI",
+      "duration": "1:53"
+    },
+    {
+      "index": 39,
+      "title": "Inventory Setting",
+      "status": "Partial",
+      "shown": "Inventory configuration covers kitchen mappings, thresholds, average-cost windows, document rules, pricing locks, MOQ and barcode/production settings.",
+      "finding": "We have fixed guards, FIFO, permissions and a few policies. Most configurable procurement/production controls do not exist; several would require explicit policy decisions.",
+      "code": "inventory.ts; records.ts; stock.ts",
+      "url": "https://www.youtube.com/watch?v=1iZHgRxtjdk",
+      "duration": "20:45"
+    },
+    {
+      "index": 40,
+      "title": "Internal Transfer Report",
+      "status": "Missing",
+      "shown": "Supplier/outlet-level internal transfer totals and invoice/material drill-down.",
+      "finding": "No underlying stock-transfer workflow, so this report is also absent.",
+      "code": "No stock-transfer model/report",
+      "url": "https://www.youtube.com/watch?v=koXgHRxh4ZY",
+      "duration": "3:39"
+    },
+    {
+      "index": 41,
+      "title": "Item Wise Internal Transfer Report",
+      "status": "Missing",
+      "shown": "Material-level quantities/value/tax transferred to each outlet.",
+      "finding": "Current stock movements do not implement an inter-outlet transfer report.",
+      "code": "stock-summary.ts; stock-reports.ts",
+      "url": "https://www.youtube.com/watch?v=GaWdJT1yIhU",
+      "duration": "3:39"
+    },
+    {
+      "index": 42,
+      "title": "Consumption Report",
+      "status": "Core present",
+      "shown": "Ingredient consumption quantity and cost by period with exports.",
+      "finding": "Daily usage quantity and recorded cost exist. Gap: range-wide/pivot comparisons, material categories and usage-specific complete exports.",
+      "code": "stock-reports.ts: stockUsageReport; waste-report.tsx",
+      "url": "https://www.youtube.com/watch?v=Y4tGzw731Ss",
+      "duration": "3:20"
+    },
+    {
+      "index": 43,
+      "title": "Food Costing Report",
+      "status": "Core present",
+      "shown": "Dish food cost, sales/profit ratio and ingredient-recipe drill-down.",
+      "finding": "Dish sales, stored ingredient costs and profit are available for settled invoices. Gap: ingredient drill-down, option-specific costing and richer exports; costing basis differs.",
+      "code": "dish-report.ts; stock.ts: order_item_costs",
+      "url": "https://www.youtube.com/watch?v=YJDFGFnu1DE",
+      "duration": "4:28"
+    },
+    {
+      "index": 44,
+      "title": "Routewise Dispatch Report",
+      "status": "Missing",
+      "shown": "Dispatch quantities organised by delivery route for central-kitchen loading.",
+      "finding": "No transport route or central-kitchen dispatch model; no route loading/picking report.",
+      "code": "No route service/schema",
+      "url": "https://www.youtube.com/watch?v=hskYoTatK8c",
+      "duration": "2:29"
+    },
+    {
+      "index": 45,
+      "title": "Purchase Report",
+      "status": "Partial",
+      "shown": "Item-wise purchase totals, price min/max, supplier invoice drill-down and exports.",
+      "finding": "Date-filtered purchases, received lines and stock movements exist. No consolidated material purchase-price analysis or complete purchase report export.",
+      "code": "procurement.ts; activity.ts; record-pages.tsx",
+      "url": "https://www.youtube.com/watch?v=dS9qq-6z8JY",
+      "duration": "4:12"
+    },
+    {
+      "index": 46,
+      "title": "Supplier Report",
+      "status": "Missing",
+      "shown": "Supplier purchase totals, outstanding/paid amounts and invoice/material drill-down.",
+      "finding": "Vendor profiles and purchase lists are present, but no supplier financial statement, aged balance or payment-summary report.",
+      "code": "records.ts; reports.ts",
+      "url": "https://www.youtube.com/watch?v=rtqG0Eble8g",
+      "duration": "3:09"
+    },
+    {
+      "index": 47,
+      "title": "Purchase Order Received Report",
+      "status": "Missing",
+      "shown": "Central-kitchen incoming outlet purchase-order queue and production/challan output.",
+      "finding": "No receiving-kitchen request queue or production ticket for outlet requisitions.",
+      "code": "No central-kitchen requisition module",
+      "url": "https://www.youtube.com/watch?v=StmjOM_v-M0",
+      "duration": "1:54"
+    },
+    {
+      "index": 48,
+      "title": "Opening Closing Report",
+      "status": "Core present",
+      "shown": "Opening/closing physical stock by day, with quantity, valuation and period export.",
+      "finding": "Dated physical counts and frozen variance are present. Gap: multi-day comparison, valued closing-count reports and printable sheets; missing counts stay unknown.",
+      "code": "stock-counts.ts; daily-stock-counts.tsx",
+      "url": "https://www.youtube.com/watch?v=gAJltbIPv5A",
+      "duration": "5:18"
+    },
+    {
+      "index": 49,
+      "title": "Manual Adjustment Report",
+      "status": "Partial",
+      "shown": "Stock discrepancy quantities valued as money, with date/user/comments and exports.",
+      "finding": "Quantity shortage/surplus and count correction audit exist. No frozen monetary valuation of the count discrepancy or dedicated loss-cost report.",
+      "code": "stock-counts.ts; stock-valuation.ts",
+      "url": "https://www.youtube.com/watch?v=Th67eT-aYgY",
+      "duration": "5:30"
+    },
+    {
+      "index": 50,
+      "title": "Monthly Earnings and Expense Report",
+      "status": "Core present",
+      "shown": "Monthly sales, purchases, cancellation totals and expenses.",
+      "finding": "Sales/COGS/operating expenses/margin reports and CSV work across outlets/date ranges. Gap: raw-material trading/cancellation breakdowns; accounting bases are not identical.",
+      "code": "reports.ts: financialReport; reports-page.tsx",
+      "url": "https://www.youtube.com/watch?v=3KUx8AznFAo",
+      "duration": "2:28"
+    },
+    {
+      "index": 51,
+      "title": "Outletwise Item Dispatch Report",
+      "status": "Missing",
+      "shown": "Outlet-by-material dispatch matrix, route filters and quantity/value summary PDF.",
+      "finding": "No central-kitchen dispatch allocation, outlet picking matrix or dispatch summary.",
+      "code": "No route/dispatch module",
+      "url": "https://www.youtube.com/watch?v=aDtheqhjW54",
+      "duration": "3:01"
+    },
+    {
+      "index": 52,
+      "title": "Current Stock Report",
+      "status": "Core present",
+      "shown": "Current stock quantity, unit value and editable current inventory value.",
+      "finding": "Current batches, stock value, purchase rate and audited remaining-value corrections exist. Gap: broad material filters and stock-specific exports; FIFO differs from moving average.",
+      "code": "workspace.ts; inventory.ts; stock-valuation.ts",
+      "url": "https://www.youtube.com/watch?v=AnWKH9SDR_k",
+      "duration": "3:37"
+    },
+    {
+      "index": 53,
+      "title": "Stock Summary Report",
+      "status": "Partial",
+      "shown": "Complete stock movement bridge: inward, consumption, loss, transfers, conversions and reconciled differences.",
+      "finding": "Opening/movement/closing, usage, waste and physical variance exist in separate views. No unified drill-down bridge including missing transfer/production/return events.",
+      "code": "stock-summary.ts; stock-reports.ts; stock-counts.ts",
+      "url": "https://www.youtube.com/watch?v=Ce8WClUbaVc",
+      "duration": "15:28"
+    },
+    {
+      "index": 54,
+      "title": "Purchase Order Approval Report",
+      "status": "Partial",
+      "shown": "Purchase request approval-to-receipt report with users, timestamps and status.",
+      "finding": "Audited approval and receipt events exist. No dedicated request/dispatch/receipt lifecycle report across outlets.",
+      "code": "records.ts; procurement.ts; audit-changes.tsx",
+      "url": "https://www.youtube.com/watch?v=E5Oe7renqqw",
+      "duration": "3:29"
+    },
+    {
+      "index": 55,
+      "title": "Orderwise Consumption Report",
+      "status": "Partial",
+      "shown": "Order-level cost/profit with ingredient quantities; also inspect waste, material sales and conversions.",
+      "finding": "Per-item costs and ingredient-need snapshots are stored, but no equivalent user-facing order-to-ingredient consumption inspector/report.",
+      "code": "stock.ts; dish-report.ts; order-pages.tsx",
+      "url": "https://www.youtube.com/watch?v=VltcDoNpuGA",
+      "duration": "6:51"
+    },
+    {
+      "index": 56,
+      "title": "Purchase Odrer Variance Report",
+      "status": "Missing",
+      "shown": "Compare quantities requested, dispatched and received, including additions or transit shortages.",
+      "finding": "Our purchase stores an amount and a delivery receipt; ordered/dispatched item quantities are not modelled, so this three-way variance cannot be calculated.",
+      "code": "records.ts: purchases; procurement.ts",
+      "url": "https://www.youtube.com/watch?v=CGKUxBGIjW4",
+      "duration": "3:54"
+    },
+    {
+      "index": 57,
+      "title": "Semi (Finished Goods) F.C.R. (Food Costing Report)",
+      "status": "Missing",
+      "shown": "Semi-finished-goods cost from component quantities and conversion output.",
+      "finding": "No semi-finished production records or output yield, so no conversion cost report.",
+      "code": "No production/conversion model",
+      "url": "https://www.youtube.com/watch?v=5CflGPL4kBw",
+      "duration": "2:16"
+    },
+    {
+      "index": 58,
+      "title": "Karnataka Excise Stock Register (Report)",
+      "status": "Missing",
+      "shown": "Karnataka-specific liquor excise stock register/export.",
+      "finding": "Bar stock and permit references exist, but no jurisdiction-specific excise return format. Conditional requirement, not a universal restaurant feature.",
+      "code": "V2_CHECKLIST.md: D04; records.ts",
+      "url": "https://www.youtube.com/watch?v=Wo4MnWXLhU0",
+      "duration": "1:16"
+    },
+    {
+      "index": 59,
+      "title": "Route Management",
+      "status": "Missing",
+      "shown": "Create delivery routes and manage route/outlet dispatch reporting.",
+      "finding": "Floor/table navigation is unrelated; no supply-chain delivery-route management.",
+      "code": "No transport route service",
+      "url": "https://www.youtube.com/watch?v=zdGW9okmX4M",
+      "duration": "1:39"
+    },
+    {
+      "index": 60,
+      "title": "Route Master",
+      "status": "Missing",
+      "shown": "Route master maps central-kitchen transport runs to outlets, with active status and export.",
+      "finding": "No transport route master, route assignments or dispatch schedules.",
+      "code": "No route model/schema",
+      "url": "https://www.youtube.com/watch?v=h99edZ_rzyo",
+      "duration": "3:47"
+    },
+    {
+      "index": 61,
+      "title": "Masterclass | Inventory | Beginner Level - Introduction",
+      "status": "Overview",
+      "shown": "Walkthrough of inventory setup, purchasing, stock movement, recipes, production and reports.",
+      "finding": "Duplicates the modules already mapped in this matrix; it is not an additional independent feature.",
+      "code": "All reviewed inventory modules",
+      "url": "https://www.youtube.com/watch?v=pcUGlfHplIY",
+      "duration": "16:30"
+    },
+    {
+      "index": 62,
+      "title": "Inventory - Unique Selling Points (USP)",
+      "status": "Overview",
+      "shown": "Inventory benefits and management metrics, including stockouts, food costs and purchase variance.",
+      "finding": "Metrics depend on the underlying modules and accurate recipes/counts. This overview is not an extra capability to count as missing.",
+      "code": "reports.ts; dish-report.ts; stock-counts.ts",
+      "url": "https://www.youtube.com/watch?v=jJRADeqLpuA",
+      "duration": "8:03"
+    },
+    {
+      "index": 63,
+      "title": "Barcode Printing Flow",
+      "status": "Missing",
+      "shown": "Material barcode codes, label layout/printer setup, bulk upload and printable label PDFs.",
+      "finding": "Table QR codes identify guest tables. Ingredient barcode IDs, label printing and scanner-assisted receiving/dispatch are absent.",
+      "code": "qr-page.tsx; no material barcode model",
+      "url": "https://www.youtube.com/watch?v=0IZY2RxBP14",
+      "duration": "2:41"
+    },
+    {
+      "index": 64,
+      "title": "Closing & Opening Stock Entry",
+      "status": "Policy difference",
+      "shown": "Current available stock, up to 30-day historical closing edits, bulk files and closing-to-next-opening carry-forward.",
+      "finding": "Our approved model uses explicit current-day opening/closing observations; past days are read-only and balances are unchanged. No automatic carry-forward/import. Changing this needs a separate decision.",
+      "code": "stock-counts.ts: COUNT_DATE_LOCKED",
+      "url": "https://www.youtube.com/watch?v=dkgbCfxk8A4",
+      "duration": "1:48"
+    },
+    {
+      "index": 65,
+      "title": "Payment Approval Flow",
+      "status": "Partial",
+      "shown": "Prepaid purchase requisition, selected approver, mirrored central-kitchen sale/transfer and restaurant receipt.",
+      "finding": "Basic purchase approval/receiving exists; procurement prepayments, central-kitchen mirroring and supplier payment allocation are missing. This is not cashier payment verification.",
+      "code": "records.ts; procurement.ts",
+      "url": "https://www.youtube.com/watch?v=TrJNU_NMn9k",
+      "duration": "3:07"
+    },
+    {
+      "index": 66,
+      "title": "Production Entry",
+      "status": "Missing",
+      "shown": "Production master and direct/PO-based execution; consumes input stock, creates output stock, exports and optional automatic production.",
+      "finding": "Existing dish prep forecasts and customer KOTs are not stock-production orders. No direct/PO-linked batch production, yield or output costing.",
+      "code": "reports.ts: prepPlan; no production model",
+      "url": "https://www.youtube.com/watch?v=F4I9JIKJldQ",
+      "duration": "2:57"
+    }
+  ],
+  "priorities": [
+    [
+      "P1",
+      "Recipe accuracy for sizes, add-ons and order channels",
+      [
+        3,
+        7
+      ],
+      "Store ingredient quantities for each size/add-on and optional takeaway/delivery packaging. Resolve and snapshot the selected recipe before reservation/consumption.",
+      "Current options change selling price, while reserveStock joins the base recipe by item_id. A configured small/large or extra-cheese option cannot have a distinct ingredient recipe. This is a capability gap verified in code, not a claim that every existing dish is misconfigured."
+    ],
+    [
+      "P1",
+      "Custom units, pack conversions and material yield",
+      [
+        4,
+        5
+      ],
+      "Support box/carton/bottle purchase units mapped to one base stock unit, plus explicit conversion factors and measured normal preparation loss.",
+      "kg/L/unit and fractional base quantities work today. They do not describe a carton of 24 bottles, multiple buying packs, peeled yield or material codes/categories/HSN metadata."
+    ],
+    [
+      "P1",
+      "Semi-finished goods and actual production",
+      [
+        6,
+        14,
+        57,
+        66
+      ],
+      "Add production recipes and batches that consume inputs, create sauce/batter/prep stock, inherit actual cost and record yield/loss. Link planned production to demand when required.",
+      "Our prep suggestion estimates dish demand; it does not create output inventory. A stockable sauce or batter requires a separate production lifecycle and cost trace."
+    ],
+    [
+      "P1",
+      "Complete purchase and receiving lifecycle",
+      [
+        10,
+        11,
+        12,
+        13,
+        38,
+        54,
+        56,
+        65
+      ],
+      "Add ordered line quantities/rates, delivery schedules, partial receipts, named approvers, supplier invoice totals and requested/dispatched/received comparisons. Add auditable purchase returns/debit-note handling.",
+      "Today a purchase is essentially vendor/reference/approved amount/note plus a one-time itemised receipt. The missing ordered and dispatch quantities prevent a meaningful three-way quantity check."
+    ],
+    [
+      "P1",
+      "Supplier payables and settlement",
+      [
+        17,
+        18,
+        46
+      ],
+      "Track supplier invoices, due balances, partial/full payments, allocation across invoices, returns/credits and supplier statements.",
+      "Approving a purchase records an expense; it is not a supplier payment ledger. Customer payment records do not settle vendor invoices."
+    ],
+    [
+      "P1",
+      "Inventory reporting depth and financial variance",
+      [
+        2,
+        42,
+        43,
+        45,
+        48,
+        49,
+        53,
+        55,
+        56
+      ],
+      "Add a unified movement bridge, valued physical shortages/surpluses, ingredient drill-down per order, item-wise purchase rates, supplier balances, period comparisons and complete exports.",
+      "Our count report already compares physical quantity with recorded recipe/receipt/waste movements. It does not yet freeze a money value for that discrepancy or provide every specialised drill-down shown in the tutorials."
+    ],
+    [
+      "P2",
+      "Bulk setup, templates and scanner operations",
+      [
+        5,
+        7,
+        17,
+        33,
+        35,
+        63,
+        64
+      ],
+      "Provide validated material/recipe/vendor/count imports, downloadable count sheets, branch copy, material barcodes/labels, scanner input and procurement document/email templates.",
+      "Existing menu photo upload, Table QR and count CSV export solve different tasks. These tools would reduce onboarding and daily entry effort."
+    ],
+    [
+      "P2",
+      "Planning and waste operations",
+      [
+        9,
+        31,
+        32
+      ],
+      "Calculate ingredient needs from planned dishes/servings, subtract usable stock and suggest a purchase request. Add dish-level wastage via recipes and affected-dish expiry views.",
+      "Same-weekday forecasting, raw-batch wastage and expiry alerts are already present; the ingredient indent and richer waste workflow are additional capabilities."
+    ],
+    [
+      "Chain phase",
+      "Inter-outlet and central-kitchen supply chain",
+      [
+        10,
+        14,
+        15,
+        16,
+        27,
+        28,
+        29,
+        30,
+        37,
+        40,
+        41,
+        44,
+        47,
+        51,
+        59,
+        60,
+        65
+      ],
+      "Map kitchens and outlets; create linked requisition/dispatch/transit/receipt and return transactions; add rate cards, material trading/challans and route/outlet picking reports.",
+      "Having several outlets and role-scoped access does not create a balanced stock transfer. These features matter most for central kitchens, franchises and multi-outlet brands."
+    ],
+    [
+      "Optional / deferred",
+      "Supplier marketplace, offline host and bar-specific registers",
+      [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        34,
+        58
+      ],
+      "Treat a supplier network as a separate ecosystem, offline reconciliation as a separate host/sync project, and excise output as a jurisdiction-specific bar requirement.",
+      "Do not replace real supplier/merchant/provider data with demo buttons. Offline/native/provider work remains deferred; applicability and current report rules need separate validation before implementation."
+    ]
+  ],
+  "policyDifferences": [
+    [
+      "FIFO versus moving average",
+      "The videos use configurable moving-average purchase costs. Diner Dost records FIFO batch costs and historical item-cost snapshots. This is a costing-policy difference; switching methods must not rewrite issued invoices or recorded costs."
+    ],
+    [
+      "Physical observations versus balance correction",
+      "Q45 records current-day physical observations separately from stock balances. Video 64 also shows past-date stock edits and automatic next-opening carry-forward. Do not silently adopt those behaviours or treat uncounted days as zero."
+    ],
+    [
+      "Reorder controls",
+      "The client explicitly requested removing the reorder UI. Threshold alerts, par levels and automatic suggested orders in the reference are benchmark differences to discuss, not an instruction to restore that UI."
+    ],
+    [
+      "Approval scope",
+      "Tutorial 65 is about supplier purchasing/prepayment approval. It does not justify restoring the removed cashier Verify payment step. Owner-only tax/charge access also stays intact."
+    ],
+    [
+      "Client recipe data",
+      "Recipes and purchase rates must be configured with actual client data. The client deferred recipe entry; unknown usage/cost must remain flagged. No report can establish theft from a stock difference alone."
+    ]
+  ],
+  "codeEvidence": [
+    [
+      "E01",
+      "packages/services/src/catalog.ts",
+      "Base recipe schema and item-keyed save/replace. Options have id, name and price, without ingredient recipes."
+    ],
+    [
+      "E02",
+      "packages/services/src/orders.ts",
+      "buildItems changes price for variants/modifiers; records selected labels and ordinary item quantity."
+    ],
+    [
+      "E03",
+      "packages/services/src/stock.ts",
+      "Ingredient requirements join recipes on item_id; FIFO reservation/consumption and stored order-item cost/need snapshots."
+    ],
+    [
+      "E04",
+      "packages/services/src/inventory.ts",
+      "Restricted ingredient units; purchase rates; stock receipt and wastage commands."
+    ],
+    [
+      "E05",
+      "packages/services/src/records.ts",
+      "Vendor/purchase schemas, permissions and owner/accountant financial approval; purchase expense generation."
+    ],
+    [
+      "E06",
+      "packages/services/src/procurement.ts",
+      "One approved purchase receipt, receipt lines, amount guard and FIFO batch creation; no ordered/dispatch line lifecycle."
+    ],
+    [
+      "E07",
+      "packages/services/src/reports.ts",
+      "Financial reports and a reviewed same-weekday dish forecast; no central-kitchen production transaction."
+    ],
+    [
+      "E08",
+      "packages/services/src/stock-counts.ts",
+      "Current-day append-only counts, correction rules, frozen movement snapshots and quantity variance. No discrepancy money value."
+    ],
+    [
+      "E09",
+      "packages/services/src/stock-valuation.ts",
+      "Audited current remaining-value correction and ingredient archive, preserving past recorded costs."
+    ],
+    [
+      "E10",
+      "packages/services/src/stock-summary.ts; stock-reports.ts; dish-report.ts",
+      "Existing stock/usage/waste/expiry and dish sales/cost/profit read models."
+    ],
+    [
+      "E11",
+      "apps/web/src/features/management/record-pages.tsx; reports-page.tsx; daily-stock-counts.tsx",
+      "Available staff-facing purchase, report and count actions; count/Sales CSV output."
+    ],
+    [
+      "E12",
+      "packages/database/migrations/001_initial.sql through 040_daily_stock_counts.sql",
+      "Reviewed inventory/recipe/record schemas; no functional production, stock transfer, supplier payment or ingredient barcode subsystem found."
+    ],
+    [
+      "E13",
+      "docs/RELEASE.json; CLIENT_FEEDBACK.md; V2_CHECKLIST.md",
+      "Release baseline 0.4.11, Q45/Q46 acceptance, approved policy decisions, incomplete V2 and client deferrals."
+    ]
+  ],
+  "method": "All 66 English transcripts and all playlist entries reviewed against current web source, database migrations and release/checklist evidence. Titles and chapter metadata cross-checked. This is transcript-based review, not a frame-by-frame video watch or a fresh end-to-end test of every current feature. Automatic caption terminology can be imperfect. The playlist mixes older and newer UI/workflow versions; findings describe these tutorials, not an independently verified current Petpooja subscription entitlement.",
+  "scope": "Comparative audit only. Proposed gaps are not added as completed client work or implemented in the app. No client records, application code, permissions, production data or deployment changed."
+}

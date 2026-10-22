@@ -1,0 +1,232 @@
+.thermal-receipt {
+  width: 80mm;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 5mm 4mm;
+  color: #111;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0;
+  font:
+    13px/1.35 "Courier New",
+    Courier,
+    monospace;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+  box-shadow: 0 8px 28px #0000000a;
+}
+.thermal-receipt * {
+  box-sizing: border-box;
+}
+.receipt-brand {
+  text-align: center;
+  padding-bottom: 3mm;
+}
+.receipt-brand h1 {
+  font:
+    bold 17px/1.25 "Courier New",
+    Courier,
+    monospace;
+  margin: 0 0 2mm;
+  letter-spacing: 0;
+}
+.receipt-brand p,
+.receipt-footer p {
+  margin: 0;
+}
+.receipt-brand .receipt-address {
+  white-space: pre-line;
+}
+.receipt-logo {
+  display: block;
+  width: 30mm;
+  height: 27mm;
+  object-fit: contain;
+  margin: 0 auto 2mm;
+  filter: grayscale(1);
+}
+.receipt-provisional {
+  text-align: center;
+  margin: 0;
+  border-top: 1px solid #111;
+  padding: 2mm 0;
+  font-size: 11px;
+  font-weight: bold;
+}
+.receipt-customer {
+  border-block: 1px solid #111;
+  padding: 2.5mm 0;
+}
+.receipt-details {
+  padding: 2.5mm 0 1.5mm;
+}
+.receipt-details > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 2mm;
+}
+.receipt-details > div > :last-child {
+  text-align: right;
+}
+.receipt-details > div > :only-child {
+  text-align: left;
+}
+.thermal-receipt .receipt-items {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  white-space: normal;
+  font: inherit;
+}
+.receipt-item-column {
+  width: 40%;
+}
+.receipt-qty-column {
+  width: 13%;
+}
+.receipt-price-column {
+  width: 22%;
+}
+.receipt-amount-column {
+  width: 25%;
+}
+.thermal-receipt .receipt-items th,
+.thermal-receipt .receipt-items td {
+  padding: 2mm 0 2mm 1mm;
+  border: 0;
+  background: none;
+  color: #111;
+  font: inherit;
+  text-align: right;
+  vertical-align: top;
+}
+.thermal-receipt .receipt-items th:first-child,
+.thermal-receipt .receipt-items td:first-child {
+  text-align: left;
+  padding-left: 0;
+}
+.thermal-receipt .receipt-items th {
+  border-block: 1px solid #111;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.thermal-receipt .receipt-items tbody td {
+  padding-block: 2.3mm;
+}
+.thermal-receipt .receipt-items tbody td:not(:first-child) {
+  white-space: nowrap;
+  font-size: 12px;
+}
+.receipt-items small {
+  display: block;
+  font: inherit;
+  font-size: 11px;
+}
+.receipt-summary {
+  border-top: 1px solid #111;
+  padding: 2.5mm 0;
+}
+.receipt-subtotal {
+  display: grid;
+  grid-template-columns: 1fr 20mm 22mm;
+  align-items: start;
+  text-align: right;
+  gap: 1mm;
+}
+.receipt-subtotal > :first-child {
+  text-align: left;
+  font-size: 12px;
+}
+.receipt-summary-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2mm;
+  padding-top: 1mm;
+}
+.receipt-summary-row > :first-child {
+  flex: 1;
+  text-align: right;
+}
+.receipt-summary-row > :last-child {
+  width: 22mm;
+  text-align: right;
+  flex: none;
+}
+.receipt-grand {
+  border-block: 1px solid #111;
+  padding: 2.5mm 0;
+  break-inside: avoid;
+}
+.receipt-grand > .receipt-summary-row > strong {
+  font-size: 17px;
+}
+.receipt-grand > .receipt-summary-row > strong:last-child {
+  width: auto;
+  min-width: 26mm;
+}
+.receipt-savings {
+  font-size: 12px;
+  margin: 1.5mm 0 0;
+  text-align: center;
+}
+.receipt-balance {
+  padding: 2mm 0;
+  border-bottom: 1px solid #111;
+}
+.receipt-footer {
+  text-align: center;
+  font-weight: bold;
+  font-size: 13px;
+  padding-top: 3mm;
+  white-space: pre-line;
+  break-inside: avoid;
+}
+.receipt-footer p + p {
+  margin-top: 1.5mm;
+}
+.receipt-footer small {
+  display: block;
+  font-weight: normal;
+  font-size: 11px;
+  margin-top: 2mm;
+}
+.invoice-page:has(.thermal-receipt) {
+  max-width: 620px;
+}
+@media (max-width: 480px) {
+  .invoice-page:has(.thermal-receipt) {
+    margin: 16px auto;
+    padding: 0 12px;
+  }
+  .invoice-page:has(.thermal-receipt) .invoice-actions {
+    align-items: start;
+    gap: 12px;
+  }
+}
+@media print {
+  @page thermalReceipt {
+    size: 80mm 297mm;
+    margin: 3mm;
+  }
+  body:has(.thermal-receipt) {
+    margin: 0;
+    padding: 0;
+  }
+  .thermal-receipt {
+    page: thermalReceipt;
+    width: 74mm;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 1mm;
+    border: 0;
+    box-shadow: none;
+    print-color-adjust: exact;
+  }
+  .receipt-items thead {
+    display: table-header-group;
+  }
+  .receipt-items tr {
+    break-inside: avoid;
+  }
+}

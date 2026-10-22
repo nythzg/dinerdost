@@ -1,0 +1,28 @@
+"use client";
+import {confirmAction} from "@/lib/confirm-action";
+import {useEffect,useState} from 'react';
+import Link from 'next/link';
+import {businessDate,can} from '@dinerdost/core';
+import {DataTable} from '@/components/ui';
+import {ReadyElapsed} from '@/components/ready-elapsed';
+import {request,type Row} from '@/lib/client';
+import {T} from '@/lib/staff-language';
+import {useDesk} from './context';
+export function useServiceBoard(){
+ const {data}=useDesk(),[day,setDay]=useState(businessDate()),[shift,setShift]=useState(''),[report,setReport]=useState<Row|null>(null),[error,setError]=useState(''),[loading,setLoading]=useState(true);
+ useEffect(()=>{setShift('');setReport(null)},[data.outletId]);
+ useEffect(()=>{const abort=new AbortController();setLoading(true);void request('/api/service-board?'+new URLSearchParams({outletId:data.outletId,date:day,...(shift?{shiftId:shift}:{})}),{signal:abort.signal}).then(result=>{setReport(result);setError('')}).catch(e=>{if(e.name!=='AbortError')setError(e.message)}).finally(()=>{if(!abort.signal.aborted)setLoading(false)});return()=>abort.abort()},[data,day,shift]);
+ return {report:report&&report.outletId===data.outletId&&report.date===day&&(report.shiftId??'')===shift?report:null,error,loading,day,setDay,shift,setShift};
+}
+export function ServiceRounds({board}:{board:ReturnType<typeof useServiceBoard>}){
+ const {data,run,busy}=useDesk(),[selected,setSelected]=useState<string[]>([]),[serving,setServing]=useState(false),[message,setMessage]=useState('');
+ const ready:Row[]=board.report?.ready??[],eligible=ready.filter(r=>r.can_serve);
+ useEffect(()=>{setSelected([]);setMessage('')},[data.outletId,board.day,board.shift]);
+ useEffect(()=>setSelected(old=>old.filter(id=>ready.some(r=>r.id===id&&r.can_serve))),[board.report]);
+ async function serve(){const rounds=ready.filter(r=>selected.includes(r.id)&&r.can_serve);if(serving||!rounds.length)return;setServing(true);setMessage('');let done=0;try{if(!await confirmAction('Confirm all selected food has actually been served.','Serve selected'))return;for(let i=0;i<rounds.length;i+=20){const batch=rounds.slice(i,i+20);await run('serveSelected',{outletId:data.outletId,confirmedServed:true,rounds:batch.map(r=>({orderId:r.order_id,roundId:r.round_id,version:r.round_version}))});done+=batch.length;setSelected(old=>old.filter(id=>!batch.some(r=>r.id===id)));}setMessage('Served '+done+' rounds.')}catch(e){setMessage('Served '+done+' rounds. '+(e as Error).message)}finally{setServing(false)}}
+ return <><div className="toolbar service-period"><label><T>Completed on</T><input type="date" aria-label="Service business date" value={board.day} onChange={e=>{if(e.target.value)board.setDay(e.target.value)}}/></label><label><T>Shift</T><select aria-label="Service shift" value={board.shift} onChange={e=>board.setShift(e.target.value)}><option value=""><T>Whole day</T></option>{(board.report?.shifts??[]).map((s:Row)=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label><small>Active requests remain visible across dates.{data.actor.role==="WAITER"&&" Counts reflect your assigned work; other ready rounds remain visible for coordination."}</small>{board.loading&&<span role="status">Updating services…</span>}</div>
+ {board.error&&<p role="alert">{board.error}</p>}
+ <div className="service-counts" role="group" aria-label="Service counts">{['Total','Table requests','Serve requests','Completed','Awaiting'].map(name=><div key={name}><span><T>{name==='Total'?'Total services':name==='Completed'?'Completed services':name==='Awaiting'?'Awaiting services':name}</T></span><strong aria-label={name+' count'}>{board.report?.counts[name]??'—'}</strong></div>)}</div>
+ <section className="panel" id="ready-orders"><div className="panel-heading"><h2><T>Ready to serve</T></h2>{can(data.actor,'orders')&&<div className="inline-actions"><button className="button small" disabled={busy||serving||!eligible.length} onClick={()=>setSelected(old=>old.length?[]:eligible.map(r=>r.id))}><T>{selected.length?'Clear selection':'Select rounds'}</T></button>{selected.length>0&&<><button className="button small" disabled={busy||serving} onClick={()=>setSelected(eligible.map(r=>r.id))}><T>Select all</T></button><button className="button small primary" disabled={busy||serving} onClick={()=>void serve()}><T>Serve selected</T> ({selected.length})</button></>}</div>}</div>{message&&<p role="status">{message}</p>}
+ <DataTable headers={['Order','Table','Station','Ready since','']} rows={ready.map(round=>[<span className="service-round-identity"><input type="checkbox" aria-label={'Select order #'+round.number+' round '+round.round_number} checked={selected.includes(round.id)} disabled={busy||serving||!round.can_serve} onChange={e=>setSelected(old=>e.target.checked?[...old,round.id]:old.filter(id=>id!==round.id))}/><span>{round.pinned&&<span className="vip-order-marker">VIP · </span>}#{round.number} · Round {round.round_number}</span></span>,round.table_label??'Takeaway',round.station,<ReadyElapsed at={round.ready_at}/>,round.can_serve?<div className="inline-actions"><button className="button small primary" disabled={busy||serving} onClick={()=>void run('serve',undefined,{orderId:round.order_id,roundId:round.round_id}).catch(()=>{})}><T>Mark as served</T></button><Link className="button small" href={'/app/orders/'+round.order_id}><T>View order</T></Link></div>:<span className="muted"><T>Assigned waiter</T></span>])} empty={board.loading?'Loading ready rounds…':'No ready rounds.'}/></section></>;
+}

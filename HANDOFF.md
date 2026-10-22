@@ -1,0 +1,111 @@
+# Diner Dost — handoff to another Codex device
+
+Prepared 22 October 2026 after the user's request to continue on another device and use that operator's Vercel account. This is a portable project-context snapshot, not a transfer of a live Codex session, account credentials or hidden model state. No destination device/account has been connected or deployed by this handoff.
+
+## Current verified state
+
+| Item | State |
+|---|---|
+| Production | **0.4.30**, [Diner Dost](https://dinerdost-app.vercel.app) |
+| Accepted deployment | `dpl_DUemt3FneNKUJQofg2waNiPZCDkk` · `https://dinerdost-a287hdc6t-nythz.vercel.app` |
+| Database | Dedicated Neon PostgreSQL; migrations **001–050 applied** |
+| Latest backend verification | **254/254 passed**; 8 affected local cases; 5 isolated hosted PostgreSQL refund cases |
+| Latest UI verification | 1 local + 1 production workflow, each exercising **1440px and 390px**; screenshots visually reviewed |
+| Build/security | Typecheck and optimized build passed; 8 anonymous/auth/CSRF checks passed; KOT gate intact; disposable hosted DBs removed |
+| Client Q18–Q119 | **99 released / 1 confirmed pending / 2 unanswered** out of 102 |
+| Latest requested 10-update batch | **9 deployed; Q89 remains** |
+| Separate Petpooja queue | **4 complete / 2 partial / 21 pending** of 27 groups |
+| Git | Originally no checkout/history/remote. The user's later request creates a **private initial import** at [nythzg/dinerdost](https://github.com/nythzg/dinerdost). Earlier Vercel releases have no historical Git commits. See GITHUB_HANDOFF.md. |
+| Monitoring | `diner-dost-client-updates` is **PAUSED**, last configured for 15 minutes. It is not copied/started automatically. |
+
+Source of truth: [release metadata](docs/RELEASE.json), [0.4.30 acceptance](verification/production-0430-acceptance.json), [client checklist](docs/CLIENT_FEEDBACK.md), [V2 cross-reference](docs/V2_CHECKLIST.md), [Petpooja additions](docs/PETPOOJA_ADDITIONS.md), [pending questions](docs/PENDING_QUESTIONS.md).
+
+## Resume order and boundaries
+
+1. Read these files and inspect the source before editing. Install dependencies and reproduce the baseline using the new-device guide. No additional Q89/PP changes were started after the user requested handoff.
+2. Complete **Q89 paid replacement** using its confirmed answer below. This is the remaining confirmed client update; do not report all client work complete before its implementation, tests and release.
+3. Continue PP additions in dependency order and record each capability, UI location, tests, release and remaining limits in `docs/PETPOOJA_ADDITIONS.md`. Never count a PP addition as completed Q-series work.
+4. Leave **Q111 next-visit bill carry-forward** and **Q114 exact calculator reference parity** in notes until answered. Do not guess financial carry-forward, live currency/mortgage rules or native floating-window behavior.
+5. Deployment is authorized after proper testing. The user now wants the receiving operator's Vercel. Use its explicit account/team/project; this handoff performs no ownership/domain/database transfer.
+
+The user repeatedly requested only client-requested behavior and necessary tests/release records. Keep the approved green visual system (`#285b45`, deep `#193f30`, canvas `#f7f8f4`, sage `#eaf1e6`). Preserve issued financial documents and receipts, real stock/cost history, reservations, permissions and tenant/outlet assignments. Keep FIFO, current-day observed physical counts, read-only historical counts and the client's removed reorder UI. Missing observations/recipes/costs remain unknown. No invented operational data.
+
+Android/Firebase/background push, payment/WhatsApp/SMS/aggregator providers, package prices/entitlements, supplier marketplace, offline/LAN hosting and client recipe data remain deferred. Android sources are included for continuity only, without generated builds, local SDK configuration or credentials; they are outside the active work scope. Platform-admin loyalty identity provisioning is an operator setup dependency, not authority to auto-grant a human user.
+
+## Confirmed answers — do not ask these again
+
+The user reported that the client answered and explicitly requested review. The complete attachment was read: [exact answers](verification/client-answers-20261022-0931.txt), [source message](https://discord.com/channels/@me/1491679750610096259/1562677243354808374). Historical unanswered paragraphs in PENDING_QUESTIONS are retained only for traceability; its current answer table supersedes them.
+
+| ID | Decision and current status |
+|---|---|
+| Q65 | Disabling kitchen stages affects new rounds only; explicit staff Mark served remains. Released 0.4.26. |
+| Q66 | Count each round once across kitchen stations; unresolved table requests + ready/unserved rounds await action, completed uses selected day/shift. Released 0.4.25. |
+| Q73 | Clear all actions may complete kitchen/service only with explicit confirmation food was actually prepared and served, within existing permissions. Released 0.4.26. |
+| Q74 | ₹50 default loyalty maximum per order/final bill; smaller rupee redemption allowed within actual balance/cap/subtotal. Only explicitly configured Diner Dost platform identities edit it. Released 0.4.29. |
+| Q76 | Save only future Round down to ₹1, never discount. Outlet owner/manager controls it; existing bills unchanged. Released 0.4.28. |
+| Q84 | Prepared-food deadline input is Hours:Minutes from now, saved as an exact timestamp; expiry/no-extension guards remain. Released. |
+| Q89 | **Pending.** Paid replacement final payable incl. tax/discount/charges must be ≥ original final amount. Credit original actual payment; equal stays Paid, higher collects only extra and is Partially Paid. Preserve original payment/invoice and link revised/supplementary records. Separate from existing unpaid-only prepared-food cancellation. |
+| Q90 | Eligible billing edits before full payment/final settlement at any kitchen stage; never below partially collected money; preserve stock/logs and owner-only tax/charge configuration. Released 0.4.28. |
+| Q91 | Record-only manual partial/full refund, capped by actual paid with original invoice/receipt links, method and reason. Owner/manager records; cashier needs manager approval. No gateway reversal. **Released 0.4.30.** |
+
+## Latest implementation map
+
+| Release | Main additions | Key files |
+|---|---|---|
+| 0.4.27 | Floor undo/redo, account/outlet/floor scoped camera state, multi-selection/group movement | `apps/web/src/features/tables/floor-editor-state.ts`, `floor-plan.tsx`; `tests/floor-editor-state.test.ts`, `tests/browser/floor-editor-ui.spec.ts` |
+| 0.4.28 | Future rounding default, guarded before-full-payment edits; additive migration 048 | `packages/services/src/web-bill-policy.ts`, `order-adjustments.ts`, `order-charges.ts`; `tests/web-bill-policy.test.ts` |
+| 0.4.29 | Shared per-order loyalty cap, platform-only configuration, separate rupee claim and coupon code; migration 049 | `packages/services/src/web-loyalty.ts`; `apps/web/src/features/orders/reward-entry.tsx`; `docs/PLATFORM_LOYALTY_SETUP.md`; `tests/web-loyalty.test.ts` |
+| 0.4.30 | Audited manual refund records, cashier approval, immutable refund print documents, net financial reporting; migration 050 | `packages/services/src/web-refunds.ts`, `reports.ts`, `workspace.ts`; `apps/web/src/features/orders/refunds.tsx`, `app/api/order-refunds/route.ts`, `app/refund/[id]/page.tsx`; `tests/web-refunds.test.ts`, `tests/browser/web-refunds.spec.ts` |
+
+0.4.30 keeps all original round amounts/payments/invoice snapshots/stock/reward history unchanged. Refund allocation is against actual VERIFIED receipts. A provisional-reference refund is recognized once when that sale receives a final invoice. Reports retain gross original collection-method rows, with refund outflows and net amounts separate. Refunds are records of money already returned outside the app, not gateway actions. Original invoice print counters are not changed by refund print.
+
+### Q89 engineering considerations, not an approved implementation
+
+No Q89 schema/service/UI implementation exists in this snapshot. The financial decision above is confirmed; the following are risks to resolve while designing it:
+
+- Original money must not become both refundable and replacement credit. Extend the existing actual-receipt balance/allocation logic when adding replacement credits; serialize concurrent actions and enforce immutable links.
+- Preserve original invoice/receipt documents and avoid duplicate recognized revenue. Linked replacement/credit/supplementary records must reconcile taxes, paid credit and only the collected extra.
+- Paid does not imply prepared or served. Never falsely mark the old meal served to enable replacement; do not restore already-consumed stock or silently reuse cooked food.
+- New food uses ordinary recipe, availability, FIFO, kitchen/payment authorization and actual service guards. Retain costs of original food that was actually consumed/prepared.
+- Avoid copying old payment_attempt rows into a new order as if fresh money arrived. Preserve partial/refunded receipt caps and role/outlet/tenant restrictions.
+- Supporting functions are in `orders.ts` (`buildItems`, `insertItems`, staff acceptance, `releaseKot`), `order-state.ts`, `stock.ts`, `payments.ts`, `billing.ts` and `shared.ts`. A new transaction helper may be appropriate; no refactor has yet been made.
+
+### Petpooja remaining work
+
+The complete specification, source video mappings, dependencies and per-item status live in `docs/PETPOOJA_ADDITIONS.md`. All 66 transcripts were reviewed; the source matrix and saved comparison/PDF are included. Do not equate that older 0.4.11 audit with today's release status.
+
+Complete: **PP01 material metadata**, **PP05 ingredient planning**, **PP18 saved ingredient/cost usage**, **PP23 expiry review/export**. Partial: **PP02 buying packs/yield** and **PP20 exports**.
+
+Pending: PP03 size/add-on/channel recipes + packaging; PP04 costed semi-finished production; PP06 ordered purchases/partial receipts; PP07 supplier invoices/taxes/attachments; PP08 payables; PP09 purchase returns/credits; PP10 linked outlet transfers; PP11 rate cards; PP12 raw-material sales/returns; PP13 central demand/production; PP14 routes/picking/dispatch; PP15 inventory dashboard; PP16 movement bridge; PP17 multi-day count/value variance; PP19 rate analysis/lifecycle reports; PP21 count sheets/validated import; PP22 material/recipe/vendor imports and safe outlet copy; PP24 dish wastage; PP25 barcodes; PP26 procurement print/templates/attachments; PP27 operation types/assignments/policies.
+
+Inventory details: exact current stock value may use `stock_batches.remaining_value`; preserve every paise via `stock-valuation.ts`. Base units are kg/L/unit and actual `round_ingredient_needs`/`order_item_costs` are historical snapshots. Legacy receiving in `procurement.ts` is one receipt per approved record and already has a linked expense; PP06 must not duplicate it. Financial purchase/expense approval defaults are OWNER/ACCOUNTANT. Daily counts are explicit current-day observations, not stock balance corrections, not automatic opening carry-forward; zero is valid, absent is unknown. Imports must preview and reject stale conflicts atomically.
+
+## Discord and monitoring
+
+Only [Prem's Diner Dost DM](https://discord.com/channels/@me/1491679750610096259) is authorized. Latest actual review: **22 October, 9:09 pm IST**, message `1562853027382042818`; a later fresh reload found no newer messages. See `verification/discord-monitor-latest.json`. Treat this as a saved cutoff, not proof no messages arrived afterward.
+
+On the new device, the user must sign in there. Browser tabs, cookies, local CUA variables and authenticated sessions are not included. Do not read unrelated DMs. Never send messages/reactions. Inspect relevant screenshots; checklist and deduplicate before implementation. Save new unresolved decisions in PENDING_QUESTIONS without implementing dependent behavior.
+
+The earlier monitor is paused. A sanitized prompt is saved in `docs/MONITOR_HANDOFF.md`; do not copy the old task ID or create a duplicate automation automatically. Monitoring should only be started on the receiving chat if requested, and remain quiet for unchanged/non-actionable state.
+
+## What this bundle contains and omits
+
+Includes source, migrations, tests, necessary scripts, all repository docs, confirmed answers, selected release/verification evidence, latest desktop/phone screenshots and the Petpooja comparison matrix/transcripts/PDF. It includes project-specific context in these files; it does not import unrelated global Codex memories or overwrite the receiver's settings.
+
+Excludes real `.env` files, `.vercel` account binding, QA fixture credentials, Codex/Vercel/Discord login state, database contents/dumps, dependency/build caches, Android APKs/SDK paths/keystores/Firebase config, unfamiliar Calculator.apk, and unrelated projects. A hashed manifest and archive verification report accompany the bundle. Account/browser access and real environment variables must be configured separately by the owner.
+
+## Testing and release practices
+
+- Node **24.x**, npm workspaces, Next **16.4.2**, React **19.3.1**, TypeScript **5.9.3**. Use lockfile; don't casually upgrade dependencies.
+- Run from project root. `npm test` covers backend with isolated in-memory PGlite. `npm run build` builds web. `npm run typecheck` checks shared/tests/scripts too. A clean build regenerates excluded `next-env.d.ts` and Next route types.
+- Browser tests use Playwright **msedge** by default, one local server on **5091**. Use `PLAYWRIGHT_CHANNEL=chromium` with an installed Playwright Chromium on other OS/devices. Main local dev is **5090**. One local Playwright process at a time.
+- For hosted tests, configure a disposable PostgreSQL-capable admin connection securely; `scripts/verify-postgres.ts --suites=tests/web-refunds.test.ts` creates and drops an exact random `dd_verify_*` DB. Do not seed/delete application tenants. It loads `.env.production.local`, which is intentionally not bundled.
+- Production browser workflows use only an isolated synthetic tenant and a local `QA_FIXTURE_FILE`; create new credentials on the destination and remove them when done. The original QA fixture was excluded; no permission to reuse a real client's session.
+- Use a separate database/Neon branch for previews and write tests. Existing old Vercel environment scopes may point to the same database; never assume a preview is isolated.
+- The original source had no Git history. The user subsequently requested GitHub; the private initial import is documented in GITHUB_HANDOFF.md. Cloning retains the new history; the ZIP omits `.git`. Vercel deployment does not itself prove Git push.
+- Historical `scripts/edit-*.mjs`, `verify-migration-04xx.ts` and `accept-web-release.ts` are one-shot/pinned records, not generic startup commands. Read first. Re-running old acceptance may overwrite the current release status; old migration assertions expect initial defaults/empty tables.
+- Several README/DEPLOYMENT historical paragraphs refer to older releases. `docs/RELEASE.json` and the latest acceptance are authoritative. All Q/PP completion claims require actual release evidence.
+
+## Sources for the handoff method
+
+[OpenAI project context/AGENTS workflow](https://developers.openai.com/cookbook/examples/codex/iterating-development-workflows-with-codex) supports keeping portable project instructions and context files with source. It does not establish automatic live-memory migration between accounts/devices. [Vercel linking](https://vercel.com/docs/cli/link), [monorepo configuration](https://vercel.com/docs/monorepos/monorepo-faq) and [project transfers](https://vercel.com/docs/projects/transferring-projects) inform the separate deployment setup. Ownership transfer is an account operation and has not been performed.

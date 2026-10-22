@@ -1,0 +1,16 @@
+✔ purchase receiving atomically creates FIFO batches once and preserves the existing expense (3513.8319ms)
+✔ P&L uses complete issued invoices and avoids counting stock purchases twice (283.253ms)
+✔ prep forecasts stay absent without enough actual history and use whole portion quantities (826.989ms)
+✔ manual partial and full refunds link real receipts and immutable issued documents without changing original payments, stock, amounts or customer rewards (3761.7231ms)
+✔ refunds reduce recognized net receipts and sales while original gross invoices, payment methods and consumed costs remain traceable (272.0924ms)
+✔ cashier requests have no financial effect until action-scoped manager approval; rejections and stale/duplicate decisions cannot post another refund (309.107ms)
+✔ concurrent refunds cannot exceed verified receipts and all foreign, native, role, confirmation and invoice guards roll back (207.7701ms)
+✔ a refund linked to an unsettled provisional bill is recognized once only when the original sale receives a final invoice (255.929ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12672.7362

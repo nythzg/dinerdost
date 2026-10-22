@@ -1,0 +1,43 @@
+{
+  "checkedAt": "2026-10-22T17:35:46.280Z",
+  "migrations": [
+    "048_web_bill_defaults.sql"
+  ],
+  "pendingBefore": [
+    "048_web_bill_defaults.sql"
+  ],
+  "applied": true,
+  "immutableHistory": {
+    "invoices": {
+      "priorCount": 52,
+      "preserved": true
+    },
+    "payments": {
+      "priorCount": 50,
+      "preserved": true
+    },
+    "itemCosts": {
+      "priorCount": 140,
+      "preserved": true
+    },
+    "stockMovements": {
+      "priorCount": 33,
+      "preserved": true
+    },
+    "stockBatches": {
+      "priorCount": 21,
+      "preserved": true
+    },
+    "rounds": {
+      "priorCount": 180,
+      "preserved": true
+    },
+    "outlets": {
+      "priorCount": 67,
+      "preserved": true
+    }
+  },
+  "kotAuthorityUnchanged": true,
+  "tenantRlsEnforced": true,
+  "scope": "Add only an outlet future-web-round preference defaulting false; no existing bill, receipt, round, stock or value changed."
+}

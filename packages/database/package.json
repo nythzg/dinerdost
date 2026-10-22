@@ -1,0 +1,12 @@
+{
+  "name": "@dinerdost/database",
+  "version": "0.4.11",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "pg": "8.23.1",
+    "@electric-sql/pglite": "0.5.10",
+    "@dinerdost/core": "*"
+  }
+}

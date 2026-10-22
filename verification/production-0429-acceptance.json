@@ -1,0 +1,93 @@
+{
+  "version": "0.4.29",
+  "previousVersion": "0.4.28",
+  "releasedClientItems": [
+    "Q74",
+    "Q95",
+    "Q96"
+  ],
+  "featureUpdate": "Shared per-order ₹50 web loyalty cap with explicit platform-admin configuration authority, separate rupee-only loyalty claim, and coupon-code popup below Received.",
+  "affectedBackendPassed": 33,
+  "hostedPostgresPassed": 4,
+  "hostedLog": "verification/hosted-0429-loyalty.log",
+  "hostedVerificationScope": "Four loyalty/coupon/identity/concurrency cases in one isolated PostgreSQL database.",
+  "localBrowserPassed": 1,
+  "productionBrowserPassed": 1,
+  "schemaChanged": true,
+  "appliedMigrations": [
+    "049_web_loyalty_cap.sql"
+  ],
+  "browserViewports": [
+    1440,
+    390
+  ],
+  "fullBackendBaseline": {
+    "version": "0.4.28",
+    "passed": 245
+  },
+  "migrationEvidence": "verification/production-migration-0429.json",
+  "platformAdministratorProvisioned": false,
+  "platformSetupNotes": "docs/PLATFORM_LOYALTY_SETUP.md",
+  "checkpoint": "Q74/Q95/Q96 released: a default ₹50 cap is shared by all web loyalty claims on one order/final bill. Smaller rupee claims respect actual balance, existing eligibility and point-value increments; concurrent separate-round claims cannot multiply the cap. Coupon code entry is separate below Received, replaces loyalty on that round, and shows the saved code in the summary. Invalid rewards stay in the new dialogs with inline validation. Only an explicitly provisioned platform identity may configure an outlet cap; ordinary restaurant roles cannot grant themselves that access. Actual platform-account provisioning remains an operator setup dependency in PLATFORM_LOYALTY_SETUP.md and no human account was auto-granted access. Thirty-three affected local backend cases, four hosted PostgreSQL cases and local/production desktop/phone workflows passed; typecheck/build and eight auth/CSRF checks passed. Browser workflow covers the zero-balance claim and invalid-code path; positive claims, valid coupons, concurrency and configuration are covered by real backend/PostgreSQL tests. Migration 049 adds only a future-web-claim cap; prior financial/stock rows remain unchanged. Latest complete backend baseline is 245 passes from 0.4.28.",
+  "accepted": true,
+  "verifiedAt": "2026-10-22T17:55:38.727Z",
+  "productionUrl": "https://dinerdost-app.vercel.app",
+  "deploymentId": "dpl_8U68JGoyiL5Am5PXfAsKJ8vn3zF4",
+  "deploymentUrl": "https://dinerdost-cg2zd5rk4-nythz.vercel.app",
+  "pendingImplementation": [
+    "Q89",
+    "Q91"
+  ],
+  "pendingQuestions": [
+    "Q111",
+    "Q114"
+  ],
+  "publicChecks": [
+    {
+      "path": "/signin",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/workspace",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/service-board?outletId=00000000-0000-4000-8000-000000000000",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/calculator",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/active-orders?outletId=00000000-0000-4000-8000-000000000000",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/inventory-tools?kind=expiry-outlet&outletId=00000000-0000-4000-8000-000000000000",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/commands",
+      "status": 401,
+      "method": "POST",
+      "origin": "https://dinerdost-app.vercel.app"
+    },
+    {
+      "path": "/api/commands",
+      "status": 403,
+      "method": "POST",
+      "origin": "https://invalid.example"
+    }
+  ],
+  "pendingMigrations": [],
+  "kotGateEnabled": true,
+  "temporaryHostedDatabasesRemaining": 0,
+  "discordMessagesSent": 0
+}

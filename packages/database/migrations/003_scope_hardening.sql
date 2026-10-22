@@ -1,0 +1,13 @@
+ALTER TABLE restaurants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE restaurants FORCE ROW LEVEL SECURITY;
+CREATE POLICY restaurant_scope ON restaurants USING(id=nullif(current_setting('app.restro_id',true),'')::uuid) WITH CHECK(id=nullif(current_setting('app.restro_id',true),'')::uuid);
+REVOKE INSERT,UPDATE,DELETE ON restaurants FROM dinerdost_app;
+REVOKE ALL ON schema_migrations FROM dinerdost_app;
+ALTER TABLE table_sessions ADD CONSTRAINT session_parent_scope FOREIGN KEY(restro_id,parent_id) REFERENCES table_sessions(restro_id,id);
+ALTER TABLE coupons ADD CONSTRAINT coupon_customer_scope FOREIGN KEY(restro_id,customer_id) REFERENCES customers(restro_id,id);
+ALTER TABLE coupons ADD CONSTRAINT coupon_round_scope FOREIGN KEY(restro_id,round_id) REFERENCES order_rounds(restro_id,id);
+ALTER TABLE payment_attempts ADD CONSTRAINT payment_state CHECK(state IN ('AWAITING_VERIFICATION','UNKNOWN','INITIATED','VERIFIED','REJECTED','FAILED'));
+CREATE INDEX orders_outlet_date ON orders(outlet_id,created_at DESC);
+CREATE INDEX rounds_order ON order_rounds(order_id);
+CREATE INDEX active_sessions ON table_sessions(outlet_id,status);
+CREATE INDEX payments_order ON payment_attempts(order_id,created_at DESC);
