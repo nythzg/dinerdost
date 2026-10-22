@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { Pool } from "pg";
-process.loadEnvFile(".env.production.local");
+process.loadEnvFile(process.argv.find(arg=>arg.startsWith('--env='))?.slice(6)??".env.production.local");
 const url = new URL(
   process.env.DATABASE_URL_UNPOOLED ||
     process.env.POSTGRES_URL_NON_POOLING ||
@@ -10,6 +10,7 @@ const url = new URL(
 url.searchParams.set("sslmode", "verify-full");
 const admin = new Pool({ connectionString: url.toString(), max: 1 });
 const availableSuites = [
+  "tests/web-replacements.test.ts",
   "tests/web-refunds.test.ts",
   "tests/web-loyalty.test.ts",
   "tests/web-bill-policy.test.ts",

@@ -59,3 +59,4 @@ export * from './web-bill-policy';
 
 export * from './web-loyalty';
 export * from './web-refunds';
+export * from './web-replacements';

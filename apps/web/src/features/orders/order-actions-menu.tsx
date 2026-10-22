@@ -1,5 +1,6 @@
 "use client";
-import {can} from "@dinerdost/core";
+import {can,isManager} from "@dinerdost/core";
+import {PaidReplacement} from './paid-replacement';
 import {Refunds} from "./refunds";
 import {useEffect,useLayoutEffect,useRef,useState,useId} from 'react';
 import {createPortal} from 'react-dom';
@@ -16,5 +17,6 @@ export function OrderActionsMenu({order,changed}:{order:Row;changed?:()=>void}){
   <button role="menuitem" disabled={desk.busy||closed&&!order.pinned} onClick={()=>{close(true);void desk.run('orderPin',{pinned:!order.pinned,version:Number(order.pin_version??0)},{orderId:order.id}).then(()=>changed?.()).catch(()=>{})}}>{order.pinned?'Unpin order':'Pin VIP order'}</button>
   {closed&&!order.pinned&&<small>Only active orders can be pinned.</small>}
   {can(desk.data.actor,'payments')&&<button role="menuitem" disabled={desk.busy||Number(order.totals?.paid??order.paid??0)<=0} onClick={()=>{close(true);desk.modal('Refund taken',<Refunds orderId={order.id} changed={changed}/>)}}>Refund taken</button>}
+  {isManager(desk.data.actor)&&<button role="menuitem" disabled={desk.busy||['VOIDED','REJECTED','CANCELLED'].includes(order.status)||Number(order.totals?.paid??order.paid??0)<=0} onClick={()=>{close(true);desk.modal('Paid replacement',<PaidReplacement orderId={order.id}/>)}}>Paid replacement</button>}
  </div>,document.body)}</>
 }

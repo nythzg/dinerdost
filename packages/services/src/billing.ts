@@ -1,4 +1,5 @@
 import { z } from "zod";
+import {settleReplacementRewards} from './web-replacements';
 import type { Database } from "@dinerdost/database";
 import {
   can,
@@ -30,6 +31,7 @@ export async function generateBill(
     { orderId, ...data },
     async (tx) => {
       const order = await scopedOrder(tx, actor, orderId, true);
+      ensure(!(await tx.query('SELECT id FROM web_replacements WHERE source_order_id=$1',[orderId])).rows.length,'ALREADY_REPLACED','Use the linked replacement; the original bill remains preserved.',409);
       const detail = await orderDetail(tx, actor, orderId);
       if (data.final) {
         ensure(
@@ -123,6 +125,7 @@ export async function generateBill(
         number,
         issuedAt: new Date().toISOString(),
         actor: actor.name,
+        replacement:(await tx.query('SELECT snapshot FROM web_replacements WHERE target_order_id=$1',[orderId])).rows[0]?.snapshot??null,
       };
       const document = await one(
         tx,
@@ -144,6 +147,7 @@ export async function generateBill(
           count,
         ]);
       else {
+        await settleReplacementRewards(tx,actor,orderId,documentId);
         await tx.query(
           "UPDATE orders SET status='SETTLED',version=version+1 WHERE id=$1",
           [orderId],

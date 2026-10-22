@@ -1,5 +1,7 @@
 # Diner Dost — handoff to another Codex device
 
+Receiving-device continuation, 23 October 2026: upstream `775355a` adds `docs/VERCEL_DATABASE_HANDOFF.md`. The receiving user then explicitly chose **a new database**, so this deployment uses a fresh production resource without transferring original restaurant data. The `web-paid-replacements` branch has Q89 source 0.4.31 in verification, with 263 local backend passes and nine isolated PostgreSQL Q89 passes. No new production release or migration of the original live database is claimed. See `docs/Q89_PAID_REPLACEMENT.md` and the current CLIENT_FEEDBACK checkpoint. The receiving project is `prem-2230/dinerdost-web`; QA is isolated. Connection secrets and QA credentials remain local/ignored. PP work remains separate and pending at its prior counts.
+
 Prepared 22 October 2026 after the user's request to continue on another device and use that operator's Vercel account. This is a portable project-context snapshot, not a transfer of a live Codex session, account credentials or hidden model state. No destination device/account has been connected or deployed by this handoff.
 
 ## Current verified state
@@ -109,3 +111,6 @@ Excludes real `.env` files, `.vercel` account binding, QA fixture credentials, C
 ## Sources for the handoff method
 
 [OpenAI project context/AGENTS workflow](https://developers.openai.com/cookbook/examples/codex/iterating-development-workflows-with-codex) supports keeping portable project instructions and context files with source. It does not establish automatic live-memory migration between accounts/devices. [Vercel linking](https://vercel.com/docs/cli/link), [monorepo configuration](https://vercel.com/docs/monorepos/monorepo-faq) and [project transfers](https://vercel.com/docs/projects/transferring-projects) inform the separate deployment setup. Ownership transfer is an account operation and has not been performed.
+
+
+Receiving Production 0.4.31 is now verified at https://dinerdost-web.vercel.app (prem-2230/dinerdost-web), implementation commit 10d892d0ab59c881e8ac0b18837dc3cd1f62bd75. Q89 accepted: 264 backend, 10 Q89 + 5 refund isolated PostgreSQL, local/hosted desktop/phone and 8 public checks passed. User selected fresh receiving database; original 0.4.30/data unchanged and not transferred. See RELEASE.json and production-0431 acceptance. PP remains 4 complete/2 partial/21 pending; next is PP03 then dependent PP04.

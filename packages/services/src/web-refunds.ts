@@ -5,9 +5,14 @@ import {audit,command,expectedVersion,id,json,num,one,scopedOrder,type Row} from
 const web=(actor:Actor)=>{ensure(!actor.application||actor.application==='MASTER','APPLICATION_FORBIDDEN','Use the web refund workflow.',403);requirePermission(actor,'payments')};
 const inputSchema=z.object({version:z.number().int().positive(),invoiceId:z.uuid(),amount:z.number().int().positive().max(1000000000),mode:z.enum(['CASH','UPI','CARD','OTHER']),reason:z.string().trim().min(5).max(500),reference:z.string().trim().max(120).default(''),confirmed:z.literal(true)}).strict();
 export async function refundBalancesRead(tx:Sql,orderId:string){
- return (await tx.query(`SELECT p.id,p.round_id,p.method,p.reference,p.amount,p.created_at,
- p.amount-coalesce((SELECT sum((a->>'amount')::bigint) FROM web_refunds f CROSS JOIN LATERAL jsonb_array_elements(f.allocations) a WHERE f.order_id=$1 AND a->>'paymentId'=p.id::text),0) AS available
- FROM payment_attempts p WHERE p.order_id=$1 AND p.state='VERIFIED' ORDER BY p.created_at,p.id`,[orderId])).rows;
+ return (await tx.query(`WITH owned AS (
+  SELECT id AS payment_id,amount FROM payment_attempts WHERE order_id=$1 AND state='VERIFIED'
+  UNION ALL SELECT (a->>'paymentId')::uuid,(a->>'amount')::bigint FROM web_replacements r CROSS JOIN LATERAL jsonb_array_elements(r.allocations) a WHERE r.target_order_id=$1
+ ), balances AS (SELECT payment_id,sum(amount) AS amount FROM owned GROUP BY payment_id)
+ SELECT p.id,p.round_id,p.method,p.reference,b.amount,p.created_at,
+ b.amount-coalesce((SELECT sum((a->>'amount')::bigint) FROM web_refunds f CROSS JOIN LATERAL jsonb_array_elements(f.allocations) a WHERE f.order_id=$1 AND a->>'paymentId'=p.id::text),0)
+ -coalesce((SELECT sum((a->>'amount')::bigint) FROM web_replacements r CROSS JOIN LATERAL jsonb_array_elements(r.allocations) a WHERE r.source_order_id=$1 AND a->>'paymentId'=p.id::text),0) AS available
+ FROM balances b JOIN payment_attempts p ON p.id=b.payment_id AND p.state='VERIFIED' ORDER BY p.created_at,p.id`,[orderId])).rows;
 }
 async function eligibility(tx:Sql,order:Row,data:{invoiceId:string;amount:number}){
  const invoice=await one(tx,"SELECT * FROM invoices WHERE id=$1 AND order_id=$2 AND document_type IN ('FINAL_TAX_INVOICE','PROVISIONAL_BILL')",[data.invoiceId,order.id],'Choose an issued bill belonging to this order.');

@@ -1,0 +1,99 @@
+{
+  "version": "0.4.31",
+  "verifiedAt": "2026-10-22T19:38:17.580Z",
+  "project": "prem-2230/dinerdost-web",
+  "url": "https://dinerdost-web.vercel.app",
+  "deploymentId": "dpl_9retnKdF5JAiY4Pqq7TnJojgJSqj",
+  "deployedSourceCommit": "10d892d0ab59c881e8ac0b18837dc3cd1f62bd75",
+  "migrations": 51,
+  "baselineBackendPassed": 254,
+  "fullBackendPassed": 264,
+  "postgresQ89Passed": 10,
+  "postgresRefundRegressionPassed": 5,
+  "localDesktopPhoneWorkflowPassed": true,
+  "hostedDesktopPhoneWorkflowPassed": true,
+  "viewports": [
+    1440,
+    390
+  ],
+  "publicChecks": [
+    {
+      "name": "signin",
+      "status": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "name": "workspace",
+      "status": 401,
+      "expected": 401,
+      "passed": true
+    },
+    {
+      "name": "replacement source",
+      "status": 401,
+      "expected": 401,
+      "passed": true
+    },
+    {
+      "name": "refund source",
+      "status": 401,
+      "expected": 401,
+      "passed": true
+    },
+    {
+      "name": "invalid origin",
+      "status": 403,
+      "expected": 403,
+      "passed": true
+    },
+    {
+      "name": "unauthenticated command",
+      "status": 401,
+      "expected": 401,
+      "passed": true
+    },
+    {
+      "name": "private environment",
+      "status": 404,
+      "expected": 404,
+      "passed": true
+    },
+    {
+      "name": "design preview",
+      "status": 404,
+      "expected": 404,
+      "passed": true
+    }
+  ],
+  "temporaryQaDatabasesRemaining": 0,
+  "originalDeployment": {
+    "version": "0.4.30",
+    "url": "https://dinerdost-app.vercel.app",
+    "project": "nythz/dinerdost-app",
+    "deploymentId": "dpl_DUemt3FneNKUJQofg2waNiPZCDkk",
+    "unchanged": true,
+    "restaurantDataTransferred": false
+  },
+  "newDatabaseSelectedByUser": true,
+  "originalRestaurantRecordsTransferred": false,
+  "petpooja": {
+    "complete": 4,
+    "partial": 2,
+    "pending": 21
+  },
+  "unanswered": [
+    "Q111",
+    "Q114"
+  ],
+  "deferred": [
+    "Android",
+    "Firebase",
+    "external providers",
+    "package configuration",
+    "offline hosting",
+    "supplier marketplace",
+    "actual client recipes and rates"
+  ],
+  "testHarnessCorrection": "Normalize PostgreSQL bigint to Number in an amount equality assertion; application source unchanged."
+}

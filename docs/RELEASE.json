@@ -1,19 +1,19 @@
 {
-  "version": "0.4.30",
+  "version": "0.4.31",
   "status": "working-web-core",
-  "productionUrl": "https://dinerdost-app.vercel.app",
-  "vercelProject": "nythz/dinerdost-app",
-  "deploymentId": "dpl_DUemt3FneNKUJQofg2waNiPZCDkk",
+  "productionUrl": "https://dinerdost-web.vercel.app",
+  "vercelProject": "prem-2230/dinerdost-web",
+  "deploymentId": "dpl_9retnKdF5JAiY4Pqq7TnJojgJSqj",
   "functionRegion": "sin1",
-  "database": "dedicated Neon PostgreSQL",
+  "database": "New dedicated Neon PostgreSQL resource selected explicitly by receiving user; original data not transferred.",
   "databasePlan": "Free",
   "businessTimeZone": "Asia/Kolkata",
   "fullPrdComplete": false,
-  "updatedAt": "2026-10-22",
-  "featureUpdate": "Audited full/partial manual refund records with original receipt/bill links, cashier manager approval, immutable credit documents and net financial reporting.",
-  "deploymentUrl": "https://dinerdost-a287hdc6t-nythz.vercel.app",
+  "updatedAt": "2026-10-23",
+  "featureUpdate": "Q89 linked paid replacement with traced payment credit, immutable original financial history and explicit stock/service disposition.",
+  "deploymentUrl": "https://dinerdost-r109ay43e-prem-2230.vercel.app",
   "deploymentStatus": "production-ready-verified",
-  "productionVersion": "0.4.30",
+  "productionVersion": "0.4.31",
   "pendingMigrations": [],
   "appliedReleaseMigrations": [
     "001_initial.sql",
@@ -65,13 +65,14 @@
     "047_web_kitchen_policy.sql",
     "048_web_bill_defaults.sql",
     "049_web_loyalty_cap.sql",
-    "050_web_refunds.sql"
+    "050_web_refunds.sql",
+    "051_web_paid_replacements.sql"
   ],
   "feedbackChecklist": "docs/CLIENT_FEEDBACK.md",
   "deferredIntegrationRequests": 4,
-  "hostedIntegrationTestsPassed": 5,
+  "hostedIntegrationTestsPassed": 15,
   "productionBrowserWorkflowsPassed": 1,
-  "verifiedAt": "2026-10-22T18:19:29.941Z",
+  "verifiedAt": "2026-10-22T19:38:17.580Z",
   "feedbackReadThrough": "2026-10-22T21:09:00+05:30",
   "localVerification": {
     "baselineFullBackendTestsPassed": 141,
@@ -82,11 +83,11 @@
     "typecheckPassed": true,
     "optimizedBuildPassed": true,
     "currentReleaseBrowserWorkflowsPassed": 1,
-    "currentFullBackendPassed": 254,
-    "currentTargetedBackendPassed": 8,
+    "currentFullBackendPassed": 264,
+    "currentTargetedBackendPassed": 10,
     "additionalQrNonblockingCasePassed": true,
-    "lastFullBackendVersion": "0.4.30",
-    "lastFullBackendPassed": 254
+    "lastFullBackendVersion": "0.4.31",
+    "lastFullBackendPassed": 264
   },
   "androidPreparation": {
     "version": "0.2.0",
@@ -114,7 +115,7 @@
     "implemented": 54,
     "deferredExternalIntegrations": 4
   },
-  "currentReleaseHostedCasesPassed": 5,
+  "currentReleaseHostedCasesPassed": 15,
   "packageConfiguration": {
     "panelPrepared": true,
     "pricesConfigured": false,
@@ -123,7 +124,7 @@
     "deferredByUser": true
   },
   "previousReleaseHostedIntegrationTestsPassed": 22,
-  "hostedVerificationScope": "Five manual refund, approval, immutable history, concurrency, authorization and recognition cases in one isolated PostgreSQL database.",
+  "hostedVerificationScope": "Ten Q89 and five refund regression cases in exact disposable QA PostgreSQL databases; no disposable databases remain.",
   "previousProductionVersion": "0.4.18",
   "previousProductionDeploymentId": "dpl_2HrTUnBq2CG2J6TJW3jx1YtEAQe9",
   "legacyPurchaseExpensesRepaired": 1,
@@ -166,15 +167,15 @@
   },
   "temporaryCredentialFilesRemoved": false,
   "issuedDocumentCountPreserved": 30,
-  "acceptanceEvidence": "verification/production-0430-acceptance.json",
+  "acceptanceEvidence": "verification/production-0431-acceptance.json",
   "latestReviewQueue": {
     "requests": 102,
-    "implemented": 99,
-    "pendingImplementation": 1,
+    "implemented": 100,
+    "pendingImplementation": 0,
     "ids": "Q18-Q119",
     "latestBatch": "Q114-Q119 latest revisions",
     "readThrough": "2026-10-22T21:09:00+05:30",
-    "status": "99 released; 1 confirmed pending; Q111/Q114 awaiting details",
+    "status": "100 released on receiving project; Q111/Q114 awaiting details. Original project remains 0.4.30.",
     "pendingClarification": 2,
     "pendingClarificationIds": [
       "Q111",
@@ -183,11 +184,9 @@
     "deferredRecipeConfiguration": true,
     "providersDeferred": true,
     "oldRoundsPreserved": true,
-    "pendingImplementationIds": [
-      "Q89"
-    ]
+    "pendingImplementationIds": []
   },
-  "productionVerificationMethod": "Synthetic QA desktop/phone workflows, isolated PostgreSQL cases, immutable-history migration comparison and anonymous authorization checks.",
+  "productionVerificationMethod": "264 backend cases; ten Q89 plus five refund PostgreSQL cases; rendered local/receiving Production desktop/phone workflow; eight public auth/CSRF checks.",
   "petpoojaImplementation": {
     "authorizedAt": "2026-10-22",
     "checklist": "docs/PETPOOJA_ADDITIONS.md",
@@ -208,7 +207,37 @@
       "PP02",
       "PP20"
     ],
-    "currentRelease": "0.4.30",
+    "currentRelease": "0.4.31",
     "status": "Four groups complete, two partial, 21 pending. Raw-ingredient expiry review complete; production and broader procurement remain pending."
+  },
+  "receivingDevelopment": {
+    "sourceVersion": "0.4.31",
+    "status": "production-ready-verified",
+    "feature": "Q89 paid-order replacement",
+    "checklist": "docs/Q89_PAID_REPLACEMENT.md",
+    "baselineCommit": "775355a8e7a94bd86d5623f02881c368930934d5",
+    "vercelProject": "prem-2230/dinerdost-web",
+    "localBackendPassed": 264,
+    "baselineReproducedBackendPassed": 254,
+    "isolatedPostgresQ89Passed": 10,
+    "localDesktopPhoneWorkflowPassed": true,
+    "typecheckPassed": true,
+    "buildPassed": true,
+    "pendingMigration": [],
+    "productionBaselineHandoff": "User explicitly selected a new empty database on 2026-10-23; old restaurant data stays in the original deployment. QA and receiving Production use separate new Neon resources.",
+    "originalDeploymentUnchanged": true,
+    "petpoojaCountsUnchanged": true,
+    "isolatedPostgresRefundPassed": 5,
+    "implementationCommit": "10d892d0ab59c881e8ac0b18837dc3cd1f62bd75",
+    "hostedDesktopPhoneWorkflowPassed": true,
+    "publicChecksPassed": 8
+  },
+  "originalDeployment": {
+    "version": "0.4.30",
+    "url": "https://dinerdost-app.vercel.app",
+    "project": "nythz/dinerdost-app",
+    "deploymentId": "dpl_DUemt3FneNKUJQofg2waNiPZCDkk",
+    "unchanged": true,
+    "restaurantDataTransferred": false
   }
 }

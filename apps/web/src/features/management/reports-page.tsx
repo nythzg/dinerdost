@@ -154,6 +154,7 @@ function SalesReport() {
       ["Net receipts (paise)", report.receipts],
       ["Gross issued amount (paise)", report.grossReceipts],
       ["Manual refunds (paise)", report.refunds],
+      ["Paid replacement credits (paise)", report.replacementCredits??0],
       ["Net sales (paise)", report.netSales],
       ["Tax (paise)", report.tax],
       ["Charges (paise)", report.charges],
@@ -172,6 +173,8 @@ function SalesReport() {
       ...report.methods.map((row: Row) => [row.method, row.amount]),
       [],["Refund record","Order","Invoice","Amount (paise)","Mode","Reason"],
       ...(report.refundRows??[]).map((r:Row)=>[r.number,r.order_id,r.invoice_id,r.amount,r.mode,r.reason]),
+      [],['Replacement record','Original order','Replacement order','Credit (paise)','Reason'],
+      ...(report.replacementRows??[]).map((r:Row)=>[r.number,r.source_order_id,r.target_order_id,r.amount,r.reason]),
     ];
     const url = URL.createObjectURL(
       new Blob([rows.map((row) => row.map(clean).join(",")).join("\r\n")], {
@@ -227,6 +230,7 @@ function SalesReport() {
       ) : (
         <>
           {Number(report.refunds)>0&&<p className="panel">Manual refunds: <strong>{money(report.refunds)}</strong> · Net receipts below include these adjustments. Original payment-method totals retain collected amounts.</p>}
+          {Number(report.replacementCredits)>0&&<p className="panel">Paid replacement credits: <strong>{money(report.replacementCredits)}</strong> · Net sales include linked credits against previously issued invoices. Credits are not new collections.</p>}
           <div className="metric-grid three">
             {[
               ["Settled sales", report.receipts],

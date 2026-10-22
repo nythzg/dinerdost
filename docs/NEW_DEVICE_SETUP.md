@@ -91,3 +91,7 @@ Do not delete the original project or stop its database as part of setup. First 
 ## 7. Browser and monitor setup
 
 Sign into the authorized Prem DM on the new device if reviewing new feedback. Saved cutoff is 22 October 9:09 pm IST; check for newer messages rather than assuming this is still latest. The user permits reading/requirement extraction only, with no messages/reactions. The old automation is paused and not copied; see MONITOR_HANDOFF.md if the user requests monitoring on the new chat.
+
+## Selected receiving setup · 23 October 2026
+
+For this run, the receiving user explicitly overrode the existing-data handoff by requesting a new database. `prem-2230/dinerdost-web` now uses its own new Production resource, with a separate QA resource and migrations 001–051. Original restaurant data stays in `nythz/dinerdost-app`; it was not transferred. The same-data instructions above apply only to a later explicitly requested existing-data connection. Receiving 0.4.31 is verified at https://dinerdost-web.vercel.app.

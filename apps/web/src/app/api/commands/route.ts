@@ -29,6 +29,9 @@ export async function POST(request: NextRequest) {
       roundId = () => z.uuid().parse(data.roundId);
     let result: unknown;
     switch (data.action) {
+      case 'paidReplacement':
+        result=await service.replacePaidOrder(db,actor,key,orderId(),data.input);
+        break;
       case "materialSetup":
         result=await service.saveMaterialSetup(db,actor,key,data.input);
         break;

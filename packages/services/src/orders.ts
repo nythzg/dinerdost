@@ -1,4 +1,5 @@
 import {webLoyaltyLimit} from './web-loyalty';
+import { replacementEarnedPoints } from './web-replacements';
 import {snapshotWebBillDefaults} from './web-bill-policy';
 import { z } from "zod";
 import {snapshotWebKitchenPolicy} from "./kitchen-policy";
@@ -420,6 +421,7 @@ export async function orderDetail(
     rounds,
     totals: { ...total, outstanding: total.payable - total.paid },
     invoices,
+    ...(!actor.application||actor.application==='MASTER'?{replacements:(await tx.query('SELECT id,source_order_id,target_order_id,amount,original_payable,snapshot->>\'number\' AS number FROM web_replacements WHERE source_order_id=$1 OR target_order_id=$1',[orderId])).rows}:{}),
     ...(!actor.application||actor.application==='MASTER'?{refund_total:num((await one(tx,'SELECT coalesce(sum(amount),0) AS amount FROM web_refunds WHERE order_id=$1',[orderId])).amount)}:{}),
     deviceAccess,
     customerVisits: order.customer_id
@@ -790,9 +792,9 @@ export async function evaluateEntitlements(
   await tx.query("UPDATE order_rounds SET quote_version=version WHERE id=$1", [
     roundId,
   ]);
-  const points = Math.floor(
+  const points = Math.max(0, Math.floor(
     ((num(round.payable) - num(round.tax)) * num(outlet.earn_bps)) / 1_000_000,
-  );
+  ) - (num(round.round_number)===1 ? await replacementEarnedPoints(tx,orderId):0));
   await tx.query(
     "INSERT INTO loyalty_ledger(id,restro_id,outlet_id,customer_id,order_id,round_id,state,points,reason) VALUES($1,$2,$3,$4,$5,$6,'PENDING_EARN',$7,'Estimated before settlement') ON CONFLICT(round_id,state) DO UPDATE SET customer_id=EXCLUDED.customer_id,points=EXCLUDED.points",
     [
@@ -1088,7 +1090,7 @@ export async function releaseKot(
   if(skipKitchenStages)await audit(tx,actor,{action:"KOT_READY",entityType:"ORDER_ROUND",entityId:round.id,outletId:order.outlet_id,newState:{kitchenStagesBypassed:true,explicitServiceRequired:true},reason:"New round follows saved kitchen workflow; serving remains an explicit staff action"});
 }
 
-async function acceptStaffSubmission(
+export async function acceptStaffSubmission(
   tx: Sql,
   actor: Actor,
   orderId: string,
