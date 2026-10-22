@@ -284,6 +284,13 @@
     },
     "workspaceToolTabs": {
       "status": "verified-local-unreleased",
+      "mobileNavigationLayering": {
+        "status": "verified-local-unreleased",
+        "behavior": "Expanded navigation covers the menu trigger; logo and links remain unobstructed.",
+        "browserWorkflowsPassed": 2,
+        "viewports": ["390x844", "320x568", "844x390", "1440x1000"],
+        "typecheckPassed": true
+      },
       "calculatorPosition": "Right edge, below header/Demo",
       "activeOrdersPosition": "Bottom right edge",
       "theme": "Existing green palette; slim vertical tabs",

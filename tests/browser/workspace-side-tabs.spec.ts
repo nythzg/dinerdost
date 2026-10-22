@@ -6,6 +6,22 @@ async function register(page:Page){
  for(const [name,value] of [['Your name','Side tabs QA'],['Restaurant name','Isolated side tabs QA'],['First outlet','Main'],['Email','side-tabs-'+randomUUID()+'@example.test'],['Password',randomBytes(24).toString('base64url')]])await page.getByLabel(name,{exact:true}).fill(value);
  await page.getByLabel('Customer QR ordering').selectOption('on');await page.getByLabel('Add a sample menu and 12 tables').press('Space');await page.getByRole('button',{name:'Create workspace',exact:true}).click();await page.waitForURL('**/app/overview');
 }
+
+test('expanded mobile navigation covers the menu button and keeps its logo and links clickable',async({page})=>{
+ await register(page);
+ const toggle=page.getByRole('button',{name:'Open navigation',exact:true}),sidebar=page.locator('#workspace-navigation');
+ for(const [width,height] of [[390,844],[320,568],[844,390]]){
+  await page.setViewportSize({width,height});await page.goto('/app/overview');
+  const button=(await toggle.boundingBox())!;
+  await toggle.click();await expect(sidebar).toHaveClass(/is-open/);
+  await expect.poll(()=>page.evaluate(({x,y})=>!!document.elementFromPoint(x,y)?.closest('#workspace-navigation'),{x:button.x+button.width/2,y:button.y+button.height/2})).toBe(true);
+  await page.screenshot({path:`verification/local-navigation-layer-${width}-${height}.png`});
+  await sidebar.getByRole('link',{name:'Diner Dost home',exact:true}).click();await expect(sidebar).toHaveClass(/is-open/);
+  await sidebar.getByRole('link',{name:'Orders',exact:true}).click();await page.waitForURL('**/app/orders');await expect(sidebar).not.toHaveClass(/is-open/);
+  await toggle.click();await page.locator('.sidebar-scrim').click({position:{x:width-16,y:40}});await expect(sidebar).not.toHaveClass(/is-open/);await expect(toggle).toBeVisible();
+ }
+ await page.setViewportSize({width:1440,height:1000});await expect(toggle).toBeHidden();await expect(sidebar).toBeInViewport();
+});
 test('green right-edge tool tabs follow the header, stay reachable on small screens and open inward without blocking page controls',async({page})=>{
  await register(page);
  const calcTab=page.locator('.calculator-dock>.workspace-dock-trigger'),ordersTab=page.locator('.active-orders-dock>.workspace-dock-trigger');
