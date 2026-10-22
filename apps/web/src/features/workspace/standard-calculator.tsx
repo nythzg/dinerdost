@@ -15,7 +15,7 @@ export function CalculatorDock({employeeId}:{employeeId:string}){
  const [expression,setExpression]=useState(''),[note,setNote]=useState('');
  const [preview,setPreview]=useState<{expression:string;result:string}|null>(null);
  const [savedId,setSavedId]=useState<string|null>(null),[savedNote,setSavedNote]=useState('');
- const [error,setError]=useState(''),[busy,setBusy]=useState(false);
+ const [error,setError]=useState(''),[status,setStatus]=useState(''),[busy,setBusy]=useState(false);
  const [history,setHistory]=useState<Row[]>([]),[historyPage,setHistoryPage]=useState(0),[historyMore,setHistoryMore]=useState(false),[loaded,setLoaded]=useState(false);
  const input=useRef<HTMLInputElement>(null),locked=useRef(false),generation=useRef(0),caret=useRef<number|null>(null);
  const live=useMemo(()=>{if(!expression.trim())return null;try{return calculate(expression)}catch{return null}},[expression]);
@@ -24,7 +24,7 @@ export function CalculatorDock({employeeId}:{employeeId:string}){
  function toggle(value:boolean){setOpen(value);try{sessionStorage.setItem('dd-calculator-open-'+employeeId,value?'1':'0')}catch{}}
  function edit(value:string,clearNote=false){
   if(savedId||clearNote)setNote(''); // A new calculation must not inherit a saved note.
-  setExpression(calculatorExpression(value).slice(0,200));setPreview(null);setSavedId(null);setSavedNote('');setError('');
+  setExpression(calculatorExpression(value).slice(0,200));setPreview(null);setSavedId(null);setSavedNote('');setError('');setStatus('');
  }
  function selection(){const field=input.current;return {start:field?field.value.slice(0,field.selectionStart??field.value.length).replace(/,/g,'').length:expression.length,end:field?field.value.slice(0,field.selectionEnd??field.value.length).replace(/,/g,'').length:expression.length}}
  function backspace(forward=false){const {start,end}=selection(),from=Math.max(0,start-(start===end&&!forward?1:0)),to=end+(start===end&&forward?1:0);caret.current=from;edit(expression.slice(0,from)+expression.slice(to))}
@@ -56,15 +56,25 @@ export function CalculatorDock({employeeId}:{employeeId:string}){
   try{const result=await idempotentPost('/api/calculator',payload);await loadHistory().catch(e=>setError('Saved. History could not refresh: '+e.message));return result}
   catch(e){setError((e as Error).message)}finally{locked.current=false;setBusy(false)}
  }
- function calculateNow(){setError('');try{setPreview({expression,result:calculate(expression)})}catch(e){setPreview(null);setError((e as Error).message)}}
+ async function calculateNow(){
+  if(locked.current)return;
+  setError('');setStatus('');
+  try{
+   const result=calculate(expression);setPreview({expression,result});
+   if(savedId)return savedId; // Repeated equals must not duplicate this completed calculation.
+   const entry=await mutate({action:'calculate',expression});
+   if(entry){setSavedId(entry.id);setSavedNote('');setStatus('Calculation saved to history.');return entry.id as string}
+  }catch(e){setPreview(null);setError((e as Error).message)}
+ }
  async function save(){
-  if(!preview)return;
-  const result=await mutate(savedId?{action:'note',id:savedId,note}:{action:'calculate',expression:preview.expression,note});
-  if(result){setSavedId(savedId??result.id);setSavedNote(note)}
+  if(locked.current)return;
+  if(!expression.trim()){setError('Enter a calculation before saving a note.');setStatus('');return}
+  const entryId=savedId??await calculateNow();if(!entryId)return;
+  if((savedId?savedNote:'')===note){setError('');setStatus('Note saved.');return}
+  if(await mutate({action:'note',id:entryId,note})){setSavedNote(note);setStatus('Note saved.')}
  }
  async function updateNote(entryId:string,value:string){if(await mutate({action:'note',id:entryId,note:value})){if(entryId===savedId){setNote(value);setSavedNote(value)}}}
  async function remove(entryId:string){if(!await confirmAction('Delete this calculation from your history?','Delete calculation'))return;if(await mutate({action:'delete',id:entryId})){if(entryId===savedId){setSavedId(null);setSavedNote('')}}}
- const saved=!!savedId&&savedNote===note;
  return <div className="calculator-dock">
  {open&&<section className="workspace-tool-panel calculator-panel" role="region" aria-label="Calculator">
   <header><h2><T>{historyOpen?'Calculator history':'Calculator'}</T></h2><div className="calculator-header-actions"><button type="button" className="button small" aria-label={historyOpen?'Back to calculator':'Show calculator history'} aria-pressed={historyOpen} onClick={()=>{setHistoryOpen(!historyOpen);setError('')}}>{historyOpen?'←':<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M3 5v5h5M3 10a9 9 0 1 1 2 8M12 7v5l3 2"/></svg>}</button><button type="button" className="button small" onClick={()=>toggle(false)} aria-label="Minimize calculator">×</button></div></header>
@@ -76,8 +86,9 @@ export function CalculatorDock({employeeId}:{employeeId:string}){
      {preview?<output className="calculator-result" aria-label="Calculation result" aria-live="polite">{calculatorDisplay(plainCalculatorResult(preview.result))}</output>:<output className="calculator-live-result" aria-label="Calculation preview" aria-live="polite">{live!==null&&/[+×÷*/%()-]/.test(expression)?calculatorDisplay(plainCalculatorResult(live)):''}</output>}
     </div>
     <div className="calculator-keypad">{['AC','%','⌫','÷','7','8','9','×','4','5','6','-','1','2','3','+','00','0','.','='].map((k,i)=><button key={k} type="button" disabled={busy} className={'button'+(i<4?' calculator-function':'')+([3,7,11,15].includes(i)?' calculator-operator':'')+(k==='='?' calculator-equals':'')} aria-label={k==='⌫'?'Backspace':k==='AC'?'Clear calculation':k==='-'?'−':k} onClick={()=>{if(k==='=')calculateNow();else if(k==='AC')edit('',true);else if(k==='⌫')backspace();else insert(k)}}>{k==='⌫'?<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 5h11a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9l-7-7z"/><path d="m12 9 6 6m0-6-6 6"/></svg>:k==='-'?'−':k}</button>)}</div>
-    <label>Note (optional)<textarea aria-label="Calculation note" disabled={busy} maxLength={500} value={note} onChange={e=>setNote(e.target.value)}/></label>
-    {preview&&<button type="button" className="button primary" disabled={busy||saved} onClick={()=>void save()}>{saved?'Saved to history':savedId?'Save note':'Save calculation'}</button>}
+    <label>Note (optional)<textarea aria-label="Calculation note" disabled={busy} maxLength={500} value={note} onChange={e=>{setNote(e.target.value);setStatus('')}}/></label>
+    <button type="button" className="button primary" disabled={busy} onClick={()=>void save()}>Save note</button>
+    <span className="calculator-input-label" role="status" aria-label="Calculation save status">{status}</span>
    </form>}
   {error&&<p role="alert">{error}</p>}
   </div>

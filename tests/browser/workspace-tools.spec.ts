@@ -80,7 +80,7 @@ test('counter/filter layout, calculator persistence, active orders, dot grid and
   expect(await filters.locator('[data-view=Active] span').evaluate(el=>getComputedStyle(el).color)).toBe('rgb(83, 102, 74)');
   await page.screenshot({path:`verification/orders-counters-0417-${width}.png`});
   if(await calcTrigger.getAttribute('aria-expanded')==='false')await calcTrigger.click();
-  await calc.getByLabel('Calculation',{exact:true}).fill(`125*2+${width}`);await calc.getByRole('button',{name:'=',exact:true}).click();await calc.getByLabel('Calculation note',{exact:true}).fill('Tools note '+width);await calc.getByRole('button',{name:'Save calculation',exact:true}).click();await calc.getByRole('button',{name:'Show calculator history',exact:true}).click();
+  await calc.getByLabel('Calculation',{exact:true}).fill(`125*2+${width}`);await calc.getByRole('button',{name:'=',exact:true}).click();await calc.getByLabel('Calculation note',{exact:true}).fill('Tools note '+width);await calc.getByRole('button',{name:'Save note',exact:true}).click();await calc.getByRole('button',{name:'Show calculator history',exact:true}).click();
   const entry=calc.locator('.calculator-entry').filter({has:page.getByText(`125*2+${width}`,{exact:true})});await expect(entry).toContainText('= '+(250+width));await expect(entry.getByRole('textbox')).toHaveValue('Tools note '+width);
   await entry.getByRole('textbox').fill('Saved revised note '+width);await entry.getByRole('button',{name:'Save note',exact:true}).click();
   await page.locator('.topbar .status-dot').click({timeout:10000});await expect(calc).toBeVisible();
