@@ -152,3 +152,9 @@ These are already deferred by the user; do not ask them again on every check or 
 - Floor content stays clipped inside the fixed outer dotted frame, with a visible box around the actual layout and scroll/pan/pinch navigation.
 
 Track implementation and acceptance in [CLIENT_FEEDBACK.md](CLIENT_FEEDBACK.md) and broader dependencies in [V2_CHECKLIST.md](V2_CHECKLIST.md). This note does not mark any feature complete.
+
+## Latest local Q114 decision and acceptance · 23 October 2026
+
+The receiving user superseded the broad APK request with **Standard only**, no mode selector, the supplied video's keypad/live-result/chaining behavior, green theme and optional notes saved per calculation. Smaller 64px circular keys and a 320px panel retain the existing text sizes. Q114 is now verified locally and unreleased; Q111 alone remains unanswered. Historical APK/parity-pending paragraphs above describe the earlier checkpoint.
+
+283 backend tests, ten isolated PostgreSQL cases, typecheck/build and four desktop/phone browser workflows passed. All four browser workflows passed again against localhost:5090 after final sizing; screenshots were inspected. Existing saved calculation results and financial history remain unchanged. See [local calculator scope and verification](LOCAL_STANDARD_CALCULATOR.md). Production/client released counts remain unchanged. The separate Petpooja queue remains 4 released complete / 2 partial / 21 pending; PP03/PP04 are local and unreleased, and PP06 remains paused. No push/deployment is authorized by this local checkpoint.

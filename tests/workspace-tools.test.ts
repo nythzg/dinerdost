@@ -4,8 +4,13 @@ import {randomUUID} from 'node:crypto';
 import {createEmbeddedDatabase,createPostgresDatabase,type Database} from '@dinerdost/database';
 import {calculate,type Actor} from '@dinerdost/core';
 import * as s from '@dinerdost/services';
+import {calculatorDisplay,calculatorExpression,plainCalculatorResult} from '../apps/web/src/features/workspace/calculator-display';
 let db:Database,owner:Actor,foreign:Actor,manager:Actor,w:any;
 const key=()=>randomUUID();
+test('calculator grouping and scientific output expansion preserve arithmetic values and input operators',()=>{
+ assert.equal(calculatorDisplay('1125÷5'),'1,125÷5');assert.equal(calculatorDisplay('12345.678-5'),'12,345.678−5');assert.equal(calculatorExpression(calculatorDisplay('12345.678-5')),'12345.678-5');
+ assert.equal(plainCalculatorResult('1e-7'),'0.0000001');assert.equal(plainCalculatorResult('-1.25e+4'),'-12500');assert.equal(calculatorExpression('abc12 + xyz3'),'12 + 3');assert.equal(calculatorExpression('00'),'0');
+});
 before(async()=>{
  db=process.env.TEST_DATABASE_URL?createPostgresDatabase(process.env.TEST_DATABASE_URL):await createEmbeddedDatabase();await db.migrate();await db.migrate();
  for(const index of [0,1]){const account=await s.signup(db,{name:'Tools QA',email:`tools-${index}@example.test`,password:'tools-test-password',restaurant:'Tools '+index,outlet:'Main',qrEnabled:true,demo:true},'tools-'+index);const actor=await s.authenticate(db,account.token);if(index)foreign=actor;else owner=actor}
@@ -59,4 +64,24 @@ test('active orders expose actual stages/outstanding and paginate beyond latest-
 test('active orders deny foreign tenants, unauthorized outlets/roles and deferred native apps',async()=>{
  await assert.rejects(s.activeOrderList(db,{...owner,role:'ACCOUNTANT'},w.outletId));
  await assert.rejects(s.activeOrderList(db,foreign,w.outletId));await assert.rejects(s.activeOrderList(db,{...manager,outletIds:[]},w.outletId));await assert.rejects(s.activeOrderList(db,{...owner,role:'KITCHEN'},w.outletId));await assert.rejects(s.activeOrderList(db,{...owner,application:'POS'},w.outletId));await assert.rejects(s.activeOrderList(db,owner,w.outletId,-1));
+});
+
+test('standard calculator relative percentages preserve compound arithmetic and reject unsupported modes',()=>{
+ for(const [expression,result] of [['200+10%','220'],['200-10%','180'],['200*10%','20'],['200/10%','2000'],['10%','0.1'],['200+10%+10%','242'],['200-10%+10%','198'],['(200+10%)*2','440'],['200+10%*2','200.2'],['200+(10%)','200.1'],['200+-10%','199.9'],['0+10%','0']])assert.equal(calculate(expression),result,expression);
+ for(const expression of ['sin(30)','2^3','sqrt(9)','2(3)','1e10','200+10000000000000000%'])assert.throws(()=>calculate(expression),expression);
+});
+test('new percentage saves and optional notes leave old recorded results and financial history intact',async()=>{
+ const oldId=key();await db.transaction(owner.restroId,tx=>tx.query('INSERT INTO calculator_history(id,restro_id,employee_id,expression,result,note) VALUES($1,$2,$3,$4,$5,$6)',[oldId,owner.restroId,owner.employeeId,'200+10%','200.1','Original saved result']));
+ const before=await financial();const entry=await s.calculatorAction(db,owner,key(),{action:'calculate',expression:'200+10%'});assert.equal(entry.result,'220');assert.equal(entry.note,'');
+ await s.calculatorAction(db,owner,key(),{action:'note',id:entry.id,note:'Optional note'});
+ const history=(await s.calculatorHistory(db,owner)).rows;assert.equal(history.find(r=>r.id===entry.id)?.note,'Optional note');assert.equal(history.find(r=>r.id===oldId)?.result,'200.1');assert.equal(history.find(r=>r.id===oldId)?.note,'Original saved result');assert.deepEqual(await financial(),before);
+ for(const input of [{action:'tool',tool:{kind:'UNIT',category:'length',from:'m',to:'cm',value:'1'}},{action:'calculate',expression:'200+10%',angle:'DEG'},{action:'calculate',expression:'200+10%',result:'999'}])await assert.rejects(s.calculatorAction(db,owner,key(),input));
+});
+test('concurrent calculator saves retain one entry and notes remain scoped to their calculation and employee',async()=>{
+ const requestKey=key(),input={action:'calculate',expression:'200-10%',note:'Concurrent note'};
+ const [first,second]=await Promise.all([s.calculatorAction(db,owner,requestKey,input),s.calculatorAction(db,owner,requestKey,input)]);assert.equal(first.id,second.id);assert.equal(first.result,'180');
+ await assert.rejects(s.calculatorAction(db,owner,requestKey,{...input,note:'Conflicting payload'}));
+ for(const actor of [manager,foreign]){await assert.rejects(s.calculatorAction(db,actor,key(),{action:'note',id:first.id,note:'Denied'}));assert(!(await s.calculatorHistory(db,actor)).rows.some(r=>r.id===first.id))}
+ const other=await s.calculatorAction(db,owner,key(),{action:'calculate',expression:'7+3',note:'Other calculation'});await s.calculatorAction(db,owner,key(),{action:'note',id:first.id,note:'Updated specific note'});
+ const history=(await s.calculatorHistory(db,owner)).rows;assert.equal(history.filter(r=>r.id===first.id).length,1);assert.equal(history.find(r=>r.id===first.id)?.note,'Updated specific note');assert.equal(history.find(r=>r.id===other.id)?.note,'Other calculation');
 });

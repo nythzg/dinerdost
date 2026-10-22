@@ -13,6 +13,7 @@ import "@/styles/late-updates.css";
 import "@/styles/review-045.css";
 import "@/styles/review-046.css";
 import "@/styles/workspace-tools.css";
+import "@/styles/calculator.css";
 import "@/styles/inventory-tools.css";
 import "sweetalert2/dist/sweetalert2.css";
 import "@/styles/review-048.css";

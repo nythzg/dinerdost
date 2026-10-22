@@ -80,12 +80,12 @@ test('counter/filter layout, calculator persistence, active orders, dot grid and
   expect(await filters.locator('[data-view=Active] span').evaluate(el=>getComputedStyle(el).color)).toBe('rgb(83, 102, 74)');
   await page.screenshot({path:`verification/orders-counters-0417-${width}.png`});
   if(await calcTrigger.getAttribute('aria-expanded')==='false')await calcTrigger.click();
-  await calc.getByLabel('Calculation',{exact:true}).fill(`125*2+${width}`);await calc.getByRole('button',{name:'Calculate',exact:true}).click();await calc.getByLabel('Calculation note',{exact:true}).fill('Tools note '+width);await calc.getByRole('button',{name:'Save calculation',exact:true}).click();await calc.getByRole('button',{name:'Show calculator history',exact:true}).click();
+  await calc.getByLabel('Calculation',{exact:true}).fill(`125*2+${width}`);await calc.getByRole('button',{name:'=',exact:true}).click();await calc.getByLabel('Calculation note',{exact:true}).fill('Tools note '+width);await calc.getByRole('button',{name:'Save calculation',exact:true}).click();await calc.getByRole('button',{name:'Show calculator history',exact:true}).click();
   const entry=calc.locator('.calculator-entry').filter({has:page.getByText(`125*2+${width}`,{exact:true})});await expect(entry).toContainText('= '+(250+width));await expect(entry.getByRole('textbox')).toHaveValue('Tools note '+width);
   await entry.getByRole('textbox').fill('Saved revised note '+width);await entry.getByRole('button',{name:'Save note',exact:true}).click();
   await page.locator('.topbar .status-dot').click({timeout:10000});await expect(calc).toBeVisible();
   await page.goto('/app/inventory');await expect(calc).toBeVisible();await page.reload();await expect(calc).toBeVisible();await calc.getByRole('button',{name:'Show calculator history',exact:true}).click();await expect(entry.getByRole('textbox')).toHaveValue('Saved revised note '+width);await calc.getByRole('button',{name:'Back to calculator',exact:true}).click();
-  await calc.getByLabel('Calculation',{exact:true}).fill('1/0');await calc.getByRole('button',{name:'Calculate',exact:true}).click();await expect(calc.getByRole('alert')).toHaveText('Cannot divide by zero.');
+  await calc.getByLabel('Calculation',{exact:true}).fill('1/0');await calc.getByRole('button',{name:'=',exact:true}).click();await expect(calc.getByRole('alert')).toHaveText('Cannot divide by zero.');
   await page.screenshot({path:`verification/calculator-0417-${width}.png`});
   await calc.getByRole('button',{name:'Minimize calculator',exact:true}).click();await expect(calc).toHaveCount(0);
   await activeTrigger.click();await expect(active).toBeVisible();const activeOrder=active.getByRole('link').filter({hasText:'#'+order.number+' · Takeaway'});await expect(activeOrder).toContainText('Preparing');await expect(activeOrder).toContainText('₹0.00');

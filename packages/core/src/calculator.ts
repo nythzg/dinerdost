@@ -14,6 +14,13 @@ export function calculate(expression: string): string {
     depth--;return checked(value);
   }
   function product(){let value=factor();while(source[at]==='*'||source[at]==='/'){const op=source[at++],right=factor();if(op==='/'&&right===0)throw new Error('Cannot divide by zero.');value=checked(op==='*'?value*right:value/right)}return value}
-  function sum(){let value=product();while(source[at]==='+'||source[at]==='-'){const op=source[at++],right=product();value=checked(op==='+'?value+right:value-right)}return value}
+  function sum(){let value=product();while(source[at]==='+'||source[at]==='-'){
+    const op=source[at++];
+    // Reference shortcut applies to a numeric % at a sum/closing/end boundary.
+    // Products and parenthesized percentages keep ordinary postfix semantics.
+    const percent=/^((?:\d+(?:\.\d*)?|\.\d+))%(?=$|[+\-)])/.exec(source.slice(at));
+    if(percent){at+=percent[0].length;const ratio=checked(Number(percent[1]))/100;value=checked(value*(op==='+'?1+ratio:1-ratio))}
+    else {const right=product();value=checked(op==='+'?value+right:value-right)}
+  }return value}
   const value=sum();if(at!==source.length)throw new Error('Check the calculation.');return String(Number(value.toPrecision(15)));
 }

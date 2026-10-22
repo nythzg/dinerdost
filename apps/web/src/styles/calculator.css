@@ -1,0 +1,18 @@
+@media screen {
+ .calculator-panel{width:320px;height:auto;max-height:calc(100dvh - 110px)}
+ .calculator-input-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+ .calculator-display{display:flex;flex-direction:column;justify-content:flex-end;min-height:96px;gap:8px;padding:8px 0 12px;text-align:right}
+ .calculator-display label{display:block;min-width:0}
+ .calculator-panel .calculator-display input{border:0;border-radius:0;box-shadow:none;background:transparent;text-align:right;padding:0 4px;font-size:34px;font-weight:600;line-height:1.25;height:48px;color:#193f30}
+ .calculator-panel .calculator-display.is-complete input{font-size:18px;font-weight:400;height:27px;color:#53664a}
+ .calculator-display .calculator-live-result{display:block;min-height:27px;font-size:20px;color:#53664a;overflow-wrap:anywhere;padding-right:4px}
+ .calculator-panel .calculator-display .calculator-result{font-size:38px;line-height:1.2;color:#193f30;background:transparent;border-radius:0;padding:0 4px;min-height:46px;overflow-wrap:anywhere}
+ .calculator-keypad{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%;max-width:286px;margin:0 auto 12px}
+ .calculator-panel .calculator-keypad .button{width:100%;aspect-ratio:1;min-height:44px;height:auto;border-radius:50%;padding:0;display:grid;place-items:center;font-size:24px;font-weight:600;background:linear-gradient(#f7f8f4,#eaf1e6);color:#193f30;border:1px solid #c6d2c0;box-shadow:inset 0 1px 2px #fff,0 2px 3px #193f3010}
+ .calculator-panel .calculator-keypad .calculator-function{background:linear-gradient(#eaf1e6,#d8e4d2);border-color:#a5b99a;font-size:20px}
+ .calculator-panel .calculator-keypad .calculator-operator{background:#285b45;color:#fff;border-color:#285b45;box-shadow:inset 0 1px 2px #ffffff24}
+ .calculator-panel .calculator-keypad .calculator-equals{background:#193f30;color:#fff;border-color:#193f30;box-shadow:inset 0 1px 2px #ffffff24;font-size:30px}
+ .calculator-panel .calculator-keypad .button:active{transform:scale(.95);filter:brightness(.95)}
+ .calculator-panel :is(button,input,textarea):focus-visible{outline:3px solid #8b9f83;outline-offset:2px}
+ .calculator-panel .calculator-display input:focus-visible{outline:0;box-shadow:inset 0 -1px #8b9f83}
+}

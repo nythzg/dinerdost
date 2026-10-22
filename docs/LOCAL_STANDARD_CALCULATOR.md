@@ -1,0 +1,23 @@
+# Local standard calculator · 23 October 2026
+
+Q114's latest direct user instructions supersede the earlier broad APK request: keep only Standard, remove the mode selector, follow the supplied `VID_20261023_024214.mp4` interface and demonstrated arithmetic, retain the green theme and optional notes/history. Scientific, conversion, currency, mortgage and native features are outside this approved scope. Q111 remains unanswered. Procurement remains paused.
+
+The local calculator has the reference's circular 4×5 keypad, AC, percent, SVG backspace, 00 and a single equals key. Live previews do not save history. Equals promotes the answer; an operator continues from it and a digit starts a fresh calculation. The demonstrated chain `45×25 = 1,125`, `÷5 = 225`, `−26 = 199` passes. Display grouping does not change stored expressions. Keyboard entry, paste, selection deletion and grouped digit editing remain supported.
+
+Following the user's size correction, the panel is 320px wide with automatic height capped to the viewport. Keys are at most 64px across with 10px gaps; numeric text stays 24px, function text 20px, equals 30px and backspace SVG 22px. Notes and Save calculation fit in the rendered desktop/phone panel; history scrolls inside it.
+
+Notes are optional before or after equals. Saving a later note updates the same entry; a new calculation does not inherit a previously saved note. Account-scoped history survives navigation/reload and supports note editing and confirmed deletion. Only explicit Save writes a result, and the server recalculates it.
+
+Relative percentages now give `200+10%=220`, `200-10%=180`, `200×10%=20` and chained `200+10%+10%=242`. The recovered literal-percent rule preserves compound expressions: `200+10%*2=200.2` and `200+(10%)=200.1`. Existing saved results remain unchanged. Original arithmetic limits and unsupported-operation rejection are retained; this does not claim full Android parity or unobserved repeat-equals behavior.
+
+## Verification
+
+- 283 full backend tests passed, including display helpers, percentages, old history/financial preservation, authorization and concurrent idempotent saves.
+- Ten affected cases passed against a disposable PostgreSQL database selected through the separate QA configuration; the runner dropped its exact temporary database.
+- Typecheck and optimized build passed. No schema, package or dependency change.
+- Four browser workflows passed on isolated localhost:5091 and again on the actual localhost:5090 at 1440px/390px. Following the final sizing changes, all four passed again on localhost:5090 (22.8s), with explicit panel/key size and unchanged font assertions. Desktop and phone screenshots were inspected.
+- Browser coverage includes the reference chain, live preview without writes, percentages, SVG backspace, notes/save/update, history persistence/edit/cancel/delete, invalid calculations, forged-result rejection, anonymous access and CSRF rejection.
+
+Evidence: `verification/local-calculator-video-match-{1440,390}.png`, `verification/local-calculator-standard-{panel,note,history,keypad}-{1440,390}.png`. These are generated local QA artifacts, not deployment evidence. QA uses synthetic tenants, not original restaurant records.
+
+The change is local and unreleased on branch `local-web-calculator`, based on `a4bc66f04d2fe8e8df3014023a03b638fcda6a0d`. Production remains 0.4.31; calculator changes are not pushed or deployed. The original account/data copy remains available at http://localhost:5090. No hosted application database was migrated or modified for this work. Released client and Petpooja totals remain separate; PP03/PP04 remain previously verified local additions and PP06 remains paused in its separate checkout.
