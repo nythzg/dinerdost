@@ -33,3 +33,7 @@ A replacement may use the same still-open table visit. When that visit has close
 New project: `prem-2230/dinerdost-web`. The new QA resource is isolated. After reviewing the upstream same-data handoff update, the user explicitly chose **“make a new data base”** in the receiving chat on 23 October. The receiving deployment therefore uses a fresh, separately provisioned production resource; no original restaurant records have been transferred. `VERCEL_DATABASE_HANDOFF.md` remains the procedure for a later explicitly requested existing-data connection, not the selected setup here. The existing `nythz/dinerdost-app` deployment and its live database have not been modified, replaced or deleted. Secrets, `.vercel`, environment files and temporary QA credentials remain outside Git.
 
 Q111/Q114 remain unanswered. Petpooja PP01–PP27 progress is tracked separately in `PETPOOJA_ADDITIONS.md`; Q89 does not complete a PP group. Android, Firebase, providers, packages, offline hosting, marketplace and client recipe/rate configuration remain deferred.
+
+## Hosted acceptance
+
+Receiving Production 0.4.31 passed the full desktop/phone workflow on 23 October 2026. All 264 backend cases, ten Q89 PostgreSQL cases and five refund PostgreSQL cases passed; eight public/auth/CSRF checks passed. [Acceptance](../verification/production-0431-acceptance.json). Original app/database are unchanged; new receiving Production has no transferred restaurant data.

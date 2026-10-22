@@ -212,3 +212,14 @@ Q91 released: owner/manager may record an already-returned manual full or partia
 ## Receiving-device continuation — 23 October 2026
 
 Web Q89 is implemented and locally verified on the 0.4.31 feature branch, with nine isolated PostgreSQL cases passed. Release remains pending; see CLIENT_FEEDBACK.md and Q89_PAID_REPLACEMENT.md. The original 0.4.30 app/data remain intact. The user explicitly chose a new database for the receiving deployment; original restaurant records are not transferred. PP counts remain four complete/two partial/21 pending; Q111/Q114 and the existing deferrals remain unchanged.
+
+
+## Receiving Production checkpoint 0.4.31 · 23 October 2026
+
+Q89 is released and verified at **https://dinerdost-web.vercel.app**, project `prem-2230/dinerdost-web`, deployment `dpl_9retnKdF5JAiY4Pqq7TnJojgJSqj`, source commit `10d892d0ab59c881e8ac0b18837dc3cd1f62bd75`. Original 0.4.30 remains at its original URL and database. The receiving user explicitly chose a new database; no original restaurant records were transferred. Only synthetic acceptance tenants have been created in this new resource.
+
+Baseline: 254 backend cases, build/typecheck and desktop/phone refund workflow reproduced. Release: **264 backend cases**, ten Q89 plus five refund regression cases in isolated PostgreSQL databases, local and hosted Q89 workflow at **1440px/390px**, typecheck/optimized builds and eight public/auth/CSRF checks passed. The hosted test normalizes PostgreSQL bigint strings in its assertion; application behavior did not change. Rendered replacement, invoice and linked record screens were inspected. Migrations 001–051 are applied only to the new receiving/QA resources; no disposable QA databases remain.
+
+Q89 credit is traced to actual receipts without copying collections; old invoices, money and FIFO costs stay preserved. New food requires ordinary stock/KOT and explicit service; unserved originals require explicit discard. Lower final totals, duplicate/concurrent allocations, stale quotes, cross-role/outlet/tenant/native access and stock failures are guarded. [Implementation](Q89_PAID_REPLACEMENT.md) · [Acceptance](../verification/production-0431-acceptance.json).
+
+Client queue: **100 released on the receiving project; Q111/Q114 unanswered**. Separate Petpooja queue: **4 complete / 2 partial / 21 pending**. No Petpooja group or deferred native/provider/package/client-data behavior is completed by this release.

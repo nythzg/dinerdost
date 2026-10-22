@@ -111,3 +111,6 @@ Excludes real `.env` files, `.vercel` account binding, QA fixture credentials, C
 ## Sources for the handoff method
 
 [OpenAI project context/AGENTS workflow](https://developers.openai.com/cookbook/examples/codex/iterating-development-workflows-with-codex) supports keeping portable project instructions and context files with source. It does not establish automatic live-memory migration between accounts/devices. [Vercel linking](https://vercel.com/docs/cli/link), [monorepo configuration](https://vercel.com/docs/monorepos/monorepo-faq) and [project transfers](https://vercel.com/docs/projects/transferring-projects) inform the separate deployment setup. Ownership transfer is an account operation and has not been performed.
+
+
+Receiving Production 0.4.31 is now verified at https://dinerdost-web.vercel.app (prem-2230/dinerdost-web), implementation commit 10d892d0ab59c881e8ac0b18837dc3cd1f62bd75. Q89 accepted: 264 backend, 10 Q89 + 5 refund isolated PostgreSQL, local/hosted desktop/phone and 8 public checks passed. User selected fresh receiving database; original 0.4.30/data unchanged and not transferred. See RELEASE.json and production-0431 acceptance. PP remains 4 complete/2 partial/21 pending; next is PP03 then dependent PP04.
