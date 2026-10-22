@@ -10,6 +10,7 @@
  .guest-shell .guest-card-stepper .icon,.pos-card-stepper .icon{color:#193f30;stroke:currentColor}
  .guest-shell .guest-card-stepper>span,.guest-shell .guest-menu article.is-added .guest-card-stepper>span{color:#193f30}
  .menu-card .dish-select{color:#24342c}.menu-card.is-added .dish-select{color:#fff}
+ .menu-card .dish-details>.ready-food-tag,.menu-card.is-added .dish-details>.ready-food-tag{color:#fff}
  .menu-card .pos-card-stepper,.menu-card .pos-card-stepper button{color:#193f30}
  .desk-confirm-container{z-index:3000}.desk-confirm-popup{border:1px solid #aec1a8;border-radius:14px;background:#f7f8f4;color:#24342c;font-family:inherit;max-width:calc(100vw - 24px)}
  .desk-confirm-popup .swal2-title{font-size:22px;color:#193f30}.desk-confirm-popup .swal2-html-container{font-size:14px;line-height:1.6;color:#43594a}.desk-confirm-popup .swal2-actions{gap:12px}.desk-confirm-popup .swal2-icon.swal2-question{color:#285b45;border-color:#8da985}

@@ -241,6 +241,14 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "readyFoodBadgeContrast": {
+      "status": "verified-local-unreleased",
+      "behavior": "White Ready to serve badge text on the existing green background in both unselected and selected POS cards.",
+      "browserWorkflowsPassed": 1,
+      "viewportWidths": [1440, 390],
+      "pushed": false,
+      "deployed": false
+    },
     "status": "verified-local-only",
     "url": "http://localhost:5090",
     "branch": "local-web-calculator",
