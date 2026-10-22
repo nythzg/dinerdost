@@ -1,7 +1,8 @@
 # Variable names only. Configure real values privately in the chosen destination.
 DATABASE_URL=
-DATABASE_MIGRATION_URL=
 APP_ORIGIN=
+# DATABASE_MIGRATION_URL is only for a controlled private migration workflow.
+# Do not add it to his Vercel or run migrations for initial same-data reconnection.
 # Optional, requires explicit platform-operator identity provisioning.
 DD_PLATFORM_ADMIN_USER_IDS=
 # Local development only; omit DATABASE_URL to use isolated PGlite.

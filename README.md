@@ -1,5 +1,7 @@
 # Diner Dost
 
+For hosting on another Vercel account while keeping existing data, follow [the database/environment handoff](docs/VERCEL_DATABASE_HANDOFF.md). Reuse the existing production Neon DB; actual credentials are never in this public repository.
+
 Working web application, version **0.4.30**, deployed and verified at https://dinerdost-app.vercel.app/. Built from DinerDost PRD v2.0 and the approved green layout with large navigation. Read [HANDOFF.md](HANDOFF.md) and [new-device setup](docs/NEW_DEVICE_SETUP.md) when moving this project. Paste [CONTINUE_IN_CODEX.txt](CONTINUE_IN_CODEX.txt) into the receiving Codex chat.
 
 Current Q18–Q119 state is **99 released, Q89 paid replacement pending, Q111/Q114 unanswered**. The latest requested ten-update batch has nine deployed. The separate Petpooja queue has **4 complete, 2 partial, 21 pending** groups. See [RELEASE.json](docs/RELEASE.json), [pending questions](docs/PENDING_QUESTIONS.md), [client checklist](docs/CLIENT_FEEDBACK.md) and [Petpooja additions](docs/PETPOOJA_ADDITIONS.md). The earlier 15-minute monitor is **PAUSED** and not automatically transferred. Recipe/native/Firebase/provider/package/offline-v2 setup remains deferred.

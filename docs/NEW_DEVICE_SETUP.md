@@ -52,6 +52,8 @@ Invoke CLI from the monorepo root. See [Vercel link](https://vercel.com/docs/cli
 
 ## 4. Database and environment variables
 
+For the existing-data hosting handoff, follow [VERCEL_DATABASE_HANDOFF.md](VERCEL_DATABASE_HANDOFF.md). It supersedes generic new-database setup: reuse the existing production DB, add only the required Production variables, do not migrate/seed/reset, and verify read-only counts/checksums before cutover. Actual credentials stay private.
+
 Configure actual values privately in the destination Vercel environment settings. They were deliberately excluded from the ZIP. Use the variable-name template `HANDOFF_ENV.example`; it contains no credentials.
 
 - **DATABASE_URL:** runtime PostgreSQL connection. Existing production database is the dedicated Neon database, with migrations 001–050 already applied. The application enforces its tenant RLS/restricted `dinerdost_app` role inside transactions. Use an owner-authorized connection compatible with that existing role setup; do not silently substitute an unrelated empty database if real data is expected.
@@ -62,10 +64,10 @@ Configure actual values privately in the destination Vercel environment settings
 
 The ZIP is not a database backup. If the receiving operator should continue using real records, the owner must securely grant access to that existing Neon resource (or separately arrange a verified backup/restore and cutover). Existing uploads/assets stored in that database move only with the database, not source files. Connecting the same database preserves records; it also makes the new deployment a live writer, so use a separate branch/database for testing.
 
-For a new empty production database, run the ordinary reviewed migration command with its explicitly selected environment file only after access/configuration is ready:
+For this same-data handoff, do not create an empty production database or run migration/seed commands just to host 0.4.30 elsewhere. Migrations 001–050 are already applied. Use the read-only connection checker instead:
 
 ```powershell
-npx tsx scripts/database.ts migrate --env=.env.production.local
+npx tsx scripts/check-handoff-database.ts --env=.env.production.local --out=verification/handoff-db-check.json
 ```
 
 Keep secret environment files local and ignored. Never send private keys/passwords in chat or include them in Git/handoff bundles.

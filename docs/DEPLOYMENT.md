@@ -1,5 +1,7 @@
 # Deployment and operations
 
+For the receiving operator's Vercel account and the existing production data, use [VERCEL_DATABASE_HANDOFF.md](VERCEL_DATABASE_HANDOFF.md). The settings/commands below describe the original account and historical schema releases; do not blindly rerun migrations or copy the original team binding for a hosting-only handoff.
+
 The approved static preview and the working app are different projects. Deploying the app must not overwrite `dinerdost-design-preview`.
 
 | Setting             | Value                                                      |
