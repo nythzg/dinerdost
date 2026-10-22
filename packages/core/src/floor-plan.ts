@@ -104,16 +104,21 @@ export function fitFloorObject(
   };
 }
 
+export type FloorResizeDirection = 'n'|'ne'|'e'|'se'|'s'|'sw'|'w'|'nw';
+
 /** Resize in local axes while holding the opposite world-space corner/edge still. */
-export function resizeFloorObject(object:FloorPlanObject,area:FloorPlanSize,direction:'se'|'e'|'s',deltaWidth:number,deltaHeight:number):FloorPlanObject{
+export function resizeFloorObject(object:FloorPlanObject,area:FloorPlanSize,direction:FloorResizeDirection,deltaWidth:number,deltaHeight:number):FloorPlanObject{
  const minWidth=object.kind==='WALL'?10:60,minHeight=object.kind==='WALL'?10:50;
- const width=direction==='s'?object.width:Math.max(minWidth,Math.min(2000,Math.round((object.width+deltaWidth)/10)*10));
- const height=direction==='e'?object.height:Math.max(minHeight,Math.min(2000,Math.round((object.height+deltaHeight)/10)*10));
- const anchor=rotateFloorPoint(object,{x:object.x+(direction==='s'?object.width/2:0),y:object.y+(direction==='e'?object.height/2:0)});
+ const horizontal=direction.includes('e')||direction.includes('w'),vertical=direction.includes('n')||direction.includes('s');
+ const width=horizontal?Math.max(minWidth,Math.min(2000,Math.round((object.width+deltaWidth)/10)*10)):object.width;
+ const height=vertical?Math.max(minHeight,Math.min(2000,Math.round((object.height+deltaHeight)/10)*10)):object.height;
+ // Fractions locate the fixed opposite edge midpoint or corner in local coordinates.
+ const ax=direction.includes('w')?1:direction.includes('e')?0:.5,ay=direction.includes('n')?1:direction.includes('s')?0:.5;
+ const anchor=rotateFloorPoint(object,{x:object.x+ax*object.width,y:object.y+ay*object.height});
  const angle=(object.rotation??0)*Math.PI/180,c=Math.cos(angle),s=Math.sin(angle);
  const at=(fraction:number)=>{
   const w=object.width+(width-object.width)*fraction,h=object.height+(height-object.height)*fraction;
-  const localX=direction==='s'?0:w/2,localY=direction==='e'?0:h/2;
+  const localX=(.5-ax)*w,localY=(.5-ay)*h;
   const cx=anchor.x+localX*c-localY*s,cy=anchor.y+localX*s+localY*c;
   return {...object,width:w,height:h,x:cx-w/2,y:cy-h/2};
  };

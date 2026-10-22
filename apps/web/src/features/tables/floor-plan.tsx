@@ -18,6 +18,7 @@ import {
   type FloorPlanKind as Kind,
   type FloorPlanObject as PlanObject,
   type FloorPlanSize,
+  type FloorResizeDirection,
   type FloorPoint,
   objectInFloor,
   floorEllipse,
@@ -31,6 +32,9 @@ import { ExploreHeader } from "./explore-header";
 import {useRenameTable} from "./rename-table";
 import {floorViewKey,parseFloorView,moveFloorSelection} from "./floor-editor-state";
 
+const resizeDirections:FloorResizeDirection[]=['nw','n','ne','w','e','sw','s','se'];
+const resizeLabels:Record<FloorResizeDirection,string>={nw:'top left corner',n:'top edge',ne:'top right corner',w:'left edge',e:'width',sw:'bottom left corner',s:'height',se:'corner'};
+const resizeVectors:Record<FloorResizeDirection,[number,number]>={nw:[-1,-1],n:[0,-1],ne:[1,-1],w:[-1,0],e:[1,0],sw:[-1,1],s:[0,1],se:[1,1]};
 const starterFixtures = [
   { kind: "RECEPTION", label: "Reception", x: 30, y: 20 },
   { kind: "WASHROOM", label: "Washroom", x: 990, y: 20 },
@@ -239,7 +243,7 @@ export function FloorPlan() {
     object: PlanObject;
     x: number;
     y: number;
-    direction: string;
+    direction: FloorResizeDirection;
   } | null>(null);
   const template = starterTables(tables);
   const persisted: PlanObject[] = saved
@@ -1161,7 +1165,12 @@ export function FloorPlan() {
               })}
               {draft &&
                 current && selection.length<=1 &&
-                ["se", "e", "s"].map((direction) => (
+                resizeDirections.map((direction) => {
+                  const [hx,hy]=resizeVectors[direction];
+                  const handle=rotateFloorPoint(current,{x:current.x+current.width/2+hx*(current.width/2+handleOutset),y:current.y+current.height/2+hy*(current.height/2+handleOutset)});
+                  const cursorAngle=Math.atan2(hy,hx)+(current.rotation??0)*Math.PI/180;
+                  const cursor=['ew-resize','nwse-resize','ns-resize','nesw-resize'][((Math.round(cursorAngle/(Math.PI/4))%4)+4)%4];
+                  return (
                   <button
                     key={direction}
                     className={"plan-resize-handle handle-" + direction}
@@ -1170,29 +1179,12 @@ export function FloorPlan() {
                       "Resize " +
                       current.label +
                       " " +
-                      { se: "corner", e: "width", s: "height" }[direction]
+                      resizeLabels[direction]
                     }
                     style={{
-                      left: rotateFloorPoint(current, {
-                        x:
-                          current.x +
-                          current.width -
-                          (direction === "s" ? current.width / 2 : 0) + (direction!=='s'?handleOutset:0),
-                        y:
-                          current.y +
-                          current.height -
-                          (direction === "e" ? current.height / 2 : 0) + (direction!=='e'?handleOutset:0),
-                      }).x,
-                      top: rotateFloorPoint(current, {
-                        x:
-                          current.x +
-                          current.width -
-                          (direction === "s" ? current.width / 2 : 0) + (direction!=='s'?handleOutset:0),
-                        y:
-                          current.y +
-                          current.height -
-                          (direction === "e" ? current.height / 2 : 0) + (direction!=='e'?handleOutset:0),
-                      }).y,
+                      left: handle.x,
+                      top: handle.y,
+                      cursor,
                       width: 32 / zoom,
                       height: 32 / zoom,
                     }}
@@ -1209,7 +1201,7 @@ export function FloorPlan() {
                         object: { ...current },
                         x: event.clientX,
                         y: event.clientY,
-                        direction:exactKnob?.dataset.resizeDirection??direction,
+                        direction:(exactKnob?.dataset.resizeDirection as FloorResizeDirection|undefined)??direction,
                       };
                       event.currentTarget.setPointerCapture(event.pointerId);
                     }}
@@ -1221,17 +1213,10 @@ export function FloorPlan() {
                           ((drag.object.rotation ?? 0) * Math.PI) / 180,
                         dx = (event.clientX - drag.x) / zoom,
                         dy = (event.clientY - drag.y) / zoom;
-                      const width =
-                          drag.object.width +
-                          (drag.direction !== "s"
-                            ? dx * Math.cos(angle) + dy * Math.sin(angle)
-                            : 0),
-                        height =
-                          drag.object.height +
-                          (drag.direction !== "e"
-                            ? -dx * Math.sin(angle) + dy * Math.cos(angle)
-                            : 0);
-                      update(current.id,resizeFloorObject(drag.object,area,drag.direction as 'se'|'e'|'s',width-drag.object.width,height-drag.object.height));
+                      const [horizontal,vertical]=resizeVectors[drag.direction];
+                      const deltaWidth=horizontal*(dx*Math.cos(angle)+dy*Math.sin(angle));
+                      const deltaHeight=vertical*(-dx*Math.sin(angle)+dy*Math.cos(angle));
+                      update(current.id,resizeFloorObject(drag.object,area,drag.direction,deltaWidth,deltaHeight));
                     }}
                     onPointerUp={() => {
                       resizing.current = null;
@@ -1250,13 +1235,14 @@ export function FloorPlan() {
                       }[event.key];
                       if (delta) {
                         event.preventDefault();
-                        update(current.id,resizeFloorObject(current,area,direction as 'se'|'e'|'s',direction!=='s'?delta[0]:0,direction!=='e'?delta[1]:0));
+                        event.stopPropagation();
+                        update(current.id,resizeFloorObject(current,area,direction,hx*delta[0],hy*delta[1]));
                       }
                     }}
                   >
                     <span style={{width:13/zoom,height:13/zoom,borderWidth:2/zoom}} />
                   </button>
-                ))}
+                );})}
             </div>
           </div>
         </div>

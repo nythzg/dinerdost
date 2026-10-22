@@ -13,3 +13,69 @@ test('rotated walls reach the edge, pointer and keyboard resize anchor correctly
   const node=page.getByRole('button',{name:'Table '+name+' available',exact:true});await node.click();await expect(node.locator('small,.plan-table-state')).toHaveCount(0);await expect(node).toHaveAttribute('title',/4 seats/);await expect(node.locator('.plan-table-name')).toHaveCSS('font-size','22px');const before=await geometry(node),fixed=anchor(before),handle=page.getByRole('button',{name:'Resize '+name+' corner',exact:true}),box=await handle.boundingBox(),r=angle*Math.PI/180;await page.mouse.move(box!.x+box!.width/2,box!.y+box!.height/2);await page.mouse.down();await page.mouse.move(box!.x+box!.width/2+(80*Math.cos(r)-60*Math.sin(r))*zoom,box!.y+box!.height/2+(80*Math.sin(r)+60*Math.cos(r))*zoom,{steps:8});await page.mouse.up();await expect.poll(async()=>(await geometry(node)).width).toBeGreaterThan(before.width);const resized=await geometry(node),moved=anchor(resized);expect(Math.hypot(moved.x-fixed.x,moved.y-fixed.y)).toBeLessThan(0.01);await handle.focus();await handle.press('ArrowRight');const keyed=await geometry(node),keyAnchor=anchor(keyed);expect(keyed.width).toBeCloseTo(resized.width+10,5);expect(Math.hypot(keyAnchor.x-fixed.x,keyAnchor.y-fixed.y)).toBeLessThan(0.01);await page.getByLabel('Rotate selected clockwise',{exact:true}).scrollIntoViewIfNeeded();expect(await page.getByLabel('Rotate selected clockwise',{exact:true}).evaluate(el=>{const r=el.getBoundingClientRect();return el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))})).toBe(true);await page.screenshot({path:`verification/floor-geometry-0425-${width}-${angle}.png`});await page.getByRole('button',{name:'Save layout',exact:true}).click();await expect(page.getByRole('button',{name:'Arrange',exact:true})).toBeVisible();const saved=(await workspace(page)).floorPlans.find((p:any)=>p.floor===floor);expect(saved.objects.find((o:any)=>o.id==='edge-wall').x).toBeLessThan(0);expect(saved.objects.find((o:any)=>o.id==='table').width).toBeCloseTo(keyed.width,5);expect((await workspace(page)).tables.find((t:any)=>t.id===table.id).label).toBe(name);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  }
 });
+
+
+test('all eight resize handles support anchored mouse, touch and keyboard edits with saved desktop and phone geometry',async({page})=>{
+ test.setTimeout(300000);await register(page);
+ const w=await workspace(page),floor='Eight handles '+randomUUID().slice(0,5);
+ const directions={nw:[-1,-1],n:[0,-1],ne:[1,-1],w:[-1,0],e:[1,0],sw:[-1,1],s:[0,1],se:[1,1]} as const;
+ const opposite={n:[2,3],ne:[3],e:[0,3],se:[0],s:[0,1],sw:[1],w:[1,2],nw:[2]};
+ const corners=(o:Awaited<ReturnType<typeof geometry>>)=>[[0,0],[1,0],[1,1],[0,1]].map(([x,y])=>{
+  const r=o.angle*Math.PI/180,dx=(x-.5)*o.width,dy=(y-.5)*o.height;
+  return {x:o.x+o.width/2+dx*Math.cos(r)-dy*Math.sin(r),y:o.y+o.height/2+dx*Math.sin(r)+dy*Math.cos(r)};
+ });
+ for(const width of [1440,390])for(const angle of [0,30]){
+  await page.setViewportSize({width,height:width===390?844:1000});
+  const existing=(await workspace(page)).floorPlans.find((p:any)=>p.floor===floor);
+  await command(page,'floorPlan',{outletId:w.outletId,floor,version:existing?.version??0,width:1200,height:800,outline:null,objects:[{id:'kitchen',kind:'KITCHEN',label:'Resize kitchen',x:400,y:280,width:300,height:220,rotation:angle}]});
+  await page.goto('/app/floor-plan');await page.getByLabel('Floor plan floor',{exact:true}).selectOption(floor);
+  await page.getByRole('button',{name:'Arrange',exact:true}).click();await page.getByLabel('Fit floor to view',{exact:true}).click();
+  const node=page.getByRole('button',{name:'Resize kitchen',exact:true});await node.click();
+  await expect(page.locator('.plan-resize-handle')).toHaveCount(8);
+  const zoom=(await page.locator('.floor-plan-canvas').boundingBox())!.width/1200;
+  const touch=width===390?await page.context().newCDPSession(page):null;
+  async function drag(direction:string,dx:number,dy:number){
+   const handle=page.locator(`[data-resize-direction="${direction}"]`);await handle.scrollIntoViewIfNeeded();
+   const b=(await handle.boundingBox())!,x=b.x+b.width/2,y=b.y+b.height/2,r=angle*Math.PI/180;
+   const end={x:x+(dx*Math.cos(r)-dy*Math.sin(r))*zoom,y:y+(dx*Math.sin(r)+dy*Math.cos(r))*zoom};
+   if(touch){await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});for(let i=1;i<=6;i++)await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x+(end.x-x)*i/6,y:y+(end.y-y)*i/6}]});await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
+   else{await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(end.x,end.y,{steps:6});await page.mouse.up();}
+  }
+  for(const [direction,[hx,hy]] of Object.entries(directions)){
+   const before=await geometry(node),fixed=corners(before),handle=page.locator(`[data-resize-direction="${direction}"]`);
+   await expect(handle).toHaveAccessibleName(/^Resize Resize kitchen /);
+   await drag(direction,hx*40,hy*30);
+   await expect.poll(async()=>[Math.round((await geometry(node)).width),Math.round((await geometry(node)).height)]).toEqual([before.width+(hx?40:0),before.height+(hy?30:0)]);
+   const grown=await geometry(node),after=corners(grown);
+   for(const i of opposite[direction as keyof typeof opposite])expect(Math.hypot(after[i].x-fixed[i].x,after[i].y-fixed[i].y)).toBeLessThan(.01);
+   if(!hx)expect(grown.width).toBe(before.width);if(!hy)expect(grown.height).toBe(before.height);
+   await drag(direction,-hx*40,-hy*30);
+   await expect.poll(async()=>[Math.round((await geometry(node)).width),Math.round((await geometry(node)).height)]).toEqual([before.width,before.height]);
+   await handle.focus();
+   if(hx)await handle.press(hx<0?'ArrowLeft':'ArrowRight');if(hy)await handle.press(hy<0?'ArrowUp':'ArrowDown');
+   const keyed=await geometry(node);expect(keyed.width).toBeCloseTo(before.width+(hx?10:0),5);expect(keyed.height).toBeCloseTo(before.height+(hy?10:0),5);
+   const keyedCorners=corners(keyed);for(const i of opposite[direction as keyof typeof opposite])expect(Math.hypot(keyedCorners[i].x-fixed[i].x,keyedCorners[i].y-fixed[i].y)).toBeLessThan(.01);
+   if(hx)await handle.press(hx<0?'ArrowRight':'ArrowLeft');if(hy)await handle.press(hy<0?'ArrowDown':'ArrowUp');
+  }
+  // One completed top-left drag is a single undoable gesture.
+  const beforeUndo=await geometry(node);await drag('nw',-40,-30);const final=await geometry(node);
+  await page.getByLabel('Undo layout change',{exact:true}).click();expect(await geometry(node)).toEqual(beforeUndo);
+  await page.getByLabel('Redo layout change',{exact:true}).click();expect(await geometry(node)).toEqual(final);
+  await node.click();await expect(page.locator('.plan-resize-handle')).toHaveCount(8);
+  // Pan the selection into the compact phone viewport without changing saved geometry.
+  if(width===390){const viewport=(await page.locator('.floor-plan-scroll').boundingBox())!,object=(await node.boundingBox())!;
+   await page.mouse.move(viewport.x+viewport.width/2,viewport.y+viewport.height/2);
+   await page.mouse.wheel(object.x+object.width/2-viewport.x-viewport.width/2,object.y+object.height/2-viewport.y-viewport.height/2);
+   await expect.poll(async()=>{const box=(await node.boundingBox())!;return Math.abs(box.y+box.height/2-viewport.y-viewport.height/2)}).toBeLessThan(1);
+   expect(await geometry(node)).toEqual(final);
+  }
+  await page.screenshot({path:`verification/local-eight-resize-handles-${width}-${angle}.png`});
+  await page.getByRole('button',{name:'Save layout',exact:true}).click();await expect(page.getByRole('button',{name:'Arrange',exact:true})).toBeVisible();
+  const saved=(await workspace(page)).floorPlans.find((p:any)=>p.floor===floor).objects[0];
+  // Chromium rounds inline CSS coordinates; persisted geometry retains full precision.
+  for(const field of ['x','y','width','height'] as const)expect(Math.abs(saved[field]-final[field])).toBeLessThan(.001);
+  await page.reload();expect(await geometry(page.getByRole('button',{name:'Resize kitchen',exact:true}))).toEqual(final);
+  await expect(page.locator('.plan-resize-handle')).toHaveCount(0);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await touch?.detach();
+ }
+});

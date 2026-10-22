@@ -241,6 +241,21 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "floorResizing": {
+      "status": "verified-local-unreleased",
+      "scope": "All eight edge/corner resize handles with anchored rotated geometry, mouse/touch and keyboard support.",
+      "affectedTestsPassed": 16,
+      "browserWorkflowsPassed": 5,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "notes": "docs/LOCAL_FLOOR_RESIZING.md",
+      "pushed": false,
+      "deployed": false
+    },
     "billSummaryLoyaltyCap": {
       "status": "verified-local-unreleased",
       "scope": "Aligned bill summary; footer removed; owners, assigned managers and existing provisioned platform admins may edit the outlet-wide per-bill default under Adjustments.",
