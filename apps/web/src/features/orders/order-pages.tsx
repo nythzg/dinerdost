@@ -875,10 +875,11 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
             />
           </section>
           <section className="panel total-panel">
-            <div className="panel-heading">
+            <div className="panel-heading bill-summary-heading">
               <h2>
                 <T>{"Bill summary"}</T>
               </h2>
+              <div className="bill-summary-actions">
               {isManager(data.actor)&&<button className="text-button" onClick={()=>form('Future bill rounding',[{name:'roundDown',label:'Round down to ₹1 for new transactions',type:'select',value:outlet?.web_round_down_default?'on':'off',options:[{value:'off',label:'Off'},{value:'on',label:'On'}],help:'Outlet-wide. Applies to future web rounds only. Existing bills and discounts remain unchanged.'}],values=>run('billDefaults',{outletId:order.outlet_id,version:outlet.version,roundDown:values.roundDown==='on'}),'Save rounding default')}>Future rounding: {outlet?.web_round_down_default?'On':'Off'}</button>}
               {!locked &&
                 can(data.actor, "bill") &&
@@ -890,6 +891,11 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
                         "Bill adjustments",
                         <AdjustmentsEditor
                           rounds={order.rounds.filter(editableRound)}
+                          loyaltyCap={isManager(data.actor)||data.platformLoyaltyAdmin ? {
+                            value: Number(outlet.web_loyalty_cap_paise),
+                            version: Number(outlet.version),
+                            save: (limit,version)=>run('loyaltyCap',{outletId:outlet.id,version,limit}),
+                          } : undefined}
                           save={(roundId, input) =>
                             action("orderAdjustments", input, { roundId }).then(
                               (result) => {
@@ -932,6 +938,7 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
                     <Icon name="edit" />
                   </button>
                 )}
+              </div>
             </div>
             {[
               ["Subtotal", order.totals.subtotal],
@@ -960,8 +967,6 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
             ))}
             {order.rounds.some((r:Row)=>r.coupon_code)&&<div className="total-row"><span>Coupon</span><strong>{order.rounds.filter((r:Row)=>r.coupon_code).map((r:Row)=>r.coupon_code).join(', ')}</strong></div>}
             {!locked&&order.customer_id&&can(data.actor,'orders')&&order.rounds.some((r:Row)=>Number(r.paid)===0&&['PENDING','ACCEPTED'].includes(r.status)&&(r.kot_status==='HELD'||['STAFF','QR_ORDER_ONLY'].includes(r.payment_gate)))&&<button className="button full-width" onClick={()=>{const eligible=order.rounds.filter((r:Row)=>Number(r.paid)===0&&r.payment_status!=='PAID'&&['PENDING','ACCEPTED'].includes(r.status)&&(r.kot_status==='HELD'||['STAFF','QR_ORDER_ONLY'].includes(r.payment_gate)));if(!eligible.length)return;modal('Apply coupon',<RewardEntry fields={[...(eligible.length>1?[{name:'roundId',label:'Round',type:'select' as const,value:eligible[0].id,options:eligible.map((r:Row)=>({value:r.id,label:'Round '+r.round_number}))}]:[]),{name:'code',label:'Coupon code',help:'Replaces any loyalty claim on this round.'}]} save={values=>{const r=eligible.find((r:Row)=>r.id===(values.roundId??eligible[0].id));return action('reward',{version:r.version,couponCode:String(values.code).trim(),points:0},{roundId:r.id})}} submit="Apply coupon"/>)}}>Coupon</button>}
-            <p className="muted">Loyalty cap: {money(outlet?.web_loyalty_cap_paise??5000)} per bill · managed by Diner Dost.</p>
-            {data.platformLoyaltyAdmin&&<button className="text-button" onClick={()=>form('Platform loyalty limit',[{name:'limit',label:'Maximum per bill (₹)',type:'number',min:0,max:10000000,step:.01,value:Number(outlet.web_loyalty_cap_paise)/100,help:'Does not rewrite earlier claims.'}],v=>run('loyaltyCap',{outletId:outlet.id,version:outlet.version,limit:Math.round(v.limit*100)}),'Save loyalty limit')}>Configure loyalty cap</button>}
             {(order.replacements??[]).map((r:Row)=><div className="total-row" key={r.id}><span>{r.source_order_id===order.id?'Credited to replacement':'Included original credit'}</span><strong>{money(r.amount)}</strong></div>)}
             {Number(order.refund_total)>0&&<><div className="total-row"><span>Refunded</span><strong>{money(order.refund_total)}</strong></div><div className="total-row"><span>Net received</span><strong>{money(Number(order.totals.paid)-Number(order.refund_total)-(order.replacements??[]).filter((r:Row)=>r.source_order_id===order.id).reduce((n:number,r:Row)=>n+Number(r.amount),0))}</strong></div></>}
             <div className="total-row grand-total">

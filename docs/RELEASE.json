@@ -241,6 +241,19 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "billSummaryLoyaltyCap": {
+      "status": "verified-local-postgres-pending",
+      "scope": "Aligned bill summary; footer removed; owners, assigned managers and existing provisioned platform admins may edit the outlet-wide per-bill default under Adjustments.",
+      "fullBackendTestsPassed": 288,
+      "browserWorkflowsPassed": 3,
+      "viewportWidths": [1440, 390],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "postgresStatus": "Two affected cases running in an isolated QA database; no result or cleanup claimed yet.",
+      "notes": "docs/LOCAL_BILL_SUMMARY.md",
+      "pushed": false,
+      "deployed": false
+    },
     "orderPlacedConfirmations": {
       "status": "verified-local-unreleased",
       "scope": "Green SweetAlert2 showing only table/order type, order number, customer, round items/prices and grand total across all web order submissions.",

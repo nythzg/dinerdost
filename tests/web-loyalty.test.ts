@@ -24,9 +24,33 @@ test('coupon-code entry replaces loyalty, preserves code and snapshots, rejects 
 test('concurrent claims on separate rounds cannot multiply the per-bill cap',async()=>{
  let o=await create();o=await s.createRound(db,owner,key(),{outletId:w.outletId,orderId:o.id,version:o.version,type:'TAKEAWAY',items:[{itemId:menuId,quantity:1}]},true);const results=await Promise.allSettled(o.rounds.map((r:any)=>claim(o,r,5000)));assert.equal(results.filter(r=>r.status==='fulfilled').length,1);assert.equal(results.filter(r=>r.status==='rejected').length,1);assert.equal(Number((await s.getOrder(db,owner,o.id)).totals.discount),5000);
 });
-test('cap configuration needs an explicit platform identity; ordinary owners/managers cannot grant themselves access or rewrite earlier discounts',async()=>{
- const beforeEnv=process.env.DD_PLATFORM_ADMIN_USER_IDS;try{delete process.env.DD_PLATFORM_ADMIN_USER_IDS;const outlet=(await s.workspace(db,owner)).outlets[0],input={outletId:w.outletId,version:outlet.version,limit:7000};for(const a of [owner,{...owner,role:'MANAGER' as const},foreign])await assert.rejects(s.savePlatformLoyaltyCap(db,a,key(),input),{code:'PLATFORM_ADMIN_REQUIRED'});assert.equal((await s.workspace(db,owner)).platformLoyaltyAdmin,false);
- const o=await create(),claimed=(await claim(o,o.rounds[0],5000)).order;process.env.DD_PLATFORM_ADMIN_USER_IDS=owner.userId;assert.equal((await s.workspace(db,owner)).platformLoyaltyAdmin,true);await s.savePlatformLoyaltyCap(db,owner,key(),input);assert.deepEqual(await s.getOrder(db,owner,o.id),claimed);await assert.rejects(s.savePlatformLoyaltyCap(db,owner,key(),input),{code:'VERSION_CONFLICT'});await assert.rejects(s.savePlatformLoyaltyCap(db,{...owner,application:'POS'},key(),{...input,version:outlet.version+1}),{code:'PLATFORM_ADMIN_REQUIRED'});assert.equal((await s.verifyAudit(db,owner)).valid,true);
+test('owners and assigned managers can change the outlet default cap while other roles, foreign outlets and native apps remain blocked',async()=>{
+ const beforeEnv=process.env.DD_PLATFORM_ADMIN_USER_IDS;
+ try{
+  delete process.env.DD_PLATFORM_ADMIN_USER_IDS;
+  const outlet=(await s.workspace(db,owner)).outlets[0],input={outletId:w.outletId,version:Number(outlet.version),limit:7000};
+  for(const role of ['CASHIER','WAITER','KITCHEN','ACCOUNTANT'] as const)await assert.rejects(s.savePlatformLoyaltyCap(db,{...owner,role},key(),input),{code:'FORBIDDEN'});
+  await assert.rejects(s.savePlatformLoyaltyCap(db,{...owner,role:'MANAGER',outletIds:[]},key(),input),{code:'OUTLET_FORBIDDEN'});
+  await assert.rejects(s.savePlatformLoyaltyCap(db,foreign,key(),input));
+  for(const application of ['POS','CAPTAIN','KITCHEN','BAR','COMMAND'] as const)await assert.rejects(s.savePlatformLoyaltyCap(db,{...owner,application},key(),input),{code:'APPLICATION_FORBIDDEN'});
+  assert.equal((await s.workspace(db,owner)).platformLoyaltyAdmin,false);
+  const o=await create(),claimed=(await claim(o,o.rounds[0],5000)).order;
+  const saved=await s.savePlatformLoyaltyCap(db,owner,key(),input);assert.equal(saved.version,input.version+1);assert.deepEqual(await s.getOrder(db,owner,o.id),claimed);
+  await assert.rejects(s.savePlatformLoyaltyCap(db,owner,key(),input),{code:'VERSION_CONFLICT'});
+  await s.savePlatformLoyaltyCap(db,{...owner,role:'MANAGER'},key(),{...input,version:saved.version,limit:1000});assert.deepEqual(await s.getOrder(db,owner,o.id),claimed);
+  const next=await create(),review=await s.reviewRewards(db,owner,key(),next.id,next.rounds[0].id);assert.equal(review.entitlements.webLoyalty!.orderCap,1000);assert.equal(review.entitlements.webLoyalty!.maxRedemptionAmount,1000);
+  for(const limit of [-1,1.5,1000000001])await assert.rejects(s.savePlatformLoyaltyCap(db,owner,key(),{...input,version:saved.version+1,limit}));
+  process.env.DD_PLATFORM_ADMIN_USER_IDS=owner.userId;assert.equal((await s.workspace(db,owner)).platformLoyaltyAdmin,true);
+  await s.savePlatformLoyaltyCap(db,{...owner,role:'CASHIER'},key(),{...input,version:saved.version+1,limit:5000});assert.equal((await s.verifyAudit(db,owner)).valid,true);
  }finally{if(beforeEnv===undefined)delete process.env.DD_PLATFORM_ADMIN_USER_IDS;else process.env.DD_PLATFORM_ADMIN_USER_IDS=beforeEnv}
 });
 
+test('concurrent cap edits serialize by outlet version and exact retries write one audit event',async()=>{
+ const outlet=(await s.workspace(db,owner)).outlets[0],version=Number(outlet.version),requests=[key(),key()],limits=[6000,8000];
+ const results=await Promise.allSettled(limits.map((limit,index)=>s.savePlatformLoyaltyCap(db,index?{...owner,role:'MANAGER'}:owner,requests[index],{outletId:w.outletId,version,limit})));
+ assert.equal(results.filter(result=>result.status==='fulfilled').length,1);assert.equal(results.filter(result=>result.status==='rejected'&&(result.reason as any).code==='VERSION_CONFLICT').length,1);
+ const index=results.findIndex(result=>result.status==='fulfilled'),actor=index?{...owner,role:'MANAGER' as const}:owner;
+ const before=await db.query("SELECT id FROM audit_events WHERE action='WEB_LOYALTY_CAP_CHANGED' ORDER BY id");
+ const retry=await s.savePlatformLoyaltyCap(db,actor,requests[index],{outletId:w.outletId,version,limit:limits[index]});assert.equal(retry.limit,limits[index]);
+ assert.deepEqual((await db.query("SELECT id FROM audit_events WHERE action='WEB_LOYALTY_CAP_CHANGED' ORDER BY id")).rows,before.rows);assert.equal((await s.verifyAudit(db,owner)).valid,true);
+});

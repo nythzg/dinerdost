@@ -20,6 +20,8 @@ Updated 22 October 2026. The user initially deferred these questions, then expli
 
 ## New question awaiting review
 
+Later receiving-user decision · 23 October 2026: the current chat explicitly authorizes **restaurant owners and assigned outlet managers** to edit the **outlet-wide default maximum per bill** under Adjustments. This supersedes the earlier platform-admin-only Q74 boundary above for the local web app. It is not a current-bill override and does not rewrite existing discounts or financial records. Q111 below remains unanswered.
+
 ### Q111 — Queue a bill for the next visit
 
 Prem requests next-visit bill queuing at 8:32 pm. Confirm: should only an unpaid outstanding balance be queued, or can a paid/settled bill be queued as a new charge? Who may authorize it; is the original receivable still outstanding; what happens when staff declines inclusion; and how should original tax/discounts, receipts, due balance and the new linked bill prevent double collection/revenue? Preserve issued invoices and original payments; no carry-forward or debt is inferred. [Source](https://discord.com/channels/@me/1491679750610096259/1562843644787036265) · [Checklist](CLIENT_FEEDBACK.md). **Awaiting answer; dependent implementation not started.**
