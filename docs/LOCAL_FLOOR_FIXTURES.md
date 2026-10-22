@@ -23,3 +23,14 @@ Migration **054_web_floor_details.sql** adds only a bounded boundary_roundness c
 Private logs in the parent task's work directory: floor-details-full-backend.log, floor-details-backend.log, floor-details-postgres.log, floor-details-final-browser.log, floor-details-typecheck.log and floor-details-build.log.
 
 **Local/unreleased.** No push/deployment or Production/client/Petpooja release-count change. Q111 remains unanswered; the separate procurement activity remains paused. This note supersedes the earlier local boundary-snapping/always-inside details in LOCAL_FLOOR_RESIZING.md.
+
+
+## Selected-edge corner insertion · local follow-up
+
+The user requested choosing the edge before adding a corner. Click/tap an edge, or focus it and press Enter/Space. The chosen edge and both endpoints highlight in green; a status line names the endpoint pair. Add corner inserts the integer midpoint between those two endpoints, including the final edge back to the first corner, and selects the new corner for editing. It no longer chooses the longest edge automatically.
+
+Add corner requires an edge selection and remains disabled for circles, 24-point outlines and an edge whose integer midpoint would duplicate an existing corner. Selecting a corner, changing the shape, rotating, removing or inserting a corner clears the previous edge selection. Existing edge/corner dragging, keyboard resizing, minimum three corners, validity checks, Apply/Cancel and explicit Save layout remain.
+
+Verified: **eight affected geometry/service tests and three browser workflows passed**. New desktop 1440px/phone 390px checks cover mouse/touch/keyboard selection, short/closing/concave edges, exact insertion order and unchanged other points, reset/remove/circle/24-point guards, draft cancellation and saved/reloaded outlines. The existing floor/outline/activation/table-link workflow also passed after selecting Edge 1 before its Add corner actions. Typecheck and optimized build passed; selected-edge screenshots inspected: verification/local-selected-outline-edge-WIDTH.png. Private logs: work/outline-edge-browser.log, outline-edge-regression.log, outline-edge-backend.log, outline-edge-typecheck.log and outline-edge-build.log in the parent task directory.
+
+Client editor change only; no service/schema/environment change or PostgreSQL rerun. Local/unreleased; Production and client/Petpooja release counts unchanged, Q111 unanswered and procurement paused.

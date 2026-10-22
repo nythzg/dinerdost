@@ -22,6 +22,9 @@ export function OutlineEditor({
     initial ?? floorOutline("Rectangle", area),
   );
   const [selected, setSelected] = useState<number | null>(null);
+  const [selectedEdge,setSelectedEdge]=useState<number|null>(null);
+  const selectEdge=(index:number)=>{setSelectedEdge(index);setSelected(null)};
+  const selectCorner=(index:number)=>{setSelected(index);setSelectedEdge(null)};
   const dragging = useRef<{
       index: number;
       edge: boolean;
@@ -118,25 +121,18 @@ export function OutlineEditor({
           : p,
       ),
     );
+  const edgeStart=selectedEdge===null?null:points[selectedEdge],edgeEnd=selectedEdge===null?null:points[(selectedEdge+1)%points.length];
+  const midpoint=edgeStart&&edgeEnd?{x:Math.round((edgeStart.x+edgeEnd.x)/2),y:Math.round((edgeStart.y+edgeEnd.y)/2)}:null;
+  const canAddCorner=!!midpoint&&points.length<24&&!ellipse&&!points.some(p=>p.x===midpoint.x&&p.y===midpoint.y);
   const addCorner = () => {
-    let longest = 0,
-      index = 0;
-    points.forEach((p, i) => {
-      const q = points[(i + 1) % points.length],
-        distance = (p.x - q.x) ** 2 + (p.y - q.y) ** 2;
-      if (distance > longest) {
-        longest = distance;
-        index = i;
-      }
-    });
-    const a = points[index],
-      b = points[(index + 1) % points.length];
+    if(selectedEdge===null||!canAddCorner||!midpoint)return;
+    const index=selectedEdge;
     setPoints([
       ...points.slice(0, index + 1),
-      { x: Math.round((a.x + b.x) / 2), y: Math.round((a.y + b.y) / 2) },
+      midpoint,
       ...points.slice(index + 1),
     ]);
-    setSelected(index + 1);
+    selectCorner(index + 1);
   };
   return (
     <div className="outline-editor">
@@ -148,7 +144,7 @@ export function OutlineEditor({
               key={shape}
               onClick={() => {
                 setPoints(floorOutline(shape, area));
-                setSelected(null);
+                setSelected(null);setSelectedEdge(null);
               }}
             >
               {shape}
@@ -215,8 +211,12 @@ export function OutlineEditor({
                 role="button"
                 tabIndex={0}
                 aria-label={"Edge " + (i + 1)}
+                aria-pressed={selectedEdge===i}
+                onFocus={()=>selectEdge(i)}
+                onClick={()=>selectEdge(i)}
                 style={{ cursor: "move", touchAction: "none" }}
                 onPointerDown={(event) => {
+                  selectEdge(i);
                   dragging.current = {
                     index: i,
                     edge: true,
@@ -226,6 +226,7 @@ export function OutlineEditor({
                   event.currentTarget.setPointerCapture(event.pointerId);
                 }}
                 onKeyDown={(event) => {
+                  if(event.key==='Enter'||event.key===' '){event.preventDefault();selectEdge(i);return;}
                   const delta = {
                     ArrowLeft: [-10, 0],
                     ArrowRight: [10, 0],
@@ -240,6 +241,7 @@ export function OutlineEditor({
               />
             );
           })}
+        {!ellipse&&selectedEdge!==null&&<line className="outline-selected-edge" x1={points[selectedEdge].x} y1={points[selectedEdge].y} x2={points[(selectedEdge+1)%points.length].x} y2={points[(selectedEdge+1)%points.length].y} stroke="#193f30" strokeWidth="5" vectorEffect="non-scaling-stroke" pointerEvents="none"/>}
         {points.map(
           (p, i) =>
             (!ellipse || i % 6 === 0) && (
@@ -259,10 +261,10 @@ export function OutlineEditor({
                       : "Corner " + (i + 1)
                   }
                   aria-pressed={selected === i}
-                  onFocus={() => setSelected(i)}
-                  onClick={() => setSelected(i)}
+                  onFocus={() => selectCorner(i)}
+                  onClick={() => selectCorner(i)}
                   onPointerDown={(event) => {
-                    setSelected(i);
+                    selectCorner(i);
                     dragging.current = {
                       index: i,
                       edge: false,
@@ -290,9 +292,9 @@ export function OutlineEditor({
                   cy={p.y}
                   r={
                     Math.max(area.width, area.height) /
-                    (selected === i ? 40 : 55)
+                    (selected === i || selectedEdge===i || (selectedEdge!==null&&(selectedEdge+1)%points.length===i) ? 40 : 55)
                   }
-                  fill={selected === i ? "#193f30" : "#285b45"}
+                  fill={selected === i || selectedEdge===i || (selectedEdge!==null&&(selectedEdge+1)%points.length===i) ? "#193f30" : "#285b45"}
                   stroke="white"
                   strokeWidth={5}
                   pointerEvents="none"
@@ -301,11 +303,11 @@ export function OutlineEditor({
             ),
         )}
       </svg>
-      <p className="outline-hint">Drag an edge or corner to reshape.</p>
+      <p className="outline-hint" role="status">{ellipse?'Drag an edge to resize the circle.':selectedEdge===null?'Select an edge to add a corner between its endpoints. Drag an edge or corner to reshape.':`Edge ${selectedEdge+1} selected · Add corner inserts halfway between corner ${selectedEdge+1} and corner ${(selectedEdge+1)%points.length+1}.`}</p>
       <div className="outline-actions">
         <button
           className="button"
-          disabled={points.length >= 24 || !!ellipse}
+          disabled={!canAddCorner}
           onClick={addCorner}
         >
           Add corner
@@ -316,7 +318,7 @@ export function OutlineEditor({
           disabled={selected === null || points.length <= 3 || !!ellipse}
           onClick={() => {
             setPoints((previous) => previous.filter((_, i) => i !== selected));
-            setSelected(null);
+            setSelected(null);setSelectedEdge(null);
           }}
         >
           Remove
@@ -327,7 +329,7 @@ export function OutlineEditor({
             if(ellipse){
               const width=Math.min(area.width,ellipse.height),height=Math.min(area.height,ellipse.width);
               setPoints(ellipseOutline({x:Math.max(0,Math.min(area.width-width,ellipse.x+ellipse.width/2-width/2)),y:Math.max(0,Math.min(area.height-height,ellipse.y+ellipse.height/2-height/2)),width,height}));
-              setSelected(null);return;
+              setSelected(null);setSelectedEdge(null);return;
             }
             setPoints((previous) =>
               previous.map((p) => ({
@@ -337,7 +339,7 @@ export function OutlineEditor({
                     y: Math.round((p.x * area.height) / area.width),
                   })),
             );
-            setSelected(null);
+            setSelected(null);setSelectedEdge(null);
           }}
         >
           Rotate

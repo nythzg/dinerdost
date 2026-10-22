@@ -100,6 +100,8 @@ test("custom floors, outlines and activation switch persist with unchanged table
     .getByRole("button", { name: "Floor outline", exact: true })
     .click();
   await page.getByRole("button", { name: "L-shaped", exact: true }).click();
+  await page.getByRole("button",{name:"Edge 1",exact:true}).focus();
+  await page.keyboard.press("Enter");
   await page.getByRole("button", { name: "Add corner", exact: true }).click();
   await page
     .getByRole("button", { name: "Remove corner", exact: true })
@@ -107,6 +109,8 @@ test("custom floors, outlines and activation switch persist with unchanged table
   await expect(
     page.getByRole("dialog").getByRole("button", { name: /^Corner \d+$/ }),
   ).toHaveCount(6);
+  await page.getByRole("button",{name:"Edge 1",exact:true}).focus();
+  await page.keyboard.press("Enter");
   await page.getByRole("button", { name: "Add corner", exact: true }).click();
   const corner = page.getByRole("button", { name: "Corner 2", exact: true }),
     handle = await corner.boundingBox();

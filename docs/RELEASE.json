@@ -241,6 +241,21 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "outlineEdgeCorners": {
+      "status": "verified-local-unreleased",
+      "scope": "Select an outline edge and insert a midpoint corner between its endpoints, with visible edge/endpoints and keyboard/touch support.",
+      "affectedTestsPassed": 8,
+      "browserWorkflowsPassed": 3,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
+      "pushed": false,
+      "deployed": false
+    },
     "floorFixtureDetails": {
       "status": "verified-local-unreleased",
       "scope": "Readable inside/callout labels, collision guards, free Entry/Exit, optional outdoor tables, per-floor roundness and Fence.",
