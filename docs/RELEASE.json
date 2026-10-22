@@ -264,6 +264,19 @@
     "pushed": false,
     "deployed": false,
     "acceptance": "verification/local-web-pp03-pp04-acceptance.json",
+    "workspaceToolTabs": {
+      "status": "verified-local-unreleased",
+      "calculatorPosition": "Right edge, below header/Demo",
+      "activeOrdersPosition": "Bottom right edge",
+      "theme": "Existing green palette; slim vertical tabs",
+      "browserWorkflowsPassed": 7,
+      "viewports": ["1440x1000", "390x844", "320x568", "844x390"],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "notes": "docs/LOCAL_STANDARD_CALCULATOR.md",
+      "pushed": false,
+      "deployed": false
+    },
     "calculator": {
       "status": "verified-local-unreleased",
       "scope": "Q114 standard only, supplied video, green theme, equals autosaves calculations, always-visible Save note, compact panel/keys and minimal note/history text",

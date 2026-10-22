@@ -98,6 +98,6 @@ export function CalculatorDock({employeeId}:{employeeId:string}){
   {error&&<p role="alert">{error}</p>}
   </div>
  </section>}
- <button className="workspace-dock-trigger" aria-expanded={open} onClick={()=>toggle(!open)}><span aria-hidden="true">▦</span><T>Calculator</T></button>
+ <button type="button" className="workspace-dock-trigger" aria-expanded={open} onClick={()=>toggle(!open)}><span className="workspace-tab-label"><T>Calculator</T></span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 10h1m3 0h1m3 0h0M8 14h1m3 0h1m3 0h0M8 18h1m3 0h1m3-4v4"/></svg></button>
  </div>;
 }

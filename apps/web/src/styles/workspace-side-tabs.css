@@ -1,0 +1,15 @@
+@media screen {
+ .workspace-side-tabs{inset:0;max-width:none;display:block;pointer-events:none}
+ .workspace-side-tabs>.calculator-dock,.workspace-side-tabs>.active-orders-dock{position:fixed;right:0;pointer-events:none}
+ .workspace-side-tabs>.calculator-dock{top:var(--workspace-tools-top,78px)}
+ .workspace-side-tabs>.active-orders-dock{bottom:max(16px,env(safe-area-inset-bottom))}
+ .workspace-side-tabs .workspace-dock-trigger{pointer-events:auto;display:flex;flex-direction:column;justify-content:center;gap:8px;width:32px;min-width:32px;min-height:112px;padding:12px 7px;box-sizing:border-box;border:1px solid #6d8e60;border-right:0;border-radius:7px 0 0 7px;background:#193f30;color:#fff;box-shadow:-2px 2px 10px #193f3020;font-size:12px;font-weight:500}
+ .workspace-side-tabs .workspace-tab-label{writing-mode:vertical-rl;transform:rotate(180deg);line-height:1.2}
+ .workspace-side-tabs .workspace-dock-trigger svg{width:16px;height:16px;flex:none}
+ .workspace-side-tabs .workspace-dock-trigger:is(:hover,[aria-expanded=true]){background:#285b45}
+ .workspace-side-tabs .workspace-dock-trigger:focus-visible{outline:2px solid #8b9f83;outline-offset:-4px}
+ .workspace-side-tabs .workspace-tool-panel{position:fixed;right:40px;bottom:auto;max-width:calc(100vw - 48px);pointer-events:auto;max-height:calc(100dvh - var(--workspace-tools-top,78px) - 12px)}
+ .workspace-side-tabs .calculator-panel{top:var(--workspace-tools-top,78px)}
+ .workspace-side-tabs .active-orders-panel{bottom:max(16px,env(safe-area-inset-bottom));max-height:calc(100dvh - var(--workspace-tools-top,78px) - 28px)}
+}
+@media screen and (max-width:850px){.main-content{padding-right:44px}}
