@@ -115,7 +115,7 @@ export async function generateBill(
         orderNumber: order.number,
         items: detail.rounds
           .filter((r) => r.status !== "REJECTED" && r.status !== "VOIDED")
-          .flatMap((r) => r.items),
+          .flatMap((r) => r.items.map(({recipe_snapshot,...item}:Record<string,any>)=>item)),
         totals: detail.totals,
         taxes: taxBreakdown(detail.totals.tax, order.tax_components),
         charges: detail.rounds

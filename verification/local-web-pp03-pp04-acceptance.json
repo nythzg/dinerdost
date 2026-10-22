@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-10-22T20:15:22.147Z",
+  "url": "http://localhost:5090",
+  "bind": "127.0.0.1",
+  "serverProcessId": 26128,
+  "sourceBaseCommit": "9f5195659dd5388b637bfc29a8d79f028cd6ceea",
+  "sourceBranch": "web-recipe-profiles",
+  "localChangesPushed": false,
+  "localChangesDeployed": false,
+  "features": [
+    "Q89 paid replacements",
+    "PP03 size/add-on/channel recipes and packaging",
+    "PP04 costed semi-finished production"
+  ],
+  "localMigrations": 53,
+  "originalDatabaseReadOnly": true,
+  "originalSourceMigrations": 50,
+  "originalTablesCopied": 63,
+  "sourceColumnCountsAndDigestsMatched": true,
+  "foreignKeysVerified": 143,
+  "existingApplicationAccountsAndPasswordHashesPreserved": true,
+  "liveDataUnchanged": true,
+  "localWritesSyncToLive": false,
+  "backendPassed": 279,
+  "postgresRecipeCasesPassed": 8,
+  "postgresProductionCasesPassed": 7,
+  "disposableQaDatabasesRemaining": 0,
+  "localDesktopPhoneWorkflowsPassed": 3,
+  "viewports": [
+    1440,
+    390
+  ],
+  "optimizedBuildPassed": true,
+  "typecheckPassed": true,
+  "petpoojaReleasedCounts": {
+    "complete": 4,
+    "partial": 2,
+    "pending": 21
+  },
+  "petpoojaLocallyVerifiedUnreleased": [
+    "PP03",
+    "PP04"
+  ],
+  "unanswered": [
+    "Q111",
+    "Q114"
+  ]
+}

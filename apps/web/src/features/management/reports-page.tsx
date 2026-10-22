@@ -160,6 +160,7 @@ function SalesReport() {
       ["Charges (paise)", report.charges],
       ["COGS (paise)", report.cogs],
       ["Operating expenses (paise)", report.expenses],
+      ["Zero-output production losses included in expenses (paise)", report.productionLosses??0],
       ["Operating result (paise)", report.operatingResult],
       [],
       ["Channel", "Orders", "Receipts (paise)"],
@@ -231,6 +232,7 @@ function SalesReport() {
         <>
           {Number(report.refunds)>0&&<p className="panel">Manual refunds: <strong>{money(report.refunds)}</strong> · Net receipts below include these adjustments. Original payment-method totals retain collected amounts.</p>}
           {Number(report.replacementCredits)>0&&<p className="panel">Paid replacement credits: <strong>{money(report.replacementCredits)}</strong> · Net sales include linked credits against previously issued invoices. Credits are not new collections.</p>}
+          {Number(report.productionLosses)>0&&<p className="panel production-loss-note">Zero-output production loss: <strong>{money(report.productionLosses)}</strong> · Included once in operating expenses. Successful production carries cost into output stock.</p>}
           <div className="metric-grid three">
             {[
               ["Settled sales", report.receipts],

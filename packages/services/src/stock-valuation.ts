@@ -205,7 +205,7 @@ export async function archiveIngredient(
     ensure(
       !(
         await tx.query(
-          "SELECT 1 FROM recipes WHERE ingredient_id=$1 UNION ALL SELECT 1 FROM menu_items WHERE liquor_ingredient_id=$1 LIMIT 1",
+          "SELECT 1 FROM recipes WHERE ingredient_id=$1 UNION ALL SELECT 1 FROM menu_items WHERE liquor_ingredient_id=$1 UNION ALL SELECT 1 FROM web_recipe_profiles p CROSS JOIN LATERAL jsonb_array_elements(p.ingredients) n WHERE p.active AND n->>'id'=$1::text UNION ALL SELECT 1 FROM web_production_recipes p JOIN ingredients i ON i.id=p.ingredient_id AND i.restro_id=p.restro_id CROSS JOIN LATERAL jsonb_array_elements(p.ingredients) n WHERE i.retired_at IS NULL AND n->>'id'=$1::text LIMIT 1",
           [item.id],
         )
       ).rows.length,

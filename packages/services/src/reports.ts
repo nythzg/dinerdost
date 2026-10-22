@@ -113,9 +113,10 @@ export async function financialReport(
     const dayKey=(value:unknown)=>value instanceof Date?[value.getFullYear(),String(value.getMonth()+1).padStart(2,'0'),String(value.getDate()).padStart(2,'0')].join('-'):String(value).slice(0,10);
     for(const refund of [...refundRows,...replacementRows]){const channel=channels.find(c=>c.source===refund.source);if(channel)channel.amount=num(channel.amount)-num(refund.amount);else channels.push({source:refund.source,orders:0,amount:-num(refund.amount)});const day=dayKey(refund.day),entry=daily.find(d=>dayKey(d.date)===day);if(entry)entry.amount=num(entry.amount)-num(refund.amount);else daily.push({date:day,orders:0,amount:-num(refund.amount)});}
     daily.sort((a,b)=>dayKey(a.date).localeCompare(dayKey(b.date)));
+    const productionLosses=num((await tx.query('SELECT coalesce(sum(cost),0) AS cost FROM web_production_batches WHERE actual_milli=0 AND outlet_id=ANY($1::uuid[]) AND (created_at AT TIME ZONE \'Asia/Kolkata\')::date BETWEEN $2::date AND $3::date',params)).rows[0].cost);
     const netSales = num(summary.net_sales)-num(refunds.net_sales)-num(replacements.net_sales),
       cogs = num(summary.cogs)+num(replacements.cogs),
-      operatingExpenses = num(expenses.total);
+      operatingExpenses = num(expenses.total)+productionLosses;
     return {
       from: data.from,
       to: data.to,
@@ -129,6 +130,7 @@ export async function financialReport(
       charges: num(summary.charges)-num(refunds.charges)-num(replacements.charges),
       cogs,
       expenses: operatingExpenses,
+      productionLosses,
       grossMargin: netSales - cogs,
       operatingResult: netSales - cogs - operatingExpenses,
       stockPurchases: num(expenses.stock_purchases),
@@ -137,7 +139,7 @@ export async function financialReport(
       daily,
       distribution,
       basis:
-        "Issued final invoices less immutable refund and paid-replacement credit adjustments, plus approved expenses and unbilled replaced-food costs. Receipt-method rows retain actual collections; payment credits are not new receipts.",
+        "Issued final invoices less immutable refund and paid-replacement credit adjustments, plus approved expenses, zero-output production losses and unbilled replaced-food costs. Successful production transfers stock value; it is not an expense. Receipt-method rows retain actual collections; payment credits are not new receipts.",
     };
   });
 }

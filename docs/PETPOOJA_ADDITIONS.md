@@ -62,6 +62,8 @@ Overview videos 1/61/62 summarize other modules and are not extra missing featur
 
 ## Change log
 
+- **23 October 2026 · local-only continuation:** PP03 recipe choices/packaging is implemented and locally verified, including eight isolated PostgreSQL cases. PP04 semi-finished production is implemented and undergoing final PostgreSQL acceptance. The receiving user requested local updates, so neither is pushed/deployed and released counts remain **4 complete / 2 partial / 21 pending**. See [local additions and safeguards](LOCAL_WEB_ADDITIONS.md). The Q89 release belongs to the separate client checklist.
+
 - **22 October 2026:** Recovered the comparison and all 66 rows; deduplicated into PP01–PP27 and seven explicit policy/dependency records. This is planning, not completed app functionality.
 
 
@@ -103,3 +105,7 @@ Evidence: [acceptance](../verification/production-0419-acceptance.json), [backen
 ### 0.4.20 — PP23 outlet expiry review
 
 Complete authorized remaining raw-ingredient batches, recorded automatic-expiry write-offs, affected current dishes and safe exports. Unknown dates remain unknown. Refresh retains exactly-once expiry/reservation handling. Three hosted expiry cases and local/production desktop/phone UI workflows passed. [Acceptance](../verification/production-0420-acceptance.json). Prepared-food production and broader exports remain pending. All nine client policy questions were answered at 9:31; implementation remains in the Q queue.
+
+### Local acceptance · 23 October 2026
+
+PP03 and PP04 are locally implemented and verified; not pushed or deployed. Combined: 279 backend cases, 8 PP03 + 7 PP04 isolated PostgreSQL cases, typecheck/build and three local desktop/phone workflows passed. The user requested hosting locally with the original accounts/data; a verified private snapshot now runs at http://localhost:5090 with migrations through 053. Original hosted databases are unchanged. See [local additions](LOCAL_WEB_ADDITIONS.md) and [acceptance](../verification/local-web-pp03-pp04-acceptance.json). Released counts remain 4 complete / 2 partial / 21 pending; local acceptance does not change production completion claims.

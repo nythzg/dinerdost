@@ -1,12 +1,23 @@
 import { ensure, splitExact } from "@dinerdost/core";
 import type { Sql } from "@dinerdost/database";
-import { id, num } from "./shared";
+import { id, num, type Row } from "./shared";
 import {
   reservePrepared,
   releasePrepared,
   consumePrepared,
 } from "./prepared-stock";
 import { consumedStockValue } from "./stock-valuation";
+
+const lineRecipes = `WITH line_recipes AS (
+ SELECT i.id,i.quantity_milli AS line_quantity,r.ingredient_id,r.quantity_milli AS recipe_quantity
+ FROM order_items i JOIN recipes r ON r.item_id=i.item_id AND r.restro_id=i.restro_id
+ JOIN menu_items m ON m.id=i.item_id AND m.restro_id=i.restro_id AND m.ready_food_batch_id IS NULL
+ WHERE i.round_id=$1 AND i.recipe_snapshot IS NULL
+ UNION ALL
+ SELECT i.id,i.quantity_milli,(n->>'id')::uuid,(n->>'quantityMilli')::bigint
+ FROM order_items i CROSS JOIN LATERAL jsonb_array_elements(i.recipe_snapshot->'needs') n
+ WHERE i.round_id=$1 AND i.recipe_snapshot IS NOT NULL
+) `;
 
 export async function reserveStock(
   tx: Sql,
@@ -16,13 +27,13 @@ export async function reserveStock(
 ) {
   await reservePrepared(tx, restroId, outletId, roundId);
   const needs = await tx.query(
-    "SELECT r.ingredient_id,ceil(sum(r.quantity_milli::numeric*i.quantity_milli)/1000)::bigint AS needed FROM order_items i JOIN recipes r ON r.item_id=i.item_id AND r.restro_id=i.restro_id JOIN menu_items m ON m.id=i.item_id AND m.restro_id=i.restro_id AND m.ready_food_batch_id IS NULL WHERE i.round_id=$1 GROUP BY r.ingredient_id ORDER BY r.ingredient_id",
+    lineRecipes+"SELECT ingredient_id,ceil(sum(recipe_quantity::numeric*line_quantity)/1000)::bigint AS needed FROM line_recipes GROUP BY ingredient_id ORDER BY ingredient_id",
     [roundId],
   );
   for (const need of needs.rows) {
     const lines = (
       await tx.query(
-        "SELECT i.id,r.quantity_milli AS recipe_quantity,i.quantity_milli AS line_quantity FROM order_items i JOIN recipes r ON r.item_id=i.item_id AND r.restro_id=i.restro_id JOIN menu_items m ON m.id=i.item_id AND m.restro_id=i.restro_id AND m.ready_food_batch_id IS NULL WHERE i.round_id=$1 AND r.ingredient_id=$2 ORDER BY i.id",
+        lineRecipes+"SELECT id,recipe_quantity,line_quantity FROM line_recipes WHERE ingredient_id=$2 ORDER BY id",
         [roundId, need.ingredient_id],
       )
     ).rows;
@@ -203,11 +214,11 @@ export async function consumeStock(
     );
   }
   for (const line of (
-    await tx.query("SELECT id FROM order_items WHERE round_id=$1 ORDER BY id", [
+    await tx.query<Row>("SELECT id,recipe_snapshot FROM order_items WHERE round_id=$1 ORDER BY id", [
       roundId,
     ])
   ).rows) {
-    const known = covered && needs.some((n) => n.order_item_id === line.id);
+    const known = covered && needs.some((n) => n.order_item_id === line.id) && (!line.recipe_snapshot || line.recipe_snapshot.baseConfigured);
     await tx.query(
       "INSERT INTO order_item_costs(restro_id,outlet_id,round_id,order_item_id,cost) VALUES($1,$2,$3,$4,$5)",
       [

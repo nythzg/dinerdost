@@ -22,6 +22,7 @@ import { IngredientExpiry } from "./ingredient-expiry";
 import { DailyStockCounts } from "./daily-stock-counts";
 import { InventoryTools } from "./inventory-tools";
 import { MaterialSetup } from "./material-setup";
+import { RecipeChoices } from "./recipe-choices";
 const number = (
   name: string,
   label: string,
@@ -558,7 +559,7 @@ export function Inventory() {
   );
 }
 export function Recipes() {
-  const { data, form, run } = useDesk();
+  const { data, form, run, modal } = useDesk();
   const edit = (itemId?: string) =>
     form(
       itemId
@@ -609,6 +610,7 @@ export function Recipes() {
     <section className="panel">
       <div className="panel-heading">
         <h2>Ingredients per dish</h2>
+        <button className="button" onClick={()=>modal('Size, add-on & channel recipes',<RecipeChoices/>)}>Recipe choices &amp; packaging</button>
         <button
           className="button primary"
           disabled={!data.ingredients?.length || !data.menu?.length}

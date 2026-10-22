@@ -239,5 +239,30 @@
     "deploymentId": "dpl_DUemt3FneNKUJQofg2waNiPZCDkk",
     "unchanged": true,
     "restaurantDataTransferred": false
+  },
+  "localDevelopment": {
+    "status": "verified-local-only",
+    "url": "http://localhost:5090",
+    "branch": "web-recipe-profiles",
+    "baseCommit": "9f5195659dd5388b637bfc29a8d79f028cd6ceea",
+    "implementedPetpoojaIds": [
+      "PP03",
+      "PP04"
+    ],
+    "backendPassed": 279,
+    "postgresRecipeCasesPassed": 8,
+    "postgresProductionCasesPassed": 7,
+    "desktopPhoneWorkflowsPassed": 3,
+    "migrationsAppliedToLocalCopy": [
+      "051_web_paid_replacements.sql",
+      "052_web_recipe_profiles.sql",
+      "053_web_production.sql"
+    ],
+    "productionMigrationsUnchanged": true,
+    "originalAccountsPreserved": true,
+    "privateDataAndCredentialsExcludedFromGit": true,
+    "pushed": false,
+    "deployed": false,
+    "acceptance": "verification/local-web-pp03-pp04-acceptance.json"
   }
 }

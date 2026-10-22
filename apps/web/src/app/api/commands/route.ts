@@ -29,6 +29,15 @@ export async function POST(request: NextRequest) {
       roundId = () => z.uuid().parse(data.roundId);
     let result: unknown;
     switch (data.action) {
+      case 'productionRecipe':
+        result=await service.saveProductionRecipe(db,actor,key,data.input);
+        break;
+      case 'produceBatch':
+        result=await service.produceBatch(db,actor,key,data.input);
+        break;
+      case 'recipeProfile':
+        result=await service.saveRecipeProfile(db,actor,key,data.input);
+        break;
       case 'paidReplacement':
         result=await service.replacePaidOrder(db,actor,key,orderId(),data.input);
         break;

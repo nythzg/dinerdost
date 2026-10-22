@@ -591,6 +591,7 @@ export async function guestSubmit(
             ])
           ).tax_bps_override,
           webFlow,
+          webFlow ? 'DINE_IN' : undefined,
         ),
         total = quote(
           items.map((i) => ({

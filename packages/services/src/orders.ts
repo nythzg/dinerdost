@@ -1,5 +1,6 @@
 import {webLoyaltyLimit} from './web-loyalty';
 import { replacementEarnedPoints } from './web-replacements';
+import { resolveRecipe } from './recipe-profiles';
 import {snapshotWebBillDefaults} from './web-bill-policy';
 import { z } from "zod";
 import {snapshotWebKitchenPolicy} from "./kitchen-policy";
@@ -68,6 +69,7 @@ export async function buildItems(
   items: z.infer<typeof lineSchema>[],
   taxBpsOverride?: number | null,
   customerWeb = false,
+  recipeChannel?: string,
 ) {
   const outlet = await one(tx, "SELECT restro_id FROM outlets WHERE id=$1", [
     outletId,
@@ -77,7 +79,7 @@ export async function buildItems(
   for (const requested of items) {
     const item = await one(
       tx,
-      "SELECT * FROM menu_items WHERE id=$1 AND outlet_id=$2 AND active=true",
+      "SELECT * FROM menu_items WHERE id=$1 AND outlet_id=$2 AND active=true FOR SHARE",
       [requested.itemId, outletId],
       "A menu item is unavailable.",
     );
@@ -120,6 +122,7 @@ export async function buildItems(
       variant,
       modifiers,
       note: requested.note,
+      recipe_snapshot: recipeChannel && !item.ready_food_batch_id ? await resolveRecipe(tx,item,requested.variant,requested.modifiers,recipeChannel) : null,
     });
   }
   return rows;
@@ -144,7 +147,7 @@ export async function insertItems(
 ) {
   for (const item of items)
     await tx.query(
-      "INSERT INTO order_items(id,restro_id,round_id,item_id,name,unit_price,quantity_milli,tax_bps,station,variant,modifiers,note,production_stream,unit_snapshot) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11::jsonb,$12,$13,$14)",
+      "INSERT INTO order_items(id,restro_id,round_id,item_id,name,unit_price,quantity_milli,tax_bps,station,variant,modifiers,note,production_stream,unit_snapshot,recipe_snapshot) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11::jsonb,$12,$13,$14,$15::jsonb)",
       [
         id(),
         restroId,
@@ -160,6 +163,7 @@ export async function insertItems(
         item.note,
         item.production_stream,
         item.unit_snapshot ?? null,
+        item.recipe_snapshot ? json(item.recipe_snapshot) : null,
       ],
     );
 }
@@ -286,7 +290,7 @@ export async function createRound(
     }
     const taxPolicy = await one(
       tx,
-      "SELECT tax_bps_override FROM orders WHERE id=$1",
+      "SELECT tax_bps_override,type FROM orders WHERE id=$1",
       [orderId],
     );
     const items = await buildItems(
@@ -294,6 +298,8 @@ export async function createRound(
         data.outletId,
         data.items,
         taxPolicy.tax_bps_override,
+        false,
+        webFlow ? taxPolicy.type : undefined,
       ),
       total = totals(items);
     const sequence = await one(
@@ -367,6 +373,7 @@ export async function orderDetail(
         [round.id],
       )
     ).rows;
+    if((actor.application&&actor.application!=='MASTER')||(!can(actor,'inventory')&&!['OWNER','MANAGER','ACCOUNTANT'].includes(actor.role)))for(const item of round.items)delete item.recipe_snapshot;
     if(!actor.application||actor.application==='MASTER')round.coupon_code=(await tx.query("SELECT code FROM coupons WHERE round_id=$1 AND state IN ('RESERVED','LOCKED','REDEEMED') LIMIT 1",[round.id])).rows[0]?.code??null;
     round.payments = (
       await tx.query(
@@ -505,6 +512,8 @@ export async function editRound(
           order.outlet_id,
           data.items,
           order.tax_bps_override,
+          false,
+          webFlow ? order.type : undefined,
         ),
         total = totals(items, 0, num(round.charges_total));
       await resetRewards(tx, roundId);

@@ -491,6 +491,7 @@ export async function submitStorefrontOrder(
         data.items,
         taxPolicy.tax_components !== null ? num(taxPolicy.tax_bps) : undefined,
         true,
+        'TAKEAWAY',
       );
       const total = quote(
         items.map((item) => ({
