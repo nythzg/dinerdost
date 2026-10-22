@@ -6,7 +6,7 @@ This transfers the source and saved project context. It does not transfer authen
 
 Copy the handoff ZIP to the receiving computer, extract it into a normal writable directory and open the extracted `dinerdost` folder as a local Codex project. Avoid running inside the ZIP, a temporary browser download preview or a cloud-only folder. Paste `CONTINUE_IN_CODEX.txt` as the first message. The root `AGENTS.md` also points Codex to the saved context, following the [OpenAI project-context workflow](https://developers.openai.com/cookbook/examples/codex/iterating-development-workflows-with-codex).
 
-The original source had no Git history. The user subsequently requested GitHub; the private initial import is [nythzg/dinerdost](https://github.com/nythzg/dinerdost). Prefer cloning it with an account authorized to read that private repo, then opening the clone in Codex. The ZIP omits `.git` and earlier Vercel releases have no historical commits. See GITHUB_HANDOFF.md. Do not copy the source computer's entire `.codex` directory or authentication files into someone else's account.
+The original source had no Git history. The user subsequently requested GitHub and public access; clone [nythzg/dinerdost](https://github.com/nythzg/dinerdost) without a read invitation, then open the clone in Codex. Writing to the original repo still needs owner-granted access, or the receiving operator can use their own fork. The ZIP omits `.git` and earlier Vercel releases have no historical commits. See GITHUB_HANDOFF.md. Do not copy the source computer's entire `.codex` directory or authentication files into someone else's account.
 
 ## 2. Reproduce the baseline
 

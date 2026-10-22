@@ -15,7 +15,7 @@ Prepared 22 October 2026 after the user's request to continue on another device 
 | Client Q18–Q119 | **99 released / 1 confirmed pending / 2 unanswered** out of 102 |
 | Latest requested 10-update batch | **9 deployed; Q89 remains** |
 | Separate Petpooja queue | **4 complete / 2 partial / 21 pending** of 27 groups |
-| Git | Originally no checkout/history/remote. The user's later request creates a **private initial import** at [nythzg/dinerdost](https://github.com/nythzg/dinerdost). Earlier Vercel releases have no historical Git commits. See GITHUB_HANDOFF.md. |
+| Git | Originally no checkout/history/remote. Initial import is at [nythzg/dinerdost](https://github.com/nythzg/dinerdost), made **public at the user's request on 23 October IST**. Public read access does not grant push rights. Earlier Vercel releases have no historical Git commits. See GITHUB_HANDOFF.md. |
 | Monitoring | `diner-dost-client-updates` is **PAUSED**, last configured for 15 minutes. It is not copied/started automatically. |
 
 Source of truth: [release metadata](docs/RELEASE.json), [0.4.30 acceptance](verification/production-0430-acceptance.json), [client checklist](docs/CLIENT_FEEDBACK.md), [V2 cross-reference](docs/V2_CHECKLIST.md), [Petpooja additions](docs/PETPOOJA_ADDITIONS.md), [pending questions](docs/PENDING_QUESTIONS.md).
@@ -102,7 +102,7 @@ Excludes real `.env` files, `.vercel` account binding, QA fixture credentials, C
 - For hosted tests, configure a disposable PostgreSQL-capable admin connection securely; `scripts/verify-postgres.ts --suites=tests/web-refunds.test.ts` creates and drops an exact random `dd_verify_*` DB. Do not seed/delete application tenants. It loads `.env.production.local`, which is intentionally not bundled.
 - Production browser workflows use only an isolated synthetic tenant and a local `QA_FIXTURE_FILE`; create new credentials on the destination and remove them when done. The original QA fixture was excluded; no permission to reuse a real client's session.
 - Use a separate database/Neon branch for previews and write tests. Existing old Vercel environment scopes may point to the same database; never assume a preview is isolated.
-- The original source had no Git history. The user subsequently requested GitHub; the private initial import is documented in GITHUB_HANDOFF.md. Cloning retains the new history; the ZIP omits `.git`. Vercel deployment does not itself prove Git push.
+- The original source had no Git history. The user subsequently requested GitHub and public access, documented in GITHUB_HANDOFF.md. Cloning retains the new history; the ZIP omits `.git`. Vercel deployment does not itself prove Git push.
 - Historical `scripts/edit-*.mjs`, `verify-migration-04xx.ts` and `accept-web-release.ts` are one-shot/pinned records, not generic startup commands. Read first. Re-running old acceptance may overwrite the current release status; old migration assertions expect initial defaults/empty tables.
 - Several README/DEPLOYMENT historical paragraphs refer to older releases. `docs/RELEASE.json` and the latest acceptance are authoritative. All Q/PP completion claims require actual release evidence.
 
