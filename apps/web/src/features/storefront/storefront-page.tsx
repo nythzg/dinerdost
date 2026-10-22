@@ -18,6 +18,7 @@ import {
 import { DishPicker } from "../workspace/dish-picker";
 import { MenuPicture } from "@/components/menu-picture";
 import { CustomerFields } from "../customers/customer-fields";
+import { showOrderPlaced } from "@/lib/order-placed";
 
 export function StorefrontPage({ slug }: { slug: string }) {
   const [data, setData] = useState<Row | null>(null),
@@ -69,12 +70,13 @@ export function StorefrontPage({ slug }: { slug: string }) {
     setBusy(true);
     setError("");
     try {
-      await idempotentPost("/api/store/" + slug, { action, input });
+      const result = await idempotentPost("/api/store/" + slug, { action, input });
       if (action === "order") {
         setCart([]);
         setCheckout(false);
         setTab("My visits");
         setNotice("Order sent. Waiting for staff acceptance.");
+        showOrderPlaced(result, { type: 'TAKEAWAY', customer: input.name });
       }
       if (action === "reserve") {
         setBooking(null);

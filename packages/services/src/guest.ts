@@ -99,7 +99,7 @@ async function guestOrder(
   for (const round of rounds)
     round.items = (
       await tx.query(
-        "SELECT name,quantity_milli,variant,note FROM order_items WHERE round_id=$1",
+        "SELECT name,unit_price,quantity_milli,unit_snapshot,variant,note FROM order_items WHERE round_id=$1",
         [round.id],
       )
     ).rows;

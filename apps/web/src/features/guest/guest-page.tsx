@@ -15,6 +15,7 @@ import {
 import { DishPicker } from "../workspace/dish-picker";
 import { CustomerFields } from "../customers/customer-fields";
 import { useActivityHeartbeat } from "@/lib/use-activity-heartbeat";
+import { showOrderPlaced } from "@/lib/order-placed";
 
 export function GuestPage({ tableKey }: { tableKey: string }) {
   const [data, setData] = useState<Row | null>(null);
@@ -579,6 +580,7 @@ export function GuestPage({ tableKey }: { tableKey: string }) {
                     setNotice(
                       "Order sent. Your server will confirm it shortly.",
                     );
+                    showOrderPlaced(result, { table: data.table, type: 'DINE_IN' });
                   }
                 })
                 .catch(() => {});

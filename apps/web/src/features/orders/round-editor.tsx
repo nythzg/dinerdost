@@ -4,6 +4,7 @@ import { useId, useState, type FormEvent } from "react";
 import { quantityMilli, wholeUnit } from "@dinerdost/core";
 import { Icon } from "@/components/ui";
 import type { Row } from "@/lib/client";
+import { showStaffOrderPlaced } from "@/lib/order-placed";
 import { useDesk } from "../workspace/context";
 
 type EditorLine = {
@@ -77,7 +78,7 @@ export function RoundEditor({
     setSaving(true);
     setError("");
     try {
-      await save({
+      const result = await save({
         version: round.version,
         submit: true,
         items: visible.map(({ item, quantity, variant }) => ({
@@ -90,6 +91,10 @@ export function RoundEditor({
       });
       close();
       notify("Round updated.");
+      if (round.status === 'DRAFT') {
+        const saved = result as Row;
+        showStaffOrderPlaced(saved.order ?? saved, data);
+      }
     } catch (failure) {
       setError((failure as Error).message);
       setSaving(false);

@@ -241,6 +241,20 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "orderPlacedConfirmations": {
+      "status": "verified-local-unreleased",
+      "scope": "Green SweetAlert2 showing only table/order type, order number, customer, round items/prices and grand total across all web order submissions.",
+      "backendTestsPassed": 11,
+      "priorFullBackendTestsPassed": 287,
+      "browserWorkflowsPassed": 2,
+      "priorRegressionWorkflowsPassed": 6,
+      "viewportWidths": [1440, 390],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "notes": "docs/LOCAL_ORDER_CONFIRMATIONS.md",
+      "pushed": false,
+      "deployed": false
+    },
     "readyFoodBadgeContrast": {
       "status": "verified-local-unreleased",
       "behavior": "White Ready to serve badge text on the existing green background in both unselected and selected POS cards.",

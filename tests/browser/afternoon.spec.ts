@@ -236,6 +236,7 @@ test("afternoon menu uploads and Half/Full choices persist into POS pricing", as
   await page.getByRole("dialog").getByRole("button", { name: /^Add / }).click();
   await page.getByRole("button", { name: "Create order", exact: true }).click();
   await page.waitForURL("**/app/orders/*");
+  await page.getByRole("dialog", { name: "Order placed", exact: true }).getByRole("button", { name: "Done", exact: true }).click();
   const detail = await (
     await page.request.get("/api/orders/" + page.url().split("/").pop())
   ).json();

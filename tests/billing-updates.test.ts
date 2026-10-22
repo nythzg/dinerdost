@@ -406,6 +406,11 @@ test("QR added rounds retain a bill tax override while a new order starts with m
     input,
   );
   let detail = await s.getOrder(db, actor, bill.id);
+  for (const field of ['payable', 'paid', 'round_number'])
+    assert.equal(bill.rounds[0][field], detail.rounds[0][field]);
+  assert.equal(Number(bill.rounds[0].items[0].unit_price), Number(detail.rounds[0].items[0].unit_price));
+  assert.equal('recipe_snapshot' in bill.rounds[0].items[0], false);
+  assert.equal('payments' in bill.rounds[0], false);
   detail = await s.changeOrderTax(db, actor, key(), bill.id, {
     version: detail.version,
     taxBps: 500,

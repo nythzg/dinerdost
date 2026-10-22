@@ -13,6 +13,7 @@ import {
 } from "@dinerdost/core";
 import { Badge, DataTable, Empty, Icon, type Field } from "@/components/ui";
 import { date, label, money, type Row } from "@/lib/client";
+import { showStaffOrderPlaced } from "@/lib/order-placed";
 import { useDesk } from "./context";
 import { TableQr } from "@/components/table-qr";
 import { DishPicker } from "./dish-picker";
@@ -751,6 +752,7 @@ export function Pos() {
       });
       setCart([]);
       go("/app/orders/" + order.id);
+      if (!draft) showStaffOrderPlaced(order, data);
     } catch {}
   };
   return (

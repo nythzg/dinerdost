@@ -455,7 +455,7 @@ test("table requests activate from Tables and notification reads survive refresh
 });
 async function register(page: Page, qr = false) {
   // Each isolated browser account represents a separate client in rate-limit tests.
-  if (!process.env.QA_BASE_URL)
+  if (!process.env.QA_BASE_URL || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(process.env.QA_BASE_URL))
     await page.setExtraHTTPHeaders({
       "x-forwarded-for": "10." + [...randomBytes(3)].join("."),
     });
@@ -540,6 +540,7 @@ test("prepaid order reaches an immutable final invoice through kitchen service",
   await page.getByRole("button", { name: /Mint cooler/ }).click();
   await page.getByRole("button", { name: "Create order", exact: true }).click();
   await page.waitForURL("**/app/orders/*");
+  await page.getByRole("dialog", { name: "Order placed", exact: true }).getByRole("button", { name: "Done", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Accept round", exact: true }),
   ).toHaveCount(0);
@@ -813,6 +814,7 @@ test("table cards open a code-free customer menu and submit pending orders", asy
   await guest.getByLabel("Customer name").fill("QR Guest");
   await guest.getByLabel("Customer phone").fill("9456789012");
   await guest.getByRole("button", { name: /Place order/ }).click();
+  await guest.getByRole("dialog", { name: "Order placed", exact: true }).getByRole("button", { name: "Done", exact: true }).click();
   await expect(guest.getByRole("heading", { name: /Order #/ })).toBeVisible();
   await expect(
     guest.getByText("Waiting for your server", { exact: true }),
@@ -1146,7 +1148,8 @@ test("draft round editor uses whole quantities, supports delete/undo and preserv
   await dialog
     .getByRole("button", { name: "Undo delete", exact: true })
     .click();
-  await save(page, "Save & submit");
+  await dialog.getByRole("button", { name: "Save & submit", exact: true }).click();
+  await page.getByRole("dialog", { name: "Order placed", exact: true }).getByRole("button", { name: "Done", exact: true }).click();
   await expect(page.locator(".round-panel tbody tr")).toHaveCount(1);
   await expect(
     page.locator(".round-panel tbody tr").getByRole("cell").nth(1),
@@ -2514,6 +2517,7 @@ test("published customer store shows floor plan, books a table and accepts priva
   await customer.getByLabel("Name", { exact: true }).fill("Public Guest");
   await customer.getByLabel("Phone", { exact: true }).fill("9123456789");
   await customer.getByRole("button", { name: /^Send order ·/ }).click();
+  await customer.getByRole("dialog", { name: "Order placed", exact: true }).getByRole("button", { name: "Done", exact: true }).click();
   await expect(
     customer.getByText("Order sent. Waiting for staff acceptance.", {
       exact: true,

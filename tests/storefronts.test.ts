@@ -51,6 +51,12 @@ test("D2C orders use server prices, remain pending with no KOT, are private, ide
   assert.equal((await s.storefrontCatalog(db, slug, token2, "device-two")).orders.length, 0);
   await assert.rejects(s.submitStorefrontOrder(db, slug, token, "wrong-device", key(), input));
   const orderDetail = await s.getOrder(db, owner, order.id);
+  const own = (await s.storefrontCatalog(db, slug, token, device)).orders[0];
+  for (const field of ['payable', 'paid', 'round_number'])
+    assert.equal(own.rounds[0][field], orderDetail.rounds[0][field]);
+  assert.equal(Number(own.rounds[0].items[0].unit_price), Number(orderDetail.rounds[0].items[0].unit_price));
+  assert.equal('recipe_snapshot' in own.rounds[0].items[0], false);
+  assert.equal('payments' in own.rounds[0], false);
   await s.setCustomerDeviceBan(db, owner, key(), order.id, { mode: "BAN", minutes: 15, version: orderDetail.deviceAccess.version, reason: "Customer browser test ban" });
   await assert.rejects(s.submitStorefrontOrder(db, slug, token, device, key(), input), { code: "DEVICE_TEMPORARILY_BANNED" });
   assert.equal((await s.verifyAudit(db, owner)).valid, true);

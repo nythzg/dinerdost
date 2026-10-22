@@ -316,6 +316,7 @@ test("overnight POS descriptions, Half/Full buttons, staff acceptance and bill a
   await page.getByLabel("Customer phone", { exact: true }).fill("9123456740");
   await page.getByRole("button", { name: "Create order", exact: true }).click();
   await page.waitForURL("**/app/orders/*");
+  await page.getByRole("dialog", { name: "Order placed", exact: true }).getByRole("button", { name: "Done", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Accept round", exact: true }),
   ).toHaveCount(0);

@@ -198,14 +198,14 @@ async function ownOrders(tx: Sql, grantId: string) {
   for (const order of orders) {
     order.rounds = (
       await tx.query<Row>(
-        "SELECT id,status,kot_status,payable,paid FROM order_rounds WHERE order_id=$1 ORDER BY round_number",
+        "SELECT id,round_number,status,kot_status,payable,paid FROM order_rounds WHERE order_id=$1 ORDER BY round_number",
         [order.id],
       )
     ).rows;
     for (const round of order.rounds)
       round.items = (
         await tx.query(
-          "SELECT name,quantity_milli,variant,note FROM order_items WHERE round_id=$1",
+          "SELECT name,unit_price,quantity_milli,unit_snapshot,variant,note FROM order_items WHERE round_id=$1",
           [round.id],
         )
       ).rows;
