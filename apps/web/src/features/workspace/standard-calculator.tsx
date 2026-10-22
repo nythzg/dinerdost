@@ -50,7 +50,12 @@ export function CalculatorDock({employeeId}:{employeeId:string}){
   if(version!==generation.current)return;
   setHistory(old=>page?[...old,...result.rows]:result.rows);setHistoryPage(page);setHistoryMore(result.more);setLoaded(true);
  }
- useEffect(()=>{if(open&&historyOpen)void loadHistory().catch(e=>setError(e.message));return()=>{generation.current++}},[open,historyOpen]);
+ useEffect(()=>{
+  if(!open||!historyOpen)return;
+  const refresh=()=>void loadHistory().catch(e=>setError(e.message));refresh();
+  const timer=setInterval(refresh,60000);
+  return()=>{generation.current++;clearInterval(timer)};
+ },[open,historyOpen]);
  async function mutate(payload:Row):Promise<Row|undefined>{
   if(locked.current)return;locked.current=true;setBusy(true);setError('');
   try{const result=await idempotentPost('/api/calculator',payload);await loadHistory().catch(e=>setError('Saved. History could not refresh: '+e.message));return result}
@@ -79,7 +84,7 @@ export function CalculatorDock({employeeId}:{employeeId:string}){
  {open&&<section className="workspace-tool-panel calculator-panel" role="region" aria-label="Calculator">
   <header><h2><T>{historyOpen?'Calculator history':'Calculator'}</T></h2><div className="calculator-header-actions"><button type="button" className="button small" aria-label={historyOpen?'Back to calculator':'Show calculator history'} aria-pressed={historyOpen} onClick={()=>{setHistoryOpen(!historyOpen);setError('')}}>{historyOpen?'←':<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M3 5v5h5M3 10a9 9 0 1 1 2 8M12 7v5l3 2"/></svg>}</button><button type="button" className="button small" onClick={()=>toggle(false)} aria-label="Minimize calculator">×</button></div></header>
   <div className="tool-panel-body">
-  {historyOpen?<div className="calculator-history-view"><p className="muted">Saved to your account until you delete it.</p>{!loaded&&<p>Loading history…</p>}{loaded&&!history.length&&<p>No calculations yet.</p>}{history.map(entry=><HistoryNote key={entry.id+entry.note} entry={entry} busy={busy} save={value=>void updateNote(entry.id,value)} remove={()=>void remove(entry.id)}/>)}{historyMore&&<button type="button" className="button" disabled={busy} onClick={()=>void loadHistory(historyPage+1).catch(e=>setError(e.message))}>Load older calculations</button>}</div>:
+  {historyOpen?<div className="calculator-history-view"><p className="muted">Calculations and notes are automatically deleted after 7 days.</p>{!loaded&&<p>Loading history…</p>}{loaded&&!history.length&&<p>No calculations yet.</p>}{history.map(entry=><HistoryNote key={entry.id+entry.note} entry={entry} busy={busy} save={value=>void updateNote(entry.id,value)} remove={()=>void remove(entry.id)}/>)}{historyMore&&<button type="button" className="button" disabled={busy} onClick={()=>void loadHistory(historyPage+1).catch(e=>setError(e.message))}>Load older calculations</button>}</div>:
    <form onSubmit={e=>{e.preventDefault();calculateNow()}} onKeyDown={keyDown}>
     <div className={'calculator-display'+(preview?' is-complete':'')}>
      <label><span className="calculator-input-label">Calculation</span><input ref={input} aria-label="Calculation" maxLength={270} inputMode="none" autoComplete="off" spellCheck={false} disabled={busy} value={calculatorDisplay(expression)} onChange={e=>edit(e.target.value)} placeholder="0"/></label>

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { getDatabase } from "@dinerdost/database";
 import { DomainError, ensure } from "@dinerdost/core";
+import {startLocalCalculatorRetention} from './calculator-retention';
 import {
   authenticate,
   SESSION_COOKIE,
@@ -12,7 +13,9 @@ import {
 export async function context() {
   const db = await getDatabase();
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  return { db, actor: await authenticate(db, token) };
+  const actor=await authenticate(db, token);
+  startLocalCalculatorRetention(db);
+  return { db, actor };
 }
 export function csrf(request: NextRequest) {
   const origin = request.headers.get("origin");

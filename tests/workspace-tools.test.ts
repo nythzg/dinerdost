@@ -30,7 +30,7 @@ test('calculator recomputes server-side, is idempotent and never changes financi
  const rows=(await s.calculatorHistory(db,owner)).rows;assert.equal(rows.filter(row=>row.id===entry.id).length,1);assert.equal(rows[0].note,'Kitchen estimate');
  await assert.rejects(s.calculatorAction(db,owner,key(),{...input,result:'999'}));await assert.rejects(s.calculatorAction(db,owner,key(),{action:'calculate',expression:'1/0'}));assert.deepEqual(await financial(),before);
 });
-test('history and edited notes persist through authentication until explicitly deleted',async()=>{
+test('unexpired history and edited notes persist through authentication until explicitly deleted',async()=>{
  const entry=await s.calculatorAction(db,owner,key(),{action:'calculate',expression:'20+2'});
  await s.calculatorAction(db,owner,key(),{action:'note',id:entry.id,note:'Revised note'});
  const login=await s.login(db,{email:'tools-0@example.test',password:'tools-test-password'},'tools-relogin'),actor=await s.authenticate(db,login.token);
@@ -84,4 +84,51 @@ test('concurrent calculator saves retain one entry and notes remain scoped to th
  for(const actor of [manager,foreign]){await assert.rejects(s.calculatorAction(db,actor,key(),{action:'note',id:first.id,note:'Denied'}));assert(!(await s.calculatorHistory(db,actor)).rows.some(r=>r.id===first.id))}
  const other=await s.calculatorAction(db,owner,key(),{action:'calculate',expression:'7+3',note:'Other calculation'});await s.calculatorAction(db,owner,key(),{action:'note',id:first.id,note:'Updated specific note'});
  const history=(await s.calculatorHistory(db,owner)).rows;assert.equal(history.filter(r=>r.id===first.id).length,1);assert.equal(history.find(r=>r.id===first.id)?.note,'Updated specific note');assert.equal(history.find(r=>r.id===other.id)?.note,'Other calculation');
+});
+
+test('calculator retention keeps the exact seven-day boundary and deletes strictly older calculations with their notes',async()=>{
+ const before=await financial(),old=key(),boundary=key(),recent=key();
+ await db.transaction(owner.restroId,async tx=>{
+  for(const [entryId,age] of [[old,"interval '168 hours 0.001 seconds'"],[boundary,"interval '168 hours'"],[recent,"interval '167 hours 59 minutes'"]])await tx.query(`INSERT INTO calculator_history(id,restro_id,employee_id,expression,result,note,created_at) VALUES($1,$2,$3,'1+2','3','Expiry fixture',now()-${age})`,[entryId,owner.restroId,owner.employeeId]);
+  await s.expireCalculatorData(tx,owner.employeeId);
+  const rows=(await tx.query('SELECT id,note FROM calculator_history WHERE id=ANY($1::uuid[])',[[old,boundary,recent]])).rows;
+  assert.deepEqual(rows.map(r=>r.id).sort(),[boundary,recent].sort());assert(rows.every(r=>r.note==='Expiry fixture'));
+ });
+ assert.deepEqual(await financial(),before);
+});
+test('expired calculator contents are removed from history and retry responses without resurrecting entries or altering audit/financial history',async()=>{
+ const requestKey=key(),input={action:'calculate',expression:'81+19',note:'Expired private note'},entry=await s.calculatorAction(db,owner,requestKey,input);
+ await db.transaction(owner.restroId,async tx=>{
+  await tx.query("UPDATE calculator_history SET created_at=now()-interval '8 days' WHERE id=$1",[entry.id]);
+  await tx.query("UPDATE idempotency_keys SET response=jsonb_set(response,'{created_at}',to_jsonb(now()-interval '8 days')) WHERE key=$1",[requestKey]);
+ });
+ const before=await financial(),auditBefore=(await db.query('SELECT * FROM audit_events ORDER BY id')).rows;
+ assert(!(await s.calculatorHistory(db,owner)).rows.some(r=>r.id===entry.id));
+ const cached=(await db.query('SELECT response FROM idempotency_keys WHERE restro_id=$1 AND key=$2',[owner.restroId,requestKey])).rows[0].response;
+ assert.deepEqual(cached,{id:entry.id,expired:true});
+ await assert.rejects(s.calculatorAction(db,owner,requestKey,input),(e:any)=>e.code==='CALCULATION_EXPIRED'&&e.status===410);
+ assert.equal((await db.query('SELECT id FROM calculator_history WHERE id=$1',[entry.id])).rows.length,0);
+ assert.deepEqual((await db.query('SELECT * FROM audit_events ORDER BY id')).rows,auditBefore);assert.deepEqual(await financial(),before);
+});
+test('account cleanup respects employee/tenant/native boundaries and concurrent note edits cannot extend an expired entry',async()=>{
+ const ids=await Promise.all([owner,manager,foreign].map(async actor=>{
+  const entry=await s.calculatorAction(db,actor,key(),{action:'calculate',expression:'2+8',note:'Scoped expiry'});
+  await db.transaction(actor.restroId,tx=>tx.query("UPDATE calculator_history SET created_at=now()-interval '8 days' WHERE id=$1",[entry.id]));return entry.id;
+ }));
+ for(const application of ['POS','COMMAND','KITCHEN'] as const)await assert.rejects(s.calculatorHistory(db,{...owner,application}));
+ assert.equal((await db.query('SELECT id FROM calculator_history WHERE id=ANY($1::uuid[])',[ids])).rows.length,3);
+ const [read,edit]=await Promise.allSettled([s.calculatorHistory(db,owner),s.calculatorAction(db,owner,key(),{action:'note',id:ids[0],note:'Do not revive'})]);
+ assert.equal(read.status,'fulfilled');assert.equal(edit.status,'rejected');
+ assert.deepEqual((await db.query('SELECT id FROM calculator_history WHERE id=ANY($1::uuid[])',[ids])).rows.map(r=>r.id).sort(),ids.slice(1).sort());
+});
+test('local maintenance removes expired accounts even while inactive, including retry copies of manually deleted calculations',async()=>{
+ const requestKey=key(),entry=await s.calculatorAction(db,owner,requestKey,{action:'calculate',expression:'75+25',note:'Deleted private note'});
+ await s.calculatorAction(db,owner,key(),{action:'delete',id:entry.id});
+ await db.transaction(owner.restroId,tx=>tx.query("UPDATE idempotency_keys SET response=jsonb_set(response,'{created_at}',to_jsonb(now()-interval '8 days')) WHERE key=$1",[requestKey]));
+ const unrelatedKey=key();await db.query("INSERT INTO idempotency_keys(restro_id,key,actor_id,fingerprint,response) VALUES($1,$2,$3,'untouched',$4::jsonb)",[owner.restroId,unrelatedKey,owner.employeeId,JSON.stringify({id:key(),expression:'Unrelated business data',result:'Keep',created_at:'not a timestamp'})]);
+ const before=await financial(),unrelated=(await db.query('SELECT response FROM idempotency_keys WHERE key=$1',[unrelatedKey])).rows[0].response;
+ await db.transaction(null,tx=>s.expireCalculatorData(tx));
+ assert.equal((await db.query("SELECT id FROM calculator_history WHERE created_at < now()-interval '168 hours'")).rows.length,0);
+ assert.deepEqual((await db.query('SELECT response FROM idempotency_keys WHERE key=$1',[requestKey])).rows[0].response,{id:entry.id,expired:true});
+ assert.deepEqual((await db.query('SELECT response FROM idempotency_keys WHERE key=$1',[unrelatedKey])).rows[0].response,unrelated);assert.deepEqual(await financial(),before);
 });
