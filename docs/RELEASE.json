@@ -241,6 +241,25 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "floorFixtureDetails": {
+      "status": "verified-local-unreleased",
+      "scope": "Readable inside/callout labels, collision guards, free Entry/Exit, optional outdoor tables, per-floor roundness and Fence.",
+      "fullBackendTestsPassed": 294,
+      "affectedTestsPassed": 19,
+      "postgresCasesPassed": 2,
+      "postgresDatabaseRemoved": true,
+      "browserWorkflowsPassed": 6,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "localMigration": "054_web_floor_details.sql",
+      "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
+      "pushed": false,
+      "deployed": false
+    },
     "floorResizing": {
       "status": "verified-local-unreleased",
       "scope": "All eight edge/corner resize handles with anchored rotated geometry, mouse/touch and keyboard support.",

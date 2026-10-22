@@ -36,6 +36,7 @@ export async function placeTableOnFloor(
     { width: Number(plan.width), height: Number(plan.height) },
     plan.outline,
     objects,
+    Number(plan.boundary_roundness??0),
   );
   ensure(
     placed,

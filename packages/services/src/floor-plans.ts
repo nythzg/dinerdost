@@ -8,8 +8,11 @@ import {
   requirePermission,
   type Actor,
   floorPlanKinds,
+  floorObjectAllowed,
+  floorAllowsOutside,
+  floorObjectsOverlap,
+  floorCoordinateLimit,
   validFloorOutline,
-  objectInFloor,
   objectInArea,
   diningTableGroups,
 } from "@dinerdost/core";
@@ -33,8 +36,9 @@ const planObject = z
     tableId: z.uuid().optional(),
     copyOfTableId: z.uuid().optional(),
     newTable: z.object({seats:z.number().int().min(1).max(100)}).strict().optional(),
-    x: z.number().min(-2000).max(4990),
-    y: z.number().min(-2000).max(4990),
+    allowOutside: z.boolean().optional(),
+    x: z.number().min(-floorCoordinateLimit).max(floorCoordinateLimit),
+    y: z.number().min(-floorCoordinateLimit).max(floorCoordinateLimit),
     width: z.number().min(10).max(2000),
     height: z.number().min(10).max(2000),
     rotation: z.number().int().min(0).max(345).multipleOf(15).optional(),
@@ -42,7 +46,7 @@ const planObject = z
   .strict()
   .refine(
     (object) =>
-      object.kind === "WALL" || (object.width >= 60 && object.height >= 50),
+      ["WALL","FENCE"].includes(object.kind) || (object.width >= 60 && object.height >= 50),
     "Rooms and tables need at least 60 × 50 units.",
   )
   .refine(
@@ -51,7 +55,7 @@ const planObject = z
         ? Number(!!object.tableId) + Number(!!object.copyOfTableId) + Number(!!object.newTable) === 1
         : !object.tableId && !object.copyOfTableId && !object.newTable,
     "Only tables can reference a dining table.",
-  );
+  ).refine(object=>object.allowOutside===undefined||object.kind==='TABLE',"Only tables have an outside-floor option.");
 
 export async function saveFloorPlan(
   db: Database,
@@ -88,6 +92,7 @@ export async function saveFloorPlan(
         .optional(),
       objects: z.array(planObject).max(250),
       boundaryStyle: z.enum(["STROKE", "WALLS"]).optional(),
+      boundaryRoundness: z.number().int().min(0).max(500).optional(),
       deletedTables: z
         .array(
           z
@@ -148,11 +153,13 @@ export async function saveFloorPlan(
     expectedVersion(before?.version ?? 0, data.version);
     const objects = data.objects.map((object) => ({
       ...object,
+      ...(object.kind==='TABLE'&&object.allowOutside===undefined&&before?.objects.find((old:Row)=>old.id===object.id)?.allowOutside===true?{allowOutside:true}:{}),
       rotation:
         object.rotation ??
         before?.objects.find((old: Row) => old.id === object.id)?.rotation ??
         0,
     }));
+    const boundaryRoundness=data.boundaryRoundness??before?.boundary_roundness??0;
     const boundaryStyle =
       data.boundaryStyle ?? before?.boundary_style ?? "STROKE";
     ensure(
@@ -192,15 +199,16 @@ export async function saveFloorPlan(
       "Use a closed outline without crossing edges, inside the floor area (minimum 30,000 square units).",
     );
     ensure(
-      objects.every((object) => objectInArea(object, { width, height })),
+      objects.every((object) => floorAllowsOutside(object)||objectInArea(object, { width, height })),
       "OUTSIDE_FLOOR_PLAN",
-      "Keep every object inside the floor plan.",
+      "Keep fixtures inside the floor plan, or enable Allow outside floor for an outdoor table.",
     );
     ensure(
-      !outline || objects.every((object) => objectInFloor(object, outline)),
+      objects.every((object) => floorObjectAllowed(object,{width,height},outline,boundaryRoundness)),
       "OUTSIDE_FLOOR_OUTLINE",
       "Move highlighted objects inside the floor outline before saving.",
     );
+    ensure(!objects.some((object,i)=>objects.slice(i+1).some(other=>floorObjectsOverlap(object,other))),"OVERLAPPING_FIXTURES","Separate overlapping fixtures and tables before saving.");
     const usedLabels = (
       await tx.query(
         "SELECT label FROM dining_tables WHERE outlet_id=$1 AND retired_at IS NULL",
@@ -249,7 +257,7 @@ export async function saveFloorPlan(
     }
     const planId = before?.id ?? id();
     await tx.query(
-      "INSERT INTO floor_plans(id,restro_id,outlet_id,floor,objects,width,height,outline,boundary_style) VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,$8::jsonb,$9) ON CONFLICT(outlet_id,floor) DO UPDATE SET objects=EXCLUDED.objects,width=EXCLUDED.width,height=EXCLUDED.height,outline=EXCLUDED.outline,boundary_style=EXCLUDED.boundary_style,version=floor_plans.version+1,updated_at=now()",
+      "INSERT INTO floor_plans(id,restro_id,outlet_id,floor,objects,width,height,outline,boundary_style,boundary_roundness) VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,$8::jsonb,$9,$10) ON CONFLICT(outlet_id,floor) DO UPDATE SET objects=EXCLUDED.objects,width=EXCLUDED.width,height=EXCLUDED.height,outline=EXCLUDED.outline,boundary_style=EXCLUDED.boundary_style,boundary_roundness=EXCLUDED.boundary_roundness,version=floor_plans.version+1,updated_at=now()",
       [
         planId,
         actor.restroId,
@@ -260,6 +268,7 @@ export async function saveFloorPlan(
         height,
         outline ? json(outline) : null,
         boundaryStyle,
+        boundaryRoundness,
       ],
     );
     await audit(tx, actor, {
@@ -272,6 +281,7 @@ export async function saveFloorPlan(
         width: before?.width ?? 1200,
         height: before?.height ?? 800,
         outline: before?.outline,
+        boundaryRoundness:before?.boundary_roundness??0,
       },
       newState: {
         objects,
@@ -279,6 +289,7 @@ export async function saveFloorPlan(
         height,
         outline,
         boundaryStyle,
+        boundaryRoundness,
         removedTables: data.deletedTables.map((t) => t.tableId),
       },
     });

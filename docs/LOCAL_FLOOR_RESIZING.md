@@ -15,3 +15,5 @@ Only client resize controls and the shared pure geometry helper changed. No serv
 Private task logs in the parent work directory: eight-resize-backend.log, eight-resize-final-browser.log, eight-resize-screen-browser.log, eight-resize-typecheck.log and eight-resize-build.log. Initial test development corrected an unsupported Escape assumption, a fixture rotation outside the existing 15° rule, and an assertion exceeding Chromium's CSS-coordinate precision; none required changing those existing product rules.
 
 No full-backend or remote PostgreSQL rerun is claimed for this geometry-only update. Local synthetic browser workspaces and in-memory service tests were used. No push, deployment or Production/client/Petpooja release-count change. Q111 remains unanswered and procurement remains paused.
+
+Latest local policy update: LOCAL_FLOOR_FIXTURES.md supersedes gate boundary snapping and always-inside placement, adds collision guards, and retains the eight resize handles.

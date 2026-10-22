@@ -1,4 +1,5 @@
 "use client";
+import {FixtureLabels} from "./fixture-details";
 import { T } from "@/lib/staff-language";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import {
@@ -8,9 +9,7 @@ import {
   floorPlanFixtures,
   fitFloorObject,
   resizeFloorObject,
-  snapFloorGate,
   rotateFloorPoint,
-  objectInArea,
   floorOutline,
   nextCopiedTableLabel,
   nextTableName,
@@ -20,8 +19,16 @@ import {
   type FloorPlanSize,
   type FloorResizeDirection,
   type FloorPoint,
-  objectInFloor,
   floorEllipse,
+  floorObjectCorners,
+  floorFixtureLabel,
+  floorAllowsOutside,
+  floorObjectAllowed,
+  floorObjectsOverlap,
+  fitFloorPlacement,
+  placeFloorFixture,
+  roundedFloorBoundary,
+  constrainFloorChange,
   ellipseOutline,
 } from "@dinerdost/core";
 import { Empty, Icon } from "@/components/ui";
@@ -38,22 +45,9 @@ const resizeVectors:Record<FloorResizeDirection,[number,number]>={nw:[-1,-1],n:[
 const starterFixtures = [
   { kind: "RECEPTION", label: "Reception", x: 30, y: 20 },
   { kind: "WASHROOM", label: "Washroom", x: 990, y: 20 },
-  { kind: "ENTRY", label: "Entry", x: 30, y: 710 },
+  { kind: "ENTRY", label: "Entry/Exit", x: 30, y: 710 },
   { kind: "STAIRS", label: "Staircase", x: 990, y: 710 },
 ] as const;
-const fixtureIcons = {
-  RECEPTION: "outlets",
-  WASHROOM: "customers",
-  ENTRY: "logout",
-  STAIRS: "stairs",
-  TABLE: "floor",
-  EXIT: "logout",
-  SMOKING_ROOM: "cup",
-  LIQUOR_ROOM: "inventory",
-  PRIVATE_ROOM: "outlets",
-  WALL: "floor",
-  KITCHEN: "kitchen",
-};
 function starterTables(tables: Row[]): PlanObject[] {
   const columns = 6,
     cellWidth = 180,
@@ -98,6 +92,7 @@ export function FloorPlan() {
     [cameraLocked, setCameraLocked] = useState(false),
     [pan, setPan] = useState({ x: 0, y: 0 }),
     [boundaryStyle, setBoundaryStyle] = useState("STROKE"),
+    [boundaryRoundness,setBoundaryRoundness]=useState(0),
     [deletedTables, setDeletedTables] = useState<
       { tableId: string; version: number }[]
     >([]),
@@ -128,7 +123,7 @@ export function FloorPlan() {
   const [hydratedView,setHydratedView]=useState('');
   const viewKey=floorViewKey(data.actor.employeeId,data.outletId,floor??'');
   const fitRef=useRef<()=>void>(()=>{});
-  type Snapshot={objects:PlanObject[];area:FloorPlanSize;outline:FloorPoint[]|null;boundary:string;deleted:{tableId:string;version:number}[]};
+  type Snapshot={objects:PlanObject[];area:FloorPlanSize;outline:FloorPoint[]|null;boundary:string;roundness:number;deleted:{tableId:string;version:number}[]};
   const history=useRef<Snapshot[]>([]),historyPosition=useRef(-1),historySkip=useRef(false),historyGesture=useRef(false);
   const [historyRevision,reviseHistory]=useState(0);
   const finishGesture=()=>{historyGesture.current=false;reviseHistory(n=>n+1)};
@@ -136,14 +131,14 @@ export function FloorPlan() {
     if(!draft){history.current=[];historyPosition.current=-1;historySkip.current=false;historyGesture.current=false;return}
     if(historySkip.current){historySkip.current=false;return}
     if(historyGesture.current)return;
-    const next:Snapshot={objects:draft,area,outline,boundary:boundaryStyle,deleted:deletedTables};
+    const next:Snapshot={objects:draft,area,outline,boundary:boundaryStyle,roundness:boundaryRoundness,deleted:deletedTables};
     if(JSON.stringify(history.current[historyPosition.current])===JSON.stringify(next))return;
     history.current=[...history.current.slice(0,historyPosition.current+1),structuredClone(next)].slice(-81);historyPosition.current=history.current.length-1;
     reviseHistory(n=>n+1);
-  },[draft,draftArea,draftOutline,boundaryStyle,deletedTables,historyRevision]);
+  },[draft,draftArea,draftOutline,boundaryStyle,boundaryRoundness,deletedTables,historyRevision]);
   const restoreHistory=(delta:number)=>{
     const position=historyPosition.current+delta,snapshot=history.current[position];if(!draft||!snapshot||historyGesture.current)return;
-    historyPosition.current=position;historySkip.current=true;setDraft(structuredClone(snapshot.objects));setDraftArea({...snapshot.area});setDraftOutline(structuredClone(snapshot.outline));setBoundaryStyle(snapshot.boundary);setDeletedTables(structuredClone(snapshot.deleted));setSelected('');reviseHistory(n=>n+1);
+    historyPosition.current=position;historySkip.current=true;setDraft(structuredClone(snapshot.objects));setDraftArea({...snapshot.area});setDraftOutline(structuredClone(snapshot.outline));setBoundaryStyle(snapshot.boundary);setBoundaryRoundness(snapshot.roundness);setDeletedTables(structuredClone(snapshot.deleted));setSelected('');reviseHistory(n=>n+1);
   };
   const syncRenamedTable=(tableId:string,label:string)=>{history.current=history.current.map(snapshot=>({...snapshot,objects:snapshot.objects.map(o=>o.tableId===tableId?{...o,label}:o)}));};
   const panMoved = useRef(false);
@@ -165,20 +160,10 @@ export function FloorPlan() {
     if (lockRef.current) return;
     const element = surface.current;
     if (!element) return;
-    const next = Math.max(
-      0.05,
-      Math.min(
-        1,
-        (element.clientWidth - 64) / area.width,
-        (element.clientHeight - 64) / area.height,
-      ),
-    );
-    manualZoom.current = false;
-    setZoom(next);
-    setPan({
-      x: (element.clientWidth - area.width * next) / 2,
-      y: (element.clientHeight - area.height * next) / 2,
-    });
+    const points=[{x:0,y:0},{x:area.width,y:area.height},...(draft??saved?.objects??[]).filter(floorAllowsOutside).flatMap(floorObjectCorners)];
+    const minX=Math.min(...points.map(p=>p.x)),minY=Math.min(...points.map(p=>p.y)),width=Math.max(...points.map(p=>p.x))-minX,height=Math.max(...points.map(p=>p.y))-minY;
+    const next=Math.max(.05,Math.min(1,(element.clientWidth-64)/width,(element.clientHeight-64)/height));
+    manualZoom.current=false;setZoom(next);setPan({x:(element.clientWidth-width*next)/2-minX*next,y:(element.clientHeight-height*next)/2-minY*next});
   };
   fitRef.current=fitView;
   const zoomTo = (next: number, point?: { x: number; y: number }) => {
@@ -269,25 +254,27 @@ export function FloorPlan() {
   const visible: PlanObject[] = draft ?? fallback;
   const current = visible.find((object) => object.id === selected);
   const handleOutset=current?Math.max(0,11/zoom-Math.min(current.width,current.height)/2):0;
-  const isGate=(object:PlanObject)=>object.kind==='ENTRY'||object.kind==='EXIT';
+  const roundness=draft?boundaryRoundness:Number(saved?.boundary_roundness??0);
+  const conflicts=new Set(visible.flatMap((o,i)=>visible.slice(i+1).filter(other=>floorObjectsOverlap(o,other)).flatMap(other=>[o.id,other.id])));
   const move = (object: PlanObject, x: number, y: number) =>
-    isGate(object)?snapFloorGate({...object,x,y},area,outline)??object:fitFloorObject({ ...object, x, y }, area);
+    fitFloorPlacement({...object,x,y},area);
   const update = (id: string, change: Partial<PlanObject>) =>
     setDraft(
       (previous) =>
         previous?.map((object) => {
           if(object.id!==id)return object;
           const next={...object,...change};
-          return isGate(next)&&['x','y','width','height','rotation'].some(key=>key in change)?snapFloorGate(next,area,outline)??object:next;
+          return ['x','y','width','height','rotation','allowOutside'].some(key=>key in change)?constrainFloorChange(object,next,previous!.filter(o=>o.id!==id),area,outline,roundness):next;
         }) ?? null,
     );
   const startArrange = () => {
     baseVersion.current = saved?.version ?? 0;
-    setDraft(visible.map((object) => ({ ...object })));
+    setDraft(visible.map((object) => ({ ...object,label:floorFixtureLabel(object) })));
     setSelected("");
     setDraftArea({ ...area });
     setDraftOutline(saved?.outline ?? null);
     setBoundaryStyle(saved?.boundary_style ?? "STROKE");
+    setBoundaryRoundness(Number(saved?.boundary_roundness??0));
     setDeletedTables([]);
   };
   const copy = () => {
@@ -324,7 +311,8 @@ export function FloorPlan() {
         ...draft.map((object) => object.label),
       ]);
     }
-    const placed = fitFloorObject(object, area);
+    const placed = placeFloorFixture(object,area,outline,draft,roundness);
+    if(!placed){notify("There is no free space for this copy. Move an object or enlarge the floor first.");return;}
     setDraft((previous) => [...previous!, placed]);
     setSelected(placed.id);
     setClipboard({ ...placed });
@@ -371,7 +359,7 @@ export function FloorPlan() {
               })) ?? null);
         });
         setDraft((previous) =>
-          previous!.map((object) => fitFloorObject(object, next)),
+          previous!.map((object) => floorAllowsOutside(object)?object:fitFloorObject(object, next)),
         );
         manualZoom.current = false;
         close();
@@ -475,10 +463,11 @@ export function FloorPlan() {
   const continueDrag=(event:PointerEvent<HTMLButtonElement>,object:PlanObject)=>{
     const active=drag.current;if(!active||active.id!==object.id)return false;
     const dx=(event.clientX-active.startX)/zoom,dy=(event.clientY-active.startY)/zoom;
-    if(active.ids.length>1)setDraft(moveFloorSelection(active.objects,active.ids,dx,dy,area,outline));
+    if(active.ids.length>1)setDraft(moveFloorSelection(active.objects,active.ids,dx,dy,area,outline,roundness));
     else{const target=move(object,active.x+dx,active.y+dy);update(object.id,{x:target.x,y:target.y});}return true;
   };
   const displayOutline = outline ?? floorOutline("Rectangle", area);
+  const boundaryGeometry=roundedFloorBoundary(displayOutline,roundness);
   const shownBoundary = draft
     ? boundaryStyle
     : (saved?.boundary_style ?? "STROKE");
@@ -514,7 +503,7 @@ export function FloorPlan() {
       {name:'seats',label:'Seats',type:'number',min:1,max:100,value:4}
     ],async values=>{
       if(draft.length>=250)throw new Error('This floor plan has reached 250 objects.');
-      const placed=placeFloorTable({id:crypto.randomUUID(),kind:'TABLE',label:String(values.label).trim(),newTable:{seats:Number(values.seats)},x:0,y:0,width:120,height:90},area,outline,draft.map(o=>['RECEPTION','WASHROOM','STAIRS','ENTRY','EXIT'].includes(o.kind)?{...o,kind:'WALL' as const}:o));
+      const placed=placeFloorTable({id:crypto.randomUUID(),kind:'TABLE',label:String(values.label).trim(),newTable:{seats:Number(values.seats)},x:0,y:0,width:120,height:90},area,outline,draft,roundness);
       if(!placed)throw new Error('There is no free space on this floor. Resize the area or move an object first.');
       manualZoom.current=true;setDraft(previous=>[...previous!,placed]);setSelected(placed.id);
     },'Place table');
@@ -674,8 +663,7 @@ export function FloorPlan() {
                     busy ||
                     draft.some(
                       (object) =>
-                        !objectInArea(object, area) ||
-                        (!!outline && !objectInFloor(object, outline)),
+                        !floorObjectAllowed(object,area,outline,roundness)||conflicts.has(object.id),
                     )
                   }
                   onClick={() =>
@@ -686,6 +674,7 @@ export function FloorPlan() {
                       objects: draft,
                       deletedTables,
                       boundaryStyle,
+                      boundaryRoundness,
                       outline,
                       ...area,
                     })
@@ -717,7 +706,7 @@ export function FloorPlan() {
               }
             >
               <option value="TABLE" disabled={!can(data.actor,'settings')}>Table</option>
-              {floorPlanFixtures.map((item) => (
+              {floorPlanFixtures.filter(item=>item.kind!=="EXIT").map((item) => (
                 <option key={item.kind} value={item.kind}>
                   {item.label}
                 </option>
@@ -735,7 +724,7 @@ export function FloorPlan() {
                   (item) => item.kind === fixture,
                 )!;
                 const id = crypto.randomUUID();
-                const initial=fitFloorObject({
+                const initial=fitFloorPlacement({
                       id,
                       kind: fixture,
                       label: item.label,
@@ -744,8 +733,8 @@ export function FloorPlan() {
                       width: item.width,
                       height: item.height,
                     },area);
-                const placed=isGate(initial)?snapFloorGate(initial,area,outline):initial;
-                if(!placed){notify('There is no usable space along this floor boundary for the gate.');return;}
+                const placed=placeFloorFixture(initial,area,outline,draft,roundness);
+                if(!placed){notify('There is no free space for this fixture. Move an object or enlarge the floor first.');return;}
                 manualZoom.current=true;setDraft(previous=>[...previous!,placed]);
                 setSelected(id);
               }}
@@ -786,6 +775,9 @@ export function FloorPlan() {
                 <T>{"Walls"}</T>
               </option>
             </select>
+            <label className="floor-roundness-control">Boundary roundness
+              <input aria-label="Boundary roundness" type="number" min="0" max="500" step="5" value={boundaryRoundness} disabled={!!floorEllipse(displayOutline)} onChange={e=>setBoundaryRoundness(Math.max(0,Math.min(500,Math.round(Number(e.target.value)||0))))}/>
+            </label>
             <button className="button" disabled={!current} onClick={copy}>
               <T>{"Copy"}</T>
             </button>
@@ -802,12 +794,12 @@ export function FloorPlan() {
           </div>
         )}
         {draft &&
-          outline &&
-          draft.some((object) => !objectInFloor(object, outline)) && (
+          draft.some((object) => !floorObjectAllowed(object,area,outline,roundness)) && (
             <p className="error" role="alert">
-              Move highlighted objects inside the floor outline before saving.
+              Move highlighted fixtures inside the boundary, or enable Allow outside floor for a table.
             </p>
           )}
+      {draft&&conflicts.size>0&&<p className="error" role="alert">Separate overlapping fixtures and tables before saving. Label boxes may overlap.</p>}
       </ExploreHeader>
       <div
         className="panel floor-plan-scroll"
@@ -998,7 +990,7 @@ export function FloorPlan() {
                 width: area.width,
                 height: area.height,
 
-                background: outline ? "#e2e5dc" : undefined,
+                background: "transparent",
               }}
             >
               {displayOutline && (
@@ -1026,23 +1018,19 @@ export function FloorPlan() {
                       );
                     })()
                   ) : (
-                    <polygon
-                      points={displayOutline
-                        .map((p) => p.x + "," + p.y)
-                        .join(" ")}
+                    <path className="floor-boundary-shape" d={boundaryGeometry.path}
                       fill="url(#floor-mapping-dots)"
                       stroke={
                         shownBoundary === "WALLS"
                           ? "#53664a"
-                          : outline
-                            ? "#819574"
-                            : "none"
+                          : "#819574"
                       }
                       strokeWidth={shownBoundary === "WALLS" ? 18 : 3}
                     />
                   )}
                   <rect
                     className="floor-layout-bounds"
+                    style={{display:roundness>0?"none":undefined}}
                     aria-label="Floor layout bounding box"
                     x="1"
                     y="1"
@@ -1074,8 +1062,7 @@ export function FloorPlan() {
                       new Date(booking.starts_at).getTime() <= Date.now(),
                   );
                 return (
-                  <button
-                    key={object.id}
+                  <button key={object.id}
                     type="button"
                     className={
                       "plan-object " +
@@ -1090,14 +1077,14 @@ export function FloorPlan() {
                       (draft && selection.includes(object.id) ? " is-selected" : "") +
                       " plan-kind-" +
                       object.kind.toLowerCase() +
-                      (outline && !objectInFloor(object, outline)
+                      (!floorObjectAllowed(object,area,outline,roundness)||conflicts.has(object.id)
                         ? " outside-outline"
                         : "")
                     }
                     aria-label={
                       (object.kind === "TABLE"
                         ? "Table " + (table?.label ?? object.label)
-                        : object.label) +
+                        : floorFixtureLabel(object)) +
                       (object.kind === "TABLE"
                         ? occupied
                           ? " occupied"
@@ -1105,7 +1092,7 @@ export function FloorPlan() {
                         : "")
                     }
                     aria-pressed={draft?selection.includes(object.id):undefined}
-                    title={(table||copySource||object.newTable)?(table?.label??object.label)+' · '+(table??copySource??object.newTable)!.seats+' seats · '+((copySource||object.newTable)?'New table · save to create':occupied?'Occupied':reserved?'Reserved':'Available'):object.label}
+                    title={(table||copySource||object.newTable)?(table?.label??object.label)+' · '+(table??copySource??object.newTable)!.seats+' seats · '+((copySource||object.newTable)?'New table · save to create':occupied?'Occupied':reserved?'Reserved':'Available'):floorFixtureLabel(object)}
                     tabIndex={draft || table ? 0 : -1}
                     style={{
                       left: object.x,
@@ -1142,27 +1129,16 @@ export function FloorPlan() {
                       }[event.key];
                       if (offset) {
                         event.preventDefault();
-                        if(selection.length>1&&selection.includes(object.id))setDraft(moveFloorSelection(draft,selection,offset[0],offset[1],area,outline));
+                        if(selection.length>1&&selection.includes(object.id))setDraft(moveFloorSelection(draft,selection,offset[0],offset[1],area,outline,roundness));
                         else{const target=move(object,object.x+offset[0],object.y+offset[1]);update(object.id,{x:target.x,y:target.y})}
                       }
                     }}
                   >
-                    {table || copySource || object.newTable ? (
-                      <>
-                        <span className="plan-table-name">
-                          {table?.label ?? object.label}
-                        </span>
 
-                      </>
-                    ) : (
-                      <>
-                        {isGate(object)?<span className="plan-gate-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M4 20V4h16M4 4a16 16 0 0 1 16 16H4"/><path d={object.kind==='ENTRY'?'M8 12h9m-3-3 3 3-3 3':'M17 12H8m3-3-3 3 3 3'}/></svg></span>:<Icon name={fixtureIcons[object.kind]} />}
-                        <strong>{object.label}</strong>
-                      </>
-                    )}
                   </button>
                 );
               })}
+              <FixtureLabels objects={visible.map(object=>({...object,label:tables.find(table=>table.id===object.tableId)?.label??object.label}))} occupiedIds={visible.filter(object=>tables.some(table=>table.id===object.tableId&&table.is_occupied)).map(object=>object.id)} zoom={zoom} reserved={draft&&current?[current]:[]} viewport={surface.current?{x:-pan.x,y:-pan.y,width:surface.current.clientWidth,height:surface.current.clientHeight}:undefined}/>
               {draft &&
                 current && selection.length<=1 &&
                 resizeDirections.map((direction) => {
@@ -1216,7 +1192,7 @@ export function FloorPlan() {
                       const [horizontal,vertical]=resizeVectors[drag.direction];
                       const deltaWidth=horizontal*(dx*Math.cos(angle)+dy*Math.sin(angle));
                       const deltaHeight=vertical*(-dx*Math.sin(angle)+dy*Math.cos(angle));
-                      update(current.id,resizeFloorObject(drag.object,area,drag.direction,deltaWidth,deltaHeight));
+                      update(current.id,resizeFloorObject(drag.object,area,drag.direction,deltaWidth,deltaHeight,floorAllowsOutside(drag.object)));
                     }}
                     onPointerUp={() => {
                       resizing.current = null;
@@ -1236,7 +1212,7 @@ export function FloorPlan() {
                       if (delta) {
                         event.preventDefault();
                         event.stopPropagation();
-                        update(current.id,resizeFloorObject(current,area,direction,hx*delta[0],hy*delta[1]));
+                        update(current.id,resizeFloorObject(current,area,direction,hx*delta[0],hy*delta[1],floorAllowsOutside(current)));
                       }
                     }}
                   >
@@ -1269,6 +1245,9 @@ export function FloorPlan() {
               />
             </label>
           )}
+          {current.kind==='TABLE'&&<label className="check-row"><input type="checkbox" aria-label="Allow outside floor" checked={!!current.allowOutside} onChange={e=>{
+            const next={...current,allowOutside:e.target.checked};if(!floorObjectAllowed(next,area,outline,roundness)){notify('Move this table inside the floor before turning this option off.');return;}update(current.id,{allowOutside:e.target.checked});
+          }}/>Allow outside floor</label>}
           <div className="inline-actions">
             <button
               className="button"
@@ -1276,7 +1255,7 @@ export function FloorPlan() {
               onClick={() =>
                 update(
                   current.id,
-                  fitFloorObject(
+                  fitFloorPlacement(
                     {
                       ...current,
                       rotation: ((current.rotation ?? 0) + 345) % 360,
@@ -1295,7 +1274,7 @@ export function FloorPlan() {
               onClick={() =>
                 update(
                   current.id,
-                  fitFloorObject(
+                  fitFloorPlacement(
                     {
                       ...current,
                       rotation: ((current.rotation ?? 0) + 15) % 360,

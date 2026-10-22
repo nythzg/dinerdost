@@ -1,10 +1,9 @@
 import {
-  floorObjectCorners,
-  objectInArea,
   type FloorPlanObject,
   type FloorPlanSize,
 } from "./floor-plan";
-import { objectInFloor, type FloorPoint } from "./floor-outline";
+import {floorObjectsOverlap,floorObjectAllowed} from "./floor-layout";
+import { type FloorPoint } from "./floor-outline";
 
 /** Place a newly created physical table within the saved floor, without moving existing objects. */
 export function placeFloorTable(
@@ -12,19 +11,8 @@ export function placeFloorTable(
   area: FloorPlanSize,
   outline: FloorPoint[] | null,
   existing: FloorPlanObject[],
+  roundness=0,
 ): FloorPlanObject | null {
-  const bounds = (o: FloorPlanObject) => {
-    const corners = floorObjectCorners(o);
-    return {
-      left: Math.min(...corners.map((p) => p.x)),
-      right: Math.max(...corners.map((p) => p.x)),
-      top: Math.min(...corners.map((p) => p.y)),
-      bottom: Math.max(...corners.map((p) => p.y)),
-    };
-  };
-  const occupied = existing
-    .filter((o) => o.kind === "TABLE" || o.kind === "WALL")
-    .map(bounds);
   for (const [width, height] of [
     [120, 90],
     [90, 60],
@@ -34,18 +22,11 @@ export function placeFloorTable(
       for (let x = 0; x + width <= area.width; x += 20) {
         const next = { ...table, x, y, width, height, rotation: 0 };
         if (
-          !objectInArea(next, area) ||
-          (outline && !objectInFloor(next, outline))
+          !floorObjectAllowed(next,area,outline,roundness)
         )
           continue;
         if (
-          occupied.some(
-            (o) =>
-              x < o.right + 10 &&
-              x + width + 10 > o.left &&
-              y < o.bottom + 10 &&
-              y + height + 10 > o.top,
-          )
+          existing.some(o=>floorObjectsOverlap(next,o))
         )
           continue;
         return next;

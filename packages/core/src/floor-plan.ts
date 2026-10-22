@@ -10,6 +10,7 @@ export const floorPlanKinds = [
   "PRIVATE_ROOM",
   "WALL",
   "KITCHEN",
+  "FENCE",
 ] as const;
 export type FloorPlanKind = (typeof floorPlanKinds)[number];
 export type FloorPlanSize = { width: number; height: number };
@@ -23,12 +24,13 @@ export type FloorPlanObject = FloorPlanSize & {
   x: number;
   y: number;
   rotation?: number;
+  allowOutside?: boolean;
 };
 export const defaultFloorPlanSize = { width: 1200, height: 800 };
 export const floorPlanFixtures = [
   { kind: "RECEPTION", label: "Reception", width: 180, height: 70 },
   { kind: "WASHROOM", label: "Washroom", width: 180, height: 70 },
-  { kind: "ENTRY", label: "Entry", width: 150, height: 60 },
+  { kind: "ENTRY", label: "Entry/Exit", width: 150, height: 60 },
   { kind: "EXIT", label: "Exit", width: 150, height: 60 },
   { kind: "STAIRS", label: "Staircase", width: 180, height: 70 },
   { kind: "SMOKING_ROOM", label: "Smoking room", width: 260, height: 180 },
@@ -36,6 +38,7 @@ export const floorPlanFixtures = [
   { kind: "PRIVATE_ROOM", label: "Private room", width: 260, height: 180 },
   { kind: "WALL", label: "Wall", width: 300, height: 20 },
   { kind: "KITCHEN", label: "Kitchen", width: 300, height: 220 },
+  { kind: "FENCE", label: "Fence", width: 240, height: 20 },
 ] as const;
 
 export function rotateFloorPoint(
@@ -72,7 +75,7 @@ export function fitFloorObject(
   object: FloorPlanObject,
   area: FloorPlanSize,
 ): FloorPlanObject {
-  const wall = object.kind === "WALL",
+  const wall = (object.kind === "WALL" || object.kind === "FENCE"),
     minWidth = wall ? 10 : 60,
     minHeight = wall ? 10 : 50;
   let width = Math.max(
@@ -107,8 +110,8 @@ export function fitFloorObject(
 export type FloorResizeDirection = 'n'|'ne'|'e'|'se'|'s'|'sw'|'w'|'nw';
 
 /** Resize in local axes while holding the opposite world-space corner/edge still. */
-export function resizeFloorObject(object:FloorPlanObject,area:FloorPlanSize,direction:FloorResizeDirection,deltaWidth:number,deltaHeight:number):FloorPlanObject{
- const minWidth=object.kind==='WALL'?10:60,minHeight=object.kind==='WALL'?10:50;
+export function resizeFloorObject(object:FloorPlanObject,area:FloorPlanSize,direction:FloorResizeDirection,deltaWidth:number,deltaHeight:number,unbounded=false):FloorPlanObject{
+ const minWidth=(object.kind==='WALL'||object.kind==='FENCE')?10:60,minHeight=(object.kind==='WALL'||object.kind==='FENCE')?10:50;
  const horizontal=direction.includes('e')||direction.includes('w'),vertical=direction.includes('n')||direction.includes('s');
  const width=horizontal?Math.max(minWidth,Math.min(2000,Math.round((object.width+deltaWidth)/10)*10)):object.width;
  const height=vertical?Math.max(minHeight,Math.min(2000,Math.round((object.height+deltaHeight)/10)*10)):object.height;
@@ -123,7 +126,7 @@ export function resizeFloorObject(object:FloorPlanObject,area:FloorPlanSize,dire
   return {...object,width:w,height:h,x:cx-w/2,y:cy-h/2};
  };
  const fits=(o:FloorPlanObject)=>floorObjectCorners(o).every(p=>p.x>=-1e-10&&p.y>=-1e-10&&p.x<=area.width+1e-10&&p.y<=area.height+1e-10);
- const target=at(1);if(fits(target))return target;
+ const target=at(1);if(unbounded||fits(target))return target;
  if(!objectInArea(object,area))return fitFloorObject(object,area);
  let low=0,high=1;
  for(let step=0;step<48;step++){const mid=(low+high)/2;if(fits(at(mid)))low=mid;else high=mid;}

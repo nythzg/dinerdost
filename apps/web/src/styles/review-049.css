@@ -8,3 +8,23 @@
  .plan-object.compact-object.plan-kind-wall>strong{display:none}
  .plan-gate-symbol{display:grid;place-items:center;flex:none;width:26px;height:26px}.plan-gate-symbol svg{width:100%;height:100%}
 }
+
+@media screen {
+ .fixture-label-connectors{position:absolute;inset:0;width:1px;height:1px;overflow:visible;pointer-events:none;z-index:7}
+ .fixture-label-connectors line{stroke:#819574;stroke-width:1;stroke-opacity:.65}
+ .fixture-detail{position:absolute;z-index:8;pointer-events:none;display:block;color:#193f30;font-size:12px;line-height:1.3;text-align:center;white-space:normal;width:max-content;max-width:180px}
+ .fixture-detail-content{display:flex;align-items:center;justify-content:center;gap:5px;max-width:164px}
+ .fixture-detail strong{font-size:12px;font-weight:650;overflow-wrap:break-word;word-break:normal;min-width:0}
+ .fixture-detail.is-occupied{color:#fff}
+ .fixture-detail .plan-table-name{display:block;letter-spacing:normal;white-space:normal;overflow:visible;line-height:1.3}
+ .fixture-detail-icon{width:16px;height:16px;flex:none}
+ .fixture-detail.is-outside{background:#fff;border:1px solid #819574;border-radius:5px;padding:5px 7px;box-shadow:0 2px 5px #193f3020}
+ .fixture-detail.is-inside{padding:0;border:0;background:transparent}
+ .floor-roundness-control{display:flex;align-items:center;gap:6px;font-size:12px}
+ .floor-roundness-control input{width:75px;min-height:36px;padding:6px}
+ .plan-object.plan-kind-fence{padding:0;border:1px solid #285b45;border-radius:2px;background:repeating-linear-gradient(90deg,#285b45 0 6px,#e7eee2 6px 14px)}
+ .plan-object.plan-kind-entry,.plan-object.plan-kind-exit{background:#e5eddf;border:2px solid #527247;border-radius:5px}
+ .plan-object.outside-outline{outline:3px solid #a44b24;outline-offset:3px}
+ .floor-plan-canvas{overflow:visible;background-image:none}
+ .floor-outline-boundary{overflow:visible;pointer-events:none}
+}

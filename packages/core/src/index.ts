@@ -14,3 +14,5 @@ export * from "./floor-gates";
 export * from "./table-groups";
 export * from "./calculator";
 export * from "./table-name";
+
+export * from "./floor-layout";

@@ -1,0 +1,25 @@
+# Local floor fixtures and boundary controls · 23 October 2026
+
+Latest direct user request: combine Entry into Entry/Exit with a clear icon; keep every fixture's details readable, using an outside bounding box when they do not fit; prevent physical overlap; permit Entry/Exit freely inside/outside and across the floor boundary; allow outdoor tables when needed; make boundary roundness editable; add Fence.
+
+## Implemented and verified locally
+
+- [x] **Entry/Exit:** one bidirectional fixture option and door/arrows icon. Legacy ENTRY/EXIT records and custom labels remain readable; default Entry/Exit names display as Entry/Exit. Existing separate EXIT data is retained, while new fixtures use the combined option. Gates move/rotate/resize freely inside, across and outside the floor boundary. This explicitly supersedes the previous web boundary-snapping requirement.
+- [x] **Readable details:** names stay horizontal. Fixture labels use 12px screen text and clean 16px icons; table names retain their usual relative sizing with a 12px screen minimum. Labels first fit within the actual rotated fixture; otherwise they use a white/green bordered callout with a connector. Callouts avoid other labels and selected resize controls, and try to remain in the visible viewport. They may overlap physical fixtures. At very crowded zoom levels, pan/zoom remains available; annotations never change saved physical geometry.
+- [x] **No physical overlap:** a separating-axis check tests actual rotated object rectangles, allowing touching edges. Add/copy/automatic table placement finds free space. Drag, resize, rotate and group movement stop at blocked placements. The save command independently rejects overlapping fixtures/tables atomically. Existing legacy overlaps are not moved or deleted automatically: Arrange highlights them and disables Save until separated. Labels are annotations and are excluded from physical collision checks.
+- [x] **Outdoor tables:** select a table in Arrange and enable Allow outside floor. This explicit per-table option permits crossing/leaving both the rectangular area and custom/rounded boundary. Turning it off requires moving the table inside first. Entry/Exit needs no checkbox. Other fixtures stay inside; coordinates remain finite and within a generous ±10,000-unit canvas limit.
+- [x] **Boundary roundness:** editable 0–500 floor units, saved per floor, included in undo/redo and audit history. Polygon corners use a quadratic path; placement validation follows its sampled boundary. Existing circles are already round and disable this control. Older payloads preserve saved roundness and outdoor-table options.
+- [x] **Fence:** available in Fixtures with a picket appearance, fence icon, thin dimensions, readable details, all-direction resizing, copy and persistence.
+
+Migration **054_web_floor_details.sql** adds only a bounded boundary_roundness column defaulting to zero. Existing geometry/accounts are retained. Applied to the private local copy and isolated test databases only; no hosted/source database was changed. No package, provider, environment or Android configuration change.
+
+## Verification
+
+- **294 full backend tests passed**, including 19 affected geometry/service tests. The new floor policy cases cover rounded-boundary rejection, free gates, opt-in outdoor tables, fence persistence, rotated collisions, missing/invalid options, cashier/foreign-outlet/tenant rejection, previous invoice/payment/stock rows, old-payload compatibility, concurrent layout saves, stale versions, exact retries and audit integrity.
+- **Two affected PostgreSQL cases passed** in the runner's separate disposable QA database. The runner exited successfully after dropping that database. No live/hand-off database was used for testing.
+- **Six browser workflows passed on localhost:5090** at desktop 1440px and phone 390px: inside/callout labels, readable text, label-box separation, combined door icon, fence, collision stopping, outdoor-table opt-in, saved roundness/reload, existing table/QR identity, cancellation, all eight resize handles with mouse/touch/keyboard, rotated anchors, group selection, undo/redo and locked pan/zoom. Selected-object screenshots were inspected: verification/local-fixture-details-WIDTH.png and verification/local-free-gate-fence-WIDTH.png.
+- Typecheck and optimized build passed. The existing fixture rotation regression now starts with an empty synthetic floor at each viewport, so it tests a permitted rotation without colliding with previously placed objects. The prior fixed 22px-in-object expectation was updated for the requested readable adaptive table labels.
+
+Private logs in the parent task's work directory: floor-details-full-backend.log, floor-details-backend.log, floor-details-postgres.log, floor-details-final-browser.log, floor-details-typecheck.log and floor-details-build.log.
+
+**Local/unreleased.** No push/deployment or Production/client/Petpooja release-count change. Q111 remains unanswered; the separate procurement activity remains paused. This note supersedes the earlier local boundary-snapping/always-inside details in LOCAL_FLOOR_RESIZING.md.
