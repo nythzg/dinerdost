@@ -10,12 +10,14 @@ Bill adjustments includes a separate Loyalty cap per bill (₹) section for owne
 
 The existing outlet version and row lock serialize edits; stale writes fail visibly instead of overwriting another setting. Exact retries retain one audit event. Repeated successful saves use the returned outlet version. Values remain integer paise from ₹0 through the existing ₹10,000,000 maximum, with at most two decimal places. No schema, dependency, provider or environment configuration change.
 
-## Verification checkpoint
+## Verified locally, unreleased
 
 - **288 full backend tests passed**, including five affected loyalty cases: owner/manager authorization, other roles, native/tenant/outlet isolation, future claim limits, earlier claim preservation, invalid amounts, stale/concurrent cap updates, exact retries and audit integrity.
 - **Three browser workflows passed** on localhost:5090: desktop 1440px/phone 390px alignment, cap persistence, independent unsaved discounts, stale settings edits, real assigned-manager and cashier sessions, direct cashier API denial, and printed/part-paid bill history preservation. Final screenshots inspected: verification/local-bill-summary-aligned-WIDTH.png and verification/local-loyalty-cap-adjustments-WIDTH.png.
-- Typecheck and optimized build passed. An affected PostgreSQL suite is running in an exact disposable QA database; its result and cleanup are not yet claimed.
+- Typecheck and optimized build passed. **Two affected PostgreSQL cases passed** in an exact disposable QA database: owner/manager authorization, staff/native/tenant/outlet rejection, preserved previous claims/future cap enforcement, and serialized edits/exact retries/audit integrity. The runner completed successfully and removed that database.
 
-Private task logs: work/bill-cap-backend-full.log, work/bill-cap-final-browser.log, work/bill-cap-typecheck.log, work/bill-cap-build.log and work/bill-cap-postgres.log in the parent task directory.
+The initial broader PostgreSQL run was intentionally stopped after its unchanged baseline case passed. Its disposable database removal was checked before starting the targeted run. No test assertion failure or live-database write was involved in this narrowing.
+
+Private task logs: work/bill-cap-backend-full.log, work/bill-cap-final-browser.log, work/bill-cap-typecheck.log, work/bill-cap-build.log and work/bill-cap-postgres-targeted.log in the parent task directory. work/bill-cap-postgres.log records the intentionally stopped broader run.
 
 Local only; no push, deployment or Production/client/Petpooja release-count change. Q111 remains unanswered and procurement remains paused.

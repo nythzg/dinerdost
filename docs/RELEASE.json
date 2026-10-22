@@ -242,14 +242,16 @@
   },
   "localDevelopment": {
     "billSummaryLoyaltyCap": {
-      "status": "verified-local-postgres-pending",
+      "status": "verified-local-unreleased",
       "scope": "Aligned bill summary; footer removed; owners, assigned managers and existing provisioned platform admins may edit the outlet-wide per-bill default under Adjustments.",
       "fullBackendTestsPassed": 288,
       "browserWorkflowsPassed": 3,
       "viewportWidths": [1440, 390],
       "typecheckPassed": true,
       "buildPassed": true,
-      "postgresStatus": "Two affected cases running in an isolated QA database; no result or cleanup claimed yet.",
+      "postgresCasesPassed": 2,
+      "postgresDatabaseRemoved": true,
+      "postgresStatus": "Two affected authorization/history and concurrent-edit/retry cases passed in an exact disposable QA database; runner completed cleanup. Initial broader run was intentionally stopped after its unchanged baseline case passed, and its database cleanup was verified.",
       "notes": "docs/LOCAL_BILL_SUMMARY.md",
       "pushed": false,
       "deployed": false
