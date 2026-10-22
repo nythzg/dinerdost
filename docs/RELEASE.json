@@ -284,6 +284,16 @@
     },
     "workspaceToolTabs": {
       "status": "verified-local-unreleased",
+      "centeredContent": {
+        "status": "verified-local-unreleased",
+        "behavior": "Balanced horizontal content margins reserve clear space beside the right-edge tabs; wide content remains centered within the main shell.",
+        "horizontalPaddingPx": {"desktop": 56, "upTo850px": 44, "upTo360px": 40},
+        "minimumContentToTabGapPx": 8,
+        "browserWorkflowsPassed": 7,
+        "inventoryViewports": ["1440x1000", "390x844", "320x568", "844x390", "2200x1100"],
+        "typecheckPassed": true,
+        "buildPassed": true
+      },
       "mobileNavigationLayering": {
         "status": "verified-local-unreleased",
         "behavior": "Expanded navigation covers the menu trigger; logo and links remain unobstructed.",

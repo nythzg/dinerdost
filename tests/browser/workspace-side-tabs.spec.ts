@@ -22,6 +22,29 @@ test('expanded mobile navigation covers the menu button and keeps its logo and l
  }
  await page.setViewportSize({width:1440,height:1000});await expect(toggle).toBeHidden();await expect(sidebar).toBeInViewport();
 });
+
+test('inventory content stays centered with a clear gutter beside the tool tabs across screen sizes',async({page})=>{
+ await register(page);
+ const workspace=await(await page.request.get('/api/workspace')).json();
+ for(const name of ['Layout QA ingredient one','Layout QA ingredient two']){
+  const response=await page.request.post('/api/commands',{headers:{Origin:new URL(page.url()).origin,'Idempotency-Key':randomUUID()},data:{action:'ingredient',input:{outletId:workspace.outletId,name,unit:'kg',purchaseRate:0}}});expect(response.ok()).toBe(true);
+ }
+ for(const [width,height] of [[1440,1000],[390,844],[320,568],[844,390],[2200,1100]]){
+  await page.setViewportSize({width,height});await page.goto('/app/inventory');
+  await expect(page.getByRole('heading',{name:'Daily counts',exact:true})).toBeVisible();
+  const shell=(await page.locator('.main-shell').boundingBox())!,heading=(await page.locator('.page-heading').boundingBox())!,tab=(await page.locator('.calculator-dock>.workspace-dock-trigger').boundingBox())!;
+  expect(Math.abs(heading.x+heading.width/2-(shell.x+shell.width/2))).toBeLessThanOrEqual(1);
+  expect(tab.x-heading.x-heading.width).toBeGreaterThanOrEqual(width<=360?8:12);
+  for(const selector of ['.inventory-metrics','.inventory-tools','#daily-stock-counts']){
+   const box=(await page.locator(selector).boundingBox())!;expect(box.x).toBeGreaterThanOrEqual(heading.x-1);expect(box.x+box.width).toBeLessThanOrEqual(heading.x+heading.width+1);
+  }
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:`verification/local-centered-inventory-${width}-${height}.png`});
+  await page.locator('#daily-stock-counts').scrollIntoViewIfNeeded();
+  const orders=(await page.locator('.active-orders-dock>.workspace-dock-trigger').boundingBox())!,counts=(await page.locator('#daily-stock-counts').boundingBox())!;
+  expect(orders.x-counts.x-counts.width).toBeGreaterThanOrEqual(width<=360?8:12);
+ }
+});
 test('green right-edge tool tabs follow the header, stay reachable on small screens and open inward without blocking page controls',async({page})=>{
  await register(page);
  const calcTab=page.locator('.calculator-dock>.workspace-dock-trigger'),ordersTab=page.locator('.active-orders-dock>.workspace-dock-trigger');

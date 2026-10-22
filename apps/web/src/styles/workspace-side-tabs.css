@@ -1,4 +1,5 @@
 @media screen {
+ .main-content{margin-inline:auto;padding-inline:56px}
  .workspace-side-tabs{inset:0;max-width:none;display:block;pointer-events:none}
  .workspace-side-tabs>.calculator-dock,.workspace-side-tabs>.active-orders-dock{position:fixed;right:0;pointer-events:none}
  .workspace-side-tabs>.calculator-dock{top:var(--workspace-tools-top,78px)}
@@ -12,4 +13,5 @@
  .workspace-side-tabs .calculator-panel{top:var(--workspace-tools-top,78px)}
  .workspace-side-tabs .active-orders-panel{bottom:max(16px,env(safe-area-inset-bottom));max-height:calc(100dvh - var(--workspace-tools-top,78px) - 28px)}
 }
-@media screen and (max-width:850px){.main-content{padding-right:44px}}
+@media screen and (max-width:850px){.main-content{padding-inline:44px}}
+@media screen and (max-width:360px){.main-content{padding-inline:40px}}
