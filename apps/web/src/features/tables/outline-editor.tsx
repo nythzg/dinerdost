@@ -4,18 +4,25 @@ import {
   floorOutline,
   validFloorOutline,
   floorEllipse,
-  ellipseOutline,
+  type FloorPlanObject,
   type FloorPoint,
   type FloorPlanSize,
 } from "@dinerdost/core";
 
+import {defaultSnapSettings,snapOutlineCorner,snapOutlineEdge,type SnapSettings,type SnapGuide} from './floor-snapping';
+import {SnapGuides} from './snapping-controls';
+
 export function OutlineEditor({
   area,
   initial,
+  objects=[],
+  snapSettings=defaultSnapSettings,
   apply,
 }: {
   area: FloorPlanSize;
   initial: FloorPoint[] | null;
+  objects?:FloorPlanObject[];
+  snapSettings?:SnapSettings;
   apply: (points: FloorPoint[]) => void;
 }) {
   const [points, setPoints] = useState<FloorPoint[]>(
@@ -32,6 +39,8 @@ export function OutlineEditor({
       points: FloorPoint[];
     } | null>(null),
     surface = useRef<SVGSVGElement>(null);
+  const [guides,setGuides]=useState<SnapGuide[]>([]);
+  const snapConfig=(keyboard=false)=>{const rect=surface.current?.getBoundingClientRect();const scale=rect?Math.min(rect.width/(area.width+120),rect.height/(area.height+120)):1;return {...snapSettings,zoomFactor:keyboard?Math.max(1,scale):scale};};
   const valid = validFloorOutline(points, area);
   const ellipse = floorEllipse(points);
   const position = (event: { clientX: number; clientY: number }) => {
@@ -55,72 +64,12 @@ export function OutlineEditor({
         60,
     };
   };
-  const resizeEdge = (
-    index: number,
-    dx: number,
-    dy: number,
-    original: FloorPoint[],
-  ) => {
-    const oval = floorEllipse(original);
-    if (oval) {
-      let { x, y, width, height } = oval;
-      if (index === 0)
-        width = Math.max(200, Math.min(area.width - x, width + dx));
-      if (index === 6)
-        height = Math.max(200, Math.min(area.height - y, height + dy));
-      if (index === 12) {
-        const next = Math.max(0, Math.min(x + width - 200, x + dx));
-        width += x - next;
-        x = next;
-      }
-      if (index === 18) {
-        const next = Math.max(0, Math.min(y + height - 200, y + dy));
-        height += y - next;
-        y = next;
-      }
-      setPoints(ellipseOutline({ x, y, width, height }));
-      return;
-    }
-    const next = (index + 1) % original.length,
-      a = original[index],
-      b = original[next],
-      nx = -(b.y - a.y),
-      ny = b.x - a.x,
-      den = nx * nx + ny * ny;
-    const distance = (dx * nx + dy * ny) / den;
-    let mx = Math.round((nx * distance) / 10) * 10,
-      my = Math.round((ny * distance) / 10) * 10;
-    mx = Math.max(
-      -Math.min(a.x, b.x),
-      Math.min(area.width - Math.max(a.x, b.x), mx),
-    );
-    my = Math.max(
-      -Math.min(a.y, b.y),
-      Math.min(area.height - Math.max(a.y, b.y), my),
-    );
-    setPoints(
-      original.map((p, i) =>
-        i === index || i === next ? { x: p.x + mx, y: p.y + my } : p,
-      ),
-    );
+  const resizeEdge=(index:number,dx:number,dy:number,original:FloorPoint[],bypass=false,keyboard=false)=>{
+    const next=snapOutlineEdge(original,index,dx,dy,area,objects,snapConfig(keyboard),bypass);setPoints(next.points);setGuides(next.guides);
   };
-  const update = (index: number, change: FloorPoint) =>
-    setPoints((previous) =>
-      previous.map((p, i) =>
-        i === index
-          ? {
-              x: Math.max(
-                0,
-                Math.min(area.width, Math.round(change.x / 10) * 10),
-              ),
-              y: Math.max(
-                0,
-                Math.min(area.height, Math.round(change.y / 10) * 10),
-              ),
-            }
-          : p,
-      ),
-    );
+  const update=(index:number,change:FloorPoint,bypass=false,keyboard=false)=>{
+    const next=snapOutlineCorner(points,index,change,area,objects,snapConfig(keyboard),bypass);setPoints(next.points);setGuides(next.guides);
+  };
   const edgeStart=selectedEdge===null?null:points[selectedEdge],edgeEnd=selectedEdge===null?null:points[(selectedEdge+1)%points.length];
   const midpoint=edgeStart&&edgeEnd?{x:Math.round((edgeStart.x+edgeEnd.x)/2),y:Math.round((edgeStart.y+edgeEnd.y)/2)}:null;
   const canAddCorner=!!midpoint&&points.length<24&&!ellipse&&!points.some(p=>p.x===midpoint.x&&p.y===midpoint.y);
@@ -167,14 +116,16 @@ export function OutlineEditor({
               target.x - drag.start.x,
               target.y - drag.start.y,
               drag.points,
+              event.altKey,
             );
-          else update(drag.index, target);
+          else update(drag.index, target,event.altKey);
         }}
+        onKeyUp={()=>setGuides([])}
         onPointerUp={() => {
-          dragging.current = null;
+          dragging.current = null;setGuides([]);
         }}
         onPointerCancel={() => {
-          dragging.current = null;
+          dragging.current = null;setGuides([]);
         }}
       >
         <rect width={area.width} height={area.height} rx={10} fill="#eef0e9" />
@@ -235,7 +186,7 @@ export function OutlineEditor({
                   }[event.key];
                   if (delta) {
                     event.preventDefault();
-                    resizeEdge(i, delta[0], delta[1], points);
+                    resizeEdge(i, delta[0], delta[1], points,event.altKey,true);
                   }
                 }}
               />
@@ -282,8 +233,8 @@ export function OutlineEditor({
                     }[event.key];
                     if (move) {
                       event.preventDefault();
-                      if (ellipse) resizeEdge(i, move[0], move[1], points);
-                      else update(i, { x: p.x + move[0], y: p.y + move[1] });
+                      if (ellipse) resizeEdge(i, move[0], move[1], points,event.altKey,true);
+                      else update(i, { x: p.x + move[0], y: p.y + move[1] },event.altKey,true);
                     }
                   }}
                 />
@@ -302,6 +253,7 @@ export function OutlineEditor({
               </g>
             ),
         )}
+        <SnapGuides guides={guides} view={{x:-60,y:-60,width:area.width+120,height:area.height+120}}/>
       </svg>
       <p className="outline-hint" role="status">{ellipse?'Drag an edge to resize the circle.':selectedEdge===null?'Select an edge to add a corner between its endpoints. Drag an edge or corner to reshape.':`Edge ${selectedEdge+1} selected · Add corner inserts halfway between corner ${selectedEdge+1} and corner ${(selectedEdge+1)%points.length+1}.`}</p>
       <div className="outline-actions">

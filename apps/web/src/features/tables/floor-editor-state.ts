@@ -16,12 +16,12 @@ export function moveFloorSelection(objects:FloorPlanObject[],ids:string[],dx:num
 
 export type FloorAreaDraft={area:FloorPlanSize;outline:FloorPoint[]|null;objects:FloorPlanObject[]};
 /** Resize the boundary, rebasing top/left coordinates while preserving world-space furniture. */
-export function resizeFloorArea(before:FloorAreaDraft,direction:FloorResizeDirection,dx:number,dy:number,roundness=0){
+export function resizeFloorArea(before:FloorAreaDraft,direction:FloorResizeDirection,dx:number,dy:number,roundness=0,gridStep=10){
  const unchanged={...before,offset:{x:0,y:0}};
  if(!Number.isFinite(dx)||!Number.isFinite(dy))return unchanged;
  const east=direction.includes('e'),west=direction.includes('w'),south=direction.includes('s'),north=direction.includes('n');
- const width=east||west?Math.max(400,Math.min(5000,before.area.width+Math.round((west?-dx:dx)/10)*10)):before.area.width;
- const height=north||south?Math.max(300,Math.min(5000,before.area.height+Math.round((north?-dy:dy)/10)*10)):before.area.height;
+ const width=east||west?Math.max(400,Math.min(5000,before.area.width+Math.round((west?-dx:dx)/gridStep)*gridStep)):before.area.width;
+ const height=north||south?Math.max(300,Math.min(5000,before.area.height+Math.round((north?-dy:dy)/gridStep)*gridStep)):before.area.height;
  const at=(fraction:number)=>{
   const area={width:Math.round(before.area.width+(width-before.area.width)*fraction),height:Math.round(before.area.height+(height-before.area.height)*fraction)};
   const offset={x:west?before.area.width-area.width:0,y:north?before.area.height-area.height:0};

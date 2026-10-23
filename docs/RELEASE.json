@@ -241,6 +241,24 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "exploreSnapping": {
+      "status": "verified-local-unreleased",
+      "scope": "Supplied snapping engine across moves/groups, object/area resizing, polygon/circle outline editing and new/copied placement; zoom-aware grid/pixel/anchor/vector/ruler targets, settings, transient green guides and bypass.",
+      "fullBackendTestsPassed": 310,
+      "affectedTestsPassed": 24,
+      "browserWorkflowsPassed": 14,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "serviceOrSchemaChanged": false,
+      "nativeDefaultGridPreserved": true,
+      "notes": "docs/LOCAL_EXPLORE_SNAPPING.md",
+      "pushed": false,
+      "deployed": false
+    },
     "fixtureSymbolsAndLabels": {
       "status": "verified-local-unreleased",
       "scope": "Inside upright fixture symbols; uniform 10px below-only object names; hidden wall labels; no connector lines; male/female washroom pictogram.",
