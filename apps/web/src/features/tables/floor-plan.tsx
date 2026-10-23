@@ -1,5 +1,5 @@
 "use client";
-import {FixtureLabels,FixtureSymbol} from "./fixture-details";
+import {FixtureLabels,FixtureSymbol,useFixtureLayout} from "./fixture-details";
 import { T } from "@/lib/staff-language";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import {
@@ -261,6 +261,8 @@ export function FloorPlan() {
   }
   const visible: PlanObject[] = draft ?? fallback;
   const current = visible.find((object) => object.id === selected);
+  const fixtureObjects=visible.map(object=>({...object,label:tables.find(table=>table.id===object.tableId)?.label??object.label}));
+  const fixtureLayout=useFixtureLayout(fixtureObjects,zoom,draft&&current?[current]:[]);
   const handleOutset=current?Math.max(0,11/zoom-Math.min(current.width,current.height)/2):0;
   const roundness=draft?boundaryRoundness:Number(saved?.boundary_roundness??0);
   const snapConfig={...snapSettings,zoomFactor:zoom};
@@ -1139,11 +1141,11 @@ export function FloorPlan() {
                       }
                     }}
                   >
-                    {object.kind!=='TABLE'&&<FixtureSymbol object={object} zoom={zoom}/>}
+                    {object.kind!=='TABLE'&&<FixtureSymbol object={object} zoom={zoom} offset={fixtureLayout.positions.get(object.id)?.iconOffset}/>}
                   </button>
                 );
               })}
-              <FixtureLabels objects={visible.map(object=>({...object,label:tables.find(table=>table.id===object.tableId)?.label??object.label}))} occupiedIds={visible.filter(object=>tables.some(table=>table.id===object.tableId&&table.is_occupied)).map(object=>object.id)} zoom={zoom} reserved={draft&&current?[current]:[]}/>
+              <FixtureLabels objects={fixtureObjects} occupiedIds={visible.filter(object=>tables.some(table=>table.id===object.tableId&&table.is_occupied)).map(object=>object.id)} zoom={zoom} layout={fixtureLayout}/>
               <SnapGuides guides={snapGuides} view={{x:-pan.x/zoom,y:-pan.y/zoom,width:(surface.current?.clientWidth??area.width)/zoom,height:(surface.current?.clientHeight??area.height)/zoom}}/>
               {draft&&resizingArea&&<>
                 <svg className="floor-area-resize-frame" aria-hidden="true" style={{width:area.width,height:area.height}}><rect x="0" y="0" width={area.width} height={area.height} fill="none" stroke="#285b45" strokeWidth="2" strokeDasharray="6 4" vectorEffect="non-scaling-stroke"/></svg>

@@ -332,6 +332,22 @@
       "deployed": false
     },
     "adaptiveFixtureLabels": {
+      "inlineIconLabels": {
+        "status": "verified-local-unreleased",
+        "scope": "Centered icon-and-label horizontal row when both fit inside the rotated fixture; otherwise 10px label beneath with icon inside. Same 10px text in both placements.",
+        "browserWorkflowsPassed": 5,
+        "viewportWidths": [
+          1440,
+          390
+        ],
+        "typecheckPassed": true,
+        "buildPassed": true,
+        "backendOrSchemaChanged": false,
+        "backendOrPostgresRerun": false,
+        "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
+        "pushed": false,
+        "deployed": false
+      },
       "status": "verified-local-unreleased",
       "scope": "Same 10px label inside when it fits with icon clearance, otherwise beneath its source; no wall names or connector lines; icons stay inside.",
       "browserWorkflowsPassed": 3,
