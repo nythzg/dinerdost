@@ -241,6 +241,21 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "compactOrderActionButtons": {
+      "status": "verified-local-unreleased",
+      "scope": "28x32 order-action frames with unchanged 24px dots; sage at 80% alpha on light surfaces and black at 25% alpha with white dots on dark green/VIP rows.",
+      "browserWorkflowsPassed": 1,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "serviceOrSchemaChanged": false,
+      "notes": "docs/CLIENT_FEEDBACK.md",
+      "pushed": false,
+      "deployed": false
+    },
     "adaptiveFixtureLabels": {
       "status": "verified-local-unreleased",
       "scope": "Same 10px label inside when it fits with icon clearance, otherwise beneath its source; no wall names or connector lines; icons stay inside.",
