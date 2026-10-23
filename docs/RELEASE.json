@@ -913,11 +913,11 @@
       "originalTablesUnchanged": 68,
       "originalRowsUnchanged": 34786,
       "initialAdminEmailPending": false,
-      "backendTestsPassed": 350,
-      "focusedEmbeddedPassed": 25,
+      "backendTestsPassed": 354,
+      "focusedEmbeddedPassed": 29,
       "postgresPreviousCasesPassed": 17,
       "postgresFinalRunStatus": "passed-cleaned-up",
-      "distinctDesktopPhoneWorkflowsPassed": 14,
+      "distinctDesktopPhoneWorkflowsPassed": 19,
       "typecheckPassed": true,
       "buildPassed": true,
       "notes": "docs/LOCAL_SUPERADMIN.md",
@@ -947,7 +947,27 @@
       "defaultPasswordAssigned": false,
       "initialAdminAccessActive": true,
       "initialAdminBrowserSignInVerified": true,
-      "identityPostgresDisposableDatabaseRemoved": true
+      "identityPostgresDisposableDatabaseRemoved": true,
+      "restaurantData": {
+        "status": "verified-local-read-only-linkage",
+        "storedRestaurantsAtInspection": 445,
+        "demoFlagOn": 349,
+        "demoFlagOff": 96,
+        "withRecordedOrders": 176,
+        "defaultDataset": "all",
+        "directoryPageSize": 25,
+        "recentRecordLimit": 20,
+        "outletScoped": true,
+        "originalTablesUnchanged": 80,
+        "originalRowsUnchanged": 34854,
+        "newBackendCasesPassed": 4,
+        "newBrowserWorkflowsPassed": 5,
+        "affectedBrowserWorkflowsPassed": 17,
+        "postgresRun": false,
+        "migrationRequired": false,
+        "recordsDeleted": 0,
+        "recordsReclassified": 0
+      }
     }
   }
 }

@@ -4,6 +4,7 @@ import type {Database,Sql} from '@dinerdost/database';
 import {ensure,platformPermissions,platformRolePermissions,platformResources,platformFeatures,type Actor,type PlatformPermission} from '@dinerdost/core';
 import {canonical,hash,id,json,one,expectedVersion,num,type Row} from './shared';
 import {passwordHash,stepUp} from './auth';
+import {platformDataset,restaurantScope,restaurantDatasetCounts} from './platform-restaurant-data';
 
 export type PlatformActor=Pick<Actor,'userId'|'name'|'sessionHash'|'application'|'ip'>&{employeeId?:string};
 async function member(tx:Sql,actor:PlatformActor,permission?:PlatformPermission):Promise<Row&{permissions:PlatformPermission[]}>{
@@ -147,8 +148,10 @@ export async function readPlatformSupportView(db:Database,actor:PlatformActor,gr
 export async function endPlatformSupportView(db:Database,actor:PlatformActor,key:string,input:unknown){const data=z.object({id:z.uuid(),reason:reasonSchema}).strict().parse(input);return mutation(db,actor,key,'support','PLATFORM_SUPPORT_ENDED',data,data.reason,async tx=>{const grant=await one(tx,'SELECT * FROM platform_support_access WHERE id=$1 AND user_id=$2 AND session_hash=$3',[data.id,actor.userId,actor.sessionHash]);await tx.query('UPDATE platform_support_access SET ended_at=coalesce(ended_at,now()) WHERE id=$1',[grant.id]);await appendPlatformAudit(tx,actor,'PLATFORM_SUPPORT_ENDED',grant.restro_id,data.reason,null,{accessId:grant.id});return {ok:true};});}
 export async function bulkPlatformQr(db:Database,actor:PlatformActor,key:string,input:unknown){const data=z.object({outletId:z.uuid(),prefix:z.string().trim().min(1).max(20),start:z.number().int().min(1).max(100000),count:z.number().int().min(1).max(50),seats:z.number().int().min(1).max(100),floor:z.string().trim().min(1).max(80),reason:reasonSchema}).strict().parse(input);return mutation(db,actor,key,'ecosystem','PLATFORM_QR_CREATED',data,data.reason,async tx=>{const outlet=await one(tx,'SELECT id,restro_id FROM outlets WHERE id=$1 FOR UPDATE',[data.outletId]),tables=[];for(let i=0;i<data.count;i++){const table={id:id(),label:data.prefix+String(data.start+i),key:randomBytes(20).toString('hex')};ensure(table.label.length<=30,'INVALID_LABEL','Table labels may contain at most 30 characters.');await tx.query('INSERT INTO dining_tables(id,restro_id,outlet_id,label,seats,floor,public_key) VALUES($1,$2,$3,$4,$5,$6,$7)',[table.id,outlet.restro_id,outlet.id,table.label,data.seats,data.floor,table.key]);tables.push(table);}await appendPlatformAudit(tx,actor,'PLATFORM_QR_CREATED',outlet.id,data.reason,null,{tables:tables.map(t=>({id:t.id,label:t.label})),seats:data.seats,floor:data.floor});return {ok:true,tables};});}
 
-export async function platformSnapshot(db:Database,actor:PlatformActor){
+export async function platformSnapshot(db:Database,actor:PlatformActor,datasetInput:unknown='all'){
+ const dataset=platformDataset.parse(datasetInput);
  return db.transaction(null,async tx=>{
+  await tx.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY');
   const admin=await member(tx,actor),permissions=admin.permissions as PlatformPermission[],allow=(p:PlatformPermission)=>permissions.includes(p);
   const recordKinds=Object.keys(platformResources).filter(kind=>allow(platformResources[kind].permission)||(kind==='PLAN'&&allow('tenants')));
   const records=(await tx.query<Row>('SELECT * FROM platform_records WHERE kind=ANY($1::text[]) ORDER BY updated_at DESC LIMIT 1000',[recordKinds])).rows;
@@ -157,7 +160,7 @@ export async function platformSnapshot(db:Database,actor:PlatformActor){
    (SELECT count(*) FROM employees WHERE restro_id=r.id AND active) AS staff,
    (SELECT count(*) FROM orders WHERE restro_id=r.id AND created_at>=now()-interval '7 days') AS current_orders,
    (SELECT count(*) FROM orders WHERE restro_id=r.id AND created_at>=now()-interval '14 days' AND created_at<now()-interval '7 days') AS previous_orders
-   FROM restaurants r LEFT JOIN platform_tenant_policies p ON p.restro_id=r.id ORDER BY r.created_at DESC LIMIT 500`)).rows.map(row=>({...row,status:row.status??'ACTIVE',kyc:row.kyc??'UNREVIEWED',version:row.version??0,details:allow('tenants')?row.details??{}:undefined})):[];
+   FROM restaurants r LEFT JOIN platform_tenant_policies p ON p.restro_id=r.id ORDER BY r.created_at DESC LIMIT 500`)).rows.map((row):Row=>({...row,status:row.status??'ACTIVE',kyc:row.kyc??'UNREVIEWED',version:row.version??0,details:allow('tenants')?row.details??{}:undefined})):[];
   const documents=allow('tenants')?(await tx.query('SELECT id,restro_id,name,mime,sha256,created_at FROM platform_documents ORDER BY created_at DESC LIMIT 500')).rows:[];
   const brandReports=allow('tenants')?(await tx.query(`SELECT b.id,b.name,count(DISTINCT p.restro_id) AS restaurants,count(DISTINCT o.id) AS outlets,count(DISTINCT q.id) AS orders_30d FROM platform_records b LEFT JOIN platform_tenant_policies p ON p.brand_id=b.id LEFT JOIN outlets o ON o.restro_id=p.restro_id LEFT JOIN orders q ON q.restro_id=p.restro_id AND q.outlet_id=o.id AND q.created_at>=now()-interval '30 days' WHERE b.kind='BRAND' AND NOT b.archived GROUP BY b.id,b.name ORDER BY b.name`)).rows:[];
   const balances=allow('plans')?(await tx.query(`SELECT r.id,r.name,coalesce(sum(CASE WHEN b.data->>'type'='INVOICE' THEN (b.data->>'amount')::numeric ELSE -(b.data->>'amount')::numeric END),0)*100 AS balance FROM restaurants r JOIN platform_records b ON b.tenant_id=r.id AND b.kind='BILLING' GROUP BY r.id,r.name ORDER BY r.name`)).rows:[];
@@ -168,17 +171,66 @@ export async function platformSnapshot(db:Database,actor:PlatformActor){
   let metrics:Row|null=null;
   if(allow('overview')){
    const started=Date.now();await tx.query('SELECT 1');const databaseLatencyMs=Date.now()-started;
-   const counts=await one(tx,`SELECT (SELECT count(*) FROM restaurants) AS restaurants,(SELECT count(*) FROM outlets) AS outlets,(SELECT count(*) FROM employees WHERE active) AS staff,
-    (SELECT count(*) FROM orders WHERE created_at>=now()-interval '30 days') AS orders_30d,
-    (SELECT coalesce(sum(amount),0) FROM payment_attempts WHERE state='VERIFIED' AND created_at>=now()-interval '30 days') AS verified_receipts_30d`);
+   const counts=await one(tx,`WITH selected AS (SELECT r.id FROM restaurants r WHERE ${restaurantScope})
+    SELECT (SELECT count(*) FROM selected) AS restaurants,
+    (SELECT count(*) FROM outlets WHERE restro_id IN(SELECT id FROM selected)) AS outlets,
+    (SELECT count(*) FROM employees WHERE active AND restro_id IN(SELECT id FROM selected)) AS staff,
+    (SELECT count(*) FROM orders WHERE restro_id IN(SELECT id FROM selected) AND created_at>=now()-interval '30 days') AS orders_30d,
+    (SELECT coalesce(sum(amount),0) FROM payment_attempts WHERE restro_id IN(SELECT id FROM selected) AND state='VERIFIED' AND created_at>=now()-interval '30 days') AS verified_receipts_30d`,[dataset]);
+   const datasets=await restaurantDatasetCounts(tx);
    const subscriptions=(await tx.query<Row>("SELECT data FROM platform_records WHERE kind='SUBSCRIPTION' AND NOT archived AND data->>'status'='ACTIVE' AND (data->>'start')::date<=current_date AND (nullif(data->>'end','') IS NULL OR (data->>'end')::date>=current_date)")).rows;
    const mrr=subscriptions.length?subscriptions.reduce((sum,row)=>sum+Math.round(Number(row.data.planFee??0)*100/({MONTHLY:1,QUARTERLY:3,ANNUAL:12}[row.data.planCycle as 'MONTHLY']??1)),0):null;
    const queues=(await tx.query('SELECT state,count(*) AS count FROM outbox GROUP BY state ORDER BY state')).rows;
-   metrics={...counts,contractedMrr:mrr,contractedArr:mrr===null?null:mrr*12,databaseLatencyMs,queues,cac:null,nrr:null,churn:null,providerHealth:'NOT_CONFIGURED'};
+   metrics={...counts,dataset,datasets,contractedMrr:mrr,contractedArr:mrr===null?null:mrr*12,databaseLatencyMs,queues,cac:null,nrr:null,churn:null,providerHealth:'NOT_CONFIGURED'};
   }
   return {admin:{userId:actor.userId,name:admin.name,email:admin.email,role:admin.role,permissions},tenants,outlets,records,members,audits,documents,brandReports,balances,qrTables,metrics,readAt:new Date().toISOString()};
  });
 }
+export async function platformRestaurantDirectory(db:Database,actor:PlatformActor,input:unknown={}){
+ const data=z.object({dataset:platformDataset.default('all'),search:z.string().trim().max(150).default(''),page:z.coerce.number().int().min(1).max(1000000).default(1)}).strict().parse(input);
+ return db.transaction(null,async tx=>{
+  await tx.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY');
+  await member(tx,actor,'tenants');
+  const where=`${restaurantScope} AND ($2='' OR strpos(lower(r.name||' '||r.slug||' '||coalesce(p.status,'ACTIVE')),lower($2))>0)`;
+  const params=[data.dataset,data.search];
+  const total=num((await one(tx,`SELECT count(*) AS count FROM restaurants r LEFT JOIN platform_tenant_policies p ON p.restro_id=r.id WHERE ${where}`,params)).count);
+  const pageSize=25,pages=Math.max(1,Math.ceil(total/pageSize)),page=Math.min(data.page,pages);
+  const rows=(await tx.query<Row>(`SELECT r.id,r.name,r.slug,r.is_demo,r.created_at,p.status,p.kyc,p.brand_id,p.plan_id,p.details,p.version,
+   (SELECT count(*) FROM outlets WHERE restro_id=r.id) AS outlets,
+   (SELECT count(*) FROM employees WHERE restro_id=r.id AND active) AS staff,
+   (SELECT count(*) FROM orders WHERE restro_id=r.id) AS orders,
+   (SELECT count(*) FROM orders WHERE restro_id=r.id AND created_at>=now()-interval '7 days') AS current_orders,
+   (SELECT count(*) FROM orders WHERE restro_id=r.id AND created_at>=now()-interval '14 days' AND created_at<now()-interval '7 days') AS previous_orders
+   FROM restaurants r LEFT JOIN platform_tenant_policies p ON p.restro_id=r.id WHERE ${where} ORDER BY lower(r.name),r.id LIMIT $3 OFFSET $4`,[...params,pageSize,(page-1)*pageSize])).rows.map((row):Row=>({...row,status:row.status??'ACTIVE',kyc:row.kyc??'UNREVIEWED',version:row.version??0,details:row.details??{}}));
+  return {rows,total,page,pages,pageSize,dataset:data.dataset,datasets:await restaurantDatasetCounts(tx),readAt:new Date().toISOString()};
+ });
+}
+
+export async function platformRestaurantData(db:Database,actor:PlatformActor,input:unknown){
+ const data=z.object({tenantId:z.uuid(),outletId:z.uuid().optional()}).strict().parse(input);
+ return db.transaction(null,async tx=>{
+  await tx.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY');
+  await member(tx,actor,'tenants');
+  const restaurant=(await tx.query<Row>('SELECT id,name,slug,currency,is_demo,created_at FROM restaurants WHERE id=$1',[data.tenantId])).rows[0];
+  ensure(restaurant,'NOT_FOUND','Restaurant not found.',404);
+  const outlets=(await tx.query<Row>('SELECT id,name,code FROM outlets WHERE restro_id=$1 ORDER BY name,id',[data.tenantId])).rows;
+  ensure(!data.outletId||outlets.some(row=>row.id===data.outletId),'NOT_FOUND','Outlet does not belong to this restaurant.',404);
+  const params=[data.tenantId,data.outletId??null],scope='restro_id=$1 AND ($2::uuid IS NULL OR outlet_id=$2)';
+  const summary=await one(tx,`SELECT
+   (SELECT count(*) FROM orders WHERE ${scope}) AS orders,
+   (SELECT count(*) FROM employees WHERE restro_id=$1 AND active AND ($2::uuid IS NULL OR $2=ANY(outlet_ids))) AS active_staff,
+   (SELECT count(*) FROM menu_items WHERE ${scope} AND active) AS active_menu_items,
+   (SELECT count(*) FROM dining_tables WHERE ${scope} AND retired_at IS NULL) AS tables,
+   (SELECT count(*) FROM ingredients WHERE ${scope}) AS ingredients,
+   (SELECT count(*) FROM invoices WHERE ${scope}) AS issued_documents,
+   (SELECT count(*) FROM payment_attempts WHERE ${scope} AND state='VERIFIED') AS verified_payments,
+   (SELECT coalesce(sum(amount),0) FROM payment_attempts WHERE ${scope} AND state='VERIFIED') AS gross_verified_receipts`,params);
+  const recentOrders=(await tx.query<Row>(`SELECT id,outlet_id,number,type,source,status,created_at FROM orders WHERE ${scope} ORDER BY created_at DESC,id DESC LIMIT 21`,params)).rows;
+  const recentInvoices=(await tx.query<Row>(`SELECT id,outlet_id,order_id,number,document_type,created_at FROM invoices WHERE ${scope} ORDER BY created_at DESC,id DESC LIMIT 21`,params)).rows;
+  return {restaurant,outlets,outletId:data.outletId??null,summary,recentOrders:recentOrders.slice(0,20),recentInvoices:recentInvoices.slice(0,20),moreOrders:recentOrders.length>20,moreInvoices:recentInvoices.length>20,readAt:new Date().toISOString()};
+ });
+}
+
 export async function verifyPlatformAudit(db:Database,actor:PlatformActor){return db.transaction(null,async tx=>{await member(tx,actor,'audit');const rows=(await tx.query<Row>('SELECT * FROM platform_audit ORDER BY sequence')).rows;let previous='',sequence=0;for(const row of rows){const event={id:row.id,sequence:num(row.sequence),actorUserId:row.actor_user_id,actorName:row.actor_name,action:row.action,entityId:row.entity_id,reason:row.reason,ip:row.ip,before:row.before_data,after:row.after_data,occurredAt:new Date(row.occurred_at).toISOString(),previousHash:row.previous_hash};if(event.sequence!==++sequence||event.previousHash!==previous||hash(canonical(event))!==row.record_hash)return {valid:false,count:rows.length};previous=row.record_hash;}const head=await one(tx,'SELECT * FROM platform_audit_head WHERE singleton=true');return {valid:num(head.sequence)===sequence&&head.hash===previous,count:rows.length};});}
 
 /** Minimal discovery for the authenticated account, never a tenant-role privilege. */
