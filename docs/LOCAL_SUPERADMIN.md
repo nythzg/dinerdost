@@ -1,5 +1,7 @@
 # Local Diner Dost platform console · 23 October 2026
 
+**Current UI:** the local console now has the [verified Superadmin redesign](LOCAL_SUPERADMIN_DESIGN.md), including grouped navigation, keyboard search and responsive management screens. Existing operational/API requirements below remain authoritative.
+
 **Current local operational scope:** migrations 059–061 extend the console with applied onboarding/templates, enterprise reports/local branding, full owner workspace with optional audited Superadmin edits, scoped internal access, configured subscription documents/lifecycle/dunning, manual settlements, observed analytics and case/health automation. See [the current A–G cross-check and verification](LOCAL_SUPERADMIN_OPERATIONS.md). The earlier implementation/pending tables below are dated historical checkpoints, superseded by that document. External providers, DNS/IRN services, bank transfers and hardware remain deferred.
 **Current local dataset:** only the user-confirmed Nythz Coooks / Nihal kaman / N1 restaurant is active. The former 445-record database is retained privately for recovery. See the latest section below.
 

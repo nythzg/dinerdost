@@ -1,5 +1,7 @@
 # Local Superadmin operational completion · 23 October 2026
 
+**Current UI:** the local console now has the [verified Superadmin redesign](LOCAL_SUPERADMIN_DESIGN.md), including grouped navigation, keyboard search and responsive management screens. Existing operational/API requirements below remain authoritative.
+
 This is the current A–G scope. Earlier checkpoints in LOCAL_SUPERADMIN.md are historical. Local web only: no push, deployment, production migration, provider connection or hardware activation. The approved restaurant remains **Nythz Coooks / Nihal kaman / N1**. Q111 remains unanswered; procurement stays paused. Client and Petpooja release counts are unchanged.
 
 ## A–G cross-check

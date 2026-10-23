@@ -10,10 +10,11 @@ export function DatasetFilter({value,onChange}:{value:string;onChange:(value:str
 }
 
 export function DatasetExplanation({counts}:{counts:Row}){
- return <p className="sa-help sa-dataset-note">{counts.all_records} stored {Number(counts.all_records)===1?'restaurant':'restaurants'} · {counts.demo} demo flag on · {counts.non_demo} demo flag off · {counts.with_orders} with orders. Counts use saved database records and demo flags. Demo/QA registrations are included when present. The demo flag does not establish whether a restaurant is a real business. Filters change the view; they preserve every record.</p>;
+ return <details className="sa-dataset-note sa-data-disclosure"><summary><span>{counts.all_records} stored {Number(counts.all_records)===1?'restaurant':'restaurants'} · {counts.with_orders} with orders · About these counts</span></summary><p>{counts.demo} demo flag on · {counts.non_demo} demo flag off. Counts use saved database records and demo flags. Demo/QA registrations are included when present. The demo flag does not establish whether a restaurant is a real business. Filters change the view; they preserve every record.</p></details>;
 }
 
 export function RestaurantDirectory({dataset,onDataset,revision,onManage,onDocuments}:{dataset:string;onDataset:(value:string)=>void;revision:string;onManage:(row:Row)=>void;onDocuments:(row:Row)=>void}){
+ const [sort,setSort]=useState({key:'name',descending:false});
  const [search,setSearch]=useState(''),[page,setPage]=useState(1),[data,setData]=useState<Row|null>(null),[error,setError]=useState(''),[selected,setSelected]=useState<Row|null>(null),[retry,setRetry]=useState(0);
  useEffect(()=>{
   const abort=new AbortController();
@@ -25,19 +26,22 @@ export function RestaurantDirectory({dataset,onDataset,revision,onManage,onDocum
   return()=>{clearTimeout(timer);abort.abort()};
  },[dataset,search,page,revision,retry]);
  if(selected)return <RestaurantData key={selected.id} tenantId={selected.id} revision={revision} onBack={()=>setSelected(null)}/>;
- return <section aria-label="Restaurant directory">
+ const changeSort=(key:string)=>setSort(old=>({key,descending:old.key===key?!old.descending:false}));
+ const sorted=data?[...data.rows].sort((a:Row,b:Row)=>{const result=sort.key==='name'?String(a.name).localeCompare(String(b.name),'en',{numeric:true}):Number(a[sort.key])-Number(b[sort.key]);return sort.descending?-result:result}):[];
+ return <section className="sa-directory" aria-label="Restaurant directory"><div className="sa-directory-title"><div><h2>Restaurant directory</h2><p>One place for partner profiles, verification and outlet records.</p></div></div>
   <div className="sa-toolbar"><DatasetFilter value={dataset} onChange={value=>{setPage(1);onDataset(value)}}/><label>Find a restaurant<input type="search" value={search} onChange={e=>{setPage(1);setSearch(e.target.value)}} placeholder="Restaurant, owner or status" maxLength={150}/></label></div>
   {error?<div role="alert" className="error">{error} <button className="button" onClick={()=>setRetry(value=>value+1)}>Retry</button></div>:!data?<p role="status">Loading restaurant records…</p>:<>
-   <DatasetExplanation counts={data.datasets}/>
    <p role="status">{data.total} matching {Number(data.total)===1?'restaurant':'restaurants'} · page {data.page} of {data.pages}</p>
-   <div className="sa-table-wrap"><table><thead><tr><th>Restaurant</th><th>Status / KYC</th><th>Outlets / staff</th><th>Orders · all time / last 7 days</th><th>Actions</th></tr></thead><tbody>{data.rows.map((row:Row)=><tr key={row.id}>
-    <td><strong>{row.name}</strong><small>{row.slug}</small>{row.owner_names&&<small>Owner: {row.owner_names}</small>}<span className="sa-pill">{row.is_demo?'Demo flag on':'Demo flag off'}</span></td>
+   <div className="sa-table-wrap"><table><thead><tr><th aria-sort={sort.key==='name'?(sort.descending?'descending':'ascending'):'none'}><button aria-label="Sort by restaurant" onClick={()=>changeSort('name')}>Restaurant <span aria-hidden="true">↕</span></button></th><th>Status / KYC</th><th>Outlets / staff</th><th aria-sort={sort.key==='orders'?(sort.descending?'descending':'ascending'):'none'}><button aria-label="Sort by orders" onClick={()=>changeSort('orders')}>Orders · all time / last 7 days <span aria-hidden="true">↕</span></button></th><th>Actions</th></tr></thead><tbody>{sorted.map((row:Row)=><tr key={row.id}>
+    <td><div className="sa-restaurant-identity"><span className="sa-restaurant-avatar" aria-hidden="true">{String(row.name).slice(0,1).toUpperCase()}</span><div><strong>{row.name}</strong><small>{row.slug}</small>{row.owner_names&&<small>Owner: {row.owner_names}</small>}<span className="sa-pill">{row.is_demo?'Demo flag on':'Demo flag off'}</span></div></div></td>
     <td><span className={'sa-pill '+(row.status==='ACTIVE'?'is-active':'')}>{label(row.status)}</span><small>{label(row.kyc)}</small></td>
     <td>{row.outlets} / {row.staff}</td><td>{row.orders} / {row.current_orders}</td>
     <td><div className="sa-row-actions"><button className="button primary" onClick={()=>setSelected(row)}>View data</button><button className="button" onClick={()=>onManage(row)}>Manage</button><button className="button" onClick={()=>onDocuments(row)}>KYC documents</button></div></td>
    </tr>)}</tbody></table></div>
+   <p className="sa-table-hint sa-help">Scroll the table horizontally for more columns and actions.</p>
    {!data.rows.length&&<p>No restaurants match these filters.</p>}
-   <div className="sa-toolbar"><button className="button" disabled={data.page<=1} onClick={()=>setPage(data.page-1)}>Previous page</button><button className="button" disabled={data.page>=data.pages} onClick={()=>setPage(data.page+1)}>Next page</button></div>
+   <div className="sa-directory-footer"><span>Page {data.page} of {data.pages} · Sorting applies to this page.</span><div><button className="button" disabled={data.page<=1} onClick={()=>setPage(data.page-1)}>Previous page</button><button className="button" disabled={data.page>=data.pages} onClick={()=>setPage(data.page+1)}>Next page</button></div></div>
+   <DatasetExplanation counts={data.datasets}/>
    <p className="sa-help">Read from this app’s database · {date(data.readAt)}. Use Refresh to retrieve current data.</p>
   </>}
  </section>;

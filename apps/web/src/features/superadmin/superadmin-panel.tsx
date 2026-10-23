@@ -16,13 +16,15 @@ import {clientUuid} from '@/lib/browser-crypto';
 
 import './superadmin.css';
 import {OperationsPanel} from './operations-panel';
-import {RestaurantDirectory,DatasetFilter,DatasetExplanation,datasets} from './restaurant-data';
+import {RestaurantDirectory,DatasetFilter} from './restaurant-data';
 
-const navigation=[{id:'overview',title:'Overview',icon:'overview',permissions:['overview']},{id:'tenants',title:'Restaurants',icon:'outlets',permissions:['tenants']},{id:'plans',title:'Plans & billing',icon:'payments',permissions:['plans']},{id:'ecosystem',title:'Dining & POS',icon:'floor',permissions:['ecosystem']},{id:'integrations',title:'Integrations',icon:'settings',permissions:['integrations']},{id:'team',title:'Internal team',icon:'team',permissions:['team']},{id:'audit',title:'Audit history',icon:'audit',permissions:['audit']},{id:'support',title:'Support & broadcasts',icon:'bell',permissions:['support','broadcasts']}];
+import {consoleNavigation as navigation} from './console-navigation';
+import {ConsoleShell} from './console-shell';
+import {ConsoleOverview} from './console-overview';
 
 type Dialog={type:'record'|'tenant'|'newTenant'|'member'|'support'|'qr'|'document'|'promo';kind?:string;row?:Row};
 
-const amount=(value:unknown)=>value===null||value===undefined?'Not recorded':money(value);
+
 
 const fieldValue=(form:FormData,key:string)=>String(form.get(key)??'').trim();
 
@@ -37,47 +39,45 @@ function Terms({row}:{row:Row}){return <dl className="sa-record-values">{Object.
 export function SuperadminPanel(){
 
  const [dataset,setDataset]=useState('all');
+ const [refreshing,setRefreshing]=useState(false),[recordState,setRecordState]=useState('all');
  const refreshSequence=useRef(0);
  const [data,setData]=useState<Row|null>(null),[section,setSection]=useState('overview'),[kind,setKind]=useState(''),[search,setSearch]=useState(''),[dialog,setDialog]=useState<Dialog|null>(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[qr,setQr]=useState<Row[]>([]),[origin,setOrigin]=useState(''),[forbidden,setForbidden]=useState(false);
 
- const refresh=useCallback(async(signal?:AbortSignal)=>{const sequence=++refreshSequence.current;try{const next=await request<Row>('/api/superadmin?dataset='+dataset,{signal});if(signal?.aborted||sequence!==refreshSequence.current)return;setData(next);setForbidden(false);setError('');setSection(current=>navigation.some(item=>item.id===current&&item.permissions.some(p=>next.admin.permissions.includes(p)))?current:navigation.find(item=>item.permissions.some(p=>next.admin.permissions.includes(p)))?.id??'overview');}catch(issue){if(signal?.aborted||sequence!==refreshSequence.current)return;setError((issue as Error).message);if(issue instanceof ApiError&&issue.status===403){setForbidden(true);setData(null)}}},[dataset]);
+ const refresh=useCallback(async(signal?:AbortSignal)=>{const sequence=++refreshSequence.current;setRefreshing(true);try{const next=await request<Row>('/api/superadmin?dataset='+dataset,{signal});if(signal?.aborted||sequence!==refreshSequence.current)return;setData(next);setForbidden(false);setError('');setSection(current=>navigation.some(item=>item.id===current&&item.permissions.some(p=>next.admin.permissions.includes(p)))?current:navigation.find(item=>item.permissions.some(p=>next.admin.permissions.includes(p)))?.id??'overview');}catch(issue){if(signal?.aborted||sequence!==refreshSequence.current)return;setError((issue as Error).message);if(issue instanceof ApiError&&issue.status===403){setForbidden(true);setData(null)}}finally{if(sequence===refreshSequence.current)setRefreshing(false)}},[dataset]);
 
  useEffect(()=>{setOrigin(location.origin);const abort=new AbortController();void refresh(abort.signal);return()=>abort.abort()},[refresh]);
 
+ useEffect(()=>{if(!notice)return;const timer=setTimeout(()=>setNotice(''),7000);return()=>clearTimeout(timer)},[notice]);
+ const changeSection=(id:string)=>{setSection(id);setKind('');setSearch('');setRecordState('all');setNotice('')};
  const run=async(action:string,input:unknown)=>{setBusy(true);setError('');try{const result=await idempotentPost<Row>('/api/superadmin',{action,input});await refresh();setNotice('Changes saved.');return result;}catch(issue){setError((issue as Error).message);throw issue;}finally{setBusy(false)}};
 
  const submit=async(event:FormEvent<HTMLFormElement>,action:string,build:(form:FormData)=>unknown)=>{event.preventDefault();try{const result=await run(action,build(new FormData(event.currentTarget)));if(action==='startSupport'){setBusy(true);try{await request('/api/superadmin/support-view',{method:'POST',body:JSON.stringify({action:'start',id:result.id})});location.assign('/app/overview');return}finally{setBusy(false)}}if(action==='bulkQr')setQr(result.tables);setDialog(null);}catch{}};
 
  if(!data)return <main className="sa-access"><Logo/><h1>Diner Dost superadmin</h1>{error?<><p role="alert">{error}</p><p>{forbidden?'Access is explicitly provisioned by a Diner Dost platform operator. Restaurant ownership does not grant superadmin access.':'Sign in with your provisioned platform account.'}</p><Link className="button primary" href="/superadmin/signin">Sign in</Link><Link className="button" href="/app/overview">Restaurant workspace</Link></>:<p role="status">Loading platform console…</p>}</main>;
 
- const allowed=navigation.filter(item=>item.permissions.some(p=>data.admin.permissions.includes(p))),can=(permission:PlatformPermission)=>data.admin.permissions.includes(permission);
+ const can=(permission:PlatformPermission)=>data.admin.permissions.includes(permission);
 
  const resourceKinds=Object.keys(platformResources).filter(key=>{const permission=platformResources[key].permission;return can(permission)&&(section==='support'?['support','broadcasts'].includes(permission):permission===section)});
 
- const activeKind=resourceKinds.includes(kind)?kind:resourceKinds[0],records=(data.records as Row[]).filter(row=>row.kind===activeKind&&(!search||row.name.toLowerCase().includes(search.toLowerCase())));
+ const activeKind=resourceKinds.includes(kind)?kind:resourceKinds[0],records=(data.records as Row[]).filter(row=>row.kind===activeKind&&(recordState==='all'||row.archived===(recordState==='archived'))&&(!search||row.name.toLowerCase().includes(search.toLowerCase())));
 
  const tenants=(data.tenants as Row[]).filter(row=>!search||(row.name+' '+row.slug+' '+row.status).toLowerCase().includes(search.toLowerCase()));
 
- return <div className="sa-shell">
+ return <ConsoleShell data={data} section={section} refreshing={refreshing} busy={busy} modalOpen={!!dialog} onNavigate={changeSection} onRefresh={()=>void refresh()} onRestaurant={row=>setDialog({type:'tenant',row})}>
+   <main id="sa-main-content" tabIndex={-1} className="sa-content"><div className="sa-heading"><div><span className="sa-section-label">{navigation.find(item=>item.id===section)?.group}</span><h1>{navigation.find(item=>item.id===section)?.title}</h1><p>{navigation.find(item=>item.id===section)?.description}</p></div>{section==='tenants'&&data.admin.tenantScope===null&&<button className="button primary" onClick={()=>setDialog({type:'newTenant'})}><Icon name="plus"/>Create restaurant</button>}</div>
 
-  <aside className="sa-sidebar"><Logo/><span className="sa-eyebrow">PLATFORM CONSOLE</span><nav aria-label="Superadmin navigation">{allowed.map(item=><button key={item.id} type="button" aria-current={section===item.id?'page':undefined} onClick={()=>{setSection(item.id);setKind('');setSearch('');setNotice('')}}><Icon name={item.icon}/>{item.title}</button>)}</nav><Link href="/app/overview">Restaurant workspace <span aria-hidden="true">↗</span></Link><div className="sa-account"><strong>{data.admin.name}</strong><span>{label(data.admin.role)}</span><button type="button" onClick={async()=>{await request('/api/superadmin/auth',{method:'POST',body:JSON.stringify({action:'logout'})});location.assign('/superadmin/signin')}}>Sign out</button></div></aside>
+    {error&&<div className="error" role="alert">{error}</div>}{notice&&<div className="sa-notice sa-toast" role="status"><Icon name="check"/>{notice}<button aria-label="Dismiss notification" onClick={()=>setNotice('')}>×</button></div>}
 
-  <div className="sa-main"><header className="sa-topbar"><span>Local web administration</span><span className="sa-role">{label(data.admin.role)}</span><button className="button" type="button" disabled={busy} onClick={()=>void refresh()}>Refresh</button></header>
-
-   <main className="sa-content"><div className="sa-heading"><div><span className="sa-eyebrow">DINER DOST</span><h1>{navigation.find(item=>item.id===section)?.title}</h1><p>Platform controls with explicit access and a recorded history.</p></div>{section==='tenants'&&<button className="button primary" onClick={()=>setDialog({type:'newTenant'})}><Icon name="plus"/>Create restaurant</button>}</div>
-
-    {error&&<div className="error" role="alert">{error}</div>}{notice&&<div className="sa-notice" role="status">{notice}</div>}
-
-    {section==='overview'&&data.metrics&&<><div className="sa-toolbar"><DatasetFilter value={dataset} onChange={setDataset}/>{can('tenants')&&<button className="button primary" onClick={()=>setSection('tenants')}>Browse restaurant data</button>}</div><Overview metrics={data.metrics}/></>}
+    {section==='overview'&&data.metrics&&<><div className="sa-toolbar"><DatasetFilter value={dataset} onChange={setDataset}/>{can('tenants')&&<button className="button primary" onClick={()=>changeSection('tenants')}>Browse restaurant data</button>}</div><ConsoleOverview data={data} onNavigate={changeSection}/></>}
 
     {section==='tenants'&&<>{data.brandReports.length>0&&<div className="sa-card-grid">{data.brandReports.map((brand:Row)=><article className="sa-card" key={brand.id}><h2>{brand.name}</h2><p className="sa-help">Brand totals · all stored records</p><Terms row={{restaurants:brand.restaurants,outlets:brand.outlets,ordersIn30Days:brand.orders_30d}}/></article>)}</div>}<RestaurantDirectory dataset={dataset} onDataset={setDataset} revision={data.readAt} onManage={row=>setDialog({type:'tenant',row})} onDocuments={row=>setDialog({type:'document',row})}/></>}
 
 
-    {resourceKinds.length>0&&<section className="sa-resources"><div className="sa-resource-tabs" role="group" aria-label="Administration categories">{resourceKinds.map(key=><button type="button" className={activeKind===key?'is-current':''} key={key} onClick={()=>{setKind(key);setSearch('')}}>{platformResources[key].title}</button>)}</div><div className="sa-section-heading"><div><h2>{platformResources[activeKind].title}</h2><p>{platformResources[activeKind].description}</p></div><button className="button primary" onClick={()=>setDialog({type:'record',kind:activeKind})}>Add {activeKind==='BILLING'?'record':'new'}</button></div>
+    {resourceKinds.length>0&&<section className="sa-resources"><div className="sa-resource-tabs" role="group" aria-label="Administration categories">{resourceKinds.map(key=><button type="button" className={activeKind===key?'is-current':''} key={key} aria-label={platformResources[key].title} aria-pressed={activeKind===key} onClick={()=>{setKind(key);setSearch('');setRecordState('all')}}>{platformResources[key].title}</button>)}</div><div className="sa-section-heading"><div><h2>{platformResources[activeKind].title}</h2><p>{platformResources[activeKind].description}</p></div><button className="button primary" onClick={()=>setDialog({type:'record',kind:activeKind})}>Add {activeKind==='BILLING'?'record':'new'}</button></div>
 
      {section==='integrations'&&<div className="sa-notice">Provider connections, secret keys, webhooks, payment routing and external dispatch remain unconfigured. These records do not activate a provider.</div>}
 
-     <div className="sa-card-grid">{records.map(row=><article className="sa-card" key={row.id}><div className="sa-section-heading"><h3>{row.name}</h3><span className="sa-pill">{row.archived?'Archived':row.kind==='INTEGRATION'?'Not configured':row.kind==='DOMAIN'?'Ownership pending':row.kind==='FEE_RULE'?'Proposal':row.kind==='BILLING'?'Recorded':label(row.data.status??'Saved')}</span></div>{row.tenant_id&&<p>{data.tenants.find((tenant:Row)=>tenant.id===row.tenant_id)?.name??'Restaurant'}</p>}<Terms row={Object.fromEntries(Object.entries(row.data).filter(([key])=>!['planFee','planCycle'].includes(key)))}/><div className="sa-card-footer"><small>Version {row.version}</small>{row.kind!=='BILLING'&&<button type="button" className="button" onClick={()=>setDialog({type:'record',kind:activeKind,row})}>Edit</button>}</div></article>)}</div>{!records.length&&<div className="sa-empty">No {platformResources[activeKind].title.toLowerCase()} recorded yet.</div>}
+     <div className="sa-toolbar sa-record-filters"><label>Find a definition<input type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search this category…"/></label><label>Record visibility<select value={recordState} onChange={e=>setRecordState(e.target.value)}><option value="all">All records</option><option value="active">Current records</option><option value="archived">Archived records</option></select></label><span>{records.length} {records.length===1?'record':'records'}</span></div><div className="sa-card-grid">{records.map(row=><article className="sa-card" key={row.id}><div className="sa-section-heading"><h3>{row.name}</h3><span className="sa-pill">{row.archived?'Archived':row.kind==='INTEGRATION'?'Not configured':row.kind==='DOMAIN'?'Ownership pending':row.kind==='FEE_RULE'?'Proposal':row.kind==='BILLING'?'Recorded':label(row.data.status??'Saved')}</span></div>{row.tenant_id&&<p>{data.tenants.find((tenant:Row)=>tenant.id===row.tenant_id)?.name??'Restaurant'}</p>}<Terms row={Object.fromEntries(Object.entries(row.data).filter(([key])=>!['planFee','planCycle'].includes(key)))}/><div className="sa-card-footer"><small>Version {row.version}</small>{row.kind!=='BILLING'&&<button type="button" className="button" onClick={()=>setDialog({type:'record',kind:activeKind,row})}>Edit</button>}</div></article>)}</div>{!records.length&&<div className="sa-empty">{search||recordState!=='all'?'No records match these filters.':'No '+platformResources[activeKind].title.toLowerCase()+' recorded yet.'}</div>}
 
     </section>}
 
@@ -92,8 +92,6 @@ export function SuperadminPanel(){
     {section==='support'&&can('support')&&<section className="sa-card"><div className="sa-section-heading"><div><h2>Restaurant dashboard support</h2><p>Enter the restaurant’s full owner dashboard for 15 minutes. Read-only by default; Superadmin can explicitly enable real troubleshooting changes.</p></div><button className="button primary" onClick={()=>setDialog({type:'support'})}>Open restaurant dashboard</button></div></section>}
 
    {['overview','tenants','plans','ecosystem','support'].includes(section)&&<OperationsPanel section={section} snapshot={data} onRefresh={()=>refresh()}/>}</main>
-
-  </div>
 
   {dialog&&<Modal title={dialog.type==='record'?(dialog.row?'Edit ':'New ')+platformResources[dialog.kind!].title:({tenant:'Manage restaurant',newTenant:'Create restaurant',member:'Internal platform access',support:'Open restaurant dashboard',qr:'Create table QR batch',document:'Private KYC documents',promo:'Apply SaaS promotion'} as Row)[dialog.type]} onClose={()=>{if(!busy)setDialog(null)}}><div className="sa-dialog">{error&&<p className="error" role="alert">{error}</p>}
 
@@ -115,7 +113,7 @@ export function SuperadminPanel(){
 
   </div></Modal>}
 
- </div>;
+ </ConsoleShell>;
 
 }
 
@@ -147,7 +145,6 @@ function ResourceField({field,value,data}:{field:PlatformField;value:any;data:Ro
 
 }
 
-function Overview({metrics:m}:{metrics:Row}){return <><DatasetExplanation counts={m.datasets}/><p className="sa-help">Restaurant activity scope: {datasets.find(([id])=>id===m.dataset)?.[1]}. Contracted recurring amounts and system health below remain platform-wide.</p><div className="sa-metrics">{[['Restaurants',m.restaurants],['Outlets',m.outlets],['Active staff',m.staff],['Orders created · 30 days',m.orders_30d],['Verified diner receipts · 30 days',amount(m.verified_receipts_30d)],['Contracted MRR',amount(m.contractedMrr)],['Contracted ARR',amount(m.contractedArr)]].map(([name,value],index)=><article className={'sa-metric '+(!index?'is-primary':'')} key={name}><span>{name}</span><strong>{String(value)}</strong></article>)}</div><p className="sa-help">Verified receipts are gross recorded diner payments before refunds and replacement credits. Contracted recurring amounts come only from recorded active SaaS subscriptions; they are not collected revenue.</p><div className="sa-card-grid"><section className="sa-card"><h2>System health</h2><Terms row={{database:'Connected',lastDatabaseCheck:m.databaseLatencyMs+' ms',providerConnections:'Not configured'}}/><h3>Outbox events</h3>{m.queues.map((row:Row)=><p key={row.state}>{label(row.state)}: {row.count}</p>)}</section><section className="sa-card"><h2>Revenue measurement</h2><p>Detailed metrics below use entered acquisition costs, actual SaaS receipts and observed immutable contract history. Missing inputs remain unrecorded.</p><p>Restaurant activity comparisons appear in Restaurants.</p></section></div></>}
 
 function QrPreview({table,origin}:{table:Row;origin:string}){const url=origin+'/q/'+table.key,{image,error}=useQrImage(url);return <article><h3>{table.label}</h3>{error?<p role="alert">{error}</p>:image?<img src={image} width={180} height={180} alt={'QR for '+table.label}/>:<span>Preparing QR…</span>}<button className="button" disabled={!image} onClick={()=>void downloadQrCard({url,label:table.label},image)}>Download QR card</button></article>}
 

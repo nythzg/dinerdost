@@ -1,3 +1,4 @@
+import {navigateConsole} from './platform-navigation';
 import {test,expect,type Page} from '@playwright/test';
 import {readFile} from 'node:fs/promises';
 
@@ -17,7 +18,7 @@ async function platformSignIn(page:Page){
 for(const width of [1440,390])test(`clean restaurant directory shows one business and owner search works at ${width}px`,async({page})=>{
  await page.setViewportSize({width,height:900});await platformSignIn(page);
  await expect(page.getByText('1 stored restaurant',{exact:false})).toBeVisible();
- await page.getByRole('navigation',{name:'Superadmin navigation'}).getByRole('button',{name:'Restaurants',exact:true}).click();
+ await navigateConsole(page,'Restaurants');
  await page.getByLabel('Find a restaurant').fill('Restaurant QA owner');
  const row=page.getByRole('row').filter({hasText:'Bistro QA'});await expect(row).toBeVisible();await expect(row.getByText('Owner: Restaurant QA owner',{exact:true})).toBeVisible();
  await expect(page.getByRole('status').filter({hasText:'1 matching restaurant'})).toBeVisible();

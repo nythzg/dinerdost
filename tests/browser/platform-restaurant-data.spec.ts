@@ -1,3 +1,4 @@
+import {navigateConsole} from './platform-navigation';
 import {test,expect,request as playwrightRequest,type Page} from '@playwright/test';
 import {readFile} from 'node:fs/promises';
 
@@ -15,14 +16,14 @@ test.beforeAll(async()=>{
  }finally{await context.dispose()}
 });
 async function open(page:Page){await page.context().addCookies(cookies);await page.goto('/superadmin');await expect(page.getByRole('heading',{name:'Overview',exact:true})).toBeVisible()}
-async function directory(page:Page){await page.getByRole('navigation',{name:'Superadmin navigation'}).getByRole('button',{name:'Restaurants',exact:true}).click();await expect(page.getByRole('region',{name:'Restaurant directory'}).getByText('matching restaurants',{exact:false})).toBeVisible()}
+async function directory(page:Page){await navigateConsole(page,'Restaurants');await expect(page.getByRole('region',{name:'Restaurant directory'}).getByText('matching restaurants',{exact:false})).toBeVisible()}
 
 test('overview filter and directory reconcile real stored flags and activity through the API',async({page})=>{
  await open(page);
  const snapshot=await (await page.request.get('/api/superadmin')).json();
  await expect(page.getByText(`${snapshot.metrics.datasets.all_records} stored restaurants`,{exact:false})).toBeVisible();
  await page.getByRole('combobox',{name:'Restaurant dataset',exact:true}).selectOption('nonDemo');
- await expect(page.getByText('Restaurant activity scope: Demo flag off.',{exact:false})).toBeVisible();
+ await expect(page.locator('.sa-portfolio-heading').getByText('Demo flag off · current database records',{exact:true})).toBeVisible();
  const scoped=await (await page.request.get('/api/superadmin?dataset=nonDemo')).json();expect(Number(scoped.metrics.orders_30d)).toBe(0);
  await page.getByRole('button',{name:'Browse restaurant data'}).click();
  await expect(page.getByRole('row').filter({hasText:'Unflagged QA registration'})).toBeVisible();

@@ -890,3 +890,8 @@ The direct local request is implemented and cross-checked separately in [LOCAL_S
 ### Local editable Superadmin support · 23 October 2026
 
 The user authorized real troubleshooting edits. Direct full-dashboard entry now supports explicit Superadmin EDIT and default READ_ONLY, with15-minute expiry, operator-attributed audits and unchanged normal tenant/financial/stock guards. Verified371backend tests,3new PostgreSQL cases,15browser workflows, typecheck/build; original restaurant data preserved. See [current support guide](LOCAL_SUPERADMIN_OPERATIONS.md). Local only; no new Q/PP released count, provider/hardware activation or deployment.
+
+
+### Local Superadmin design · 23 October 2026
+
+Implemented the direct UI redesign in the existing green theme: grouped/collapsible navigation, phone drawer, keyboard search, actual overview priorities, analytics views, directory sorting and definition filters. All existing management/support workflows remain guarded. Verified31browser workflows and typecheck/build; desktop/phone screens inspected. Confirmed restaurant data untouched; no migration/provider/hardware/push/deployment. See [design and verification](LOCAL_SUPERADMIN_DESIGN.md). This is a local platform UI checkpoint; Q/PP released counts, Q111 and procurement pause remain unchanged.

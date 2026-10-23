@@ -1075,6 +1075,29 @@
         "syntheticRowsAddedToWorkingRestaurant": 0,
         "pushed": false,
         "deployed": false
+      },
+      "design": {
+        "status": "verified-local",
+        "guide": "docs/LOCAL_SUPERADMIN_DESIGN.md",
+        "browserWorkflowsPassed": 31,
+        "browserSuites": {
+          "console": 12,
+          "impersonation": 3,
+          "design": 5,
+          "restaurantData": 5,
+          "operations": 6
+        },
+        "typecheckPassed": true,
+        "buildPassed": true,
+        "desktopPhoneScreensInspected": true,
+        "backendTestsRerun": false,
+        "postgresTestsRerun": false,
+        "backendSchemaChanged": false,
+        "packagesOrConfigurationChanged": false,
+        "workingRestaurantDataMutated": false,
+        "qaDatabasesIsolated": true,
+        "pushed": false,
+        "deployed": false
       }
     }
   }
