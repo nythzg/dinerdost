@@ -42,6 +42,7 @@ const planObject = z
     width: z.number().min(10).max(2000),
     height: z.number().min(10).max(2000),
     rotation: z.number().int().min(0).max(345).multipleOf(15).optional(),
+    cornerRadius: z.number().int().min(0).max(1000).optional(),
   })
   .strict()
   .refine(
@@ -105,6 +106,7 @@ export async function saveFloorPlan(
     .strict()
     .parse(input);
   requireOutlet(actor, data.outletId);
+  ensure(!data.objects.some(object=>object.cornerRadius!==undefined)||!actor.application||actor.application==='MASTER', 'APPLICATION_FORBIDDEN', 'Fixture corner roundness is available in the web app.',403);
   ensure(
     new Set(data.objects.map((object) => object.id)).size ===
       data.objects.length,
@@ -153,6 +155,7 @@ export async function saveFloorPlan(
     expectedVersion(before?.version ?? 0, data.version);
     const objects = data.objects.map((object) => ({
       ...object,
+      ...(object.cornerRadius===undefined&&before?.objects.find((old:Row)=>old.id===object.id)?.cornerRadius!==undefined?{cornerRadius:before.objects.find((old:Row)=>old.id===object.id).cornerRadius}:{}),
       ...(object.kind==='TABLE'&&object.allowOutside===undefined&&before?.objects.find((old:Row)=>old.id===object.id)?.allowOutside===true?{allowOutside:true}:{}),
       rotation:
         object.rotation ??

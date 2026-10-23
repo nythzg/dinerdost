@@ -21,6 +21,7 @@ import {
   type FloorPoint,
   floorEllipse,
   floorObjectCorners,
+  floorObjectCornerRadius,
   floorFixtureLabel,
   floorAllowsOutside,
   floorObjectAllowed,
@@ -1110,6 +1111,7 @@ export function FloorPlan() {
                       top: object.y,
                       width: object.width,
                       height: object.height,
+                      borderRadius: object.cornerRadius===undefined?undefined:floorObjectCornerRadius(object),
                       transform: `rotate(${object.rotation ?? 0}deg)`,
                       zIndex:
                         draft && selected === object.id
@@ -1144,7 +1146,7 @@ export function FloorPlan() {
                       }
                     }}
                   >
-                    {object.kind!=='TABLE'&&<FixtureSymbol object={object} zoom={zoom} offset={fixtureLayout.positions.get(object.id)?.iconOffset}/>}
+                    <FixtureSymbol object={object} zoom={zoom} seats={(table??copySource??object.newTable)?.seats} offset={fixtureLayout.positions.get(object.id)?.iconOffset}/>
                   </button>
                 );
               })}
@@ -1272,6 +1274,11 @@ export function FloorPlan() {
           {current.kind==='TABLE'&&<label className="check-row"><input type="checkbox" aria-label="Allow outside floor" checked={!!current.allowOutside} onChange={e=>{
             const next={...current,allowOutside:e.target.checked};if(!floorObjectAllowed(next,area,outline,roundness)){notify('Move this table inside the floor before turning this option off.');return;}update(current.id,{allowOutside:e.target.checked});
           }}/>Allow outside floor</label>}
+          <label className="floor-roundness-control">Corner roundness
+            <input aria-label="Corner roundness" type="number" min="0" max="1000" step="1" value={current.cornerRadius??floorObjectCornerRadius(current)} onChange={event=>{
+              const value=event.target.valueAsNumber;if(Number.isInteger(value)&&value>=0&&value<=1000)update(current.id,{cornerRadius:value});
+            }}/>
+          </label>
           <div className="inline-actions">
             <button
               className="button"

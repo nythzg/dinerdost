@@ -30,13 +30,13 @@ test("table copies create independent empty tables and QR keys exactly once; fai
   const source = workspace.tables[0];
   await s.openSession(db, actor, key(), { tableId: source.id, guests: 2 });
   const input = { outletId: workspace.outletId, floor: source.floor, version: 2, width: 2000, height: 1600,
-    objects: [{ id: "copy-1", kind: "TABLE", copyOfTableId: source.id, label: "T01 copy", width: 140, height: 100, x: 1600, y: 1200 }] };
+    objects: [{ id: "copy-1", kind: "TABLE", copyOfTableId: source.id, label: "T01 copy", cornerRadius:32, width: 140, height: 100, x: 1600, y: 1200 }] };
   const request = key();
   await s.saveFloorPlan(db, actor, request, input); await s.saveFloorPlan(db, actor, request, input);
   let w = await s.workspace(db, actor); const copied = w.tables.find((t: any) => t.label === "T01 copy");
   assert.equal(w.tables.length, 13); assert.notEqual(copied.id, source.id); assert.notEqual(copied.public_key, source.public_key);
   assert.equal(copied.is_occupied, false); assert.equal(copied.seats, source.seats);
-  assert.equal(w.floorPlans[0].objects[0].tableId, copied.id); assert.equal(w.floorPlans[0].objects[0].copyOfTableId, undefined);
+  assert.equal(w.floorPlans[0].objects[0].cornerRadius,32); assert.equal(w.floorPlans[0].objects[0].tableId, copied.id); assert.equal(w.floorPlans[0].objects[0].copyOfTableId, undefined);
   await assert.rejects(s.saveFloorPlan(db, { ...actor, role: "MANAGER" }, key(), { ...input, version: 3 }), { code: "FORBIDDEN" });
   await assert.rejects(s.saveFloorPlan(db, actor, key(), { ...input, version: 3, objects: [
     { ...input.objects[0], id: "new-a", label: "Should rollback" }, { ...input.objects[0], id: "new-b", label: "T01 copy", x:1800 },
@@ -109,4 +109,47 @@ test('fixture details: concurrent layout edits serialize with exact retries and 
  await s.saveFloorPlan(db,actor,requests[winner],inputs[winner]);
  const plan=(await s.workspace(db,actor)).floorPlans.find((p:any)=>p.floor===floor);assert.equal(plan.version,2);assert.equal(plan.boundary_roundness,inputs[winner].boundaryRoundness);assert.equal(plan.objects.length,1);
  const events=await db.transaction(actor.restroId,tx=>tx.query("SELECT id FROM audit_events WHERE entity_id=$1 AND action='FLOOR_PLAN_SAVED'",[plan.id]));assert.equal(events.rows.length,2);assert.equal((await s.verifyAudit(db,actor)).valid,true);
+});
+
+test('object corner roundness persists for every fixture and table without changing history, old clients, scope or collisions',async()=>{
+ const initial=await s.workspace(db,actor),floor='Object corners acceptance';
+ let paid=await s.createRound(db,actor,key(),{outletId:initial.outletId,type:'TAKEAWAY',customer:{name:'Corner history QA',phone:'9161234567'},items:[{itemId:initial.menu[0].id,quantity:1}]});
+ paid=await s.decideRound(db,actor,key(),paid.id,paid.rounds[0].id,{version:paid.rounds[0].version,decision:'ACCEPT'});
+ await s.recordPayment(db,actor,key(),paid.id,paid.rounds[0].id,{version:paid.rounds[0].version,method:'CASH',amount:Number(paid.rounds[0].payable)});
+ await s.generateBill(db,actor,key(),paid.id,{});
+ const current=await s.workspace(db,actor);
+ const history=async()=>db.transaction(actor.restroId,async tx=>{const rows=[];for(const table of ['invoices','payment_attempts','stock_movements','stock_batches','order_item_costs','order_rounds','order_items'])rows.push((await tx.query('SELECT * FROM '+table+' ORDER BY '+(table==='order_item_costs'?'order_item_id':'id'))).rows);return rows;});
+ const beforeHistory=await history();assert(beforeHistory[0].length>0);assert(beforeHistory[1].length>0);
+ const objects:any[]=floorPlanFixtures.map((item,i)=>({...item,id:'corners-'+i,x:100+(i%4)*450,y:100+Math.floor(i/4)*350,cornerRadius:i*7}));
+ objects.push({id:'corner-table',kind:'TABLE',label:'Rounded table QA',newTable:{seats:4},x:1500,y:1300,width:160,height:100,cornerRadius:50});
+ const input={outletId:current.outletId,floor,version:0,width:2000,height:1600,objects};
+ for(const cornerRadius of [-1,1001,.5,null])await assert.rejects(s.saveFloorPlan(db,actor,key(),{...input,objects:[{...objects[0],cornerRadius}]}));
+ await assert.rejects(s.saveFloorPlan(db,{...actor,role:'CASHIER'},key(),input),{code:'FORBIDDEN'});
+ await assert.rejects(s.saveFloorPlan(db,{...actor,application:'POS'},key(),input),{code:'APPLICATION_FORBIDDEN'});
+ await assert.rejects(s.saveFloorPlan(db,actor,key(),{...input,outletId:randomUUID()}));
+ await assert.rejects(s.saveFloorPlan(db,{...actor,restroId:randomUUID()},key(),input));
+ const request=key();await s.saveFloorPlan(db,actor,request,input);await s.saveFloorPlan(db,actor,request,input);
+ let after=await s.workspace(db,actor),saved=after.floorPlans.find((p:any)=>p.floor===floor);
+ assert.deepEqual(saved.objects.map((o:any)=>o.cornerRadius),objects.map(o=>o.cornerRadius));assert.equal(saved.version,1);
+ assert.equal(after.tables.length,current.tables.length+1);assert.deepEqual(after.orders,current.orders);assert.deepEqual(after.sessions,current.sessions);assert.deepEqual(await history(),beforeHistory);
+ // A previous web/native client omitting this visual field cannot erase it.
+ const oldObjects=saved.objects.map(({cornerRadius,...object}:any)=>object);
+ await s.saveFloorPlan(db,{...actor,application:'POS'},key(),{...input,version:1,objects:oldObjects});
+ saved=(await s.workspace(db,actor)).floorPlans.find((p:any)=>p.floor===floor);assert.deepEqual(saved.objects.map((o:any)=>o.cornerRadius),objects.map(o=>o.cornerRadius));
+ // Assigned managers can edit existing furniture; explicit zero resets the radius.
+ await s.saveFloorPlan(db,{...actor,role:'MANAGER'},key(),{...input,version:2,objects:saved.objects.map((o:any)=>({...o,cornerRadius:0}))});
+ saved=(await s.workspace(db,actor)).floorPlans.find((p:any)=>p.floor===floor);assert(saved.objects.every((o:any)=>o.cornerRadius===0));
+ await assert.rejects(s.saveFloorPlan(db,actor,key(),{...input,version:3,objects:[{...saved.objects[0],cornerRadius:1000},{...saved.objects[0],id:'overlap',cornerRadius:1000}]}),{code:'OVERLAPPING_FIXTURES'});
+ assert.deepEqual(await history(),beforeHistory);assert.equal((await s.verifyAudit(db,actor)).valid,true);
+});
+
+test('object corner roundness concurrent saves keep one winner, exact replay and stale protection',async()=>{
+ const current=await s.workspace(db,actor),floor='Concurrent object corners',objects=[{id:'corner-room',kind:'PRIVATE_ROOM',label:'Private room',x:150,y:150,width:250,height:180}];
+ await s.saveFloorPlan(db,actor,key(),{outletId:current.outletId,floor,version:0,objects});
+ const requests=[key(),key()],inputs=[30,80].map(cornerRadius=>({outletId:current.outletId,floor,version:1,objects:objects.map(o=>({...o,cornerRadius}))}));
+ const results=await Promise.allSettled(inputs.map((input,i)=>s.saveFloorPlan(db,actor,requests[i],input))),winner=results.findIndex(r=>r.status==='fulfilled');
+ assert.equal(results.filter(r=>r.status==='fulfilled').length,1);assert.equal((results.find(r=>r.status==='rejected') as PromiseRejectedResult).reason.code,'VERSION_CONFLICT');
+ await s.saveFloorPlan(db,actor,requests[winner],inputs[winner]);const saved=(await s.workspace(db,actor)).floorPlans.find((p:any)=>p.floor===floor);
+ assert.equal(saved.version,2);assert.equal(saved.objects[0].cornerRadius,inputs[winner].objects[0].cornerRadius);
+ const events=await db.transaction(actor.restroId,tx=>tx.query("SELECT id FROM audit_events WHERE entity_id=$1 AND action='FLOOR_PLAN_SAVED'",[saved.id]));assert.equal(events.rows.length,2);assert.equal((await s.verifyAudit(db,actor)).valid,true);
 });

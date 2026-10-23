@@ -780,8 +780,8 @@
       "buildPassed": true,
       "backendOrSchemaChanged": false,
       "backendOrPostgresRerun": false,
-      "tableIconProposalStatus": "preview-only-awaiting-explicit-user-approval",
-      "tableIconsApplied": false,
+      "tableIconProposalStatus": "explicitly-approved-integrated-locally",
+      "tableIconsApplied": true,
       "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
       "pushed": false,
       "deployed": false
@@ -800,7 +800,7 @@
       "buildPassed": true,
       "backendOrSchemaChanged": false,
       "backendOrPostgresRerun": false,
-      "tableIconsRemainOnHold": true,
+      "tableIconsRemainOnHold": false,
       "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
       "pushed": false,
       "deployed": false
@@ -814,6 +814,37 @@
       "buildPassed": true,
       "physicalPhoneSignInConfirmed": true,
       "notes": "docs/LOCAL_LAN_ACCESS.md",
+      "pushed": false,
+      "deployed": false
+    },
+    "approvedTableIconsAndObjectCorners": {
+      "status": "verified-local-unreleased",
+      "scope": "Approved seat-linked table symbols and individually editable visual corner radius for every fixture/table; existing rounded-shape labels and physical guards preserved.",
+      "fullBackendTestsPassed": 325,
+      "finalAffectedServiceTestsPassed": 8,
+      "finalPostgresWorkflowsPassed": 2,
+      "postgresDisposableDatabaseRemoved": true,
+      "distinctBrowserWorkflowsPassed": 6,
+      "finalGeometryBrowserRepeatsPassed": 2,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "seatCountsVerified": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        12,
+        100
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "migrationRequired": false,
+      "tableIconsApproved": true,
+      "privateRoomIconApproved": true,
+      "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
       "pushed": false,
       "deployed": false
     }

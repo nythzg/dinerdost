@@ -39,7 +39,7 @@ test('uniform small labels fit inside or sit beneath fixtures without lines; int
   await expect(page.locator('[data-fixture-id="wall"]')).toHaveCount(0);await expect(page.locator('.fixture-label-connectors,.fixture-label-connectors line')).toHaveCount(0);
   await expect(page.getByRole('button',{name:'Washroom',exact:true}).locator('.fixture-symbol circle')).toHaveCount(2);
   for(const symbol of await page.locator('.fixture-symbol').all())await expect(symbol).toHaveCSS('background-color','rgba(0, 0, 0, 0)');
-  await expect(page.locator('[data-plan-object-id=table] svg')).toHaveCount(0);
+  await expect(page.locator('[data-plan-object-id=table] svg')).toHaveAttribute('data-seat-count','4');await expect(page.locator('[data-plan-object-id=table] [data-table-chair]')).toHaveCount(4);
   const privateIcon=page.locator('[data-plan-object-id=private] .fixture-symbol svg');await expect(privateIcon).toHaveAttribute('fill','none');expect(await privateIcon.locator('path').getAttribute('d')).not.toBe(await page.locator('[data-plan-object-id=narrow] .fixture-symbol path').getAttribute('d'));
   expect(await page.locator('.fixture-detail').evaluateAll(labels=>labels.every(label=>{
    const object=document.querySelector('.plan-object[data-plan-object-id="'+label.getAttribute('data-fixture-id')+'"]');

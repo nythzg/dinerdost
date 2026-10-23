@@ -24,8 +24,14 @@ export type FloorPlanObject = FloorPlanSize & {
   x: number;
   y: number;
   rotation?: number;
+  /** Visual rounding only; collision and floor geometry remain rectangular. */
+  cornerRadius?: number;
   allowOutside?: boolean;
 };
+export function floorObjectCornerRadius(object: FloorPlanObject): number {
+  const defaults: Partial<Record<FloorPlanKind,number>> = {TABLE:14,WALL:3,FENCE:2,ENTRY:5,EXIT:5,KITCHEN:8,SMOKING_ROOM:8,LIQUOR_ROOM:8};
+  return Math.min(object.cornerRadius ?? defaults[object.kind] ?? 10, object.width/2, object.height/2);
+}
 export const defaultFloorPlanSize = { width: 1200, height: 800 };
 export const floorPlanFixtures = [
   { kind: "RECEPTION", label: "Reception", width: 180, height: 70 },
