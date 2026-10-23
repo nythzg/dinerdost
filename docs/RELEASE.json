@@ -241,6 +241,21 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "fixtureSymbolsAndLabels": {
+      "status": "verified-local-unreleased",
+      "scope": "Inside upright fixture symbols; uniform 10px below-only object names; hidden wall labels; no connector lines; male/female washroom pictogram.",
+      "browserWorkflowsPassed": 4,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "serviceOrSchemaChanged": false,
+      "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
+      "pushed": false,
+      "deployed": false
+    },
     "floorNameTags": {
       "status": "verified-local-unreleased",
       "scope": "Visible saved floor name tag; follows floor switching and rename, stays readable during pan/zoom and wraps long names.",

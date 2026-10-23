@@ -1,5 +1,5 @@
 "use client";
-import {FixtureLabels} from "./fixture-details";
+import {FixtureLabels,FixtureSymbol} from "./fixture-details";
 import { T } from "@/lib/staff-language";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import {
@@ -1048,6 +1048,7 @@ export function FloorPlan() {
                   );
                 return (
                   <button key={object.id}
+                    data-plan-object-id={object.id}
                     type="button"
                     className={
                       "plan-object " +
@@ -1119,11 +1120,11 @@ export function FloorPlan() {
                       }
                     }}
                   >
-
+                    {object.kind!=='TABLE'&&<FixtureSymbol object={object} zoom={zoom}/>}
                   </button>
                 );
               })}
-              <FixtureLabels objects={visible.map(object=>({...object,label:tables.find(table=>table.id===object.tableId)?.label??object.label}))} occupiedIds={visible.filter(object=>tables.some(table=>table.id===object.tableId&&table.is_occupied)).map(object=>object.id)} zoom={zoom} reserved={draft&&current?[current]:[]} viewport={surface.current?{x:-pan.x,y:-pan.y,width:surface.current.clientWidth,height:surface.current.clientHeight}:undefined}/>
+              <FixtureLabels objects={visible.map(object=>({...object,label:tables.find(table=>table.id===object.tableId)?.label??object.label}))} zoom={zoom} reserved={draft&&current?[current]:[]}/>
               {draft&&resizingArea&&<>
                 <svg className="floor-area-resize-frame" aria-hidden="true" style={{width:area.width,height:area.height}}><rect x="0" y="0" width={area.width} height={area.height} fill="none" stroke="#285b45" strokeWidth="2" strokeDasharray="6 4" vectorEffect="non-scaling-stroke"/></svg>
                 {resizeDirections.map(direction=>{const [hx,hy]=resizeVectors[direction];return <button key={direction} type="button" className="plan-resize-handle floor-area-resize-handle" aria-label={'Resize floor '+{nw:'top left corner',n:'top edge',ne:'top right corner',w:'left edge',e:'right edge',sw:'bottom left corner',s:'bottom edge',se:'bottom right corner'}[direction]} data-area-resize-direction={direction}
