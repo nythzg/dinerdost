@@ -45,3 +45,12 @@
  .bill-coupon-code>.remove-applied-coupon{width:32px;height:32px;min-width:32px;padding:7px;flex:none;color:var(--primary,#275e47)}
  .bill-coupon-code>.remove-applied-coupon svg{width:16px;height:16px}
 }
+
+@media screen {
+ .coupon-applied-popup{width:400px}
+ .coupon-applied-summary>p{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin:0;padding:12px 0;border-bottom:1px solid #d5ded3}
+ .coupon-applied-summary>p strong{color:#193f30;font-variant-numeric:tabular-nums}
+ .coupon-applied-totals{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:10px 16px;padding:22px 0 4px;font-variant-numeric:tabular-nums}
+ .coupon-applied-totals del{color:#6b786e;font-size:17px;text-decoration-thickness:1.5px}
+ .coupon-applied-totals>strong{color:#193f30;font-size:28px;line-height:1.3}
+}

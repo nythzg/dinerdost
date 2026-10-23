@@ -654,7 +654,7 @@ test("review zero-total staff bills retain reward authorization and settle witho
   await page.goto("/app/orders/" + o.id);
   const config=await(await page.request.get('/api/bill-settings?outletId='+w.outletId)).json(),code='ZERO-'+randomUUID().slice(0,8).toUpperCase();
   await command(page,'billSettings',{outletId:w.outletId,version:config.version,loyaltyCap:config.loyaltyCap,roundingMode:config.roundingMode,createCoupons:[{code,amount:100,validUntil:new Date(Date.now()+172800000).toISOString().slice(0,10),maxUses:1}],removeCoupons:[]});
-  await page.locator('.total-panel').getByRole('button',{name:'Coupon',exact:true}).click();await page.getByRole('dialog').getByLabel('Coupon code',{exact:true}).fill(code);await save(page,'Apply coupon');
+  await page.locator('.total-panel').getByRole('button',{name:'Coupon',exact:true}).click();await page.getByRole('dialog').getByLabel('Coupon code',{exact:true}).fill(code);await page.getByRole('dialog').getByRole('button',{name:'Apply coupon',exact:true}).click();const success=page.getByRole('dialog',{name:'Coupon applied',exact:true});await expect(success.getByLabel('Discounted total',{exact:true})).toHaveText('₹0.00');await expect(success.getByLabel('Total discount',{exact:true})).toHaveText('₹1.00');await success.getByRole('button',{name:'Done',exact:true}).click();await expect(success).toHaveCount(0);
   await page
     .getByRole("button", { name: "Review loyalty", exact: true })
     .click();

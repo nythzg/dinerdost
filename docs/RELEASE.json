@@ -241,6 +241,23 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "rewardSuccessAlerts": {
+      "status": "verified-local-unreleased",
+      "scope": "Green SweetAlert2 Coupon applied / Loyalty points claimed with total bill discount, prior payable struck through and new server payable highlighted; successful saves only.",
+      "browserWorkflowsPassed": 7,
+      "positiveScreenshotWorkflowsRepeated": 4,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "backendOrSchemaChanged": false,
+      "backendOrPostgresRerun": false,
+      "notes": "docs/LOCAL_BILL_ADJUSTMENTS.md",
+      "pushed": false,
+      "deployed": false
+    },
     "roundItemTotals": {
       "status": "verified-local-unreleased",
       "behavior": "Round total sums only the Amount values displayed for that round; final payable, bill summary, payment/invoice data remain unchanged.",
