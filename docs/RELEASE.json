@@ -785,6 +785,25 @@
       "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
       "pushed": false,
       "deployed": false
+    },
+    "floorBottomResizeGrip": {
+      "status": "verified-local-unreleased",
+      "scope": "Matching floor-view bottom grip, draggable to the full screen lower edge in view mode; mouse/touch/keyboard, local mode/outlet preferences and measured responsive bounds.",
+      "canvasMinimumPx": 140,
+      "browserWorkflowsPassed": 4,
+      "finalFullHeightWorkflowRepeated": 1,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "backendOrSchemaChanged": false,
+      "backendOrPostgresRerun": false,
+      "tableIconsRemainOnHold": true,
+      "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
+      "pushed": false,
+      "deployed": false
     }
   }
 }

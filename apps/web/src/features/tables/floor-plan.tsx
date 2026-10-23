@@ -34,6 +34,7 @@ import { type Row } from "@/lib/client";
 import { useDesk } from "../workspace/context";
 import { OutlineEditor } from "./outline-editor";
 import { ExploreHeader } from "./explore-header";
+import { ExploreViewport } from "./explore-viewport";
 import {useRenameTable} from "./rename-table";
 import {floorViewKey,parseFloorView,resizeFloorArea,type FloorAreaDraft} from "./floor-editor-state";
 
@@ -803,6 +804,7 @@ export function FloorPlan() {
           )}
       {draft&&conflicts.size>0&&<p className="error" role="alert">Separate overlapping fixtures and tables before saving. Label boxes may overlap.</p>}
       </ExploreHeader>
+      <ExploreViewport account={data.actor.employeeId+':'+data.outletId} arranging={!!draft}>
       <div
         className="panel floor-plan-scroll"
         ref={surface}
@@ -1243,6 +1245,7 @@ export function FloorPlan() {
           </div>
         </div>
       </div>
+      </ExploreViewport>
       {draft && current && (
         <div className="panel floor-plan-inspector">
           <strong>

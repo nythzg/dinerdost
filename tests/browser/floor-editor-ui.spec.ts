@@ -36,3 +36,32 @@ test('draft undo/redo groups gestures; Ctrl/touch multi-select moves together; s
   await page.getByLabel('Fit floor to view',{exact:true}).click();await page.screenshot({path:`verification/local-floor-name-tag-${width}.png`});
  }
 });
+
+
+test('bottom floor-view grip resizes with mouse, touch and keyboard, persists locally and leaves physical layout unchanged',async({page})=>{
+ test.setTimeout(180000);await register(page);const w=await workspace(page),floor='Viewport '+randomUUID().slice(0,5);
+ await command(page,'floorPlan',{outletId:w.outletId,floor,version:0,width:1000,height:700,objects:[{id:'room',kind:'PRIVATE_ROOM',label:'Viewport room',x:200,y:200,width:200,height:150}]});
+ const baseline=await workspace(page);
+ for(const width of [1440,390]){
+  const screenHeight=width===390?844:1000;await page.setViewportSize({width,height:screenHeight});await page.goto('/app/floor-plan');await page.getByLabel('Floor plan floor',{exact:true}).selectOption(floor);
+  const top=page.getByRole('separator',{name:'Resize Explore controls',exact:true}),bottom=page.getByRole('separator',{name:'Resize floor view',exact:true}),canvas=page.locator('.floor-plan-scroll');
+  await top.focus();await top.press('Home');await bottom.focus();await bottom.press('Enter');await expect(bottom).toBeInViewport();await bottom.press('End');const maxHeight=Number(await bottom.getAttribute('aria-valuemax'));await bottom.press('ArrowDown');await expect.poll(async()=>(await canvas.boundingBox())!.height).toBeCloseTo(maxHeight,0);await expect.poll(async()=>{const box=(await bottom.boundingBox())!;return box.y+box.height;}).toBeCloseTo(screenHeight,0);
+  await bottom.press('Home');await expect.poll(async()=>(await canvas.boundingBox())!.height).toBeCloseTo(140,0);
+  for(let i=0;i<5;i++)await bottom.press('ArrowDown');await expect.poll(async()=>(await canvas.boundingBox())!.height).toBeCloseTo(190,0);
+  const grip=(await bottom.boundingBox())!,x=grip.x+grip.width/2,y=grip.y+grip.height/2;
+  expect(await bottom.evaluate(el=>{const r=el.getBoundingClientRect();return el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))})).toBe(true);
+  if(width===390){const touch=await page.context().newCDPSession(page);await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});for(let i=1;i<=5;i++)await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y+12*i}]});await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await touch.detach();}
+  else{await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x,y+60,{steps:6});await page.mouse.up();}
+  await expect.poll(async()=>(await canvas.boundingBox())!.height).toBeCloseTo(250,0);
+  const edge=(await bottom.boundingBox())!,dragX=edge.x+edge.width/2,dragY=edge.y+edge.height/2;
+  if(width===390){const touch=await page.context().newCDPSession(page);await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:dragX,y:dragY}]});await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:dragX,y:screenHeight-1}]});await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await touch.detach();}
+  else{await page.mouse.move(dragX,dragY);await page.mouse.down();await page.mouse.move(dragX,screenHeight-1,{steps:8});await page.mouse.up();}
+  await expect.poll(async()=>{const box=(await bottom.boundingBox())!;return box.y+box.height;}).toBeCloseTo(screenHeight,0);await page.getByLabel('Fit floor to view',{exact:true}).click();await page.screenshot({path:`verification/local-floor-bottom-full-height-${width}.png`});await page.reload();await expect.poll(async()=>{const box=(await bottom.boundingBox())!;return box.y+box.height;}).toBeCloseTo(screenHeight,0);
+  await bottom.focus();await bottom.press('Home');for(let i=0;i<11;i++)await bottom.press('ArrowDown');await expect.poll(async()=>(await canvas.boundingBox())!.height).toBeCloseTo(250,0);await page.reload();await expect.poll(async()=>(await canvas.boundingBox())!.height).toBeCloseTo(250,0);
+  await page.getByLabel('Lock floor view',{exact:true}).click();const camera=await page.locator('.floor-camera').getAttribute('style');await bottom.focus();await bottom.press('ArrowUp');await expect.poll(async()=>(await canvas.boundingBox())!.height).toBeCloseTo(240,0);expect(await page.locator('.floor-camera').getAttribute('style')).toBe(camera);await page.getByLabel('Unlock floor view',{exact:true}).click();
+  await page.getByLabel('Fit floor to view',{exact:true}).click();await page.screenshot({path:`verification/local-floor-bottom-grip-${width}.png`});
+  await page.getByRole('button',{name:'Arrange',exact:true}).click();await top.focus();await top.press('Home');await bottom.focus();await bottom.press('Home');await expect.poll(async()=>(await canvas.boundingBox())!.height).toBeCloseTo(140,0);await page.getByRole('button',{name:'Viewport room',exact:true}).focus();await page.keyboard.press('Enter');await expect(page.locator('.floor-plan-inspector')).toBeVisible();await bottom.focus();await bottom.press('ArrowDown');await expect.poll(async()=>(await canvas.boundingBox())!.height).toBeCloseTo(150,0);await page.getByRole('button',{name:'Cancel',exact:true}).click();await expect.poll(async()=>(await canvas.boundingBox())!.height).toBeCloseTo(240,0);
+  await top.focus();await top.press('Home');await bottom.focus();await bottom.press('Enter');const expanded=(await canvas.boundingBox())!.height;await top.focus();for(let i=0;i<3;i++)await top.press('ArrowDown');await expect.poll(async()=>(await canvas.boundingBox())!.height).toBeCloseTo(expanded-30,0);
+  const result=await workspace(page);for(const field of ['floorPlans','tables','sessions','orders','movements','payments','invoices'])expect(result[field]).toEqual(baseline[field]);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ }
+});

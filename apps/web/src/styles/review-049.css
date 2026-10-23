@@ -30,6 +30,10 @@
 }
 
 @media screen {
+ .main-content.explore-content{height:calc(100dvh - 70px);padding-bottom:0}
+ .explore-floor-viewport{display:flex;flex-direction:column;flex:1;min-height:152px;min-width:0}
+ .explore-floor-viewport>.floor-plan-scroll{margin:0}
+ .explore-viewport-edge{flex-shrink:0}
  .floor-area-resize-frame{position:absolute;inset:0;overflow:visible;pointer-events:none;z-index:11}
  .floor-area-resize-handle{z-index:12}
  .floor-area-resize-hint{font-size:12px;color:#285b45}
@@ -47,3 +51,5 @@
  .floor-snapping-controls input[type=number]{width:65px;padding:6px;min-height:34px}
  .floor-snapping-controls small{flex-basis:100%;font-size:11px}
 }
+
+@media screen and (max-width:650px){.main-content.explore-content{height:calc(100dvh - 66px)}}
