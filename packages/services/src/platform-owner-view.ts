@@ -20,7 +20,7 @@ export function platformOwnerEditDatabase(db:Database,operator:PlatformActor,gra
  const transaction:Database['transaction']=async(restroId,callback)=>{
   ensure(restroId===null||restroId===tenantId,'PLATFORM_SCOPE_FORBIDDEN','A support session cannot change restaurant.',403);
   return db.transaction(null,async raw=>{
-   let checked=false,readOnly=false;
+   let checked=false,readOnly=false,auditSequence=0;
    const tx:Sql={query:async(sql,params)=>{
     // Read models may choose isolation/read-only before their first query.
     if(!checked&&/^\s*SET TRANSACTION\b/i.test(sql)){readOnly=readOnly||/READ ONLY/i.test(sql);return raw.query(sql,params);}
@@ -30,12 +30,18 @@ export function platformOwnerEditDatabase(db:Database,operator:PlatformActor,gra
      ensure(view.actor.supportView?.mode==='EDIT','SUPPORT_READ_ONLY','This grant does not permit changes.',403);
      ensure(view.actor.restroId===tenantId,'PLATFORM_SCOPE_FORBIDDEN','This support session belongs to another restaurant.',403);
      await raw.query("SELECT set_config('app.restro_id',$1,true),set_config('app.support_readonly','false',true)",[tenantId]);
+     if(!readOnly)auditSequence=Number((await raw.query<{sequence:number}>('SELECT sequence FROM audit_heads WHERE restro_id=$1',[tenantId])).rows[0]?.sequence??0);
      await raw.query('SET LOCAL ROLE dinerdost_app');checked=true;
     }
     return raw.query(sql,params);
    }};
    const result=await callback(tx);
-   if(checked&&!readOnly){await raw.query('RESET ROLE');await appendPlatformAudit(raw,operator,'PLATFORM_OWNER_TRANSACTION',tenantId,'Explicit editable owner support',null,{grantId,mode:'EDIT'});}
+   if(checked&&!readOnly){
+    await raw.query('RESET ROLE');
+    // Only this transaction's immutable business events count, never reads or idempotent replays.
+    const actions=(await raw.query<Row>('SELECT id,action,entity_type,entity_id,outlet_id FROM audit_events WHERE restro_id=$1 AND sequence>$2 AND xmin=pg_current_xact_id_if_assigned()::xid ORDER BY sequence',[tenantId,auditSequence])).rows;
+    for(const event of actions)await appendPlatformAudit(raw,operator,'PLATFORM_OWNER_ACTION',tenantId,'Explicit editable owner support',null,{grantId,mode:'EDIT',tenantAuditId:event.id,action:event.action,entityType:event.entity_type,entityId:event.entity_id,outletId:event.outlet_id});
+   }
    return result;
   });
  };

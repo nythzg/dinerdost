@@ -182,7 +182,7 @@ export async function platformSnapshot(db:Database,actor:PlatformActor,datasetIn
   const outlets=allow('ecosystem')||allow('tenants')?(await tx.query('SELECT id,restro_id,name,code FROM outlets WHERE ($1::uuid[] IS NULL OR restro_id=ANY($1)) ORDER BY name LIMIT 1000',[scope])).rows:[];
   const qrTables=allow('ecosystem')?(await tx.query('SELECT id,restro_id,outlet_id,label,seats,floor,public_key AS key FROM dining_tables WHERE retired_at IS NULL AND ($1::uuid[] IS NULL OR restro_id=ANY($1)) ORDER BY id DESC LIMIT 200',[scope])).rows:[];
   const members=allow('team')&&scope===null?(await tx.query('SELECT m.user_id,m.role,m.permissions,m.enabled,m.version,m.tenant_scope,m.region,u.name,u.email FROM platform_members m JOIN users u ON u.id=m.user_id ORDER BY u.name')).rows:[];
-  const audits=allow('audit')&&scope===null?(await tx.query('SELECT * FROM platform_audit ORDER BY sequence DESC LIMIT 100')).rows:[];
+  const audits=allow('audit')&&scope===null?(await tx.query("SELECT * FROM platform_audit WHERE action<>'PLATFORM_OWNER_TRANSACTION' ORDER BY sequence DESC LIMIT 100")).rows:[];
   let metrics:Row|null=null;
   if(allow('overview')){
    const started=Date.now();await tx.query('SELECT 1');const databaseLatencyMs=Date.now()-started;

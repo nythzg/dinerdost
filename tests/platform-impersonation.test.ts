@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {createEmbeddedDatabase,createPostgresDatabase,type Database} from '@dinerdost/database';
 import * as s from '@dinerdost/services';
+import {audit} from '../packages/services/src/shared';
 let db:Database,admin:any,owner:any,foreign:any;
 const key=()=>randomUUID(),password='isolated-impersonation-password-123',reason='Diagnose synthetic restaurant issue';
 const start=()=>s.createPlatformSupportView(db,admin,key(),{tenantId:owner.restroId,mode:'EDIT',confirmedChanges:true,adminPassword:password,reason});
@@ -27,7 +28,29 @@ test('editable dashboard uses normal owner services, tenant RLS and immutable fi
  await edit.transaction(owner.restroId,async tx=>{await tx.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY');assert.equal((await tx.query('SELECT id FROM restaurants')).rows.length,1)});
  assert.deepEqual((await db.query('SELECT * FROM invoices WHERE order_id=$1',[order.id])).rows,invoices);assert.deepEqual((await db.query('SELECT * FROM payment_attempts WHERE order_id=$1',[order.id])).rows,payments);
  const event=(await db.query<any>("SELECT * FROM audit_events WHERE action='INGREDIENT_CREATED' AND restro_id=$1 ORDER BY sequence DESC LIMIT 1",[owner.restroId])).rows[0];assert.match(event.actor_name,/Impersonation QA 0/);assert.ok(event.reason.includes(grant.id));
- assert.ok((await db.query("SELECT id FROM platform_audit WHERE actor_user_id=$1 AND action='PLATFORM_OWNER_TRANSACTION'",[admin.userId])).rows.length>0);
+ assert.ok((await db.query("SELECT id FROM platform_audit WHERE actor_user_id=$1 AND action='PLATFORM_OWNER_ACTION'",[admin.userId])).rows.length>0);
+});
+
+test('owner support audit ignores reads, retries and rolled-back actions while recording each committed action',async()=>{
+ const grant=await start(),view=await s.platformOwnerView(db,admin,grant.id),edit=s.platformOwnerEditDatabase(db,admin,grant.id,owner.restroId);
+ const count=async()=>Number((await db.query<any>('SELECT count(*) AS n FROM platform_audit')).rows[0].n),before=await count();
+ for(let n=0;n<3;n++){await edit.query('SELECT id FROM restaurants');await s.workspace(edit,view.actor)}
+ assert.equal(await count(),before,'Opening or refreshing a dashboard must not register an action');
+ const request=key(),input={outletId:owner.outletIds[0],name:'Audited diagnostic '+key(),unit:'kg'};
+ const [first,retry]=await Promise.all([s.addIngredient(edit,view.actor,request,input),s.addIngredient(edit,view.actor,request,input)]);assert.equal(first.id,retry.id);assert.equal(await count(),before+1,'One committed action, even when submitted concurrently twice');
+ const event=(await db.query<any>("SELECT * FROM platform_audit WHERE action='PLATFORM_OWNER_ACTION' ORDER BY sequence DESC LIMIT 1")).rows[0];assert.equal(event.actor_user_id,admin.userId);assert.equal(event.after_data.action,'INGREDIENT_CREATED');assert.equal(event.after_data.entityId,first.id);assert.equal(event.after_data.grantId,grant.id);
+ const tenant=(await db.query<any>('SELECT * FROM audit_events WHERE id=$1',[event.after_data.tenantAuditId])).rows[0];assert.equal(tenant.action,event.after_data.action);assert.equal(tenant.restro_id,owner.restroId);
+ const parallel={outletId:owner.outletIds[0],name:'Parallel operator '+key(),unit:'kg'};await Promise.all([s.addIngredient(edit,view.actor,key(),parallel),s.addIngredient(db,owner,key(),{...parallel,name:'Parallel actual owner '+key()})]);assert.equal(await count(),before+2,'A concurrent real-owner action must not be attributed to the operator');
+ await assert.rejects(edit.transaction(owner.restroId,async tx=>{await tx.query("INSERT INTO ingredients(id,restro_id,outlet_id,name,unit) VALUES($1,$2,$3,$4,'kg')",[key(),owner.restroId,owner.outletIds[0],'Rolled back diagnostic']);await audit(tx,view.actor,{action:'ROLLBACK_DIAGNOSTIC',entityType:'ingredient',entityId:'synthetic-rollback',reason:'Synthetic transaction rollback'});throw new Error('Rollback diagnostic')}),/Rollback diagnostic/);
+ assert.equal(await count(),before+2);assert.equal((await db.query("SELECT id FROM ingredients WHERE name='Rolled back diagnostic'")).rows.length,0);assert.equal((await s.verifyPlatformAudit(db,admin)).valid,true);
+});
+
+test('owner support audit preserves the legacy chain while the console lists actionable events',async()=>{
+ await db.transaction(null,tx=>s.appendPlatformAudit(tx,admin,'PLATFORM_OWNER_TRANSACTION',owner.restroId,'Historical generic editable transaction',null,{mode:'EDIT'}));
+ const count=Number((await db.query<any>('SELECT count(*) AS n FROM platform_audit')).rows[0].n),snapshot=await s.platformSnapshot(db,admin);
+ assert.ok(snapshot.audits.length>0);assert.ok(snapshot.audits.every((r:any)=>r.action!=='PLATFORM_OWNER_TRANSACTION'));
+ assert.equal((await s.verifyPlatformAudit(db,admin)).count,count);assert.equal((await s.verifyPlatformAudit(db,admin)).valid,true);
+ assert.ok((await db.query("SELECT id FROM platform_audit WHERE action='PLATFORM_OWNER_TRANSACTION'")).rows.length>0);
 });
 
 test('cached edit databases reject ended, expired and demoted grants and cannot replay owner idempotency results',async()=>{
