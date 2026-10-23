@@ -89,7 +89,7 @@ export async function audit(tx: Sql, actor: AuditActor, input: AuditInput) {
     entityId: input.entityId,
     oldState: safeAudit(input.oldState ?? null),
     newState: safeAudit(input.newState ?? null),
-    reason: input.reason ?? input.action,
+    reason: actor.supportView ? '[Support operator '+actor.supportView.operatorId+'; grant '+actor.supportView.grantId+'] '+(input.reason??input.action) : input.reason ?? input.action,
     impact: input.impact ?? 0,
     risk: input.risk ?? "INFO",
     tableId: input.tableId ?? null,
@@ -154,7 +154,7 @@ export async function audit(tx: Sql, actor: AuditActor, input: AuditInput) {
 }
 export async function command<T>(
   db: Database,
-  actor: Pick<AuditActor, "restroId" | "employeeId" | "role" | "outletIds">,
+  actor: Pick<AuditActor, "restroId" | "employeeId" | "role" | "outletIds" | "supportView">,
   key: string,
   action: string,
   input: unknown,
@@ -171,6 +171,7 @@ export async function command<T>(
       input,
       authorization: {
         role: actor.role,
+        ...(actor.supportView?{supportGrant:actor.supportView.grantId,operator:actor.supportView.operatorId}:{}),
         outletIds: [...actor.outletIds].sort(),
         ...("application" in actor && actor.application && actor.application !== "MASTER" ? { application: actor.application } : {}),
       },

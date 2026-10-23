@@ -7,7 +7,7 @@ import { body, context, csrf, failure, response } from "@/lib/server";
 export const runtime = "nodejs";
 async function handlePOST(request: NextRequest) {
   try {
-    csrf(request);
+    await csrf(request);
     const { db, actor } = await context();
     actor.ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim();
     actor.deviceId = request.headers.get("x-device-id")?.slice(0, 80);

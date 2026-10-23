@@ -10,7 +10,7 @@ export async function POST(
   { params }: { params: Promise<{ action: string }> },
 ) {
   try {
-    csrf(request);
+    await csrf(request);
     const db = await getDatabase();
     const { action } = await params;
     const ip =

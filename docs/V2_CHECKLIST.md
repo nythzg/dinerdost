@@ -315,3 +315,8 @@ Confirmed single-restaurant local working copy (23 October): the user requested 
 ### Local Superadmin operational additions · 23 October 2026
 
 The direct local request is implemented and cross-checked separately in [LOCAL_SUPERADMIN_OPERATIONS.md](LOCAL_SUPERADMIN_OPERATIONS.md): tenant templates/branding/report grants, full read-only support workspace, scoped internal staff, configured subscription documents/lifecycle/in-app dunning, manual custody/settlements, fee corrections, observed analytics and support/health automation. External providers/hardware/DNS/IRN registration/bank transfers remain deferred, and business configuration is never invented. All 3,114 original retained rows matched; the confirmed restaurant and original credentials/history remain. Verified 368 backend tests, six new and 12 regression desktop/phone browser workflows, typecheck/build; PostgreSQL evidence is recorded in RELEASE.json. This is a local platform extension, not a new Q/PP released completion. Q111 and the procurement pause remain unchanged.
+
+
+### Local editable Superadmin support · 23 October 2026
+
+The user authorized real troubleshooting edits. Direct full-dashboard entry now supports explicit Superadmin EDIT and default READ_ONLY, with15-minute expiry, operator-attributed audits and unchanged normal tenant/financial/stock guards. Verified371backend tests,3new PostgreSQL cases,15browser workflows, typecheck/build; original restaurant data preserved. See [current support guide](LOCAL_SUPERADMIN_OPERATIONS.md). Local only; no new Q/PP released count, provider/hardware activation or deployment.

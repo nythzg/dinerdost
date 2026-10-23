@@ -142,11 +142,12 @@ export async function savePlatformMember(db:Database,actor:PlatformActor,key:str
  });
 }
 export async function createPlatformSupportView(db:Database,actor:PlatformActor,key:string,input:unknown){
- const data=z.object({tenantId:z.uuid(),reason:reasonSchema,adminPassword:z.string()}).strict().parse(input);await stepUp(db,actor,data.adminPassword);
- return platformMutation(db,actor,key,'support','PLATFORM_SUPPORT_OPENED',{tenantId:data.tenantId,reason:data.reason},data.reason,async tx=>{
+ const data=z.object({tenantId:z.uuid(),reason:reasonSchema,adminPassword:z.string(),mode:z.enum(['READ_ONLY','EDIT']).default('READ_ONLY'),confirmedChanges:z.boolean().default(false)}).strict().parse(input);if(data.mode==='EDIT')ensure(data.confirmedChanges,'SUPPORT_CONFIRMATION_REQUIRED','Confirm that troubleshooting changes affect real restaurant data.');await stepUp(db,actor,data.adminPassword);
+ return platformMutation(db,actor,key,'support','PLATFORM_SUPPORT_OPENED',{tenantId:data.tenantId,reason:data.reason,mode:data.mode},data.reason,async tx=>{
+  if(data.mode==='EDIT')ensure((await requirePlatformMember(tx,actor,'support')).role==='SUPERADMIN','PLATFORM_FORBIDDEN','Only a Superadmin may enable changes in owner support.',403);
   await one(tx,'SELECT id FROM restaurants WHERE id=$1',[data.tenantId]);const grantId=id();
-  await tx.query("INSERT INTO platform_support_access(id,user_id,restro_id,session_hash,reason,expires_at) VALUES($1,$2,$3,$4,$5,now()+interval '15 minutes')",[grantId,actor.userId,data.tenantId,actor.sessionHash,data.reason]);
-  await appendPlatformAudit(tx,actor,'PLATFORM_SUPPORT_OPENED',data.tenantId,data.reason,null,{accessId:grantId,mode:'READ_ONLY',minutes:15});return {ok:true,id:grantId};
+  await tx.query("INSERT INTO platform_support_access(id,user_id,restro_id,session_hash,reason,expires_at,mode) VALUES($1,$2,$3,$4,$5,now()+interval '15 minutes',$6)",[grantId,actor.userId,data.tenantId,actor.sessionHash,data.reason,data.mode]);
+  await appendPlatformAudit(tx,actor,'PLATFORM_SUPPORT_OPENED',data.tenantId,data.reason,null,{accessId:grantId,mode:data.mode,minutes:15});return {ok:true,id:grantId};
  });
 }
 export async function readPlatformSupportView(db:Database,actor:PlatformActor,grantId:string){

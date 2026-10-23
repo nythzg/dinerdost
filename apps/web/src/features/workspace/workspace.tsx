@@ -608,7 +608,7 @@ export function Workspace() {
                   (section === "floor-plan" ? " explore-content" : "")
                 }
               >
-                {data.supportView&&<div className="notice" role="status"><strong>Read-only owner view · {data.supportView.operatorName}</strong><p>Expires {new Date(data.supportView.expiresAt).toLocaleTimeString()}. Changes, payments and stock actions are blocked.</p><button type="button" className="button" onClick={async()=>{await request('/api/superadmin/support-view',{method:'POST',body:JSON.stringify({action:'end'})});location.assign('/superadmin')}}>Exit owner view</button></div>}
+                {data.supportView&&<div className="notice" role="status" style={{maxWidth:"min(100%, calc(100vw - 88px))",overflowWrap:"anywhere"}}><strong>{data.supportView.mode==='EDIT'?'Editable owner support':'Read-only owner view'} · {data.supportView.operatorName}</strong><p>Expires {new Date(data.supportView.expiresAt).toLocaleTimeString()}. {data.supportView.mode==='EDIT'?'Changes affect this restaurant’s real data and are audited under your administrator identity.':'Changes, payments and stock actions are blocked.'}</p><button type="button" className="button" onClick={async()=>{await request('/api/superadmin/support-view',{method:'POST',body:JSON.stringify({action:'end'})});location.assign('/superadmin')}}>Exit owner view</button></div>}
                 <div className="page-heading">
                   <div>
                     <h1>
@@ -619,7 +619,7 @@ export function Workspace() {
                       </T>
                     </h1>
                   </div>
-                  {can(data.actor.role, "orders") && !data.supportView && section === "overview" && (
+                  {can(data.actor.role, "orders") && data.supportView?.mode!=='READ_ONLY' && section === "overview" && (
                     <Link className="button primary" href="/app/pos">
                       <Icon name="plus" />
                       <T>{"New order"}</T>
@@ -627,7 +627,7 @@ export function Workspace() {
                   )}
                 </div>
                 <fieldset
-                  disabled={busy||!!data.supportView}
+                  disabled={busy||data.supportView?.mode==='READ_ONLY'}
                   className="workspace-controls"
                   aria-busy={busy}
                 >

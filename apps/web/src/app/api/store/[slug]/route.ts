@@ -14,7 +14,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 }
 export async function POST(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
-    csrf(request);
+    await csrf(request);
     const { slug } = await params, jar = await cookies(), db = await getDatabase();
     const data = z.object({ action: z.enum(["connect", "reserve", "cancelReservation", "order"]), input: z.unknown() }).strict().parse(await body(request));
     const device = jar.get("dd_device")?.value ?? randomBytes(32).toString("base64url");

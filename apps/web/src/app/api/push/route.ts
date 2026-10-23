@@ -4,7 +4,7 @@ import { body, context, csrf, failure, response } from "@/lib/server";
 export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   try {
-    csrf(request);
+    await csrf(request);
     const { db, actor } = await context();
     const { action, ...input } = await body(request);
     const result = action === "register" ? await registerPushDevice(db, actor, input)

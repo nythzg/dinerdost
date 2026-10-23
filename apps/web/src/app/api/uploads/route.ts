@@ -6,7 +6,7 @@ import { context, csrf, failure, response } from "@/lib/server";
 export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   try {
-    csrf(request);
+    await csrf(request);
     const { db, actor } = await context();
     const purpose = request.nextUrl.searchParams.get("purpose") ?? "MENU";
     ensure(

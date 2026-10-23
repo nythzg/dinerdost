@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 }
 export async function POST(request: NextRequest) {
   try {
-    csrf(request);
+    await csrf(request);
     const { db, actor } = await context();
     return response(await readNotifications(db, actor, await body(request)));
   } catch (error) {

@@ -1050,6 +1050,31 @@
           "distinctCases": 13,
           "allDisposableDatabasesRemoved": true
         }
+      },
+      "editableImpersonation": {
+        "status": "verified-local",
+        "migration": "061_platform_editable_support.sql",
+        "directFullDashboardEntry": true,
+        "editRequiresSuperadminAndExplicitConfirmation": true,
+        "oldGrantsRemainReadOnly": true,
+        "expiryMinutes": 15,
+        "operatorAuditAttribution": true,
+        "freshPerTransactionChecks": true,
+        "normalFinancialStockAndTenantGuardsRetained": true,
+        "backendTestsPassed": 371,
+        "newPostgresCasesPassed": 3,
+        "postgresDisposableDatabaseRemoved": true,
+        "browserWorkflowsPassed": 15,
+        "finalPhoneRepeatPassed": true,
+        "typecheckPassed": true,
+        "buildPassed": true,
+        "preMigrationTablesPreserved": 99,
+        "preMigrationRowsPreserved": 3172,
+        "businessIdentityTablesMatched": 67,
+        "businessIdentityRowsMatched": 2473,
+        "syntheticRowsAddedToWorkingRestaurant": 0,
+        "pushed": false,
+        "deployed": false
       }
     }
   }

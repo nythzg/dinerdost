@@ -56,7 +56,7 @@ export async function POST(
   { params }: { params: Promise<{ key: string }> },
 ) {
   try {
-    csrf(request);
+    await csrf(request);
     const { key } = await params;
     const db = await getDatabase(),
       store = await cookies();

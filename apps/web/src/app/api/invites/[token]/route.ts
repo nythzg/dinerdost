@@ -25,7 +25,7 @@ export async function POST(
   { params }: { params: Promise<{ token: string }> },
 ) {
   try {
-    csrf(request);
+    await csrf(request);
     const result = await acceptStaffInvitation(
       await getDatabase(),
       (await params).token,
