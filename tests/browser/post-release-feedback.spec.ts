@@ -652,9 +652,9 @@ test("review zero-total staff bills retain reward authorization and settle witho
       items: [{ itemId: menu.id, quantity: 1 }],
     });
   await page.goto("/app/orders/" + o.id);
-  await page.getByRole("button", { name: "Adjustments", exact: true }).click();
-  await page.getByLabel("Discount (₹)", { exact: true }).fill("1");
-  await save(page, "Save adjustments");
+  const config=await(await page.request.get('/api/bill-settings?outletId='+w.outletId)).json(),code='ZERO-'+randomUUID().slice(0,8).toUpperCase();
+  await command(page,'billSettings',{outletId:w.outletId,version:config.version,loyaltyCap:config.loyaltyCap,roundingMode:config.roundingMode,createCoupons:[{code,amount:100,validUntil:new Date(Date.now()+172800000).toISOString().slice(0,10),maxUses:1}],removeCoupons:[]});
+  await page.locator('.total-panel').getByRole('button',{name:'Coupon',exact:true}).click();await page.getByRole('dialog').getByLabel('Coupon code',{exact:true}).fill(code);await save(page,'Apply coupon');
   await page
     .getByRole("button", { name: "Review loyalty", exact: true })
     .click();
@@ -686,7 +686,7 @@ test("review zero-total staff bills retain reward authorization and settle witho
     .toBe("PAID");
   await expect(
     page.getByRole("button", { name: "Adjustments", exact: true }),
-  ).toHaveCount(0);
+  ).toBeVisible(); // Future settings remain available without changing a paid bill.
   await page.screenshot({
     path: "verification/review-zero-total.png",
     animations: "disabled",

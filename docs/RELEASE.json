@@ -241,6 +241,29 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "futureBillAdjustments": {
+      "status": "verified-local-unreleased",
+      "scope": "Leftmost Adjustments replaces separate Future rounding and current-bill Discount UI; generated coupon codes with fixed amount, inclusive IST expiry, shared use limits and staged removal; outlet cap and exclusive UP/DOWN rounding saved atomically for future web transactions.",
+      "fullBackendTestsPassed": 319,
+      "newBackendCasesPassed": 9,
+      "postgresCasesPassed": 9,
+      "postgresDatabaseRemoved": true,
+      "browserWorkflowsPassed": 9,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "localMigration": "055_web_bill_settings.sql",
+      "coldBackupCreated": true,
+      "unchangedFinancialStockTableFingerprints": 6,
+      "existingBillsAndHistoryPreserved": true,
+      "ownerAndAssignedManagerOnly": true,
+      "notes": "docs/LOCAL_BILL_ADJUSTMENTS.md",
+      "pushed": false,
+      "deployed": false
+    },
     "compactOrderActionButtons": {
       "status": "verified-local-unreleased",
       "scope": "28x32 order-action frames with unchanged 24px dots; sage at 80% alpha on light surfaces and black at 25% alpha with white dots on dark green/VIP rows.",
@@ -386,6 +409,7 @@
       "deployed": false
     },
     "billSummaryLoyaltyCap": {
+      "supersededUiNotes": "docs/LOCAL_BILL_ADJUSTMENTS.md",
       "status": "verified-local-unreleased",
       "scope": "Aligned bill summary; footer removed; owners, assigned managers and existing provisioned platform admins may edit the outlet-wide per-bill default under Adjustments.",
       "fullBackendTestsPassed": 288,
@@ -437,7 +461,9 @@
     "migrationsAppliedToLocalCopy": [
       "051_web_paid_replacements.sql",
       "052_web_recipe_profiles.sql",
-      "053_web_production.sql"
+      "053_web_production.sql",
+      "054_web_floor_details.sql",
+      "055_web_bill_settings.sql"
     ],
     "productionMigrationsUnchanged": true,
     "originalAccountsPreserved": true,

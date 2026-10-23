@@ -1,3 +1,4 @@
+import {reserveWebDiscountCoupon} from './web-discount-coupons';
 import {webLoyaltyLimit} from './web-loyalty';
 import { replacementEarnedPoints } from './web-replacements';
 import { resolveRecipe } from './recipe-profiles';
@@ -374,7 +375,7 @@ export async function orderDetail(
       )
     ).rows;
     if((actor.application&&actor.application!=='MASTER')||(!can(actor,'inventory')&&!['OWNER','MANAGER','ACCOUNTANT'].includes(actor.role)))for(const item of round.items)delete item.recipe_snapshot;
-    if(!actor.application||actor.application==='MASTER')round.coupon_code=(await tx.query("SELECT code FROM coupons WHERE round_id=$1 AND state IN ('RESERVED','LOCKED','REDEEMED') LIMIT 1",[round.id])).rows[0]?.code??null;
+    if(!actor.application||actor.application==='MASTER')round.coupon_code=(await tx.query("SELECT coalesce(d.code,c.code) AS code FROM coupons c LEFT JOIN web_discount_coupons d ON d.id=c.web_discount_coupon_id AND d.restro_id=c.restro_id WHERE c.round_id=$1 AND c.state IN ('RESERVED','LOCKED','REDEEMED') LIMIT 1",[round.id])).rows[0]?.code??null;
     round.payments = (
       await tx.query(
         "SELECT id,method,amount,state,reference,created_at,verified_at FROM payment_attempts WHERE round_id=$1 ORDER BY created_at",
@@ -794,7 +795,7 @@ export async function evaluateEntitlements(
   );
   const coupons = (
     await tx.query<Row>(
-      "SELECT id,code,discount_amount,minimum_amount,expires_at FROM coupons WHERE outlet_id=$1 AND expires_at>now() AND minimum_amount<=$2 AND (customer_id IS NULL OR customer_id=$3) AND (state='AVAILABLE' OR (state='RESERVED' AND (reserved_until<now() OR round_id=$4)))",
+      "SELECT id,code,discount_amount,minimum_amount,expires_at FROM coupons WHERE outlet_id=$1 AND web_discount_coupon_id IS NULL AND expires_at>now() AND minimum_amount<=$2 AND (customer_id IS NULL OR customer_id=$3) AND (state='AVAILABLE' OR (state='RESERVED' AND (reserved_until<now() OR round_id=$4)))",
       [order.outlet_id, round.subtotal, order.customer_id, roundId],
     )
   ).rows;
@@ -889,9 +890,17 @@ export async function applyEntitlement(
         409,
       );
       ensure(!(data.couponId&&data.couponCode),'INVALID_COUPON','Use a coupon code or a selected coupon, not both.');
-      if(data.couponCode){const matches=(await tx.query('SELECT id FROM coupons WHERE outlet_id=$1 AND lower(code)=lower($2)',[order.outlet_id,data.couponCode])).rows;ensure(matches.length===1,'COUPON_NOT_FOUND','Enter one unambiguous eligible coupon code.',422);data.couponId=String(matches[0].id);}
+      let webCouponId:string|undefined;
+      if(data.couponCode){
+        const definitions=(await tx.query('SELECT id FROM web_discount_coupons WHERE outlet_id=$1 AND lower(code)=lower($2)',[order.outlet_id,data.couponCode])).rows;
+        const matches=(await tx.query('SELECT id FROM coupons WHERE outlet_id=$1 AND web_discount_coupon_id IS NULL AND lower(code)=lower($2)',[order.outlet_id,data.couponCode])).rows;
+        ensure(definitions.length+matches.length===1,'COUPON_NOT_FOUND','Enter one unambiguous eligible coupon code.',422);
+        if(definitions.length)webCouponId=String(definitions[0].id);else data.couponId=String(matches[0].id);
+      }
+      if(data.couponId){const token=(await tx.query('SELECT web_discount_coupon_id FROM coupons WHERE id=$1 AND outlet_id=$2',[data.couponId,order.outlet_id])).rows[0];if(token?.web_discount_coupon_id)webCouponId=String(token.web_discount_coupon_id);}
+      ensure(!webCouponId||webFlow,'APPLICATION_FORBIDDEN','Discount coupon codes are available in the web app only.',403);
       ensure(
-        !(data.couponId && (data.points||data.amount)),
+        !((data.couponId||webCouponId) && (data.points||data.amount)),
         "STACKING_NOT_ALLOWED",
         "Choose either a coupon or points.",
       );
@@ -904,8 +913,12 @@ export async function applyEntitlement(
           order.outlet_id,
         ]);
       if(data.amount!==undefined){const pointValue=num(outlet.point_value_paise);ensure(data.points===0&&pointValue>0&&data.amount%pointValue===0,'INVALID_REDEMPTION','Enter an amount in valid point-value increments.');data.points=data.amount/pointValue;}
+      // Lock both definitions in stable order before resetting/reusing their tokens.
+      // Concurrent coupon switches must use the same definition-before-token order as payment.
+      await tx.query("SELECT id FROM web_discount_coupons WHERE id=$1 OR id IN (SELECT web_discount_coupon_id FROM coupons WHERE round_id=$2 AND state IN ('RESERVED','LOCKED')) ORDER BY id FOR UPDATE",[webCouponId??null,roundId]);
       await resetRewards(tx, roundId);
       let discount = 0;
+      if(webCouponId)data.couponId=await reserveWebDiscountCoupon(tx,actor,order.outlet_id,webCouponId,customer.id);
       if (data.couponId) {
         const coupon = await one(
           tx,

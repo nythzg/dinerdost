@@ -377,7 +377,7 @@ test("late KOT printing follows authorized release, supports manual reprint and 
   ).toBe(404);
 });
 
-test("late downward rounding preview and compact descriptions agree with persisted web totals", async ({
+test("late future downward rounding and compact descriptions agree with persisted web totals", async ({
   page,
 }) => {
   await register(page);
@@ -406,14 +406,17 @@ test("late downward rounding preview and compact descriptions agree with persist
   await page
     .getByRole("checkbox", { name: "Round down to ₹1", exact: true })
     .check();
-  await expect(page.getByRole("dialog")).toContainText("₹172.00");
+  await expect(page.getByRole("dialog")).toContainText("Saving does not change the current bill.");
   await page
     .getByRole("dialog")
     .screenshot({ path: "verification/late-round-down.png" });
-  await save(page, "Save adjustments");
-  await page.reload();
+  await save(page, "Save adjustment");
+  const unchanged = await (await page.request.get("/api/orders/" + order.id)).json();
+  expect(Number(unchanged.rounds[0].payable)).toBe(17280);
+  const future = await create(page, item.id, "9123456773");
+  await page.goto("/app/orders/" + future.id);
   const result = await (
-    await page.request.get("/api/orders/" + order.id)
+    await page.request.get("/api/orders/" + future.id)
   ).json();
   expect(Number(result.rounds[0].payable)).toBe(17200);
   expect(Number(result.rounds[0].round_off)).toBe(-80);

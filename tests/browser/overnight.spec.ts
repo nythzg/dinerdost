@@ -334,12 +334,9 @@ test("overnight POS descriptions, Half/Full buttons, staff acceptance and bill a
   ).json();
   expect(submitted.rounds[0].kot_status).toBe("RELEASED");
   expect(Number(submitted.rounds[0].paid)).toBe(0);
-  await page.getByRole("button", { name: "Adjustments", exact: true }).click();
-  await page.getByLabel("Discount (₹)", { exact: true }).fill("1.25");
-  await page
-    .getByRole("checkbox", { name: "Round down to ₹1", exact: true })
-    .check();
-  await save(page, "Save adjustments");
+  // The dialog now configures future transactions; retain API coverage of old per-bill overrides.
+  await command(page,"orderAdjustments",{version:submitted.rounds[0].version,discount:125,roundToRupee:true,roundingMode:"DOWN"},{orderId:submitted.id,roundId:submitted.rounds[0].id});
+  await page.reload();
   await expect(page.locator(".total-panel")).toContainText("Saved amount");
   let detail = await (
     await page.request.get("/api/orders/" + page.url().split("/").pop())
@@ -363,7 +360,7 @@ test("overnight POS descriptions, Half/Full buttons, staff acceptance and bill a
   await expect(page.getByRole("dialog")).toBeHidden();
   await expect(
     page.getByRole("button", { name: "Adjustments", exact: true }),
-  ).toHaveCount(0);
+  ).toBeVisible(); // Future settings remain available without changing a paid bill.
   await page.screenshot({
     animations: "disabled",
     path: "verification/overnight-bill-adjustments.png",

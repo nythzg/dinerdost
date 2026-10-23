@@ -1,3 +1,4 @@
+import {lockWebCouponDefinition} from './web-discount-coupons';
 import { z } from "zod";
 import type { Database, Sql } from "@dinerdost/database";
 import { ensure, requirePermission, type Actor } from "@dinerdost/core";
@@ -12,6 +13,7 @@ import {
 } from "./shared";
 import { evaluateEntitlements, orderDetail, releaseKot } from "./orders";
 export async function lockRewardReservations(tx: Sql, round: Row) {
+  const webDefinition=await lockWebCouponDefinition(tx,round.id);
   const coupon = (
     await tx.query<Row>(
       "SELECT *,reserved_until>clock_timestamp() AS reservation_current FROM coupons WHERE round_id=$1 AND state IN ('RESERVED','LOCKED') FOR UPDATE",
@@ -31,6 +33,7 @@ export async function lockRewardReservations(tx: Sql, round: Row) {
     409,
   );
   if (coupon) {
+    ensure(!webDefinition||coupon.state==='LOCKED'||(webDefinition.active&&webDefinition.unexpired),'REWARD_EXPIRED','This coupon expired or was removed. Choose an eligible reward before authorization.',409);
     ensure(
       num(coupon.round_version) === num(round.version) &&
         (coupon.state === "LOCKED" || coupon.reservation_current),

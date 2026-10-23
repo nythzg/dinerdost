@@ -880,37 +880,7 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
                 <T>{"Bill summary"}</T>
               </h2>
               <div className="bill-summary-actions">
-              {isManager(data.actor)&&<button className="text-button" onClick={()=>form('Future bill rounding',[{name:'roundDown',label:'Round down to ₹1 for new transactions',type:'select',value:outlet?.web_round_down_default?'on':'off',options:[{value:'off',label:'Off'},{value:'on',label:'On'}],help:'Outlet-wide. Applies to future web rounds only. Existing bills and discounts remain unchanged.'}],values=>run('billDefaults',{outletId:order.outlet_id,version:outlet.version,roundDown:values.roundDown==='on'}),'Save rounding default')}>Future rounding: {outlet?.web_round_down_default?'On':'Off'}</button>}
-              {!locked &&
-                can(data.actor, "bill") &&
-                order.rounds.some(editableRound) && (
-                  <button
-                    className="text-button"
-                    onClick={() =>
-                      modal(
-                        "Bill adjustments",
-                        <AdjustmentsEditor
-                          rounds={order.rounds.filter(editableRound)}
-                          loyaltyCap={isManager(data.actor)||data.platformLoyaltyAdmin ? {
-                            value: Number(outlet.web_loyalty_cap_paise),
-                            version: Number(outlet.version),
-                            save: (limit,version)=>run('loyaltyCap',{outletId:outlet.id,version,limit}),
-                          } : undefined}
-                          save={(roundId, input) =>
-                            action("orderAdjustments", input, { roundId }).then(
-                              (result) => {
-                                desk.close();
-                                return result;
-                              },
-                            )
-                          }
-                        />,
-                      )
-                    }
-                  >
-                    <T>{"Adjustments"}</T>
-                  </button>
-                )}
+              {isManager(data.actor) && <button className="text-button" onClick={()=>modal('Bill adjustments',<AdjustmentsEditor outletId={order.outlet_id} save={input=>run('billSettings',input).then(result=>{desk.close();void load();return result;})}/>)}>Adjustments</button>}
               {data.actor.role === "OWNER" &&
                 !["SETTLED", "VOIDED", "REJECTED"].includes(order.status) &&
                 order.rounds.every(

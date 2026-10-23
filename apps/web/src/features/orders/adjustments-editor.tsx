@@ -1,163 +1,39 @@
 "use client";
-import { T } from "@/lib/staff-language";
-import { useState } from "react";
-import { quote, roundAdjustment } from "@dinerdost/core";
-import { money, type Row } from "@/lib/client";
+import {useEffect,useState,type FormEvent} from 'react';
+import {amountPaise} from '@dinerdost/core';
+import {Icon} from '@/components/ui';
+import {money,request,type Row} from '@/lib/client';
 
-export function AdjustmentsEditor({
-  rounds,
-  save,
-  loyaltyCap,
-}: {
-  rounds: Row[];
-  save: (roundId: string, input: Row) => Promise<unknown>;
-  loyaltyCap?: { value: number; version: number; save: (limit: number, version: number) => Promise<{version: number}> };
-}) {
-  const [roundId, setRoundId] = useState(rounds[0].id),
-    [discount, setDiscount] = useState(
-      String(Number(rounds[0].manual_discount ?? 0) / 100),
-    ),
-    [rounding, setRounding] = useState(!!rounds[0].rounding_enabled),
-    [busy, setBusy] = useState(false),
-    [error, setError] = useState("");
-  const [cap, setCap] = useState(String(Number(loyaltyCap?.value ?? 0) / 100));
-  const [capVersion, setCapVersion] = useState(loyaltyCap?.version ?? 0);
-  const [capBusy, setCapBusy] = useState(false), [capMessage, setCapMessage] = useState(''), [capError, setCapError] = useState('');
-  const capAmount = Math.round(Number(cap) * 100);
-  const capValid = /^\d+(\.\d{1,2})?$/.test(cap) && Number.isSafeInteger(capAmount) && capAmount >= 0 && capAmount <= 1000000000;
-  const round = rounds.find((r) => r.id === roundId)!;
-  const amount = Math.round(Number(discount) * 100);
-  const valid =
-    Number.isSafeInteger(amount) &&
-    amount >= 0 &&
-    amount <= Number(round.subtotal);
-  const calculated = valid
-    ? quote(
-        round.items.map((i: Row) => ({
-          unit_price: Number(i.unit_price),
-          quantity_milli: Number(i.quantity_milli),
-          tax_bps: Number(i.tax_bps),
-        })),
-        amount,
-      )
-    : null;
-  const beforeRounding =
-    (calculated?.payable ?? 0) + Number(round.charges_total);
-  const previewPayable=beforeRounding+roundAdjustment(beforeRounding,rounding,'DOWN');
-  const coversReceived=previewPayable>=Number(round.paid);
-  return (
-    <>
-    <form
-      className="form"
-      onSubmit={(event) => {
-        event.preventDefault();
-        if (busy || capBusy || !valid || !coversReceived) return;
-        setBusy(true);
-        setError("");
-        void save(roundId, {
-          version: round.version,
-          discount: amount,
-          roundToRupee: rounding,
-          roundingMode: "DOWN",
-        })
-          .catch((e) => setError(e.message))
-          .finally(() => setBusy(false));
-      }}
-    >
-      {rounds.length > 1 && (
-        <label className="field">
-          <T>{"Round"}</T>
-          <select
-            aria-label="Adjustment round"
-            disabled={busy}
-            value={roundId}
-            onChange={(e) => {
-              const next = rounds.find((r) => r.id === e.target.value)!;
-              setRoundId(next.id);
-              setDiscount(String(Number(next.manual_discount ?? 0) / 100));
-              setRounding(!!next.rounding_enabled);
-            }}
-          >
-            {rounds.map((r) => (
-              <option key={r.id} value={r.id}>
-                <T>{"Round "}</T>
-                {r.round_number}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
-      <label className="field">
-        <T>{"Discount (₹)"}</T>
-        <input
-          aria-label="Discount (₹)"
-          type="number"
-          step="0.01"
-          required
-          min="0"
-          max={Number(round.subtotal) / 100}
-          value={discount}
-          disabled={busy}
-          onChange={(e) => setDiscount(e.target.value)}
-        />
-      </label>
-      <label className="adjustment-toggle">
-        <input
-          type="checkbox"
-          checked={rounding}
-          disabled={busy}
-          onChange={(e) => setRounding(e.target.checked)}
-        />
-        <T>{"Round down to ₹1"}</T>
-      </label>
-      <div className="total-row">
-        <span>
-          <T>{"Round off"}</T>
-        </span>
-        <strong>
-          {money(valid ? roundAdjustment(beforeRounding, rounding, "DOWN") : 0)}
-        </strong>
-      </div>
-      <div className="total-row">
-        <span>
-          <T>{"Total"}</T>
-        </span>
-        <strong>
-          {money(
-            valid
-              ? beforeRounding +
-                  roundAdjustment(beforeRounding, rounding, "DOWN")
-              : 0,
-          )}
-        </strong>
-      </div>
-      <small className="muted">
-        Replaces any selected coupon or points for this round.
-      </small>
-      {valid&&!coversReceived&&<p className="error" role="alert">The total must cover the {money(round.paid)} already received.</p>}
-      {error && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
-      <button className="button primary" disabled={busy || capBusy || !valid || !coversReceived}>
-        {busy ? "Saving…" : "Save adjustments"}
-      </button>
-    </form>
-      {loyaltyCap && <section className="form loyalty-cap-settings" aria-label="Outlet loyalty cap">
-        <label className="field">
-          <T>Loyalty cap per bill (₹)</T>
-          <input aria-label="Loyalty cap per bill (₹)" type="number" min="0" max="10000000" step="0.01" value={cap} disabled={busy || capBusy} onChange={event=>{setCap(event.target.value);setCapMessage('');setCapError('')}}/>
-        </label>
-        <small className="muted">Outlet-wide default for loyalty claims. Existing discounts remain unchanged.</small>
-        {capError && <p className="error" role="alert">{capError}</p>}
-        {capMessage && <p className="success-note" role="status">{capMessage}</p>}
-        <button className="button" type="button" disabled={busy || capBusy || !capValid} onClick={()=>{
-          if(busy || capBusy || !capValid)return;
-          setCapBusy(true);setCapMessage('');setCapError('');
-          void loyaltyCap.save(capAmount,capVersion).then(result=>{setCapVersion(result.version);setCapMessage('Loyalty cap saved.')}).catch(issue=>setCapError((issue as Error).message)).finally(()=>setCapBusy(false));
-        }}>{capBusy?'Saving…':'Save loyalty cap'}</button>
-      </section>}
-    </>
-  );
+type DraftCoupon={id:string;code:string;amount:string;validUntil:string;maxUses:string};
+export function AdjustmentsEditor({outletId,save}:{outletId:string;save:(input:Row)=>Promise<unknown>}){
+ const [settings,setSettings]=useState<Row|null>(null),[cap,setCap]=useState(''),[rounding,setRounding]=useState('NONE'),[coupons,setCoupons]=useState<DraftCoupon[]>([]),[removed,setRemoved]=useState<string[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState(''),[reload,setReload]=useState(0);
+ useEffect(()=>{const abort=new AbortController();setError('');void request('/api/bill-settings?outletId='+encodeURIComponent(outletId),{signal:abort.signal}).then(value=>{setSettings(value);setCap(String(value.loyaltyCap/100));setRounding(value.roundingMode)}).catch(issue=>{if(issue.name!=='AbortError')setError(issue.message)});return()=>abort.abort()},[outletId,reload]);
+ if(!settings)return <div>{error?<><p className="error" role="alert">{error}</p><button className="button" onClick={()=>setReload(n=>n+1)}>Retry</button></>:<p>Loading bill adjustments…</p>}</div>;
+ const change=(id:string,values:Partial<DraftCoupon>)=>setCoupons(rows=>rows.map(row=>row.id===id?{...row,...values}:row));
+ async function submit(event:FormEvent<HTMLFormElement>){
+  event.preventDefault();if(busy)return;setError('');
+  try{const input={outletId,version:settings!.version,loyaltyCap:amountPaise(cap),roundingMode:rounding,createCoupons:coupons.map(c=>({code:c.code,amount:amountPaise(c.amount),validUntil:c.validUntil,maxUses:Number(c.maxUses)})),removeCoupons:removed};setBusy(true);await save(input)}catch(issue){setError((issue as Error).message)}finally{setBusy(false)}
+ }
+ return <form className="form future-bill-adjustments" onSubmit={submit}><fieldset disabled={busy}>
+  <section className="bill-coupon-settings" aria-label="Discount coupons">
+   <button type="button" className="button" disabled={coupons.length>=100} onClick={()=>setCoupons(rows=>[...rows,{id:crypto.randomUUID(),code:'DD-'+crypto.randomUUID().replaceAll('-','').slice(0,8).toUpperCase(),amount:'',validUntil:'',maxUses:''}])}>Generate discount coupon</button>
+   {settings.coupons.map((coupon:Row)=><article className={'bill-coupon-row'+(removed.includes(coupon.id)?' is-removed':'')} key={coupon.id}><div><strong>{coupon.code}</strong><span>{money(coupon.discount_amount)} discount</span><small>Valid through {coupon.valid_until} · {Number(coupon.redeemed)+Number(coupon.held)}/{coupon.max_uses} uses used or reserved</small>{removed.includes(coupon.id)&&<small>Will be removed when you save.</small>}</div>{removed.includes(coupon.id)?<button type="button" className="text-button" onClick={()=>setRemoved(ids=>ids.filter(id=>id!==coupon.id))}>Undo removal</button>:<button type="button" className="icon-button" aria-label={'Delete coupon '+coupon.code} title="Delete coupon" onClick={()=>setRemoved(ids=>[...ids,coupon.id])}><Icon name="trash"/></button>}</article>)}
+   {coupons.map((coupon,index)=><article className="bill-coupon-draft" key={coupon.id} aria-label={'New coupon '+(index+1)}>
+    <div className="bill-coupon-title"><strong>Coupon {index+1}</strong><button type="button" className="icon-button" aria-label={'Delete new coupon '+(index+1)} onClick={()=>setCoupons(rows=>rows.filter(row=>row.id!==coupon.id))}><Icon name="trash"/></button></div>
+    <label className="field">Coupon code<input aria-label={'Coupon code '+(index+1)} required maxLength={80} pattern="[A-Z0-9][A-Z0-9_\-]*" value={coupon.code} onChange={e=>change(coupon.id,{code:e.target.value.toUpperCase()})}/></label>
+    <label className="field">Discount amount (₹)<input aria-label={'Coupon discount amount (₹) '+(index+1)} required type="number" min="0.01" max="10000000" step="0.01" value={coupon.amount} onChange={e=>change(coupon.id,{amount:e.target.value})}/></label>
+    <label className="field">Valid through<input aria-label={'Coupon valid through '+(index+1)} required type="date" value={coupon.validUntil} onChange={e=>change(coupon.id,{validUntil:e.target.value})}/></label>
+    <label className="field">Total uses<input aria-label={'Coupon total uses '+(index+1)} required type="number" min="1" max="1000000" step="1" value={coupon.maxUses} onChange={e=>change(coupon.id,{maxUses:e.target.value})}/></label>
+   </article>)}
+   <small className="muted">Coupons are applied by code. Total uses are shared across bills; expiry is at the end of the selected day in India time.</small>
+  </section>
+  <label className="field">Loyalty cap per bill (₹)<input aria-label="Loyalty cap per bill (₹)" required type="number" min="0" max="10000000" step="0.01" value={cap} onChange={e=>setCap(e.target.value)}/></label>
+  <div className="bill-rounding-options" role="group" aria-label="Future bill rounding">
+   <label className="adjustment-toggle"><input type="checkbox" checked={rounding==='UP'} onChange={e=>setRounding(e.target.checked?'UP':'NONE')}/>Round up to ₹1</label>
+   <label className="adjustment-toggle"><input type="checkbox" checked={rounding==='DOWN'} onChange={e=>setRounding(e.target.checked?'DOWN':'NONE')}/>Round down to ₹1</label>
+  </div>
+  <small className="muted">Applies to future transactions and reward claims at this outlet. Saving does not change the current bill.</small>
+  {error&&<p className="error" role="alert">{error}</p>}
+  <button className="button primary full-width">{busy?'Saving…':'Save adjustment'}</button>
+ </fieldset></form>;
 }

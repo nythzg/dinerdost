@@ -1,5 +1,7 @@
 # Local bill summary and loyalty cap · 23 October 2026
 
+Latest follow-up: see LOCAL_BILL_ADJUSTMENTS.md. One combined future-settings form now replaces the separate Future rounding action, current-bill Discount editor and independent Save loyalty cap button. The sections below describe the earlier checkpoint, not the current form.
+
 The receiving user requested aligned bill-summary text, removal of the managed-by-Diner-Dost loyalty footer, and a cap editor under Adjustments. They explicitly confirmed that **restaurant owners and assigned outlet managers** may edit the **outlet-wide default maximum per bill**, rather than an individual bill override. This supersedes the earlier platform-admin-only Q74 restriction locally.
 
 ## Implementation

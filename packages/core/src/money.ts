@@ -121,13 +121,13 @@ export function currency(paise: number) {
 export function roundAdjustment(
   payable: number,
   enabled: boolean,
-  mode: "NEAREST" | "DOWN" = "NEAREST",
+  mode: "NEAREST" | "DOWN" | "UP" = "NEAREST",
 ) {
   integer(payable, "Payable amount");
   return enabled
     ? (mode === "DOWN"
         ? Math.floor(payable / 100)
-        : Math.round(payable / 100)) *
+        : mode === "UP" ? Math.ceil(payable / 100) : Math.round(payable / 100)) *
         100 -
         payable
     : 0;
