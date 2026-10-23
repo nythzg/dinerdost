@@ -500,7 +500,7 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
                     <button
                       className="text-button claim-loyalty-button"
                       disabled={round.payment_status === "PAID"}
-                      onClick={()=>{void action('reviewRewards',{},extra).then(result=>{const limit=result.entitlements.webLoyalty;modal('Claim loyalty points',<RewardEntry fields={[{name:'amount',label:'Loyalty amount (₹)',type:'number',min:0,max:limit.maxRedemptionAmount/100,step:limit.pointValue/100,value:0,help:'Maximum '+money(limit.maxRedemptionAmount)+' for this round; '+money(limit.remainingOrderCap)+' remains on this bill. Verified phone required. Replaces any coupon.'}]} save={values=>action('reward',{version:result.order.rounds.find((r:Row)=>r.id===round.id).version,amount:Math.round(Number(values.amount)*100)},extra)} submit="Claim loyalty"/>) }).catch(()=>{})}}
+                      onClick={()=>{void action('reviewRewards',{},extra).then(result=>{const limit=result.entitlements.webLoyalty;modal('Claim loyalty points',<RewardEntry fields={[{name:'amount',label:'Loyalty amount (₹)',type:'number',min:0,max:limit.maxRedemptionAmount/100,step:limit.pointValue/100,value:0,help:'Maximum '+money(limit.maxRedemptionAmount)+' for this round; '+money(limit.remainingOrderCap)+' remains on this bill. Replaces any coupon.'}]} save={values=>action('reward',{version:result.order.rounds.find((r:Row)=>r.id===round.id).version,amount:Math.round(Number(values.amount)*100)},extra)} submit="Claim loyalty"/>) }).catch(()=>{})}}
                     >
                       <T>{"Claim loyalty points"}</T>
                     </button>

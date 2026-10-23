@@ -2,6 +2,8 @@
 
 Updated 22 October 2026. The user initially deferred these questions, then explicitly reported that the client had answered and requested review of those answers. The complete 9:31 am answer attachment has now been read and saved. Answers are requirements, not implementation/release claims. Preserve the historical questions below and track each implementation separately in CLIENT_FEEDBACK.md.
 
+Latest receiving-user instruction · 23 October: remove phone verification from local web coupon/loyalty redemption and web phone-status badges. This supersedes earlier web OTP requirements; identity, balances/caps, coupon/payment/permission guards and stored historical facts remain. Native policy is deferred and unchanged. See LOCAL_BILL_ADJUSTMENTS.md. Q111 remains unanswered.
+
 ## Answers received · 22 October, 9:31 am IST
 
 [Source message](https://discord.com/channels/@me/1491679750610096259/1562677243354808374) · [Exact answer attachment](../verification/client-answers-20261022-0931.txt). All nine original questions have answers; the rows below are pending implementation and verification unless explicitly released in the canonical checklist.

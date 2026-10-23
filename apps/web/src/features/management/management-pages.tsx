@@ -693,7 +693,6 @@ export function Customers() {
         headers={[
           "Customer",
           "Mobile",
-          "Phone status",
           "Settled visits",
           "Settled spend",
           "Points",
@@ -702,7 +701,6 @@ export function Customers() {
         rows={(listing?.items ?? []).map((c: Row) => [
           <strong>{c.name}</strong>,
           c.phone,
-          <Badge value={c.otp_verified ? "VERIFIED" : "CAPTURED"} />,
           c.visits,
           money(c.spend),
           c.points,

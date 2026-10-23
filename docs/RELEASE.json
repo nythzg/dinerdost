@@ -241,6 +241,26 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "webPhoneVerificationRemoved": {
+      "status": "verified-local-unreleased",
+      "scope": "Web loyalty and coupon redemption no longer requires customer phone verification; web verification help/status badges removed without changing stored verification facts or native policy.",
+      "fullBackendTestsPassed": 320,
+      "affectedBackendPassed": 19,
+      "postgresCasesPassed": 1,
+      "postgresDatabaseRemoved": true,
+      "browserWorkflowsPassed": 6,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "schemaChanged": false,
+      "financialAndStockHistoryPreserved": true,
+      "notes": "docs/LOCAL_BILL_ADJUSTMENTS.md",
+      "pushed": false,
+      "deployed": false
+    },
     "futureBillAdjustments": {
       "appliedCouponRemoval": {
         "status": "verified-local-unreleased",

@@ -946,7 +946,7 @@ export async function applyEntitlement(
         );
         discount = Math.min(num(coupon.discount_amount), num(round.subtotal));
         ensure(
-          discount <= num(outlet.otp_threshold) || customer.otp_verified,
+          webFlow || discount <= num(outlet.otp_threshold) || customer.otp_verified,
           "OTP_REQUIRED",
           "Verify the customer’s phone before using this reward.",
         );
@@ -957,7 +957,7 @@ export async function applyEntitlement(
       }
       if (data.points) {
         ensure(
-          customer.otp_verified,
+          webFlow || customer.otp_verified,
           "OTP_REQUIRED",
           "Phone verification is required to redeem loyalty points.",
         );

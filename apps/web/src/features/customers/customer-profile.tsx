@@ -1,7 +1,7 @@
 "use client";
 import { T } from "@/lib/staff-language";
 import { useEffect, useState } from "react";
-import { Badge, Empty, Form } from "@/components/ui";
+import { Empty, Form } from "@/components/ui";
 import { date, request, type Row } from "@/lib/client";
 import { useDesk } from "../workspace/context";
 
@@ -88,10 +88,6 @@ export function CustomerProfile({
             <T>{"Phone"}</T>
           </span>
           <strong>{profile.phone}</strong>
-        </div>
-        <div>
-          <span>Phone status</span>
-          <Badge value={profile.otp_verified ? "VERIFIED" : "CAPTURED"} />
         </div>
         <div>
           <span>Available points</span>
