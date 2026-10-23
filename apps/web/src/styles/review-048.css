@@ -36,3 +36,12 @@
  .bill-rounding-options{display:grid;gap:12px}
  .future-bill-adjustments .icon-button{flex:none}
 }
+
+@media screen {
+ .total-panel>.bill-coupons-row{grid-template-columns:auto minmax(0,1fr);align-items:center}
+ .bill-applied-coupons{display:grid;gap:4px;justify-items:end;min-width:0}
+ .bill-coupon-code{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0;max-width:100%}
+ .bill-coupon-code strong{min-width:0;overflow-wrap:anywhere}
+ .bill-coupon-code>.remove-applied-coupon{width:32px;height:32px;min-width:32px;padding:7px;flex:none;color:var(--primary,#275e47)}
+ .bill-coupon-code>.remove-applied-coupon svg{width:16px;height:16px}
+}

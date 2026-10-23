@@ -242,6 +242,22 @@
   },
   "localDevelopment": {
     "futureBillAdjustments": {
+      "appliedCouponRemoval": {
+        "status": "verified-local-unreleased",
+        "behavior": "Trash icon beside each applied code clears only an eligible unpaid round claim through the existing guarded command; reusable definition and paid/issued history preserved.",
+        "affectedBackendPassed": 18,
+        "browserWorkflowsPassed": 2,
+        "viewportWidths": [
+          1440,
+          390
+        ],
+        "typecheckPassed": true,
+        "buildPassed": true,
+        "backendOrSchemaChanged": false,
+        "postgresRerun": false,
+        "pushed": false,
+        "deployed": false
+      },
       "status": "verified-local-unreleased",
       "scope": "Leftmost Adjustments replaces separate Future rounding and current-bill Discount UI; generated coupon codes with fixed amount, inclusive IST expiry, shared use limits and staged removal; outlet cap and exclusive UP/DOWN rounding saved atomically for future web transactions.",
       "fullBackendTestsPassed": 319,
