@@ -804,6 +804,18 @@
       "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
       "pushed": false,
       "deployed": false
+    },
+    "lanAccess": {
+      "status": "verified-local-unreleased",
+      "url": "http://10.37.66.219:5090",
+      "browserWorkflowsPassed": 4,
+      "cryptoCompatibilityTestsPassed": 1,
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "physicalPhoneSignInConfirmed": true,
+      "notes": "docs/LOCAL_LAN_ACCESS.md",
+      "pushed": false,
+      "deployed": false
     }
   }
 }

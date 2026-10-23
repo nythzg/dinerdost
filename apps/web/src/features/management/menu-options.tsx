@@ -1,4 +1,5 @@
 "use client";
+import {clientUuid} from "@/lib/browser-crypto";
 import { useState } from "react";
 import { Icon } from "@/components/ui";
 import type { Row } from "@/lib/client";
@@ -49,7 +50,7 @@ export function MenuOptions({ item }: { item: Row }) {
               onClick={() =>
                 group.set([
                   ...group.rows,
-                  { id: crypto.randomUUID(), name: "", price: 0 },
+                  { id: clientUuid(), name: "", price: 0 },
                 ])
               }
             >

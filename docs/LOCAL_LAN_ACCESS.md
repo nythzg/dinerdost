@@ -1,0 +1,7 @@
+# Local phone access
+
+Local phone access is verified at http://10.37.66.219:5090, using the same private local database and existing accounts. DD_LAN_HOST explicitly allows this IPv4 host during development; foreign origins remain rejected. HTTP LAN saves use getRandomValues-backed UUIDs and identical SHA-256 fingerprints, retaining safe retry keys. Four LAN browser workflows passed (same-account sign-in, two desktop/phone fixture flows, calculator interrupted-save retry), one hash/UUID compatibility test, typecheck and optimized build passed. The user confirmed both physical-phone page loading and real-account sign-in. No account reset, original business-data rewrite, firewall change, push or deployment. Production/client/Petpooja release counts unchanged; procurement paused.
+
+From apps/web in PowerShell, set DD_LAN_HOST to the active Wi-Fi IPv4 address, then run node ../../node_modules/next/dist/bin/next dev --port 5090 --hostname 0.0.0.0. Restart after changing the host. Keep the ignored local database configuration unchanged and credentials out of source. Existing Windows Node TCP permission already allowed access; no firewall rule or network profile was modified. Cookies are device/host-specific; use the same existing email and password on the phone.
+
+Plain HTTP LAN browsers do not expose subtle/randomUUID. The fallback preserves SHA-256 request fingerprints and random v4 IDs, with response-loss retry verified to produce one saved calculation and update its note. This is development access only.

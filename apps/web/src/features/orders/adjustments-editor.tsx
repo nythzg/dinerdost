@@ -1,4 +1,5 @@
 "use client";
+import {clientUuid} from "@/lib/browser-crypto";
 import {useEffect,useState,type FormEvent} from 'react';
 import {amountPaise} from '@dinerdost/core';
 import {Icon} from '@/components/ui';
@@ -16,7 +17,7 @@ export function AdjustmentsEditor({outletId,save}:{outletId:string;save:(input:R
  }
  return <form className="form future-bill-adjustments" onSubmit={submit}><fieldset disabled={busy}>
   <section className="bill-coupon-settings" aria-label="Discount coupons">
-   <button type="button" className="button" disabled={coupons.length>=100} onClick={()=>setCoupons(rows=>[...rows,{id:crypto.randomUUID(),code:'DD-'+crypto.randomUUID().replaceAll('-','').slice(0,8).toUpperCase(),amount:'',validUntil:'',maxUses:''}])}>Generate discount coupon</button>
+   <button type="button" className="button" disabled={coupons.length>=100} onClick={()=>setCoupons(rows=>[...rows,{id:clientUuid(),code:'DD-'+clientUuid().replaceAll('-','').slice(0,8).toUpperCase(),amount:'',validUntil:'',maxUses:''}])}>Generate discount coupon</button>
    {settings.coupons.map((coupon:Row)=><article className={'bill-coupon-row'+(removed.includes(coupon.id)?' is-removed':'')} key={coupon.id}><div><strong>{coupon.code}</strong><span>{money(coupon.discount_amount)} discount</span><small>Valid through {coupon.valid_until} · {Number(coupon.redeemed)+Number(coupon.held)}/{coupon.max_uses} uses used or reserved</small>{removed.includes(coupon.id)&&<small>Will be removed when you save.</small>}</div>{removed.includes(coupon.id)?<button type="button" className="text-button" onClick={()=>setRemoved(ids=>ids.filter(id=>id!==coupon.id))}>Undo removal</button>:<button type="button" className="icon-button" aria-label={'Delete coupon '+coupon.code} title="Delete coupon" onClick={()=>setRemoved(ids=>[...ids,coupon.id])}><Icon name="trash"/></button>}</article>)}
    {coupons.map((coupon,index)=><article className="bill-coupon-draft" key={coupon.id} aria-label={'New coupon '+(index+1)}>
     <div className="bill-coupon-title"><strong>Coupon {index+1}</strong><button type="button" className="icon-button" aria-label={'Delete new coupon '+(index+1)} onClick={()=>setCoupons(rows=>rows.filter(row=>row.id!==coupon.id))}><Icon name="trash"/></button></div>

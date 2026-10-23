@@ -1,4 +1,5 @@
 "use client";
+import {clientUuid} from "@/lib/browser-crypto";
 import {FixtureLabels,FixtureSymbol,useFixtureLayout} from "./fixture-details";
 import { T } from "@/lib/staff-language";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
@@ -315,7 +316,7 @@ export function FloorPlan() {
     const object = {
       ...clipboard,
       kind:clipboard.kind==='EXIT'?'ENTRY' as const:clipboard.kind,
-      id: crypto.randomUUID(),
+      id: clientUuid(),
       x: clipboard.x + 30,
       y: clipboard.y + 30,
     };
@@ -505,7 +506,7 @@ export function FloorPlan() {
       {name:'seats',label:'Seats',type:'number',min:1,max:100,value:4}
     ],async values=>{
       if(draft.length>=250)throw new Error('This floor plan has reached 250 objects.');
-      const placed=placeFloorTable({id:crypto.randomUUID(),kind:'TABLE',label:String(values.label).trim(),newTable:{seats:Number(values.seats)},x:0,y:0,width:120,height:90},area,outline,draft,roundness);
+      const placed=placeFloorTable({id:clientUuid(),kind:'TABLE',label:String(values.label).trim(),newTable:{seats:Number(values.seats)},x:0,y:0,width:120,height:90},area,outline,draft,roundness);
       if(!placed)throw new Error('There is no free space on this floor. Resize the area or move an object first.');
       manualZoom.current=true;setDraft(previous=>[...previous!,snapPlaced(placed)]);setSelected(placed.id);
     },'Place table');
@@ -722,7 +723,7 @@ export function FloorPlan() {
                 const item = floorPlanFixtures.find(
                   (item) => item.kind === fixture,
                 )!;
-                const id = crypto.randomUUID();
+                const id = clientUuid();
                 const initial=fitFloorPlacement({
                       id,
                       kind: fixture,

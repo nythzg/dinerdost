@@ -1,4 +1,5 @@
 "use client";
+import {clientUuid} from "@/lib/browser-crypto";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { quote, quantityMilli, taxBreakdown, wholeUnit } from "@dinerdost/core";
 import { MenuPicture } from "@/components/menu-picture";
@@ -168,7 +169,7 @@ export function GuestPage({ tableKey }: { tableKey: string }) {
     !!data.order &&
     !["SETTLED", "VOIDED", "REJECTED"].includes(data.order.status);
   const add = (line: Row) =>
-    setCart((prev) => [...prev, { ...line, cartId: crypto.randomUUID() }]);
+    setCart((prev) => [...prev, { ...line, cartId: clientUuid() }]);
   const addItem = (m: Row) => {
     if (m.variants.length || m.modifiers.length || m.unit !== "portion")
       setPick(m);
@@ -183,7 +184,7 @@ export function GuestPage({ tableKey }: { tableKey: string }) {
             )
           : [
               ...prev,
-              { ...m, quantity: 1, modifiers: [], cartId: crypto.randomUUID() },
+              { ...m, quantity: 1, modifiers: [], cartId: clientUuid() },
             ];
       });
   };

@@ -1,9 +1,12 @@
 import type { NextConfig } from "next";
 import { resolve } from "node:path";
+import { isIP } from "node:net";
 
 const config: NextConfig = {
   distDir: process.env.DD_NEXT_DIST_DIR ?? ".next",
   devIndicators: false,
+  // Explicit local network access for development; no wildcard origins.
+  allowedDevOrigins: isIP(process.env.DD_LAN_HOST ?? '') === 4 ? [process.env.DD_LAN_HOST!] : [],
   transpilePackages: [
     "@dinerdost/core",
     "@dinerdost/database",

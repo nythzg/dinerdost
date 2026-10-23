@@ -1,4 +1,5 @@
 "use client";
+import {clientUuid,requestDigest} from "./browser-crypto";
 export class ApiError extends Error {
   constructor(
     public code: string,
@@ -41,18 +42,9 @@ export async function idempotentPost<T = any>(
   payload: unknown,
 ): Promise<T> {
   const body = JSON.stringify(payload);
-  const digest = Array.from(
-    new Uint8Array(
-      await crypto.subtle.digest(
-        "SHA-256",
-        new TextEncoder().encode(url + body),
-      ),
-    ),
-  )
-    .map((n) => n.toString(16).padStart(2, "0"))
-    .join("");
+  const digest = await requestDigest(url + body);
   const slot = "dd-request-" + digest;
-  const key = sessionStorage.getItem(slot) ?? crypto.randomUUID();
+  const key = sessionStorage.getItem(slot) ?? clientUuid();
   sessionStorage.setItem(slot, key);
   let result: T;
   try {

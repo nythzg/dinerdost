@@ -1,4 +1,5 @@
 import "server-only";
+import {isIP} from 'node:net';
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
@@ -19,9 +20,13 @@ export async function context() {
 }
 export function csrf(request: NextRequest) {
   const origin = request.headers.get("origin");
+  const local = new URL(request.url);
+  const lanHost = process.env.NODE_ENV === 'development' ? process.env.DD_LAN_HOST : undefined;
+  if(lanHost && isIP(lanHost) === 4)local.hostname = lanHost;
   ensure(
     origin === new URL(request.url).origin ||
-      (!!process.env.APP_ORIGIN && origin === process.env.APP_ORIGIN),
+      (!!process.env.APP_ORIGIN && origin === process.env.APP_ORIGIN) ||
+      (!!lanHost && isIP(lanHost) === 4 && origin === local.origin),
     "INVALID_ORIGIN",
     "Refresh this page before trying again.",
     403,
