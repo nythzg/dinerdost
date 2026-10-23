@@ -1125,6 +1125,35 @@
           "deployed": false
         }
       }
+    },
+    "uploadUiKit": {
+      "status": "verified-local-unreleased",
+      "guide": "docs/LOCAL_UPLOAD_UI_KIT.md",
+      "existingUploadPurposes": 7,
+      "sharedNativeFileInput": true,
+      "greenTheme": true,
+      "distinctBrowserWorkflowsPassed": 16,
+      "browserSuites": {
+        "uploadKit": 8,
+        "platformOperations": 6,
+        "menuAndPrivateStaff": 2
+      },
+      "focusedBackendCasesPassed": 4,
+      "fullBackendSuiteRerun": false,
+      "postgresTestsRerun": false,
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "renderedScreenWidths": [
+        1440,
+        375
+      ],
+      "desktopPhoneScreensInspected": true,
+      "qaDatabasesIsolated": true,
+      "workingRestaurantDataMutated": false,
+      "backendApiOrSchemaChanged": false,
+      "packagesOrConfigurationChanged": false,
+      "pushed": false,
+      "deployed": false
     }
   }
 }

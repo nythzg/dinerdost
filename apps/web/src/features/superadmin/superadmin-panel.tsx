@@ -16,6 +16,7 @@ import {clientUuid} from '@/lib/browser-crypto';
 
 import './superadmin.css';
 import {OperationsPanel} from './operations-panel';
+import {UploadField} from '@/components/upload-field';
 import {RestaurantDirectory,DatasetFilter} from './restaurant-data';
 
 import {consoleNavigation as navigation} from './console-navigation';
@@ -150,4 +151,4 @@ function QrPreview({table,origin}:{table:Row;origin:string}){const url=origin+'/
 
 
 
-function KycUploadForm({tenantId,busy,upload}:{tenantId:string;busy:boolean;upload:(form:FormData,key:string)=>Promise<void>}){const requestKey=useRef('');return <form onChange={()=>{requestKey.current=''}} onSubmit={async event=>{event.preventDefault();const form=new FormData(event.currentTarget);requestKey.current||=clientUuid();try{await upload(form,requestKey.current)}catch{}}}><fieldset disabled={busy}><input type="hidden" name="tenantId" value={tenantId}/><label>Business license / KYC evidence<input name="file" type="file" accept="application/pdf,image/png,image/jpeg" required/></label><p className="sa-help">PDF, PNG or JPEG, up to 2 MiB. Upload authentic supplied evidence only.</p><Reason/><button className="button primary">Save private document</button></fieldset></form>}
+function KycUploadForm({tenantId,busy,upload}:{tenantId:string;busy:boolean;upload:(form:FormData,key:string)=>Promise<void>}){const requestKey=useRef(''),[uploadError,setUploadError]=useState('');return <form onChange={()=>{requestKey.current='';setUploadError('')}} onSubmit={async event=>{event.preventDefault();setUploadError('');const form=new FormData(event.currentTarget);requestKey.current||=clientUuid();try{await upload(form,requestKey.current)}catch(issue){setUploadError((issue as Error).message)}}}><fieldset disabled={busy}><input type="hidden" name="tenantId" value={tenantId}/><UploadField label="Business license / KYC evidence" name="file" accept="application/pdf,image/png,image/jpeg" help="PDF, PNG or JPEG · up to 2 MiB" maxBytes={2097152} required busy={busy} error={uploadError}/><p className="sa-help">Upload authentic supplied evidence only.</p><Reason/><button className="button primary">Save private document</button></fieldset></form>}
