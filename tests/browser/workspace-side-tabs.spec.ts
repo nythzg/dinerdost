@@ -45,7 +45,7 @@ test('inventory content stays centered with a clear gutter beside the tool tabs 
   expect(orders.x-counts.x-counts.width).toBeGreaterThanOrEqual(width<=360?8:12);
  }
 });
-test('green right-edge tool tabs follow the header, stay reachable on small screens and open inward without blocking page controls',async({page})=>{
+test('original green tool tabs stack at the bottom right and open inward without blocking page controls',async({page})=>{
  await register(page);
  const calcTab=page.locator('.calculator-dock>.workspace-dock-trigger'),ordersTab=page.locator('.active-orders-dock>.workspace-dock-trigger');
  for(const [width,height] of [[1440,1000],[390,844],[320,568],[844,390]]){
@@ -53,15 +53,15 @@ test('green right-edge tool tabs follow the header, stay reachable on small scre
   if(await calcTab.getAttribute('aria-expanded')==='true')await calcTab.click();
   const header=(await page.locator('.topbar').boundingBox())!,calculator=(await calcTab.boundingBox())!,orders=(await ordersTab.boundingBox())!;
   expect(calculator.x+calculator.width).toBe(width);expect(orders.x+orders.width).toBe(width);expect(calculator.width).toBe(32);expect(orders.width).toBe(32);
-  expect(calculator.y).toBeGreaterThanOrEqual(header.y+header.height+7);expect(calculator.y).toBeLessThanOrEqual(header.y+header.height+10);expect(orders.y+orders.height).toBe(height-16);expect(calculator.y+calculator.height).toBeLessThan(orders.y);
-  await expect(calcTab.locator('.workspace-tab-label')).toHaveCSS('writing-mode','vertical-rl');await expect(calcTab).toHaveCSS('background-color','rgb(25, 63, 48)');
+  expect(calculator.y).toBeGreaterThanOrEqual(header.y+header.height+7);expect(orders.y+orders.height).toBe(height-16);expect(calculator.y+calculator.height+8).toBe(orders.y);
+  await expect(calcTab.locator('.workspace-tab-label')).toHaveCSS('writing-mode','vertical-rl');for(const tab of [calcTab,ordersTab]){await expect(tab).toHaveCSS('background-color','rgb(25, 63, 48)');await expect(tab).toHaveCSS('border-top-width','1px');await expect(tab).toHaveCSS('border-top-left-radius','7px');await expect(tab).not.toHaveCSS('box-shadow','none');await expect(tab.locator('svg')).toHaveCSS('width','16px');}
   const primary=(await page.getByRole('link',{name:'New order',exact:true}).boundingBox())!;expect(primary.x+primary.width).toBeLessThanOrEqual(calculator.x);
   await page.screenshot({path:`verification/local-workspace-side-tabs-${width}-${height}.png`});
-  await calcTab.focus();await page.keyboard.press('Enter');const calc=page.getByRole('region',{name:'Calculator',exact:true});await expect(calc).toBeVisible();const panel=(await calc.boundingBox())!;
+  await calcTab.focus();await page.keyboard.press('Enter');const calc=page.getByRole('region',{name:'Calculator',exact:true});await expect(calc).toBeVisible();await expect(calcTab).toHaveCSS('background-color','rgb(40, 91, 69)');const panel=(await calc.boundingBox())!;
   expect(panel.x).toBeGreaterThanOrEqual(8);expect(panel.x+panel.width).toBeLessThanOrEqual(width-40);expect(panel.y).toBeGreaterThanOrEqual(header.y+header.height);expect(panel.y+panel.height).toBeLessThanOrEqual(height-8);
   await calc.getByLabel('Calculation',{exact:true}).fill('200+10%');await calc.getByLabel('Calculation',{exact:true}).press('Enter');await expect(calc.getByLabel('Calculation result',{exact:true})).toHaveText('220');await expect(calc.getByRole('button',{name:'Save note',exact:true})).toBeEnabled();await page.screenshot({path:`verification/local-workspace-side-calculator-${width}-${height}.png`});
   await page.locator('.topbar .status-dot').click();await expect(calc).toBeVisible();await calcTab.click();await expect(calc).toHaveCount(0);
-  await ordersTab.focus();await page.keyboard.press('Enter');const active=page.getByRole('region',{name:'Active orders',exact:true});await expect(active).toBeVisible();const activeBox=(await active.boundingBox())!;
+  await ordersTab.focus();await page.keyboard.press('Enter');const active=page.getByRole('region',{name:'Active orders',exact:true});await expect(active).toBeVisible();await expect(ordersTab).toHaveCSS('background-color','rgb(40, 91, 69)');const activeBox=(await active.boundingBox())!;
   expect(activeBox.x).toBeGreaterThanOrEqual(8);expect(activeBox.x+activeBox.width).toBeLessThanOrEqual(width-40);expect(activeBox.y).toBeGreaterThanOrEqual(header.y+header.height);expect(activeBox.y+activeBox.height).toBeLessThanOrEqual(height-8);await page.screenshot({path:`verification/local-workspace-side-orders-${width}-${height}.png`});await page.keyboard.press('Escape');await expect(active).toHaveCount(0);
   await ordersTab.click();await expect(active).toBeVisible();await page.getByRole('heading',{name:'Overview',exact:true}).click();await expect(active).toHaveCount(0);
   await page.evaluate(()=>window.scrollTo(0,document.body.scrollHeight));await expect(calcTab).toBeInViewport();await expect(ordersTab).toBeInViewport();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);

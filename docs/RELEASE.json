@@ -746,6 +746,27 @@
       "notes": "docs/LOCAL_BILL_REWARD_DETAILS.md",
       "pushed": false,
       "deployed": false
+    },
+    "bottomToolTabs": {
+      "status": "verified-local-unreleased",
+      "scope": "Calculator immediately above Active orders in a bottom-right stack; original green framed tab appearance retained exactly per clarification.",
+      "gapPx": 8,
+      "bottomClearancePx": 16,
+      "browserWorkflowsPassed": 6,
+      "viewportWidths": [
+        1440,
+        390,
+        320,
+        844,
+        2200
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "backendOrSchemaChanged": false,
+      "backendOrPostgresRerun": false,
+      "notes": "docs/LOCAL_STANDARD_CALCULATOR.md",
+      "pushed": false,
+      "deployed": false
     }
   }
 }
