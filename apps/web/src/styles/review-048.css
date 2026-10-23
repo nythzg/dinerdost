@@ -54,3 +54,5 @@
  .coupon-applied-totals del{color:#6b786e;font-size:17px;text-decoration-thickness:1.5px}
  .coupon-applied-totals>strong{color:#193f30;font-size:28px;line-height:1.3}
 }
+
+@media screen { .reward-applied-note{display:block;color:#53664a;font-size:12px;line-height:1.5;margin-top:10px} }

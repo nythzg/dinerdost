@@ -259,6 +259,24 @@
       "deployed": false
     },
     "rewardSuccessAlerts": {
+      "repeatedClaimClarification": {
+        "status": "verified-local-unreleased",
+        "scope": "Prefill the existing total loyalty claim; repeated rewards show Already applied without identical crossed-out totals; genuine/replacement/rounding changes retain server amounts and explanations.",
+        "affectedBackendTestsPassed": 19,
+        "browserWorkflowsPassed": 7,
+        "viewportWidths": [
+          1440,
+          390
+        ],
+        "typecheckPassed": true,
+        "buildPassed": true,
+        "readOnlyDiagnosticTableFingerprintsUnchanged": 8,
+        "backendOrSchemaChanged": false,
+        "postgresRerun": false,
+        "notes": "docs/LOCAL_BILL_ADJUSTMENTS.md",
+        "pushed": false,
+        "deployed": false
+      },
       "status": "verified-local-unreleased",
       "scope": "Green SweetAlert2 Coupon applied / Loyalty points claimed with total bill discount, prior payable struck through and new server payable highlighted; successful saves only.",
       "browserWorkflowsPassed": 7,

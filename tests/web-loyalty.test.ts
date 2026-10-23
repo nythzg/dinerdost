@@ -58,7 +58,7 @@ test('concurrent cap edits serialize by outlet version and exact retries write o
 
 test('web rewards work without phone verification while balances, payments, native policy and history remain protected',async()=>{
  let o=await create(false),r=o.rounds[0];const request=key(),input={version:r.version,amount:1000};
- const claimed=await s.applyEntitlement(db,owner,request,o.id,r.id,input,true);assert.equal(Number(claimed.order.rounds[0].discount),1000);assert.deepEqual(JSON.parse(JSON.stringify(await s.applyEntitlement(db,owner,request,o.id,r.id,input,true))),JSON.parse(JSON.stringify(claimed)));o=claimed.order;r=o.rounds[0];
+ const claimed=await s.applyEntitlement(db,owner,request,o.id,r.id,input,true);assert.equal(Number(claimed.order.rounds[0].discount),1000);assert.deepEqual(JSON.parse(JSON.stringify(await s.applyEntitlement(db,owner,request,o.id,r.id,input,true))),JSON.parse(JSON.stringify(claimed)));o=claimed.order;r=o.rounds[0];const repeated=(await claim(o,r,1000)).order;assert.deepEqual(repeated.totals,o.totals);assert.equal(Number((await db.query("SELECT points FROM loyalty_reservations WHERE round_id=$1 AND state='RESERVED'",[r.id])).rows[0].points),10);o=repeated;r=o.rounds[0];
  await assert.rejects(s.applyEntitlement(db,owner,key(),o.id,r.id,{version:r.version,points:100000},true),{code:'INSUFFICIENT_POINTS'});assert.deepEqual(await s.getOrder(db,owner,o.id),o);
  await assert.rejects(s.applyEntitlement(db,{...owner,application:'POS'},key(),o.id,r.id,{version:r.version,points:1},false),{code:'OTP_REQUIRED'});assert.deepEqual(await s.getOrder(db,owner,o.id),o);
  const code='NO-OTP-'+key(),coupon=key(),nativeCoupon=key();await db.transaction(owner.restroId,async tx=>{
