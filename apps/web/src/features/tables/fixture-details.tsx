@@ -14,7 +14,7 @@ export function FixtureIcon({kind}:{kind:FloorPlanObject['kind']}){
   STAIRS:'M2 21h5v-5h5v-5h5V6h5 M3 12 16 2 M11 2h5v5',
   SMOKING_ROOM:'M2 15h20v5H2z M17 15v5 M8 11V9c0-3 5-2 5-5V2 M17 11V8',
   LIQUOR_ROOM:'M7 3h10l-2 8-3 3-3-3z M12 14v7 M7 21h10',
-  PRIVATE_ROOM:'M4 21V3h16v18 M8 21V7h8v14 M12 14h.01',
+  PRIVATE_ROOM:'M5 21V3h14v18 M3 21h18 M9 12V9a3 3 0 0 1 6 0v3 M8 12h8v6H8z M12 15v.5',
  };
  return <svg className="fixture-detail-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{kind==='WASHROOM'&&<><circle cx="6" cy="3.5" r="1.7"/><circle cx="17" cy="3.5" r="1.7"/></>}<path d={paths[kind]??paths.PRIVATE_ROOM}/></svg>;
 }

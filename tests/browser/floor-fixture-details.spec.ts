@@ -17,6 +17,7 @@ test('uniform small labels fit inside or sit beneath fixtures without lines; int
    {id:'under-label',kind:'WASHROOM',label:'Washroom',x:480,y:330,width:120,height:80},
    {id:'fence',kind:'FENCE',label:'Fence',x:100,y:450,width:240,height:20},
    {id:'gate',kind:'ENTRY',label:'Entry',x:-40,y:300,width:80,height:60},
+   {id:'private',kind:'PRIVATE_ROOM',label:'Private room',x:800,y:100,width:220,height:180},
    {id:'wall',kind:'WALL',label:'Wall',x:700,y:100,width:20,height:230,rotation:15},
    {id:'table',kind:'TABLE',tableId:table.id,label:'Outdoor '+width,x:800,y:450,width:150,height:100},
   ]});
@@ -37,6 +38,9 @@ test('uniform small labels fit inside or sit beneath fixtures without lines; int
   for(let i=0;i<labelBoxes.length;i++)for(let j=i+1;j<labelBoxes.length;j++){const a=labelBoxes[i],b=labelBoxes[j];expect(a.x<b.x+b.width&&a.x+a.width>b.x&&a.y<b.y+b.height&&a.y+a.height>b.y).toBe(false);}
   await expect(page.locator('[data-fixture-id="wall"]')).toHaveCount(0);await expect(page.locator('.fixture-label-connectors,.fixture-label-connectors line')).toHaveCount(0);
   await expect(page.getByRole('button',{name:'Washroom',exact:true}).locator('.fixture-symbol circle')).toHaveCount(2);
+  for(const symbol of await page.locator('.fixture-symbol').all())await expect(symbol).toHaveCSS('background-color','rgba(0, 0, 0, 0)');
+  await expect(page.locator('[data-plan-object-id=table] svg')).toHaveCount(0);
+  const privateIcon=page.locator('[data-plan-object-id=private] .fixture-symbol svg');await expect(privateIcon).toHaveAttribute('fill','none');expect(await privateIcon.locator('path').getAttribute('d')).not.toBe(await page.locator('[data-plan-object-id=narrow] .fixture-symbol path').getAttribute('d'));
   expect(await page.locator('.fixture-detail').evaluateAll(labels=>labels.every(label=>{
    const object=document.querySelector('.plan-object[data-plan-object-id="'+label.getAttribute('data-fixture-id')+'"]');
    if(!object)return false;const body=object.getBoundingClientRect(),name=label.getBoundingClientRect();
@@ -45,7 +49,7 @@ test('uniform small labels fit inside or sit beneath fixtures without lines; int
    return [name.left,name.right].every(x=>[name.top,name.bottom].every(y=>{const dx=x-(body.left+body.right)/2,dy=y-(body.top+body.bottom)/2;return Math.abs(dx*Math.cos(angle)+dy*Math.sin(angle))<=(object as HTMLElement).offsetWidth*zoom/2+.5&&Math.abs(-dx*Math.sin(angle)+dy*Math.cos(angle))<=(object as HTMLElement).offsetHeight*zoom/2+.5;}));
   }))).toBe(true);
   // Symbols remain inside the actual rotated fixture, while names fit inside or stay below.
-  await expect(page.locator('.plan-fixture .fixture-symbol')).toHaveCount(6);await expect(page.locator('.fixture-detail svg')).toHaveCount(0);
+  await expect(page.locator('.plan-fixture .fixture-symbol')).toHaveCount(7);await expect(page.locator('.fixture-detail svg')).toHaveCount(0);
   expect(await page.locator('.fixture-symbol').evaluateAll(symbols=>{
    const zoom=new DOMMatrix(getComputedStyle(document.querySelector('.floor-camera')!).transform).a;
    return symbols.every(symbol=>{const body=symbol.parentElement!,r=symbol.getBoundingClientRect(),b=body.getBoundingClientRect(),angle=Number(body.style.transform.match(/rotate\(([-.\d]+)/)?.[1]??0)*Math.PI/180;
@@ -68,6 +72,6 @@ test('uniform small labels fit inside or sit beneath fixtures without lines; int
   await page.screenshot({path:`verification/local-fixture-adaptive-labels-${width}.png`});
   await page.getByRole('button',{name:'Save layout',exact:true}).click();await expect(page.getByRole('button',{name:'Arrange',exact:true})).toBeVisible();
   const saved=(await workspace(page)).floorPlans.find((p:any)=>p.floor===floor);expect(saved.boundary_roundness).toBe(80);expect(saved.objects.find((o:any)=>o.id==='table').allowOutside).toBe(true);expect(saved.objects.find((o:any)=>o.id==='table').x).toBeGreaterThan(1200);expect(saved.objects.find((o:any)=>o.id==='gate').x).toBe(-140);expect(saved.objects.some((o:any)=>o.kind==='FENCE')).toBe(true);
-  await page.reload();await expect(page.getByRole('button',{name:'Entry/Exit',exact:true})).toBeAttached();await expect(page.locator('.floor-boundary-shape')).toHaveAttribute('d',/ Q/);await expect(page.locator('.fixture-detail')).toHaveCount(6);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.reload();await expect(page.getByRole('button',{name:'Entry/Exit',exact:true})).toBeAttached();await expect(page.locator('.floor-boundary-shape')).toHaveAttribute('d',/ Q/);await expect(page.locator('.fixture-detail')).toHaveCount(7);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  }
 });

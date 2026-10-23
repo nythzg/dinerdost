@@ -767,6 +767,24 @@
       "notes": "docs/LOCAL_STANDARD_CALCULATOR.md",
       "pushed": false,
       "deployed": false
+    },
+    "transparentFixtureIcons": {
+      "status": "verified-local-unreleased",
+      "scope": "Transparent fixture-icon backplates and clearer Private Room door/lock; unchanged adaptive labels and physical geometry.",
+      "browserWorkflowsPassed": 3,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "backendOrSchemaChanged": false,
+      "backendOrPostgresRerun": false,
+      "tableIconProposalStatus": "preview-only-awaiting-explicit-user-approval",
+      "tableIconsApplied": false,
+      "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
+      "pushed": false,
+      "deployed": false
     }
   }
 }
