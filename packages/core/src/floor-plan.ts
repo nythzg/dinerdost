@@ -31,7 +31,6 @@ export const floorPlanFixtures = [
   { kind: "RECEPTION", label: "Reception", width: 180, height: 70 },
   { kind: "WASHROOM", label: "Washroom", width: 180, height: 70 },
   { kind: "ENTRY", label: "Entry/Exit", width: 150, height: 60 },
-  { kind: "EXIT", label: "Exit", width: 150, height: 60 },
   { kind: "STAIRS", label: "Staircase", width: 180, height: 70 },
   { kind: "SMOKING_ROOM", label: "Smoking room", width: 260, height: 180 },
   { kind: "LIQUOR_ROOM", label: "Liquor room", width: 260, height: 180 },

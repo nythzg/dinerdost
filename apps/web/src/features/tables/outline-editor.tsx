@@ -137,7 +137,7 @@ export function OutlineEditor({
   return (
     <div className="outline-editor">
       <div className="outline-shapes">
-        {(["Rectangle", "L-shaped", "U-shaped", "Circle"] as const).map(
+        {(["Rectangle", "Circle"] as const).map(
           (shape) => (
             <button
               className="button"
@@ -323,27 +323,7 @@ export function OutlineEditor({
         >
           Remove
         </button>
-        <button
-          className="button"
-          onClick={() => {
-            if(ellipse){
-              const width=Math.min(area.width,ellipse.height),height=Math.min(area.height,ellipse.width);
-              setPoints(ellipseOutline({x:Math.max(0,Math.min(area.width-width,ellipse.x+ellipse.width/2-width/2)),y:Math.max(0,Math.min(area.height-height,ellipse.y+ellipse.height/2-height/2)),width,height}));
-              setSelected(null);setSelectedEdge(null);return;
-            }
-            setPoints((previous) =>
-              previous.map((p) => ({
-                    x: Math.round(
-                      area.width - (p.y * area.width) / area.height,
-                    ),
-                    y: Math.round((p.x * area.height) / area.width),
-                  })),
-            );
-            setSelected(null);setSelectedEdge(null);
-          }}
-        >
-          Rotate
-        </button>
+
       </div>
       {!valid && (
         <p className="error" role="alert">

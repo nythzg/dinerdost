@@ -29,7 +29,6 @@ import {
   placeFloorFixture,
   roundedFloorBoundary,
   constrainFloorChange,
-  ellipseOutline,
 } from "@dinerdost/core";
 import { Empty, Icon } from "@/components/ui";
 import { type Row } from "@/lib/client";
@@ -37,7 +36,7 @@ import { useDesk } from "../workspace/context";
 import { OutlineEditor } from "./outline-editor";
 import { ExploreHeader } from "./explore-header";
 import {useRenameTable} from "./rename-table";
-import {floorViewKey,parseFloorView,moveFloorSelection} from "./floor-editor-state";
+import {floorViewKey,parseFloorView,moveFloorSelection,resizeFloorArea,type FloorAreaDraft} from "./floor-editor-state";
 
 const resizeDirections:FloorResizeDirection[]=['nw','n','ne','w','e','sw','s','se'];
 const resizeLabels:Record<FloorResizeDirection,string>={nw:'top left corner',n:'top edge',ne:'top right corner',w:'left edge',e:'width',sw:'bottom left corner',s:'height',se:'corner'};
@@ -97,9 +96,11 @@ export function FloorPlan() {
       { tableId: string; version: number }[]
     >([]),
     [draftArea, setDraftArea] = useState<FloorPlanSize | null>(null),
+    [resizingArea,setResizingArea]=useState(false),
+    [areaOrigin,setAreaOrigin]=useState({x:0,y:0}),
     [clipboard, setClipboard] = useState<PlanObject | null>(null);
   const [selection,setSelection]=useState<string[]>([]),[touchSelect,setTouchSelect]=useState(false);
-  const setSelected=(id:string)=>{selectPrimary(id);setSelection(id?[id]:[])};
+  const setSelected=(id:string)=>{if(id)setResizingArea(false);selectPrimary(id);setSelection(id?[id]:[])};
   const toggleSelection=(id:string)=>{const next=selection.includes(id)?selection.filter(x=>x!==id):[...selection,id];setSelection(next);selectPrimary(next.at(-1)??'')};
   const [draftOutline, setDraftOutline] = useState<FloorPoint[] | null>(null);
   const outline: FloorPoint[] | null = draft
@@ -123,7 +124,7 @@ export function FloorPlan() {
   const [hydratedView,setHydratedView]=useState('');
   const viewKey=floorViewKey(data.actor.employeeId,data.outletId,floor??'');
   const fitRef=useRef<()=>void>(()=>{});
-  type Snapshot={objects:PlanObject[];area:FloorPlanSize;outline:FloorPoint[]|null;boundary:string;roundness:number;deleted:{tableId:string;version:number}[]};
+  type Snapshot={objects:PlanObject[];area:FloorPlanSize;outline:FloorPoint[]|null;boundary:string;roundness:number;origin:{x:number;y:number};deleted:{tableId:string;version:number}[]};
   const history=useRef<Snapshot[]>([]),historyPosition=useRef(-1),historySkip=useRef(false),historyGesture=useRef(false);
   const [historyRevision,reviseHistory]=useState(0);
   const finishGesture=()=>{historyGesture.current=false;reviseHistory(n=>n+1)};
@@ -131,16 +132,18 @@ export function FloorPlan() {
     if(!draft){history.current=[];historyPosition.current=-1;historySkip.current=false;historyGesture.current=false;return}
     if(historySkip.current){historySkip.current=false;return}
     if(historyGesture.current)return;
-    const next:Snapshot={objects:draft,area,outline,boundary:boundaryStyle,roundness:boundaryRoundness,deleted:deletedTables};
+    const next:Snapshot={objects:draft,area,outline,boundary:boundaryStyle,roundness:boundaryRoundness,origin:areaOrigin,deleted:deletedTables};
     if(JSON.stringify(history.current[historyPosition.current])===JSON.stringify(next))return;
     history.current=[...history.current.slice(0,historyPosition.current+1),structuredClone(next)].slice(-81);historyPosition.current=history.current.length-1;
     reviseHistory(n=>n+1);
-  },[draft,draftArea,draftOutline,boundaryStyle,boundaryRoundness,deletedTables,historyRevision]);
+  },[draft,draftArea,draftOutline,boundaryStyle,boundaryRoundness,areaOrigin,deletedTables,historyRevision]);
   const restoreHistory=(delta:number)=>{
     const position=historyPosition.current+delta,snapshot=history.current[position];if(!draft||!snapshot||historyGesture.current)return;
+    setPan(p=>({x:p.x+(snapshot.origin.x-areaOrigin.x)*zoom,y:p.y+(snapshot.origin.y-areaOrigin.y)*zoom}));setAreaOrigin({...snapshot.origin});
     historyPosition.current=position;historySkip.current=true;setDraft(structuredClone(snapshot.objects));setDraftArea({...snapshot.area});setDraftOutline(structuredClone(snapshot.outline));setBoundaryStyle(snapshot.boundary);setBoundaryRoundness(snapshot.roundness);setDeletedTables(structuredClone(snapshot.deleted));setSelected('');reviseHistory(n=>n+1);
   };
   const syncRenamedTable=(tableId:string,label:string)=>{history.current=history.current.map(snapshot=>({...snapshot,objects:snapshot.objects.map(o=>o.tableId===tableId?{...o,label}:o)}));};
+  const areaDrag=useRef<{layout:FloorAreaDraft;origin:{x:number;y:number};pan:{x:number;y:number};zoom:number;pointerId:number;direction:FloorResizeDirection;start:{x:number;y:number}}|null>(null);
   const panMoved = useRef(false);
   const touchPoints = useRef(new Map<number, { x: number; y: number }>());
   const touchStartSelection = useRef("");
@@ -157,7 +160,7 @@ export function FloorPlan() {
     startY: number;
   } | null>(null);
   const fitView = () => {
-    if (lockRef.current) return;
+    if (lockRef.current || areaDrag.current) return;
     const element = surface.current;
     if (!element) return;
     const points=[{x:0,y:0},{x:area.width,y:area.height},...(draft??saved?.objects??[]).filter(floorAllowsOutside).flatMap(floorObjectCorners)];
@@ -166,8 +169,9 @@ export function FloorPlan() {
     manualZoom.current=false;setZoom(next);setPan({x:(element.clientWidth-width*next)/2-minX*next,y:(element.clientHeight-height*next)/2-minY*next});
   };
   fitRef.current=fitView;
+  useEffect(()=>{if(!resizingArea)return;const frame=requestAnimationFrame(()=>fitRef.current());return()=>cancelAnimationFrame(frame)},[resizingArea]);
   const zoomTo = (next: number, point?: { x: number; y: number }) => {
-    if (cameraLocked) return;
+    if (cameraLocked || areaDrag.current) return;
     const element = surface.current;
     if (!element) return;
     next = Math.max(0.05, Math.min(4, next));
@@ -185,7 +189,7 @@ export function FloorPlan() {
   const wheel = useRef<(event: WheelEvent) => void>(() => {});
   wheel.current = (event) => {
     event.preventDefault();
-    if (cameraLocked) return;
+    if (cameraLocked || areaDrag.current) return;
     const rect = surface.current!.getBoundingClientRect();
     if (event.ctrlKey || event.metaKey)
       zoomTo(zoom * Math.exp(-event.deltaY * 0.002), {
@@ -269,7 +273,8 @@ export function FloorPlan() {
     );
   const startArrange = () => {
     baseVersion.current = saved?.version ?? 0;
-    setDraft(visible.map((object) => ({ ...object,label:floorFixtureLabel(object) })));
+    setDraft(visible.map((object) => ({ ...object,kind:object.kind==='EXIT'?'ENTRY':object.kind,label:floorFixtureLabel(object) })));
+    setAreaOrigin({x:0,y:0});setResizingArea(false);
     setSelected("");
     setDraftArea({ ...area });
     setDraftOutline(saved?.outline ?? null);
@@ -290,6 +295,7 @@ export function FloorPlan() {
     }
     const object = {
       ...clipboard,
+      kind:clipboard.kind==='EXIT'?'ENTRY' as const:clipboard.kind,
       id: crypto.randomUUID(),
       x: clipboard.x + 30,
       y: clipboard.y + 30,
@@ -317,55 +323,31 @@ export function FloorPlan() {
     setSelected(placed.id);
     setClipboard({ ...placed });
   };
-  const resizeArea = () =>
-    form(
-      "Resize floor area",
-      [
-        {
-          name: "width",
-          label: "Area width",
-          type: "number",
-          value: area.width,
-          min: 400,
-          max: 5000,
-        },
-        {
-          name: "height",
-          label: "Area height",
-          type: "number",
-          value: area.height,
-          min: 300,
-          max: 5000,
-        },
-      ],
-      async (values) => {
-        const next = {
-          width: Number(values.width),
-          height: Number(values.height),
-        };
-        setDraftArea(next);
-        setDraftOutline((previous) => {
-          const ellipse = previous ? floorEllipse(previous) : null;
-          return ellipse
-            ? ellipseOutline({
-                x: (ellipse.x * next.width) / area.width,
-                y: (ellipse.y * next.height) / area.height,
-                width: (ellipse.width * next.width) / area.width,
-                height: (ellipse.height * next.height) / area.height,
-              })
-            : (previous?.map((p) => ({
-                x: Math.round((p.x * next.width) / area.width),
-                y: Math.round((p.y * next.height) / area.height),
-              })) ?? null);
-        });
-        setDraft((previous) =>
-          previous!.map((object) => floorAllowsOutside(object)?object:fitFloorObject(object, next)),
-        );
-        manualZoom.current = false;
-        close();
-      },
-      "Apply size",
-    );
+  const applyAreaChange=(change:ReturnType<typeof resizeFloorArea>,origin:{x:number;y:number},viewPan:{x:number;y:number},viewZoom:number)=>{
+    setDraft(change.objects);setDraftArea(change.area);setDraftOutline(change.outline);
+    setAreaOrigin({x:origin.x+change.offset.x,y:origin.y+change.offset.y});
+    setPan({x:viewPan.x+change.offset.x*viewZoom,y:viewPan.y+change.offset.y*viewZoom});
+  };
+  const startAreaResize=(event:PointerEvent<HTMLButtonElement>,direction:FloorResizeDirection)=>{
+    event.preventDefault();event.stopPropagation();if(!draft||areaDrag.current)return;
+    // Thin floors can have overlapping touch targets; honor the visible knob under the pointer.
+    const exact=Array.from(event.currentTarget.closest('.floor-plan-canvas')!.querySelectorAll<HTMLButtonElement>('[data-area-resize-direction]')).find(handle=>{
+      const rect=handle.querySelector('span')!.getBoundingClientRect();
+      return event.clientX>=rect.left&&event.clientX<=rect.right&&event.clientY>=rect.top&&event.clientY<=rect.bottom;
+    });
+    (exact??event.currentTarget).focus({preventScroll:true});
+    manualZoom.current=true;historyGesture.current=true;panMoved.current=false;
+    areaDrag.current={layout:{area:{...area},outline:structuredClone(outline),objects:structuredClone(draft)},origin:{...areaOrigin},pan:{...pan},zoom,pointerId:event.pointerId,direction:(exact?.dataset.areaResizeDirection as FloorResizeDirection|undefined)??direction,start:{x:event.clientX,y:event.clientY}};
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const abortAreaDrag=()=>{
+    const active=areaDrag.current;if(active)applyAreaChange({...active.layout,offset:{x:0,y:0}},active.origin,active.pan,active.zoom);
+    areaDrag.current=null;finishGesture();
+  };
+  const cancelArrange=()=>{
+    setPan(p=>({x:p.x-areaOrigin.x*zoom,y:p.y-areaOrigin.y*zoom}));setAreaOrigin({x:0,y:0});setResizingArea(false);areaDrag.current=null;
+    setDraft(null);setDraftArea(null);setSelected('');
+  };
   const openTable = (table: Row) => {
     if (table.is_occupied) {
       if (
@@ -411,6 +393,7 @@ export function FloorPlan() {
     object: PlanObject,
   ) => {
     if (!draft) return;
+    setResizingArea(false);
     manualZoom.current = true;
     if(event.ctrlKey||event.metaKey||touchSelect){toggleSelection(object.id);event.preventDefault();return;}
     const ids=selection.includes(object.id)?selection:[object.id];
@@ -649,11 +632,7 @@ export function FloorPlan() {
               <div className="inline-actions">
                 <button
                   className="button"
-                  onClick={() => {
-                    setDraft(null);
-                    setDraftArea(null);
-                    setSelected("");
-                  }}
+                  onClick={cancelArrange}
                 >
                   <T>{"Cancel"}</T>
                 </button>
@@ -679,6 +658,7 @@ export function FloorPlan() {
                       ...area,
                     })
                       .then(() => {
+                        setResizingArea(false);setAreaOrigin({x:0,y:0});
                         setDraft(null);
                         setDraftArea(null);
                         setSelected("");
@@ -706,7 +686,7 @@ export function FloorPlan() {
               }
             >
               <option value="TABLE" disabled={!can(data.actor,'settings')}>Table</option>
-              {floorPlanFixtures.filter(item=>item.kind!=="EXIT").map((item) => (
+              {floorPlanFixtures.map((item) => (
                 <option key={item.kind} value={item.kind}>
                   {item.label}
                 </option>
@@ -742,8 +722,8 @@ export function FloorPlan() {
               <Icon name="plus" />
               <T>{fixture==='TABLE'?'Add table':'Add fixture'}</T>
             </button>
-            <button className="button" onClick={resizeArea}>
-              <T>{"Resize area"}</T>
+            <button className={"button"+(resizingArea?" primary":"")} aria-label="Resize area" aria-pressed={resizingArea} onClick={()=>{setSelected('');manualZoom.current=true;setResizingArea(value=>!value)}}>
+              <T>{resizingArea?"Done resizing":"Resize area"}</T>
             </button>
             <button
               className="button"
@@ -788,6 +768,7 @@ export function FloorPlan() {
             <button className="button" disabled={historyPosition.current>=history.current.length-1} onClick={()=>restoreHistory(1)} aria-label="Redo layout change">Redo</button>
             <button className="button" aria-pressed={touchSelect} onClick={()=>setTouchSelect(value=>!value)}>Select multiple</button>
             {selection.length>1&&<span role="status">{selection.length} selected · drag together</span>}
+            {resizingArea&&<span className="floor-area-resize-hint" role="status">Drag a floor edge or corner. Furniture stays in place.</span>}
             <small>
               Ctrl+Z / Ctrl+Shift+Z · Ctrl+C / Ctrl+V · {area.width} × {area.height}
             </small>
@@ -832,6 +813,7 @@ export function FloorPlan() {
               update(resizing.current.object.id, resizing.current.object);
             drag.current = null;
             resizing.current = null;
+            areaDrag.current=null;
             panDrag.current = null;finishGesture();
             setSelected(touchStartSelection.current);
           }
@@ -1139,6 +1121,18 @@ export function FloorPlan() {
                 );
               })}
               <FixtureLabels objects={visible.map(object=>({...object,label:tables.find(table=>table.id===object.tableId)?.label??object.label}))} occupiedIds={visible.filter(object=>tables.some(table=>table.id===object.tableId&&table.is_occupied)).map(object=>object.id)} zoom={zoom} reserved={draft&&current?[current]:[]} viewport={surface.current?{x:-pan.x,y:-pan.y,width:surface.current.clientWidth,height:surface.current.clientHeight}:undefined}/>
+              {draft&&resizingArea&&<>
+                <svg className="floor-area-resize-frame" aria-hidden="true" style={{width:area.width,height:area.height}}><rect x="0" y="0" width={area.width} height={area.height} fill="none" stroke="#285b45" strokeWidth="2" strokeDasharray="6 4" vectorEffect="non-scaling-stroke"/></svg>
+                {resizeDirections.map(direction=>{const [hx,hy]=resizeVectors[direction];return <button key={direction} type="button" className="plan-resize-handle floor-area-resize-handle" aria-label={'Resize floor '+{nw:'top left corner',n:'top edge',ne:'top right corner',w:'left edge',e:'right edge',sw:'bottom left corner',s:'bottom edge',se:'bottom right corner'}[direction]} data-area-resize-direction={direction}
+                  style={{left:(hx+1)*area.width/2,top:(hy+1)*area.height/2,width:32/zoom,height:32/zoom,cursor:hx&&hy?(hx===hy?'nwse-resize':'nesw-resize'):hx?'ew-resize':'ns-resize'}}
+                  onPointerDown={event=>startAreaResize(event,direction)}
+                  onPointerMove={event=>{const active=areaDrag.current;if(!active||active.pointerId!==event.pointerId)return;event.stopPropagation();applyAreaChange(resizeFloorArea(active.layout,active.direction,(event.clientX-active.start.x)/active.zoom,(event.clientY-active.start.y)/active.zoom,roundness),active.origin,active.pan,active.zoom)}}
+                  onPointerUp={event=>{if(areaDrag.current?.pointerId!==event.pointerId)return;areaDrag.current=null;finishGesture()}}
+                  onPointerCancel={event=>{if(areaDrag.current?.pointerId===event.pointerId)abortAreaDrag()}}
+                  onLostPointerCapture={event=>{if(areaDrag.current?.pointerId===event.pointerId){areaDrag.current=null;finishGesture()}}}
+                  onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();abortAreaDrag();setResizingArea(false);return;}const delta={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[event.key];if(!delta)return;event.preventDefault();event.stopPropagation();manualZoom.current=true;applyAreaChange(resizeFloorArea({area,outline,objects:draft},direction,delta[0],delta[1],roundness),areaOrigin,pan,zoom)}}
+                ><span style={{width:13/zoom,height:13/zoom,borderWidth:2/zoom}}/></button>})}
+              </>}
               {draft &&
                 current && selection.length<=1 &&
                 resizeDirections.map((direction) => {

@@ -33,10 +33,12 @@ for(const width of [1440,390])test('selected outline edge inserts its midpoint w
  await insert(1,true);await remove.click();expect((await outlinePoints(page)).length).toBe(4);
  // The last edge connects the last corner back to the first.
  await insert(3,true);await remove.click();
- await dialog.getByRole('button',{name:'U-shaped',exact:true}).click();await expect(add).toBeDisabled();await insert(3,true);await remove.click();
- // Selecting a corner clears the edge; Rotate and shape presets do too.
+ await insert(0);const indentation=dialog.getByRole('button',{name:'Corner 2',exact:true});for(let i=0;i<20;i++)await indentation.press('ArrowDown');await insert(1,true);
+ await dialog.getByRole('button',{name:'Rectangle',exact:true}).click();
+ for(const name of ['L-shaped','U-shaped','Rotate'])await expect(dialog.getByRole('button',{name,exact:true})).toHaveCount(0);
+ // Selecting a corner and choosing a shape clear the edge.
  await chooseEdge(0);await dialog.getByRole('button',{name:'Corner 2',exact:true}).focus();await expect(add).toBeDisabled();
- await chooseEdge(0);await dialog.getByRole('button',{name:'Rotate',exact:true}).click();await expect(add).toBeDisabled();
+ await chooseEdge(0);await dialog.getByRole('button',{name:'Rectangle',exact:true}).click();await expect(add).toBeDisabled();
  await dialog.getByRole('button',{name:'Rectangle',exact:true}).click();
  while((await outlinePoints(page)).length<24){const points=await outlinePoints(page);let longest=0,index=0;points.forEach((p,i)=>{const q=points[(i+1)%points.length],length=(p.x-q.x)**2+(p.y-q.y)**2;if(length>longest){longest=length;index=i}});await insert(index);}
  await chooseEdge(0);await expect(add).toBeDisabled();await dialog.getByRole('button',{name:'Circle',exact:true}).click();await expect(add).toBeDisabled();await expect(remove).toBeDisabled();

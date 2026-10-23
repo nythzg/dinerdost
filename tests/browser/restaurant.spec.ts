@@ -99,7 +99,7 @@ test("custom floors, outlines and activation switch persist with unchanged table
   await page
     .getByRole("button", { name: "Floor outline", exact: true })
     .click();
-  await page.getByRole("button", { name: "L-shaped", exact: true }).click();
+  await page.getByRole("button", { name: "Rectangle", exact: true }).click();
   await page.getByRole("button",{name:"Edge 1",exact:true}).focus();
   await page.keyboard.press("Enter");
   await page.getByRole("button", { name: "Add corner", exact: true }).click();
@@ -108,10 +108,11 @@ test("custom floors, outlines and activation switch persist with unchanged table
     .click();
   await expect(
     page.getByRole("dialog").getByRole("button", { name: /^Corner \d+$/ }),
-  ).toHaveCount(6);
+  ).toHaveCount(4);
   await page.getByRole("button",{name:"Edge 1",exact:true}).focus();
   await page.keyboard.press("Enter");
   await page.getByRole("button", { name: "Add corner", exact: true }).click();
+  const beforeManualOutline=await page.locator(".outline-preview polygon").getAttribute("points");
   const corner = page.getByRole("button", { name: "Corner 2", exact: true }),
     handle = await corner.boundingBox();
   await page.mouse.move(
@@ -125,12 +126,9 @@ test("custom floors, outlines and activation switch persist with unchanged table
     { steps: 4 },
   );
   await page.mouse.up();
-  const polygon = page.locator(".outline-preview polygon"),
-    beforeRotation = await polygon.getAttribute("points");
-  await page.getByRole("button", { name: "Rotate", exact: true }).click();
-  await expect(polygon).not.toHaveAttribute("points", beforeRotation!);
-  for (let i = 0; i < 3; i++)
-    await page.getByRole("button", { name: "Rotate", exact: true }).click();
+  await expect(page.locator(".outline-preview polygon")).not.toHaveAttribute("points",beforeManualOutline!);
+  const expectedOutline=await page.locator(".outline-preview polygon").evaluate(element=>(element.getAttribute("points")??"").trim().split(/\s+/).map(value=>{const [x,y]=value.split(",").map(Number);return {x,y}}));
+  for(const name of ["L-shaped","U-shaped","Rotate"])await expect(page.getByRole("dialog").getByRole("button",{name,exact:true})).toHaveCount(0);
   await expect(page.getByRole("dialog").locator("input")).toHaveCount(0);
   const notification = page.getByRole("button", {
     name: "Dismiss notification",
@@ -202,7 +200,7 @@ test("custom floors, outlines and activation switch persist with unchanged table
   );
   expect(
     final.floorPlans.find((p: any) => p.floor === "Garden lounge").outline,
-  ).toHaveLength(7);
+  ).toEqual(expectedOutline);
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator(".sidebar")).not.toBeInViewport();
   await page.screenshot({
@@ -2361,15 +2359,15 @@ test("Floor plan resizes, copies tables and fixtures, and saves rooms without du
   await page.goto("/app/floor-plan");
   await page.getByRole("button", { name: "Arrange", exact: true }).click();
   await page.getByRole("button", { name: "Resize area", exact: true }).click();
-  await page.getByLabel("Area width", { exact: true }).fill("2000");
-  await page.getByLabel("Area height", { exact: true }).fill("1400");
-  await save(page, "Apply size");
+  const areaHandle=page.getByRole("button",{name:"Resize floor bottom right corner",exact:true});await areaHandle.focus();
+  for(let i=0;i<80;i++)await areaHandle.press("ArrowRight");for(let i=0;i<60;i++)await areaHandle.press("ArrowDown");
+  await page.getByRole("button",{name:"Resize area",exact:true}).click();
   await expect(page.locator(".floor-plan-canvas")).toHaveCSS("width", "2000px");
   for (const [kind, name] of [
     ["SMOKING_ROOM", "Smoking room"],
     ["LIQUOR_ROOM", "Liquor room"],
     ["WALL", "Wall"],
-    ["EXIT", "Exit"],
+    ["ENTRY", "Entry/Exit"],
     ["KITCHEN", "Kitchen"],
   ]) {
     await page.getByLabel("Fixture type", { exact: true }).selectOption(kind);
@@ -2427,9 +2425,8 @@ test("Floor plan resizes, copies tables and fixtures, and saves rooms without du
   );
   await page.getByRole("button", { name: "Arrange", exact: true }).click();
   await page.getByRole("button", { name: "Resize area", exact: true }).click();
-  await page.getByLabel("Area width", { exact: true }).fill("400");
-  await page.getByLabel("Area height", { exact: true }).fill("300");
-  await save(page, "Apply size");
+  const shrinkArea=page.getByRole("button",{name:"Resize floor bottom right corner",exact:true});await shrinkArea.focus();
+  for(let i=0;i<10;i++)await shrinkArea.press("ArrowLeft");for(let i=0;i<10;i++)await shrinkArea.press("ArrowUp");
   await page.getByRole("button", { name: "Cancel", exact: true }).click();
   await expect(page.locator(".floor-plan-canvas")).toHaveCSS("width", "2000px");
   await page.screenshot({

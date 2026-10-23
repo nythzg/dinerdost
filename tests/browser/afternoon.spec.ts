@@ -343,7 +343,7 @@ test("afternoon Explore supports circle edges, visual resize and compact labels"
     .getByRole("button", { name: "Floor outline", exact: true })
     .click();
   await page.getByRole("button", { name: "Circle", exact: true }).click();
-  await page.getByRole("button", { name: "Rotate", exact: true }).click();
+  await expect(page.getByRole("dialog").getByRole("button", { name: "Rotate", exact: true })).toHaveCount(0);
   await expect(page.locator(".outline-preview ellipse")).toHaveAttribute(
     "rx",
     "400",
@@ -406,7 +406,7 @@ test("afternoon Explore supports circle edges, visual resize and compact labels"
   for (let i = 0; i < 4; i++) await handle.press("ArrowUp");
   const fixture = page.getByRole("button", { name: "Reception", exact: true });
   await expect(fixture).toHaveCSS("width", "80px");
-  await expect(fixture).toHaveCSS("overflow", "visible");
+  await expect(page.locator(".fixture-detail").filter({hasText:"Reception"})).toBeVisible();
   await expect(page.getByLabel("Object width", { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Save layout", exact: true }).click();
   await expect(

@@ -241,6 +241,23 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "draggableFloorArea": {
+      "status": "verified-local-unreleased",
+      "scope": "Standalone Exit removed; Rectangle/Circle/manual outline controls; eight draggable area boundaries replacing numeric size inputs while preserving physical furniture.",
+      "fullBackendTestsPassed": 298,
+      "affectedTestsPassed": 23,
+      "browserWorkflowsPassed": 14,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "serviceOrSchemaChanged": false,
+      "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
+      "pushed": false,
+      "deployed": false
+    },
     "outlineEdgeCorners": {
       "status": "verified-local-unreleased",
       "scope": "Select an outline edge and insert a midpoint corner between its endpoints, with visible edge/endpoints and keyboard/touch support.",
