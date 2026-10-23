@@ -438,6 +438,7 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
             const reward = rewards[round.id];
             const extra = { roundId: round.id };
             const remaining = Number(round.payable) - Number(round.paid);
+            const itemTotal = round.items.reduce((sum:number,item:Row)=>sum+Math.round(Number(item.unit_price)*Number(item.quantity_milli)/1000),0);
             const activePayment = round.payments.find((p: Row) =>
               ["AWAITING_VERIFICATION", "UNKNOWN"].includes(p.state),
             );
@@ -487,7 +488,7 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
                   </div>
                   <div className="round-total">
                     <small>Round total</small>
-                    <strong>{money(round.payable)}</strong>
+                    <strong>{money(itemTotal)}</strong>
                   </div>
                 </div>
                 {reward && (

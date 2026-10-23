@@ -21,3 +21,14 @@ test('combined future adjustments preserve existing bills; direct part-paid bill
  }
 });
 
+
+
+for(const width of [1440,390])test('round total sums its own displayed items independently of the bill payable at '+width+'px',async({page})=>{
+ test.setTimeout(120000);await page.setViewportSize({width,height:width===390?844:1000});await register(page);const w=await workspace(page),suffix=randomUUID().slice(0,6),items=[];
+ for(const [name,price] of [['Round A',22000],['Round B',16000],['Fractional',8001]] as const)items.push(await command(page,'menu',{outletId:w.outletId,name:name+' '+suffix,category:'Food',price,taxBps:500,unit:'kg',station:'Main kitchen'}));
+ let order=await command(page,'createRound',{outletId:w.outletId,type:'TAKEAWAY',customer:{name:'Round totals QA',phone:'9123456742'},items:[{itemId:items[0].id,quantity:1},{itemId:items[1].id,quantity:1}]});
+ await command(page,'orderAdjustments',{version:order.rounds[0].version,discount:10000,roundToRupee:true,roundingMode:'DOWN'},{orderId:order.id,roundId:order.rounds[0].id});order=await detail(page,order.id);
+ order=await command(page,'createRound',{outletId:w.outletId,orderId:order.id,version:order.version,type:'TAKEAWAY',items:[{itemId:items[2].id,quantity:1.125}]});await command(page,'recordPayment',{version:order.rounds[0].version,method:'CASH',amount:100},{orderId:order.id,roundId:order.rounds[0].id});const before=await detail(page,order.id);
+ await page.goto('/app/orders/'+order.id);for(const [index,total] of ['₹380.00','₹90.01'].entries()){const round=page.locator('#round-'+order.rounds[index].id);await expect(round.locator('.round-total strong')).toHaveText(total);const amounts=await round.locator('tbody tr td:last-child').allTextContents();const shown=amounts.reduce((sum,text)=>sum+Math.round(Number(text.replace(/[^0-9.]/g,''))*100),0);expect(Math.round(Number(total.replace(/[^0-9.]/g,''))*100)).toBe(shown);expect(Number(before.rounds[index].payable)).not.toBe(shown);await round.screenshot({path:`verification/local-round-items-total-${width}-${index+1}.png`});}
+ const summary=page.locator('.total-panel');await expect(summary.locator('.total-row').filter({hasText:/^Total/}).locator('strong')).toContainText((Number(before.totals.payable)/100).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2}));expect(await detail(page,order.id)).toEqual(before);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});

@@ -241,6 +241,22 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "roundItemTotals": {
+      "status": "verified-local-unreleased",
+      "behavior": "Round total sums only the Amount values displayed for that round; final payable, bill summary, payment/invoice data remain unchanged.",
+      "browserWorkflowsPassed": 3,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "backendOrSchemaChanged": false,
+      "backendOrPostgresRerun": false,
+      "notes": "docs/LOCAL_BILL_ADJUSTMENTS.md",
+      "pushed": false,
+      "deployed": false
+    },
     "webPhoneVerificationRemoved": {
       "status": "verified-local-unreleased",
       "scope": "Web loyalty and coupon redemption no longer requires customer phone verification; web verification help/status badges removed without changing stored verification facts or native policy.",
