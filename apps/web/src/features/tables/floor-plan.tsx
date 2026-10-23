@@ -953,6 +953,9 @@ export function FloorPlan() {
         }}
       >
         <div className="floor-plan-window">
+          <div className="floor-name-tag" aria-label="Floor name tag">
+            {floor}
+          </div>
           <div
             className="floor-camera"
             style={{

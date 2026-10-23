@@ -8,10 +8,12 @@ async function command(page:Page,action:string,input:unknown){const r=await page
 const position=(page:Page,name:string)=>page.getByRole('button',{name,exact:true}).evaluate(el=>({x:parseFloat((el as HTMLElement).style.left),y:parseFloat((el as HTMLElement).style.top)}));
 test('draft undo/redo groups gestures; Ctrl/touch multi-select moves together; scoped locked view survives navigation and reload',async({page})=>{
  test.setTimeout(240000);await register(page);const w=await workspace(page);
+ await command(page,'floorPlan',{outletId:w.outletId,floor:'Reference floor '+randomUUID().slice(0,4),version:0,width:1000,height:700,objects:[]});
  for(const width of [1440,390]){
   await page.setViewportSize({width,height:width===390?844:1000});const floor='Editor '+width+' '+randomUUID().slice(0,4);
   await command(page,'floorPlan',{outletId:w.outletId,floor,version:0,width:1000,height:700,objects:[{id:'a',kind:'RECEPTION',label:'Counter A',x:100,y:180,width:150,height:80},{id:'b',kind:'PRIVATE_ROOM',label:'Room B',x:400,y:300,width:180,height:100},{id:'c',kind:'KITCHEN',label:'Kitchen C',x:700,y:450,width:200,height:160}]});
   await page.goto('/app/floor-plan');await page.getByLabel('Floor plan floor',{exact:true}).selectOption(floor);await page.getByRole('button',{name:'Arrange',exact:true}).click();await page.getByLabel('Fit floor to view',{exact:true}).click();
+  const nameTag=page.getByLabel('Floor name tag',{exact:true});await expect(nameTag).toHaveText(floor);await expect(nameTag).toBeVisible();
   const a=page.getByRole('button',{name:'Counter A',exact:true}),b=page.getByRole('button',{name:'Room B',exact:true});
   if(width===390){await page.getByRole('button',{name:'Select multiple',exact:true}).click();await a.click();await b.click();await page.getByRole('button',{name:'Select multiple',exact:true}).click()}else{await a.click();await b.click({modifiers:['Control']})}
   await expect(a).toHaveAttribute('aria-pressed','true');await expect(b).toHaveAttribute('aria-pressed','true');await expect(page.getByRole('status').filter({hasText:'2 selected'})).toBeVisible();
@@ -27,5 +29,10 @@ test('draft undo/redo groups gestures; Ctrl/touch multi-select moves together; s
   await page.goto('/app/orders');await page.goto('/app/floor-plan');await expect(page.getByLabel('Floor plan floor',{exact:true})).toHaveValue(floor);await expect(page.getByLabel('Unlock floor view',{exact:true})).toBeVisible();expect(await page.locator('.floor-camera').getAttribute('style')).toBe(transform);
   await page.reload();await expect(page.getByLabel('Unlock floor view',{exact:true})).toBeVisible();await expect(page.getByLabel('Zoom in floor plan',{exact:true})).toBeDisabled();expect(await page.locator('.floor-camera').getAttribute('style')).toBe(transform);
   await page.screenshot({path:`verification/floor-editor-0427-${width}.png`});await page.getByLabel('Unlock floor view',{exact:true}).click();await expect(page.getByLabel('Zoom in floor plan',{exact:true})).toBeEnabled();
+  const tagBefore=await nameTag.boundingBox();await page.getByLabel('Zoom in floor plan',{exact:true}).click();expect(await nameTag.boundingBox()).toEqual(tagBefore);
+  await page.getByRole('button',{name:'Rename floor',exact:true}).click();const renamed='Garden terrace '+width+' '+('LongFloorName'.repeat(4));await page.getByLabel('Floor name',{exact:true}).fill(renamed);await page.getByRole('dialog').getByRole('button',{name:'Rename floor',exact:true}).click();await expect(nameTag).toHaveText(renamed);
+  const otherFloor=await page.getByLabel('Floor plan floor',{exact:true}).locator('option').evaluateAll((options,selected)=>options.map(option=>(option as HTMLOptionElement).value).find(value=>value!==selected),renamed);expect(otherFloor).toBeTruthy();await page.getByLabel('Floor plan floor',{exact:true}).selectOption(otherFloor!);await expect(nameTag).toHaveText(otherFloor!);await page.getByLabel('Floor plan floor',{exact:true}).selectOption(renamed);await page.reload();await expect(nameTag).toHaveText(renamed);await expect(nameTag).toBeVisible();
+  const tagBox=(await nameTag.boundingBox())!,windowBox=(await page.locator('.floor-plan-window').boundingBox())!;expect(tagBox.x).toBeGreaterThan(windowBox.x);expect(tagBox.x+tagBox.width).toBeLessThan(windowBox.x+windowBox.width);expect(await nameTag.evaluate(el=>getComputedStyle(el).pointerEvents)).toBe('none');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
+  await page.getByLabel('Fit floor to view',{exact:true}).click();await page.screenshot({path:`verification/local-floor-name-tag-${width}.png`});
  }
 });
