@@ -241,6 +241,21 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "adaptiveFixtureLabels": {
+      "status": "verified-local-unreleased",
+      "scope": "Same 10px label inside when it fits with icon clearance, otherwise beneath its source; no wall names or connector lines; icons stay inside.",
+      "browserWorkflowsPassed": 3,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "serviceOrSchemaChanged": false,
+      "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
+      "pushed": false,
+      "deployed": false
+    },
     "exploreSnapping": {
       "status": "verified-local-unreleased",
       "scope": "Supplied snapping engine across moves/groups, object/area resizing, polygon/circle outline editing and new/copied placement; zoom-aware grid/pixel/anchor/vector/ruler targets, settings, transient green guides and bypass.",

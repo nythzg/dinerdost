@@ -16,6 +16,8 @@
  .fixture-detail .plan-table-name{display:block;font-size:10px;font-weight:500;letter-spacing:normal;white-space:normal;overflow:visible;line-height:1.3}
  .fixture-detail-icon{width:16px;height:16px;flex:none}
  .fixture-detail.is-outside{background:#fff;border:1px solid #b0bea7;border-radius:4px;padding:3px 5px;box-shadow:0 1px 3px #193f3010}
+ .fixture-detail.is-inside{padding:0;border:0;background:transparent;box-shadow:none}
+ .fixture-detail.is-inside.is-occupied{color:#fff}
  .plan-object>.fixture-symbol{position:absolute;display:grid;place-items:center;left:50%;top:50%;transform-origin:center;pointer-events:none;background:#eef3e9;color:#285b45;border-radius:2px}
  .fixture-symbol>.fixture-detail-icon{display:block;width:100%;height:100%}
  .floor-roundness-control{display:flex;align-items:center;gap:6px;font-size:12px}

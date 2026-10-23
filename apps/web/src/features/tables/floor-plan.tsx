@@ -1143,7 +1143,7 @@ export function FloorPlan() {
                   </button>
                 );
               })}
-              <FixtureLabels objects={visible.map(object=>({...object,label:tables.find(table=>table.id===object.tableId)?.label??object.label}))} zoom={zoom} reserved={draft&&current?[current]:[]}/>
+              <FixtureLabels objects={visible.map(object=>({...object,label:tables.find(table=>table.id===object.tableId)?.label??object.label}))} occupiedIds={visible.filter(object=>tables.some(table=>table.id===object.tableId&&table.is_occupied)).map(object=>object.id)} zoom={zoom} reserved={draft&&current?[current]:[]}/>
               <SnapGuides guides={snapGuides} view={{x:-pan.x/zoom,y:-pan.y/zoom,width:(surface.current?.clientWidth??area.width)/zoom,height:(surface.current?.clientHeight??area.height)/zoom}}/>
               {draft&&resizingArea&&<>
                 <svg className="floor-area-resize-frame" aria-hidden="true" style={{width:area.width,height:area.height}}><rect x="0" y="0" width={area.width} height={area.height} fill="none" stroke="#285b45" strokeWidth="2" strokeDasharray="6 4" vectorEffect="non-scaling-stroke"/></svg>

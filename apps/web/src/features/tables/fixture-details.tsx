@@ -19,7 +19,7 @@ export function FixtureIcon({kind}:{kind:FloorPlanObject['kind']}){
  return <svg className="fixture-detail-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{kind==='WASHROOM'&&<><circle cx="6" cy="3.5" r="1.7"/><circle cx="17" cy="3.5" r="1.7"/></>}<path d={paths[kind]??paths.PRIVATE_ROOM}/></svg>;
 }
 type Size={width:number;height:number};
-type LabelPosition={x:number;y:number};
+type LabelPosition={x:number;y:number;inside:boolean};
 type LabelBox=Size&{x:number;y:number};
 const intersects=(a:LabelBox,b:LabelBox)=>a.x<b.x+b.width+5&&a.x+a.width+5>b.x&&a.y<b.y+b.height+5&&a.y+a.height+5>b.y;
 
@@ -34,8 +34,8 @@ export function FixtureSymbol({object,zoom}:{object:FloorPlanObject;zoom:number}
  return <span className="fixture-symbol" aria-hidden="true" style={{width:size,height:size,transform:`translate(-50%,-50%) rotate(${-(object.rotation??0)}deg) scale(${1/zoom})`}}><FixtureIcon kind={object.kind}/></span>;
 }
 
-/** Names sit beneath their objects, avoiding other names, icons and resize controls. */
-export function FixtureLabels({objects,zoom,reserved=[]}:{objects:FloorPlanObject[];zoom:number;reserved?:FloorPlanObject[]}){
+/** Names fit inside first; otherwise they stay beneath their object at the same size. */
+export function FixtureLabels({objects,zoom,reserved=[],occupiedIds=[]}:{objects:FloorPlanObject[];zoom:number;reserved?:FloorPlanObject[];occupiedIds?:string[]}){
  const [sizes,setSizes]=useState<Record<string,Size>>({});
  const measured=useCallback((id:string,size:Size)=>setSizes(old=>old[id]&&Math.abs(old[id].width-size.width)<.1&&Math.abs(old[id].height-size.height)<.1?old:{...old,[id]:size}),[]);
  const occupied:LabelBox[]=objects.filter(object=>object.kind!=='TABLE').map(object=>{
@@ -43,11 +43,21 @@ export function FixtureLabels({objects,zoom,reserved=[]}:{objects:FloorPlanObjec
   return {x:(object.x+object.width/2)*zoom-size/2,y:(object.y+object.height/2)*zoom-size/2,width:size,height:size};
  });
  const positions=new Map<string,LabelPosition>(),named=objects.filter(object=>object.kind!=='WALL');
+ // Fit horizontal text within the real rotated shape, leaving its icon clear.
+ for(const object of named){
+  const size=sizes[object.id];if(!size)continue;
+  const angle=(object.rotation??0)*Math.PI/180,c=Math.abs(Math.cos(angle)),s=Math.abs(Math.sin(angle));
+  const offset=object.kind==='TABLE'?0:fixtureIconSize(object,zoom)/2+6+size.height/2;
+  const fits=(size.width*c+size.height*s)/2+offset*s+4<=object.width*zoom/2&&(size.width*s+size.height*c)/2+offset*c+4<=object.height*zoom/2;
+  const cx=(object.x+object.width/2)*zoom,cy=(object.y+object.height/2)*zoom+offset,box={x:cx-size.width/2,y:cy-size.height/2,...size};
+  if(fits&&!occupied.some(other=>intersects(box,other))){occupied.push(box);positions.set(object.id,{x:cx/zoom,y:cy/zoom,inside:true});}
+ }
  for(const object of reserved){
   const corners=floorObjectCorners(object),xs=corners.map(p=>p.x*zoom),ys=corners.map(p=>p.y*zoom);
   occupied.push({x:Math.min(...xs)-10,y:Math.min(...ys)-10,width:Math.max(...xs)-Math.min(...xs)+20,height:Math.max(...ys)-Math.min(...ys)+20});
  }
  for(const object of named){
+  if(positions.has(object.id))continue;
   const size=sizes[object.id]??{width:120,height:13},width=size.width+12,height=size.height+8;
   const x=(object.x+object.width/2)*zoom-width/2;
   let y=Math.max(...floorObjectCorners(object).map(p=>p.y))*zoom+6;
@@ -57,19 +67,19 @@ export function FixtureLabels({objects,zoom,reserved=[]}:{objects:FloorPlanObjec
    if(!blockers.length)break;
    y=Math.max(...blockers.map(other=>other.y+other.height))+6;
   }
-  occupied.push({x,y,width,height});positions.set(object.id,{x:(x+width/2)/zoom,y:y/zoom});
+  occupied.push({x,y,width,height});positions.set(object.id,{x:(x+width/2)/zoom,y:y/zoom,inside:false});
  }
- return <>{named.map(object=><FixtureDetails key={object.id} object={object} zoom={zoom} position={positions.get(object.id)!} measured={measured}/>)}</>;
+ return <>{named.map(object=><FixtureDetails key={object.id} object={object} zoom={zoom} position={positions.get(object.id)!} measured={measured} occupied={occupiedIds.includes(object.id)}/>)}</>;
 }
-function FixtureDetails({object,zoom,position,measured}:{object:FloorPlanObject;zoom:number;position:LabelPosition;measured:(id:string,size:Size)=>void}){
+function FixtureDetails({object,zoom,position,measured,occupied}:{object:FloorPlanObject;zoom:number;position:LabelPosition;measured:(id:string,size:Size)=>void;occupied:boolean}){
  const content=useRef<HTMLSpanElement>(null),label=floorFixtureLabel(object);
  useLayoutEffect(()=>{
   const element=content.current;if(!element)return;
   const measure=()=>{const rect=element.getBoundingClientRect();measured(object.id,{width:rect.width,height:rect.height});};
   measure();const observer=new ResizeObserver(measure);observer.observe(element);return()=>observer.disconnect();
  },[object.id,label,zoom,measured]);
- const {x,y}=position;
- return <span className="fixture-detail is-outside" data-fixture-id={object.id} data-label-placement="below" style={{left:x,top:y,transform:`translateX(-50%) scale(${1/zoom})`,transformOrigin:'top center'}}>
+ const {x,y,inside}=position;
+ return <span className={'fixture-detail '+(inside?'is-inside':'is-outside')+(inside&&occupied?' is-occupied':'')} data-fixture-id={object.id} data-label-placement={inside?'inside':'below'} style={{left:x,top:y,transform:`translate(-50%,${inside?'-50%':'0'}) scale(${1/zoom})`,transformOrigin:inside?'center':'top center'}}>
   <span ref={content} className="fixture-detail-content"><strong className={object.kind==='TABLE'?'plan-table-name':undefined}>{label}</strong></span>
  </span>;
 }
