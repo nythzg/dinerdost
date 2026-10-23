@@ -126,6 +126,9 @@ export function FloorPlan() {
         });
   const baseVersion = useRef(0);
   const surface = useRef<HTMLDivElement>(null);
+  const [canvasSize,setCanvasSize]=useState({width:0,height:0});
+  const [compactLabels,setCompactLabels]=useState(false);
+  useEffect(()=>{const query=window.matchMedia('(max-width: 650px), (max-width: 950px) and (max-height: 500px)'),changed=()=>setCompactLabels(query.matches);changed();query.addEventListener('change',changed);return()=>query.removeEventListener('change',changed)},[]);
   const manualZoom = useRef(false);
   const lockRef=useRef(false);lockRef.current=cameraLocked;
   const [hydratedView,setHydratedView]=useState('');
@@ -172,7 +175,8 @@ export function FloorPlan() {
     if (!element) return;
     const points=[{x:0,y:0},{x:area.width,y:area.height},...(draft??saved?.objects??[]).filter(floorAllowsOutside).flatMap(floorObjectCorners)];
     const minX=Math.min(...points.map(p=>p.x)),minY=Math.min(...points.map(p=>p.y)),width=Math.max(...points.map(p=>p.x))-minX,height=Math.max(...points.map(p=>p.y))-minY;
-    const next=Math.max(.05,Math.min(1,(element.clientWidth-64)/width,(element.clientHeight-64)/height));
+    const padding=compactLabels?32:64;
+    const next=Math.max(.05,Math.min(1,(element.clientWidth-padding)/width,(element.clientHeight-padding)/height));
     manualZoom.current=false;setZoom(next);setPan({x:(element.clientWidth-width*next)/2-minX*next,y:(element.clientHeight-height*next)/2-minY*next});
   };
   fitRef.current=fitView;
@@ -222,7 +226,7 @@ export function FloorPlan() {
   useEffect(()=>{if(hydratedView!==viewKey)return;try{localStorage.setItem(viewKey,JSON.stringify({zoom,pan,locked:cameraLocked,manual:manualZoom.current}))}catch{}},[viewKey,hydratedView,zoom,pan,cameraLocked]);
   useEffect(()=>{
     const element=surface.current;if(!element)return;
-    const observer=new ResizeObserver(()=>{if(!manualZoom.current&&!lockRef.current)fitRef.current()});observer.observe(element);
+    const observer=new ResizeObserver(()=>{setCanvasSize(old=>old.width===element.clientWidth&&old.height===element.clientHeight?old:{width:element.clientWidth,height:element.clientHeight});if(!manualZoom.current&&!lockRef.current)fitRef.current()});observer.observe(element);
     const handle=(event:WheelEvent)=>wheel.current(event);element.addEventListener('wheel',handle,{passive:false});
     return()=>{observer.disconnect();element.removeEventListener('wheel',handle)};
   },[floor]);
@@ -265,7 +269,7 @@ export function FloorPlan() {
   const visible: PlanObject[] = draft ?? fallback;
   const current = visible.find((object) => object.id === selected);
   const fixtureObjects=visible.map(object=>({...object,label:tables.find(table=>table.id===object.tableId)?.label??object.label}));
-  const fixtureLayout=useFixtureLayout(fixtureObjects,zoom,draft&&current?[current]:[]);
+  const fixtureLayout=useFixtureLayout(fixtureObjects,zoom,draft&&current?[current]:[],compactLabels,{x:8-pan.x,y:8-pan.y,width:Math.max(0,(canvasSize.width||area.width)-16),height:Math.max(0,(canvasSize.height||area.height)-16)});
   const handleOutset=current?Math.max(0,11/zoom-Math.min(current.width,current.height)/2):0;
   const roundness=draft?boundaryRoundness:Number(saved?.boundary_roundness??0);
   const snapConfig={...snapSettings,zoomFactor:zoom};
@@ -1146,7 +1150,7 @@ export function FloorPlan() {
                       }
                     }}
                   >
-                    <FixtureSymbol object={object} zoom={zoom} seats={(table??copySource??object.newTable)?.seats} offset={fixtureLayout.positions.get(object.id)?.iconOffset}/>
+                    <FixtureSymbol object={object} zoom={zoom} compact={compactLabels} seats={(table??copySource??object.newTable)?.seats} offset={fixtureLayout.positions.get(object.id)?.iconOffset}/>
                   </button>
                 );
               })}

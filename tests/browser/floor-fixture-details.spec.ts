@@ -27,7 +27,7 @@ test('uniform small labels fit inside or sit beneath fixtures without lines; int
   await expect(kitchenLabel).toHaveAttribute('data-label-placement','inside');await expect(narrowLabel).toHaveAttribute('data-label-placement','below');
   const besideIcon=async()=>{
    const fixture=page.locator('[data-plan-object-id="kitchen"]'),icon=(await fixture.locator('.fixture-symbol').boundingBox())!,text=(await kitchenLabel.locator('strong').boundingBox())!,body=(await fixture.boundingBox())!;
-   expect(Math.abs(text.y+text.height/2-icon.y-icon.height/2)).toBeLessThan(1);expect(text.x-icon.x-icon.width).toBeCloseTo(6,0);expect(Math.abs((icon.x+text.x+text.width)/2-body.x-body.width/2)).toBeLessThan(1);
+   expect(Math.abs(text.y+text.height/2-icon.y-icon.height/2)).toBeLessThan(1);expect(text.x-icon.x-icon.width).toBeCloseTo(width<=650?2:6,0);expect(Math.abs((icon.x+text.x+text.width)/2-body.x-body.width/2)).toBeLessThan(1);
   };await besideIcon();
 
   for(const label of await page.locator('.fixture-detail').all()){
@@ -44,7 +44,7 @@ test('uniform small labels fit inside or sit beneath fixtures without lines; int
   expect(await page.locator('.fixture-detail').evaluateAll(labels=>labels.every(label=>{
    const object=document.querySelector('.plan-object[data-plan-object-id="'+label.getAttribute('data-fixture-id')+'"]');
    if(!object)return false;const body=object.getBoundingClientRect(),name=label.getBoundingClientRect();
-   if(label.getAttribute('data-label-placement')==='below')return name.top>=body.bottom+5&&Math.abs((name.left+name.right-body.left-body.right)/2)<1;
+   if(label.getAttribute('data-label-placement')!=='inside')return label.classList.contains('is-compact')?name.top>=body.bottom+2:name.top>=body.bottom+5&&Math.abs((name.left+name.right-body.left-body.right)/2)<1;
    const style=(object as HTMLElement).style,angle=Number(style.transform.match(/rotate\(([-.\d]+)/)?.[1]??0)*Math.PI/180,zoom=new DOMMatrix(getComputedStyle(document.querySelector('.floor-camera')!).transform).a;
    return [name.left,name.right].every(x=>[name.top,name.bottom].every(y=>{const dx=x-(body.left+body.right)/2,dy=y-(body.top+body.bottom)/2;return Math.abs(dx*Math.cos(angle)+dy*Math.sin(angle))<=(object as HTMLElement).offsetWidth*zoom/2+.5&&Math.abs(-dx*Math.sin(angle)+dy*Math.cos(angle))<=(object as HTMLElement).offsetHeight*zoom/2+.5;}));
   }))).toBe(true);

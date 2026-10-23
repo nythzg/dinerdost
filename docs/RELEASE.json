@@ -847,6 +847,28 @@
       "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
       "pushed": false,
       "deployed": false
+    },
+    "mobileFloorLabels": {
+      "status": "verified-local-unreleased",
+      "scope": "Compact mobile labels with nearby bounded overflow placement, tighter Fit inset and short-landscape scrolling; desktop and saved data retained.",
+      "distinctBrowserWorkflowsPassed": 7,
+      "finalGeometryWorkflowsRepeated": 2,
+      "viewportWidths": [
+        320,
+        390,
+        650,
+        844,
+        1440
+      ],
+      "densePlanObjects": 23,
+      "labelTextPx": 10,
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "backendOrSchemaChanged": false,
+      "backendOrPostgresRerun": false,
+      "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
+      "pushed": false,
+      "deployed": false
     }
   }
 }
