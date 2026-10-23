@@ -24,7 +24,7 @@ export async function POST(
     const data = await body(request);
     const result =
       action === "signup"
-        ? await signup(db, data, ip)
+        ? await signup(db, data, ip, true)
         : action === "login"
           ? await login(db, data, ip)
           : null;

@@ -1,3 +1,4 @@
+import {assertPlatformInviteAcceptance} from "./platform-policy";
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import type { Database, Sql } from "@dinerdost/database";
@@ -257,6 +258,7 @@ export async function acceptStaffInvitation(
     [hash(token)],
   );
   return db.transaction(context.restro_id, async (tx) => {
+    await assertPlatformInviteAcceptance(tx,data.application==='MASTER');
     const invitation = await one(
       tx,
       "SELECT * FROM staff_invitations WHERE token_hash=$1 AND state='PENDING' AND expires_at>now() FOR UPDATE",

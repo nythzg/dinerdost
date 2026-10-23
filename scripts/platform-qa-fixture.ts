@@ -1,0 +1,7 @@
+import {resolve} from 'node:path';
+import {writeFile} from 'node:fs/promises';
+import {randomBytes,randomUUID} from 'node:crypto';
+import {createEmbeddedDatabase} from '@dinerdost/database';
+import * as s from '@dinerdost/services';
+const path='.data/platform-qa-'+Date.now(),password=randomBytes(24).toString('base64url'),db=await createEmbeddedDatabase(resolve(path));
+try{await db.migrate();const accounts=[];for(let i=0;i<3;i++){const email='platform-browser-'+i+'-'+Date.now()+'@example.test',auth=await s.signup(db,{name:['Console administrator','Restaurant QA owner','Analytics QA'][i],email,password,restaurant:['Platform Operations QA','Bistro QA','Analytics QA'][i],outlet:'QA Main',qrEnabled:true,demo:true},'platform-browser-'+i);accounts.push({email,actor:await s.authenticate(db,auth.token)})}await s.bootstrapPlatformAdmin(db,accounts[0].email);await s.savePlatformMember(db,accounts[0].actor,randomUUID(),{email:accounts[2].email,role:'ANALYST',permissions:[],enabled:true,version:0,reason:'Isolated browser role verification',adminPassword:password});const w=await s.workspace(db,accounts[1].actor);await writeFile(resolve('../work/platform-browser-fixture.json'),JSON.stringify({path,password,admin:accounts[0].email,owner:accounts[1].email,analyst:accounts[2].email,tenantId:accounts[1].actor.restroId,outletId:w.outletId}));console.log('Isolated browser database and private fixture prepared.');}finally{await db.close()}

@@ -1,3 +1,4 @@
+import {assertPlatformNewOrder} from "./platform-policy";
 import {snapshotWebBillDefaults} from './web-bill-policy';
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
@@ -529,7 +530,7 @@ export async function guestSubmit(
     phone = normalizePhone(data.phone);
   await expireGuestTable(db, key);
   const grant = await grantContext(db, key, token, device),
-    actor = guestActor(grant);
+    actor = {...guestActor(grant),...(webFlow?{application:'MASTER' as const}:{})};
   return command(
     db,
     actor,
@@ -565,6 +566,7 @@ export async function guestSubmit(
           name,
           phone,
         );
+        await assertPlatformNewOrder(tx,webFlow);
         await tx.query(
           "INSERT INTO orders(id,restro_id,outlet_id,session_id,source,type,customer_id,customer_snapshot) VALUES($1,$2,$3,$4,'CUSTOMER_QR','DINE_IN',$5,$6::jsonb)",
           [
@@ -651,6 +653,7 @@ export async function guestService(
   device: string | undefined,
   requestKey: string,
   input: unknown,
+  webFlow = false,
 ) {
   const data = z
     .object({
@@ -668,7 +671,7 @@ export async function guestService(
     .parse(input);
   await expireGuestTable(db, key);
   const grant = await grantContext(db, key, token, device),
-    actor = guestActor(grant);
+    actor = {...guestActor(grant),...(webFlow?{application:'MASTER' as const}:{})};
   return command(
     db,
     actor,

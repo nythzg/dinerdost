@@ -1,3 +1,4 @@
+import {assertPlatformNewOrder} from "./platform-policy";
 import {snapshotWebBillDefaults} from './web-bill-policy';
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
@@ -145,6 +146,7 @@ async function visit(
 }
 function visitor(grant: Row, store: Row): AuditActor {
   return {
+    application: 'MASTER',
     restroId: grant.restro_id,
     employeeId: grant.id,
     userId: "store-guest",
@@ -502,6 +504,7 @@ export async function submitStorefrontOrder(
       );
       const orderId = id(),
         roundId = id();
+      await assertPlatformNewOrder(tx,true);
       await tx.query(
         "INSERT INTO orders(id,restro_id,outlet_id,source,type,customer_id,customer_snapshot) VALUES($1,$2,$3,'D2C','TAKEAWAY',$4,$5::jsonb)",
         [orderId, actor.restroId, store.outlet_id, customer.id, json(snapshot)],

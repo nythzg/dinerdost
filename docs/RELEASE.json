@@ -595,7 +595,8 @@
       "053_web_production.sql",
       "054_web_floor_details.sql",
       "055_web_bill_settings.sql",
-      "056_web_loyalty_name.sql"
+      "056_web_loyalty_name.sql",
+      "057_platform_console.sql"
     ],
     "productionMigrationsUnchanged": true,
     "originalAccountsPreserved": true,
@@ -900,6 +901,36 @@
       "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
       "pushed": false,
       "deployed": false
+    },
+    "superadmin": {
+      "status": "implemented-local-initial-access-pending",
+      "scope": "Local web platform console; see A–G implementation/pending matrix.",
+      "url": "http://localhost:5090/superadmin",
+      "lanUrl": "http://10.37.66.219:5090/superadmin",
+      "migration": "057_platform_console.sql",
+      "migrationAppliedToLocalCopy": true,
+      "originalTablesUnchanged": 68,
+      "originalRowsUnchanged": 34786,
+      "initialAdminEmailPending": true,
+      "backendTestsPassed": 344,
+      "focusedEmbeddedPassed": 19,
+      "postgresPreviousCasesPassed": 17,
+      "postgresFinalRunStatus": "passed-cleaned-up",
+      "distinctDesktopPhoneWorkflowsPassed": 12,
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "notes": "docs/LOCAL_SUPERADMIN.md",
+      "allSevenModulesComplete": false,
+      "providerConnectionsActivated": false,
+      "pushed": false,
+      "deployed": false,
+      "finalFocusedBrowserCasesPassed": 2,
+      "phoneWorkflowRepeated": true,
+      "postgresCoreCasesPassed": 18,
+      "postgresFinalOnboardingCasesPassed": 2,
+      "postgresDistinctCasesPassed": 19,
+      "finalFullBrowserRunPassed": 12,
+      "devCacheRefreshResolved": true
     }
   }
 }

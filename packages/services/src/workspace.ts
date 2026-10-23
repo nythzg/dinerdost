@@ -1,3 +1,5 @@
+import {platformPolicy} from './platform-policy';
+import {platformConsoleAvailable} from './platform-console';
 import {settledRefundsRead} from './web-refunds';
 import {replacementAdjustmentsRead} from './web-replacements';
 import {isPlatformLoyaltyAdmin} from './web-loyalty';
@@ -22,6 +24,8 @@ import { expireInventory } from "./stock-expiry";
 import { orderSummary } from "./order-summary";
 export async function workspace(db: Database, actor: Actor, outletId?: string) {
   const stream = actorStream(actor);
+  const web=!actor.application||actor.application==='MASTER';
+  const platformConsole=web?await platformConsoleAvailable(db,actor):false;
   return db.transaction(actor.restroId, async (tx) => {
     const restaurant = await one(
       tx,
@@ -55,6 +59,7 @@ export async function workspace(db: Database, actor: Actor, outletId?: string) {
       outletId: selected,
       ...(!actor.application||actor.application==='MASTER'?{platformLoyaltyAdmin:isPlatformLoyaltyAdmin(actor)}:{}),
     };
+    if(web){const policy=await platformPolicy(tx);result.platformConsole=platformConsole;result.platformPolicy=policy?{status:policy.status,features:policy.features,staffLimit:policy.staff_limit,outletLimit:policy.outlet_limit,orderLimit:policy.order_limit}:null;if((await tx.query<{present:string|null}>("SELECT to_regprocedure('public.platform_current_broadcasts()') AS present")).rows[0].present)result.platformBroadcasts=(await tx.query('SELECT * FROM platform_current_broadcasts()')).rows;}
     await expireIdleTables(tx, actor.restroId, selected);
     await expireInventory(tx, actor.restroId, selected);
     if (can(actor, "inventory") || can(actor, "orders"))

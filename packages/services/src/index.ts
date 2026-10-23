@@ -65,3 +65,6 @@ export * from './recipe-profiles';
 export * from './production';
 
 export * from './web-bill-settings';
+
+export * from "./platform-console";
+export * from "./platform-policy";

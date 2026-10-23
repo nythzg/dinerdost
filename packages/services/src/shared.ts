@@ -1,3 +1,4 @@
+import {guardPlatformCommand} from "./platform-policy";
 import { createHash, randomUUID } from "node:crypto";
 import type { Database, Sql } from "@dinerdost/database";
 import {
@@ -193,6 +194,7 @@ export async function command<T>(
       409,
     );
     if (existing.response !== null) return existing.response as T;
+    await guardPlatformCommand(tx,actor,action,input);
     const result = await callback(tx);
     await tx.query(
       "UPDATE idempotency_keys SET response=$3::jsonb WHERE restro_id=$1 AND key=$2",

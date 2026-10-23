@@ -37,7 +37,7 @@ const signupSchema = z
     taxBps: z.number().int().min(0).max(10000).default(0),
   })
   .strict();
-export async function signup(db: Database, input: unknown, ip: string) {
+export async function signup(db: Database, input: unknown, ip: string, webFlow=false) {
   const data = signupSchema.parse(input);
   await rateLimit(db, `signup:${ip}`, 5, 3600);
   const encoded = await passwordHash(data.password);
@@ -81,6 +81,8 @@ export async function signup(db: Database, input: unknown, ip: string) {
       "INSERT INTO employees(id,restro_id,user_id,name,role,outlet_ids) VALUES($1,$2,$3,$4,'OWNER',$5)",
       [employeeId, restroId, userId, data.name, [outletId]],
     );
+    // Activate review for new web registrations only after an operator is provisioned.
+    if(webFlow&&(await tx.query<{present:string|null}>("SELECT to_regclass('public.platform_members') AS present")).rows[0].present&&(await tx.query("SELECT user_id FROM platform_members WHERE role='SUPERADMIN' AND enabled LIMIT 1")).rows.length)await tx.query("INSERT INTO platform_tenant_policies(restro_id,status) VALUES($1,'HOLD')",[restroId]);
     if (data.demo) {
       for (let i = 1; i <= 12; i++)
         await tx.query(

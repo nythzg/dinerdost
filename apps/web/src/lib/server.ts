@@ -8,13 +8,15 @@ import { DomainError, ensure } from "@dinerdost/core";
 import {startLocalCalculatorRetention} from './calculator-retention';
 import {
   authenticate,
+  platformWebAccess,
   SESSION_COOKIE,
   translateError,
 } from "@dinerdost/services";
-export async function context() {
+export async function context(options:{platform?:boolean}={}) {
   const db = await getDatabase();
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   const actor=await authenticate(db, token);
+  if(!options.platform)await platformWebAccess(db,actor);
   startLocalCalculatorRetention(db);
   return { db, actor };
 }

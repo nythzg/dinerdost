@@ -1,3 +1,4 @@
+import {assertPlatformNewOrder} from "./platform-policy";
 import {reserveWebDiscountCoupon} from './web-discount-coupons';
 import {webLoyaltyLimit} from './web-loyalty';
 import { replacementEarnedPoints } from './web-replacements';
@@ -250,6 +251,7 @@ export async function createRound(
       );
     } else {
       orderId = id();
+      await assertPlatformNewOrder(tx,!actor.application||actor.application==='MASTER');
       await tx.query(
         "INSERT INTO orders(id,restro_id,outlet_id,session_id,source,type,created_by,status) VALUES($1,$2,$3,$4,$5,$6,$7,$8)",
         [

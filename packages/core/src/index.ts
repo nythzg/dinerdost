@@ -16,3 +16,5 @@ export * from "./calculator";
 export * from "./table-name";
 
 export * from "./floor-layout";
+
+export * from "./platform-console";

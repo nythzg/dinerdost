@@ -1,0 +1,58 @@
+# Local Diner Dost platform console · 23 October 2026
+
+Local web implementation from the supplied seven-module Super Admin requirements. Production remains 0.4.31; this work is not pushed or deployed. No provider, Android, Firebase, package, offline-hosting or marketplace work is activated. Procurement remains paused and Q111 remains unanswered.
+
+Open `/superadmin` on localhost:5090 or the existing LAN host. The original-copy database has additive migration `057_platform_console.sql`. Initial real-account provisioning is **pending the receiving user's existing email**; no restaurant owner is automatically promoted. A separate isolated QA database/account was used to verify the interface.
+
+## Implemented locally
+
+- Explicit platform membership: Superadmin, Onboarding, Billing, Support, Sales, Analyst and custom module permissions. Every API operation checks an active MASTER web session and fresh membership. Platform access remains separate from restaurant employee roles; disabled membership takes effect immediately. Grant/revoke needs the administrator's own password; the last enabled superadmin cannot be removed. Normal tenant SQL cannot access platform memberships, documents, audit, billing or support grants.
+- Once an enabled superadmin is provisioned, new web self-service registrations start on hold for review. Existing restaurant accounts, pre-provisioning bootstrap behavior and legacy/native service signup remain unchanged.
+- Restaurant creation provisions a new owner and first outlet on hold with no menu, recipes or assumed tax rate. Existing email accounts are rejected rather than overwritten. Lifecycle and KYC metadata use version guards and change reasons. Termination needs password confirmation and cannot be reversed from this console. GSTIN/license fields and private PDF/PNG/JPEG evidence support human review; the software does not verify regulators' records.
+- Brand assignment and platform-only aggregate restaurant/outlet/order counts. Existing tenant and outlet identities remain independent; enterprise-client cross-tenant reporting access is not yet implemented.
+- Plan fee/cycle/module/cap definitions and explicit restaurant assignments. Editing a plan does not silently rewrite existing assignments. Web module navigation/direct links and new writes enforce the assignment; financial history remains readable. Staff seats include active employees and reserved pending invitations; new staff, invitation acceptance and reactivation retain the cap. Outlet and monthly new-order limits serialize against the policy. Added rounds do not consume another new-order slot. Monthly usage counts all tenant orders in the current India-time month. Limits restrict new allocations; they do not delete pre-existing staff/outlets/orders. Native application policy remains unchanged.
+- Subscription dates, manual trial extension fields and snapshotted contract fee/cycle, preventing overlapping ACTIVE contract dates. Contracted MRR/ARR derive from active entered contracts, not collected payments. Subscription access assignment and subscription ledger dates remain explicitly separate; no renewal/trial-expiry scheduler is claimed.
+- Immutable manual SaaS invoice/credit/payment records and account balances, separate from diner invoices, receipts, loyalty and bank accounts. Duplicate tenant/type/reference entries are rejected. Onboarding promotions enforce inclusive India-time expiry, one redemption per restaurant and concurrent total-use capacity, issuing one immutable SaaS credit. SaaS records are not a GST-compliant invoice-generation engine.
+- Master tax, dietary/cuisine/allergen, printer/KDS and tenant-role reference definitions. Tax values must be supplied by an operator; no slabs, recipes, tags on actual dishes or existing permissions are inferred. Reference definitions are not automatically applied to tenant menus, taxes, printers or employee roles.
+- Bulk table/QR provisioning with explicit labels, floor and seats, unique public keys, atomic duplicate rollback and exact retries. Current table QR cards can be viewed/downloaded (up to 200 listed); existing table/session/invoice identities are retained.
+- Read-only support diagnostics bound to the requesting session for 15 minutes, with password confirmation, reason, start/end audit and expiry. This is a limited menu/order/invoice diagnostic view, not an owner session, impersonation cookie or full owner-dashboard replacement. It exposes no owner password, customer phone, bank or provider secrets.
+- Targeted/global scheduled web announcements actually reach the intended restaurant dashboard; unpublished, archived, expired and other-tenant messages do not. Support/dispute tickets require a resolution when closed and never initiate refunds.
+- Platform counts, 30-day order creation and gross verified diner receipts; exact current/previous-week activity counts rather than an invented health score. Database probe latency and actual outbox state counts are displayed. Missing measurements are explicitly unavailable.
+- Immutable hash-chained platform audit records with actor, timestamp, request IP, reason and before/after data, plus chain verification. Passwords/document bytes/session tokens are excluded from audit payloads. Private document downloads are authenticated, served as attachments and audited. Database operators remain trusted; this is not a claim of protection against an operator replacing the entire database.
+
+## Remaining / configuration-only items from A–G
+
+| Module | Remaining work |
+| --- | --- |
+| A · Onboarding | External KYC verification, enterprise-client unified-report grants, custom DNS/certificates/white-label asset routing; domain requests remain ownership-pending. Full owner-dashboard impersonation is not enabled. |
+| B · Monetization | Automated renewals/trial expiry, tax-compliant SaaS invoice issue/export, dunning/reminder delivery and settlement payouts require business/legal/provider configuration. Commission/fee proposals do not alter diner totals or route funds. |
+| C · Dining/POS | Applying global taxonomy/tax/template selections during tenant onboarding, custom tenant-role application and actual hardware/native printer integration. Reference records are not completion of those integrations. |
+| D · Providers | Delivery, payments, SMS, WhatsApp, email and reservation network connections remain deferred. Only non-secret setup request records exist; no credentials, webhook health or live provider state are fabricated. |
+| E · Access | Regional/tenant-scoped internal assignments and automatic tenant role-template application remain future work; current custom roles grant explicit platform module permissions. |
+| F · Analytics | CAC, NRR, churn, recognized net GMV, reservation analytics, acquisition history and automated at-risk outreach remain unavailable. Gross receipts are before refunds and are not net GMV. Brand summaries are currently platform-facing. |
+| G · Operations | External telemetry, API/webhook failure-rate and DB-load histories, notification delivery, ticket attachments/escalation automation and chargeback processing remain pending. Outbox counts and the database probe are actual local observations only. |
+
+Lists currently cap tenants/documents at 500, records/outlets at 1000, QR tables at 200 and audit at latest 100; expanded pagination is pending. Audit-chain verification checks all events. Support projects up to 200 menu entries and 50 recent orders/invoices. There are no invented starter plans, fees, rates or business data in the original-copy database.
+
+## Verification
+
+- Full backend suite: **344 passed** (325 previous cases plus 19 platform cases), including existing invoice/payment/FIFO/stock/permissions regressions.
+- Focused platform suite: **19 passed** on isolated embedded PostgreSQL; authorization, tenant SQL isolation, exact/concurrent retries, stale edits, suspension/termination, original financial/stock history, staff/outlet/monthly quotas, module gates, internal-role revocation/last-superadmin, support expiry/session binding, private evidence, billing immutability, promotion capacity, QR atomicity and audit verification.
+- Real PostgreSQL: **18 core cases passed**, followed by **2 final bootstrap/onboarding cases passed**, covering **19 distinct platform cases**. Both exact disposable QA databases were removed by the successful verifier.
+- Rendered browser: **12 workflows passed in the final full browser run**, after the earlier focused checks. Verified 1440px desktop and 390px phone screens, owner/signed-out denial, plan form, lifecycle plus owner dashboard, exact private document download, targeted announcements, support end, audit/analyst visibility, phone overflow/forms, module gating with retained bill access, new web registrations on hold and the authenticated navigation entry. Screens inspected in ignored work outputs.
+- Typecheck and optimized Next build passed. React review retains unconditional hooks, abort cleanup, support expiry timer cleanup, stable row keys, semantic forms/labels and keyboard/focus behavior through the existing modal.
+- Original-copy migration: cold backup taken, migration applied twice idempotently and **68 pre-existing tables / 34,786 rows retained identical content fingerprints**. Credentials/accounts, issued documents, payments, FIFO/costs and physical stock observations were not rewritten by migration. Normal existing runtime retention/expiry continues independently.
+- Local app restarted on 0.0.0.0:5090; signin and superadmin pages return 200. Phone/LAN account access uses the existing database and credentials. No production database/deployment is changed.
+
+## Initial access and operator setup
+
+Wait for the user to name the existing email before granting real platform access. There is intentionally no public bootstrap endpoint or owner self-enrolment.
+
+1. Stop the local server and make a cold backup of the exact intended existing database directory.
+2. In a private local shell set `DD_PLATFORM_LOCAL_DATABASE` to that directory under this repository's `.data` and `DD_PLATFORM_BOOTSTRAP_EMAIL` to the explicitly approved existing email. Do not add a password or connection string to source or command arguments.
+3. Run `node node_modules/tsx/dist/cli.mjs scripts/platform-bootstrap.ts`. It applies additive migrations and creates only the first membership, audit record and audit head update. It refuses another initial superadmin once an enabled one exists; subsequent grants use the audited panel.
+4. Clear those shell variables, restart the same local app and sign in normally, then open `/superadmin`. No account password is reset. Existing restaurant owners remain ordinary owners unless explicitly provisioned.
+
+During final browser verification, an old development cache repeatedly triggered reloads. A fresh ignored `DD_NEXT_DIST_DIR` resolved it; all 12 browser cases then passed. Stop other Next instances/builds while switching QA configurations. The normal local server is restored with `.next-local-superadmin`; no package/dependency configuration was changed.
+
+Tests use `scripts/platform-qa-fixture.ts` to create a fresh isolated synthetic local fixture, followed by a separate QA server with that fixture's explicit `LOCAL_DATABASE_PATH` and `DD_NEXT_DIST_DIR`. Its generated login material is written only to ignored private work storage. Browser tests target that QA server, never the original-copy or live database. PostgreSQL verification uses `scripts/verify-postgres.ts --env=.env.qa.local --suites=tests/platform-console.test.ts`, which creates and drops only its own exact disposable database.

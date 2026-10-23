@@ -336,7 +336,9 @@ export function Workspace() {
         )}
       </div>
     );
-  const allowed = nav.filter((n) => can(data.actor.role, n.permission));
+  const sectionModules:Record<string,string>={pos:'pos',qr:'qr',inventory:'inventory',recipes:'inventory',vendors:'procurement',purchases:'procurement',customers:'crm',campaigns:'crm',loyalty:'loyalty',reports:'reports',reservations:'reservations',expenses:'finance'};
+  const hasModule=(id:string)=>!Array.isArray(data.platformPolicy?.features)||!sectionModules[id]||data.platformPolicy.features.includes(sectionModules[id]);
+  const allowed = nav.filter((n) => can(data.actor.role, n.permission)&&hasModule(n.id));
   const navigation = allowed.filter((n) => n.sidebar !== false);
   const current = nav.find((n) => n.id === section);
   const authorized = current && can(data.actor.role, current.permission);
@@ -356,6 +358,7 @@ export function Workspace() {
         This page is not available for your role.
       </Empty>
     );
+  else if(!hasModule(section))content=<Empty>This module is not included in the assigned web plan. Existing bills and payment history remain available.</Empty>;
   else if (
     [
       "reservations",
@@ -528,6 +531,7 @@ export function Workspace() {
                     )}
                   </>
                 )}
+                {data.platformConsole&&<Link href="/superadmin"><Icon name="settings"/><span>Superadmin</span></Link>}
               </nav>
               <div className="sidebar-footer">
                 <div className="profile">
@@ -625,6 +629,8 @@ export function Workspace() {
                   className="workspace-controls"
                   aria-busy={busy}
                 >
+                  {data.platformPolicy&&data.platformPolicy.status!=='ACTIVE'&&<div className="notice" role="status">Restaurant {data.platformPolicy.status.toLowerCase()}. Historical records remain available; new web operations are paused.</div>}
+                  {data.platformBroadcasts?.map((item:Row)=><div className="notice" role="status" key={item.id}><strong>{item.name}</strong><p>{item.data.message}</p></div>)}
                   {content}
                 </fieldset>
               </main>

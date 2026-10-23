@@ -1,3 +1,4 @@
+import {assertPlatformFeature} from './platform-policy';
 import {settledRefundsRead} from './web-refunds';
 import {replacementAdjustmentsRead} from './web-replacements';
 import { z } from "zod";
@@ -25,6 +26,7 @@ export async function financialReport(
   input: unknown,
 ) {
   requirePermission(actor, "reports");
+  await assertPlatformFeature(db,actor,'reports');
   ensure(
     isManager(actor) || actor.role === "ACCOUNTANT",
     "FORBIDDEN",

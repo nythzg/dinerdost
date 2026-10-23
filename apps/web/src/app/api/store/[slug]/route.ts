@@ -20,6 +20,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const device = jar.get("dd_device")?.value ?? randomBytes(32).toString("base64url");
     const token = jar.get("dd_store")?.value;
     if (data.action === "connect") {
+      await service.platformPublicAccess(db,{slug},'pos');
       const result = await service.connectStorefront(db, slug, device, request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "local", token);
       const reply = response({ ok: true });
       for (const [name, value] of [["dd_store", result.token], ["dd_device", device]]) reply.cookies.set(name, value, {

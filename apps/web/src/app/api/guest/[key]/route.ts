@@ -5,6 +5,7 @@ import { z } from "zod";
 import { getDatabase } from "@dinerdost/database";
 import {
   guestCatalog,
+  platformPublicAccess,
   connectGuest,
   limitGuestRequest,
   pairGuest,
@@ -69,6 +70,7 @@ export async function POST(
     const device =
       store.get(deviceCookie)?.value ?? randomBytes(32).toString("base64url");
     if (data.action === "connect" || data.action === "pair") {
+      await platformPublicAccess(db,{tableKey:key},'qr');
       const ip =
         request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "local";
       const result =
@@ -119,6 +121,7 @@ export async function POST(
             device,
             requestKey,
             data.input,
+            true,
           )),
     );
   } catch (error) {
