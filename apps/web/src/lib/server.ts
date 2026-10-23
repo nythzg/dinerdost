@@ -1,12 +1,13 @@
 import "server-only";
 import {isIP} from 'node:net';
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { getDatabase } from "@dinerdost/database";
 import { DomainError, ensure } from "@dinerdost/core";
 import {startLocalCalculatorRetention} from './calculator-retention';
 import {
+  platformOwnerView,platformOwnerReadDatabase,PLATFORM_OWNER_VIEW_COOKIE,
   authenticate,
   authenticatePlatform,
   PLATFORM_SESSION_COOKIE,
@@ -17,13 +18,16 @@ import {
 export async function context(options:{platform?:boolean}={}) {
   const db = await getDatabase();
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  const grant=(await cookies()).get(PLATFORM_OWNER_VIEW_COOKIE)?.value;
+  if(grant){const platform=await platformContext(),view=await platformOwnerView(db,platform.actor,grant);return {db:platformOwnerReadDatabase(db,view.actor.restroId),actor:view.actor};}
   const actor=await authenticate(db, token);
   if(!options.platform)await platformWebAccess(db,actor);
   startLocalCalculatorRetention(db);
   return { db, actor };
 }
-export async function platformContext(){const db=await getDatabase(),jar=await cookies(),token=jar.get(PLATFORM_SESSION_COOKIE)?.value;const actor=token?await authenticatePlatform(db,token):await authenticate(db,jar.get(SESSION_COOKIE)?.value);return {db,actor};}
+export async function platformContext(){const db=await getDatabase(),jar=await cookies(),token=jar.get(PLATFORM_SESSION_COOKIE)?.value;const actor=token?await authenticatePlatform(db,token):await authenticate(db,jar.get(SESSION_COOKIE)?.value);actor.ip=(await headers()).get('x-forwarded-for')?.split(',')[0].trim()??'local';return {db,actor};}
 export function csrf(request: NextRequest) {
+  ensure(!request.cookies.get(PLATFORM_OWNER_VIEW_COOKIE)||request.nextUrl.pathname==='/api/superadmin/support-view','SUPPORT_READ_ONLY','This is a read-only owner view. Exit it before changing data.',403);
   const origin = request.headers.get("origin");
   const local = new URL(request.url);
   const lanHost = process.env.NODE_ENV === 'development' ? process.env.DD_LAN_HOST : undefined;

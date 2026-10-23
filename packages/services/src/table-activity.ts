@@ -57,6 +57,7 @@ export async function expireIdleTables(
   outletId: string,
   tableId?: string,
 ) {
+  if((await tx.query("SELECT current_setting('app.support_readonly',true) AS mode")).rows[0]?.mode==='true')return;
   const candidates = (
     await tx.query<Row>(
       "SELECT t.id FROM dining_tables t WHERE t.outlet_id=$1 AND ($2::uuid IS NULL OR t.id=$2) AND EXISTS(SELECT 1 FROM table_sessions s WHERE s.table_id=t.id AND s.status<>'CLOSED' AND s.last_activity_at<=now()-interval '10 minutes') ORDER BY t.id FOR UPDATE SKIP LOCKED",

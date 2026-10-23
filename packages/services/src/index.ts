@@ -70,3 +70,9 @@ export * from "./platform-console";
 export * from "./platform-policy";
 
 export * from './platform-auth';
+
+export * from './platform-operations';
+export * from './platform-billing';
+export * from './platform-analytics';
+export * from './platform-maintenance';
+export * from './platform-owner-view';

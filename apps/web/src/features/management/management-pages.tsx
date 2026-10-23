@@ -32,7 +32,7 @@ const number = (
 export function Menu() {
   const { data, form, run, modal } = useDesk();
   const [search, setSearch] = useState(""),
-    [category, setCategory] = useState("All");
+    [category, setCategory] = useState("All"),[masterTag,setMasterTag]=useState('');
   const categories: Row[] = data.categories ?? [];
   const canEditDishes = can(data.actor.role, "settings");
   const edit = (item?: Row, liquor = item?.unit === "peg") =>
@@ -181,6 +181,7 @@ export function Menu() {
             </option>
           ))}
         </select>
+        <select aria-label="Master dietary / cuisine tag" value={masterTag} onChange={e=>setMasterTag(e.target.value)}><option value="">All master tags</option>{Array.from(new Map<string,Row>((data.menu??[]).flatMap((m:Row)=>(m.masterTags??[]).map((t:Row)=>[t.id,t]))).values()).map((t:Row)=><option key={t.id} value={t.id}>{t.name}</option>)}</select>
         <div className="search-box">
           <Icon name="search" />
           <input
@@ -219,7 +220,7 @@ export function Menu() {
         rows={(data.menu ?? [])
           .filter(
             (m: Row) =>
-              !m.ready_food_batch_id &&
+              !m.ready_food_batch_id && (!masterTag||(m.masterTags??[]).some((t:Row)=>t.id===masterTag)) &&
               (category === "All" ||
                 m.category.toLowerCase() === category.toLowerCase()) &&
               m.name.toLowerCase().includes(search.toLowerCase()),

@@ -10,6 +10,7 @@ const url = new URL(
 url.searchParams.set("sslmode", "verify-full");
 const admin = new Pool({ connectionString: url.toString(), max: 1 });
 const availableSuites = [
+  "tests/platform-operations.test.ts",
   "tests/platform-console.test.ts",
   "tests/platform-identities.test.ts",
   "tests/web-bill-settings.test.ts",

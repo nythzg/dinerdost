@@ -17,7 +17,9 @@ export function StaffAccessEditor({
   outlets,
   outletId,
   save,
+  templates=[],
 }: {
+  templates?: Row[];
   member?: Row;
   outlets: Row[];
   outletId: string;
@@ -77,6 +79,7 @@ export function StaffAccessEditor({
           </label>
         </>
       )}
+      {templates.length>0&&<label className="field">Onboarding role template<select defaultValue="" onChange={e=>{if(e.target.value)setRole(e.target.value)}}><option value="">Choose a saved template…</option>{templates.filter(t=>staffRoles.includes(t.role)).map(t=><option key={t.id} value={t.role}>{t.name} · {t.notes}</option>)}</select></label>}
       <label className="field">
         Role
         <select

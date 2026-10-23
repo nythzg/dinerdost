@@ -24,6 +24,8 @@ export type Actor = {
   application?: Application;
   /** Server-only session binding. Never include in a workspace or public response. */
   sessionHash?: string;
+  /** Read-only, server-created platform support delegation. */
+  supportView?: {operatorName:string;expiresAt:string};
 };
 export type Permission =
   | "settings"

@@ -531,6 +531,7 @@ export function Workspace() {
                     )}
                   </>
                 )}
+                {data.enterpriseReports&&<Link href="/enterprise"><Icon name="reports"/><span>Brand reports</span></Link>}
                 {data.platformConsole&&<Link href="/superadmin"><Icon name="settings"/><span>Superadmin</span></Link>}
               </nav>
               <div className="sidebar-footer">
@@ -607,6 +608,7 @@ export function Workspace() {
                   (section === "floor-plan" ? " explore-content" : "")
                 }
               >
+                {data.supportView&&<div className="notice" role="status"><strong>Read-only owner view · {data.supportView.operatorName}</strong><p>Expires {new Date(data.supportView.expiresAt).toLocaleTimeString()}. Changes, payments and stock actions are blocked.</p><button type="button" className="button" onClick={async()=>{await request('/api/superadmin/support-view',{method:'POST',body:JSON.stringify({action:'end'})});location.assign('/superadmin')}}>Exit owner view</button></div>}
                 <div className="page-heading">
                   <div>
                     <h1>
@@ -617,7 +619,7 @@ export function Workspace() {
                       </T>
                     </h1>
                   </div>
-                  {can(data.actor.role, "orders") && section === "overview" && (
+                  {can(data.actor.role, "orders") && !data.supportView && section === "overview" && (
                     <Link className="button primary" href="/app/pos">
                       <Icon name="plus" />
                       <T>{"New order"}</T>
@@ -625,7 +627,7 @@ export function Workspace() {
                   )}
                 </div>
                 <fieldset
-                  disabled={busy}
+                  disabled={busy||!!data.supportView}
                   className="workspace-controls"
                   aria-busy={busy}
                 >

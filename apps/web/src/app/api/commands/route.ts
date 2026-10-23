@@ -1,10 +1,11 @@
+import {observePlatformRoute} from '@/lib/platform-local-runtime';
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import * as service from "@dinerdost/services";
 import { DomainError } from "@dinerdost/core";
 import { body, context, csrf, failure, response } from "@/lib/server";
 export const runtime = "nodejs";
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
   try {
     csrf(request);
     const { db, actor } = await context();
@@ -482,3 +483,5 @@ export async function POST(request: NextRequest) {
     return failure(error);
   }
 }
+
+export const POST=observePlatformRoute('/api/commands',handlePOST);

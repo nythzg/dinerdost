@@ -10,6 +10,7 @@ export async function expireInventory(
   restroId: string,
   outletId: string,
 ) {
+  if((await tx.query("SELECT current_setting('app.support_readonly',true) AS mode")).rows[0]?.mode==='true')return;
   const actor = {
     restroId,
     userId: "system",

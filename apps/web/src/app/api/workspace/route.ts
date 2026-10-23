@@ -1,9 +1,10 @@
+import {observePlatformRoute} from '@/lib/platform-local-runtime';
 import { NextRequest } from "next/server";
 import { workspace } from "@dinerdost/services";
 import { z } from "zod";
 import { context, failure, response } from "@/lib/server";
 export const runtime = "nodejs";
-export async function GET(request: NextRequest) {
+async function handleGET(request: NextRequest) {
   try {
     const { db, actor } = await context();
     const outlet = z
@@ -15,3 +16,5 @@ export async function GET(request: NextRequest) {
     return failure(error);
   }
 }
+
+export const GET=observePlatformRoute('/api/workspace',handleGET);

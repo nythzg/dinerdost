@@ -21,7 +21,7 @@ export async function request<T = any>(
   const data = await reply.json();
   if (!reply.ok) {
     if (reply.status === 401 && location.pathname.startsWith("/app"))
-      location.assign("/signin");
+      location.assign(data.error?.code==='SUPPORT_UNAVAILABLE'?'/superadmin':'/signin');
     throw new ApiError(
       data.error?.code ?? "REQUEST_FAILED",
       data.error?.message ?? "The request failed.",

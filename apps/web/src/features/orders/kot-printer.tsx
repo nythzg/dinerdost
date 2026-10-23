@@ -34,6 +34,7 @@ export function KotPrintProvider({ children }: { children: ReactNode }) {
     "OFF";
   const print = async (orderId: string, roundId: string, automatic = false) => {
     setBusy(true);
+    if(data.supportView)return;
     try {
       const job = await command(
         "kotPrint",
@@ -52,6 +53,7 @@ export function KotPrintProvider({ children }: { children: ReactNode }) {
     }
   };
   useEffect(() => {
+    if(data.supportView)return;
     const tickets: Row[] = data.kotPrintTickets ?? [],
       current = new Set<string>(tickets.map((t) => t.id));
     if (known.current.outlet !== data.outletId) {

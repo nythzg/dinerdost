@@ -1,3 +1,4 @@
+import {applyOnboardingDefault} from './platform-setup';
 import {
   randomBytes,
   scrypt as scryptCallback,
@@ -81,6 +82,7 @@ export async function signup(db: Database, input: unknown, ip: string, webFlow=f
       "INSERT INTO employees(id,restro_id,user_id,name,role,outlet_ids) VALUES($1,$2,$3,$4,'OWNER',$5)",
       [employeeId, restroId, userId, data.name, [outletId]],
     );
+    if(webFlow)await applyOnboardingDefault(tx,restroId,outletId);
     // Activate review for new web registrations only after an operator is provisioned.
     if(webFlow&&(await tx.query<{present:string|null}>("SELECT to_regclass('public.platform_members') AS present")).rows[0].present&&(await tx.query("SELECT user_id FROM platform_members WHERE role='SUPERADMIN' AND enabled LIMIT 1")).rows.length)await tx.query("INSERT INTO platform_tenant_policies(restro_id,status) VALUES($1,'HOLD')",[restroId]);
     if (data.demo) {

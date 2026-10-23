@@ -2,7 +2,7 @@ import {assertPlatformFeature} from './platform-policy';
 import {settledRefundsRead} from './web-refunds';
 import {replacementAdjustmentsRead} from './web-replacements';
 import { z } from "zod";
-import type { Database } from "@dinerdost/database";
+import type { Database,Sql } from "@dinerdost/database";
 import {
   businessDate,
   ensure,
@@ -12,7 +12,7 @@ import {
   wholeUnit,
   type Actor,
 } from "@dinerdost/core";
-import { num } from "./shared";
+import { num,type Row } from "./shared";
 
 const financialPeriod = `WITH issued AS (
  SELECT i.*,o.source,coalesce((SELECT sum(r.cogs) FROM order_rounds r WHERE r.order_id=o.id AND r.status='ACCEPTED'),0) AS cogs
@@ -56,6 +56,12 @@ export async function financialReport(
         [actor.role === "OWNER", actor.outletIds, data.outletId ?? null],
       )
     ).rows;
+    return financialReportRead(tx,outlets,data);
+  });
+}
+
+/** Internal read model; callers must authorize every selected outlet. */
+export async function financialReportRead(tx:Sql,outlets:Row[],data:{from:string;to:string}){
     const params = [outlets.map((outlet) => outlet.id), data.from, data.to];
     const summary = (
       await tx.query(
@@ -143,7 +149,6 @@ export async function financialReport(
       basis:
         "Issued final invoices less immutable refund and paid-replacement credit adjustments, plus approved expenses, zero-output production losses and unbilled replaced-food costs. Successful production transfers stock value; it is not an expense. Receipt-method rows retain actual collections; payment credits are not new receipts.",
     };
-  });
 }
 
 export async function prepPlan(db: Database, actor: Actor, input: unknown) {

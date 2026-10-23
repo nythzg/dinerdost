@@ -1,3 +1,4 @@
+import {enterpriseBrands} from './platform-analytics';
 import {platformPolicy} from './platform-policy';
 import {platformConsoleAvailable} from './platform-console';
 import {settledRefundsRead} from './web-refunds';
@@ -25,7 +26,10 @@ import { orderSummary } from "./order-summary";
 export async function workspace(db: Database, actor: Actor, outletId?: string) {
   const stream = actorStream(actor);
   const web=!actor.application||actor.application==='MASTER';
-  const platformConsole=web?await platformConsoleAvailable(db,actor):false;
+  const platformConsole=web&&!actor.supportView?await platformConsoleAvailable(db,actor):false;
+  const enterpriseReady=web&&!actor.supportView&&(actor.role==='OWNER'||actor.role==='MANAGER')&&!!actor.sessionHash&&(await db.query("SELECT to_regclass('public.platform_brand_access') AS present")).rows[0]?.present;
+  const enterpriseAssigned=enterpriseReady&&(await db.query('SELECT brand_id FROM platform_brand_access WHERE user_id=$1 AND enabled LIMIT 1',[actor.userId])).rows.length>0;
+  const enterpriseReports=enterpriseAssigned?(await enterpriseBrands(db,actor)).length>0:false;
   return db.transaction(actor.restroId, async (tx) => {
     const restaurant = await one(
       tx,
@@ -55,11 +59,17 @@ export async function workspace(db: Database, actor: Actor, outletId?: string) {
     const result: Row = {
       actor: { ...actor, ip: undefined, sessionHash: undefined },
       restaurant,
+      enterpriseReports,
+      ...(actor.supportView?{supportView:actor.supportView}:{}),
       outlets,
       outletId: selected,
       ...(!actor.application||actor.application==='MASTER'?{platformLoyaltyAdmin:isPlatformLoyaltyAdmin(actor)}:{}),
     };
     if(web){const policy=await platformPolicy(tx);result.platformConsole=platformConsole;result.platformPolicy=policy?{status:policy.status,features:policy.features,staffLimit:policy.staff_limit,outletLimit:policy.outlet_limit,orderLimit:policy.order_limit}:null;if((await tx.query<{present:string|null}>("SELECT to_regprocedure('public.platform_current_broadcasts()') AS present")).rows[0].present)result.platformBroadcasts=(await tx.query('SELECT * FROM platform_current_broadcasts()')).rows;}
+    if(web){
+      const extras=(await tx.query("SELECT to_regclass('public.platform_tenant_setup') AS present")).rows[0]?.present;
+      if(extras){result.platformSetup=(await tx.query('SELECT taxonomies,role_templates,branding FROM platform_tenant_setup WHERE restro_id=$1',[actor.restroId])).rows[0]??null;result.platformBroadcasts=[...(result.platformBroadcasts??[]),...(await tx.query('SELECT * FROM platform_current_notices()')).rows];}
+    }
     await expireIdleTables(tx, actor.restroId, selected);
     await expireInventory(tx, actor.restroId, selected);
     if (can(actor, "inventory") || can(actor, "orders"))
@@ -316,6 +326,7 @@ export async function workspace(db: Database, actor: Actor, outletId?: string) {
       );
     }
     result.uiDismissals=(await tx.query("SELECT kind,state_key FROM ui_alert_dismissals WHERE employee_id=$1 AND outlet_id=$2",[actor.employeeId,selected])).rows.map(row=>row.kind+":"+row.state_key);
+    if(web&&(await tx.query("SELECT to_regclass('public.platform_menu_tags') AS present")).rows[0]?.present){const tags=(await tx.query<Row>('SELECT item_id,tag_id,snapshot FROM platform_menu_tags')).rows;result.menu=result.menu?.map((m:Row)=>({...m,masterTags:tags.filter(t=>t.item_id===m.id).map(t=>({id:t.tag_id,...t.snapshot}))}));}
     return result;
   });
 }

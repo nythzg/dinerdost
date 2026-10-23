@@ -31,6 +31,9 @@ export async function copySingleRestaurant(source:Database,destination:Database,
   const userIds=new Set<string>([admin.id,...employees.map(e=>e.user_id)]);
   const userReferences=(await tx.query<{table_name:string;column_name:string}>(`SELECT t.relname AS table_name,a.attname AS column_name FROM pg_constraint c JOIN pg_class t ON t.oid=c.conrelid JOIN pg_class r ON r.oid=c.confrelid CROSS JOIN LATERAL unnest(c.conkey) k(attnum) JOIN pg_attribute a ON a.attrelid=t.oid AND a.attnum=k.attnum WHERE c.contype='f' AND r.relname='users' AND t.relnamespace='public'::regnamespace`)).rows;
   for(const ref of userReferences)for(const row of rows.get(ref.table_name)??[])if(row[ref.column_name])userIds.add(row[ref.column_name]);
+  for(const name of ['platform_operational_config','platform_assets','platform_http_samples','platform_db_samples','platform_maintenance_runs'])if(names.includes(name))rows.set(name,(await tx.query<Row>('SELECT * FROM '+identifier(name)+(name==='platform_operational_config'?" WHERE NOT(data ? 'tenantId') OR data->>'tenantId'=$1":''),name==='platform_operational_config'?[tenantId]:[])).rows);
+  if(names.includes('platform_brand_access'))rows.set('platform_brand_access',(await tx.query<Row>('SELECT * FROM platform_brand_access WHERE user_id=ANY($1::uuid[])',[[...userIds]])).rows);
+  if(names.includes('platform_case_attachments'))rows.set('platform_case_attachments',(await tx.query<Row>('SELECT * FROM platform_case_attachments WHERE ticket_id=ANY($1::uuid[])',[(rows.get('platform_records')??[]).filter(r=>r.kind==='TICKET').map(r=>r.id)])).rows);
   rows.set('users',(await tx.query<Row>('SELECT * FROM users WHERE id=ANY($1::uuid[])',[[...userIds]])).rows);
   const sourceMigrations=(await tx.query<{name:string}>('SELECT name FROM schema_migrations ORDER BY name')).rows;
   for(const name of names)if(name!=='schema_migrations'&&!rows.has(name))throw new Error('Unclassified source table: '+name);

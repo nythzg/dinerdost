@@ -12,6 +12,7 @@ export function Team() {
     modal(
       "Invite staff",
       <StaffAccessEditor
+        templates={data.platformSetup?.role_templates??[]}
         outlets={data.outlets}
         outletId={data.outletId}
         save={async (input) => {
@@ -29,6 +30,7 @@ export function Team() {
     modal(
       "Edit access · " + member.name,
       <StaffAccessEditor
+        templates={data.platformSetup?.role_templates??[]}
         member={member}
         outlets={data.outlets}
         outletId={data.outletId}
