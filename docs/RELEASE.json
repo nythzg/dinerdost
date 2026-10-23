@@ -726,6 +726,26 @@
       "notes": "docs/LOCAL_LOYALTY_NAME.md",
       "pushed": false,
       "deployed": false
+    },
+    "billRewardSnapshots": {
+      "status": "verified-local-unreleased",
+      "scope": "New web provisional/final bills capture separate named loyalty, coupon-code and other-discount reductions; snapshot-only thermal/80mm/PDF rendering, original totals and frozen legacy reprints.",
+      "fullBackendTestsPassed": 322,
+      "affectedBackendTestsPassed": 23,
+      "postgresMixedBillWorkflowsPassed": 1,
+      "postgresDisposableDatabaseRemoved": true,
+      "browserWorkflowsPassed": 3,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "printWidthMm": 80,
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "migrationRequired": false,
+      "notes": "docs/LOCAL_BILL_REWARD_DETAILS.md",
+      "pushed": false,
+      "deployed": false
     }
   }
 }

@@ -8,8 +8,22 @@ import {
   taxBreakdown,
   type Actor,
 } from "@dinerdost/core";
-import { audit, command, id, json, num, one, scopedOrder } from "./shared";
+import { audit, command, id, json, num, one, scopedOrder, type Row } from "./shared";
 import { orderDetail } from "./orders";
+
+/** Capture descriptions with the money they explain; never look up names on reprint. */
+function discountBreakdown(rounds:Row[]){
+  const grouped=new Map<string,{kind:'LOYALTY'|'COUPON'|'DISCOUNT';name:string;amount:number;code?:string}>();
+  for(const round of rounds.filter(r=>!['VOIDED','REJECTED'].includes(r.status))){
+    const loyalty=num(round.loyalty_amount),other=num(round.discount)-loyalty;
+    const entries=[
+      ...(loyalty>0?[{kind:'LOYALTY' as const,name:String(round.loyalty_name??'Loyalty'),amount:loyalty}]:[]),
+      ...(other>0?[round.coupon_code?{kind:'COUPON' as const,name:'Coupon',code:String(round.coupon_code),amount:other}:{kind:'DISCOUNT' as const,name:'Discount',amount:other}]:[]),
+    ];
+    for(const entry of entries){const key=JSON.stringify([entry.kind,entry.name,'code' in entry?entry.code:null]),prior=grouped.get(key);if(prior)prior.amount+=entry.amount;else grouped.set(key,entry);}
+  }
+  return [...grouped.values()];
+}
 
 export async function generateBill(
   db: Database,
@@ -117,6 +131,7 @@ export async function generateBill(
           .filter((r) => r.status !== "REJECTED" && r.status !== "VOIDED")
           .flatMap((r) => r.items.map(({recipe_snapshot,...item}:Record<string,any>)=>item)),
         totals: detail.totals,
+        ...(!actor.application||actor.application==='MASTER'?{discountBreakdown:discountBreakdown(detail.rounds)}:{}),
         taxes: taxBreakdown(detail.totals.tax, order.tax_components),
         charges: detail.rounds
           .filter((round) => !["REJECTED", "VOIDED"].includes(round.status))

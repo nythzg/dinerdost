@@ -105,3 +105,24 @@ test('named loyalty is authorized, versioned and snapshotted separately from cou
  next=(await claim(next,next.rounds[0],1000)).order;assert.equal(next.rounds[0].loyalty_name,newName);
  assert.equal((await s.verifyAudit(db,owner)).valid,true);
 });
+
+
+test('web bills snapshot named rewards and coupon codes separately, preserving current totals, retries and issued history',async()=>{
+ let outlet=(await s.workspace(db,owner)).outlets[0];await s.saveWebLoyaltyName(db,owner,key(),{outletId:w.outletId,version:Number(outlet.version),name:'Receipt rewards'});
+ let o=await create();o=(await claim(o,o.rounds[0],1000)).order;
+ const legacy=await s.generateBill(db,{...owner,application:'POS'},key(),o.id,{});assert.equal(legacy.snapshot.discountBreakdown,undefined);
+ for(let i=0;i<2;i++)o=await s.createRound(db,owner,key(),{outletId:w.outletId,orderId:o.id,version:o.version,type:'TAKEAWAY',items:[{itemId:menuId,quantity:1}]},true);
+ const settings=await s.getWebBillSettings(db,owner,w.outletId),code='PRINT-'+key().slice(0,8).toUpperCase();await s.saveWebBillSettings(db,owner,key(),{outletId:w.outletId,version:settings.version,loyaltyCap:settings.loyaltyCap,roundingMode:'UP',createCoupons:[{code,amount:700,validUntil:new Date(Date.now()+172800000).toISOString().slice(0,10),maxUses:2}],removeCoupons:[]});
+ o=(await s.applyEntitlement(db,owner,key(),o.id,o.rounds[1].id,{version:o.rounds[1].version,couponCode:code},true)).order;
+ o=await s.changeRoundAdjustments(db,owner,key(),o.id,o.rounds[2].id,{version:o.rounds[2].version,discount:123,roundToRupee:true,roundingMode:'DOWN'},true);
+ o=await s.changeRoundCharges(db,owner,key(),o.id,o.rounds[2].id,{version:o.rounds[2].version,charges:[{name:'Packaging',amount:250}]},true);
+ const request=key(),provisional=await s.generateBill(db,owner,request,o.id,{}),rows=provisional.snapshot.discountBreakdown;
+ assert.deepEqual(rows,[{kind:'LOYALTY',name:'Receipt rewards',amount:1000},{kind:'COUPON',name:'Coupon',code,amount:700},{kind:'DISCOUNT',name:'Discount',amount:123}]);assert.equal(rows.reduce((sum:number,r:any)=>sum+r.amount,0),Number(o.totals.discount));assert.deepEqual(provisional.snapshot.totals,o.totals);assert.equal(provisional.snapshot.charges[0].name,'Packaging');assert.notEqual(Number(provisional.snapshot.totals.roundOff),0);
+ assert.equal((await s.generateBill(db,owner,request,o.id,{})).id,provisional.id);
+ outlet=(await s.workspace(db,owner)).outlets[0];await s.saveWebLoyaltyName(db,owner,key(),{outletId:w.outletId,version:Number(outlet.version),name:'Future receipt rewards'});
+ assert.deepEqual((await s.getInvoice(db,owner,provisional.id)).snapshot,provisional.snapshot);assert.deepEqual((await s.getInvoice(db,owner,legacy.id)).snapshot,legacy.snapshot);
+ await assert.rejects(s.getInvoice(db,foreign,provisional.id));await assert.rejects(s.generateBill(db,{...owner,role:'KITCHEN'},key(),o.id,{}),{code:'FORBIDDEN'});
+ for(const r of o.rounds){o=(await s.recordPayment(db,owner,key(),o.id,r.id,{version:r.version,method:'CASH',amount:Number(r.payable)},true)).order;const current=o.rounds.find((round:any)=>round.id===r.id)!;await s.completePreparedService(db,owner,key(),o.id,r.id,{version:current.version,confirmedPreparedAndServed:true})}
+ const final=await s.generateBill(db,owner,key(),o.id,{final:true});assert.deepEqual(final.snapshot.discountBreakdown,rows);assert.equal(final.snapshot.totals.outstanding,0);
+ const before=await s.getOrder(db,owner,o.id),out=(await s.workspace(db,owner)).outlets[0];await s.saveWebLoyaltyName(db,owner,key(),{outletId:w.outletId,version:Number(out.version),name:'Later rewards'});assert.deepEqual(await s.getOrder(db,owner,o.id),before);assert.equal((await s.generateBill(db,owner,key(),o.id,{final:true})).id,final.id);assert.deepEqual((await s.getInvoice(db,owner,final.id)).snapshot,final.snapshot);assert.equal((await s.verifyAudit(db,owner)).valid,true);
+});

@@ -11,6 +11,7 @@ const amount = (value: unknown) =>
 /** All printed content comes from the issued snapshot, never current outlet settings. */
 export function ThermalReceipt({ bill }: { bill: Row }) {
   const settings = bill.receipt ?? {},
+    discounts = bill.discountBreakdown ?? [{name:'Discount',amount:bill.totals.discount}],
     savedAmount =
       Number(bill.totals.discount) +
       Math.max(0, -Number(bill.totals.roundOff ?? 0)),
@@ -141,12 +142,12 @@ export function ThermalReceipt({ bill }: { bill: Row }) {
           <span>Sub Total</span>
           <span>{amount(bill.totals.subtotal)}</span>
         </div>
-        {Number(bill.totals.discount) > 0 && (
-          <div className="receipt-summary-row">
-            <span>Discount</span>
-            <span>−{amount(bill.totals.discount)}</span>
+        {discounts.filter((discount:Row)=>Number(discount.amount)>0).map((discount:Row,index:number) => (
+          <div className="receipt-summary-row" key={'discount-'+index}>
+            <span>{discount.name}{discount.code?' '+discount.code:''}</span>
+            <span>−{amount(discount.amount)}</span>
           </div>
-        )}
+        ))}
         {taxes.map((tax: Row, index: number) => (
           <div className="receipt-summary-row" key={index}>
             <span>
