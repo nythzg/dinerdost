@@ -2,7 +2,7 @@
 
 Local web implementation from the supplied seven-module Super Admin requirements. Production remains 0.4.31; this work is not pushed or deployed. No provider, Android, Firebase, package, offline-hosting or marketplace work is activated. Procurement remains paused and Q111 remains unanswered.
 
-Open `/superadmin` on localhost:5090 or the existing LAN host. The original-copy database has additive migration `057_platform_console.sql`. Initial real-account provisioning is **pending the receiving user's existing email**; no restaurant owner is automatically promoted. A separate isolated QA database/account was used to verify the interface.
+Open `/superadmin` on localhost:5090 or the existing LAN host. The original-copy database has additive migration `057_platform_console.sql`. The receiving user approved creation of a new platform login after the supplied email was not found. The **platform-only identity is active**: the user completed private name/password setup and signed into the local panel. No restaurant owner is automatically promoted. A separate isolated QA database/account was used to verify the interface.
 
 ## Implemented locally
 
@@ -46,7 +46,7 @@ Lists currently cap tenants/documents at 500, records/outlets at 1000, QR tables
 
 ## Initial access and operator setup
 
-Wait for the user to name the existing email before granting real platform access. There is intentionally no public bootstrap endpoint or owner self-enrolment.
+Use only an explicitly approved identity. The existing-account operator flow is below; the new platform-only identity flow used on this device is documented in the following section. There is intentionally no public bootstrap/enrollment-creation endpoint or owner self-enrolment.
 
 1. Stop the local server and make a cold backup of the exact intended existing database directory.
 2. In a private local shell set `DD_PLATFORM_LOCAL_DATABASE` to that directory under this repository's `.data` and `DD_PLATFORM_BOOTSTRAP_EMAIL` to the explicitly approved existing email. Do not add a password or connection string to source or command arguments.
@@ -56,3 +56,18 @@ Wait for the user to name the existing email before granting real platform acces
 During final browser verification, an old development cache repeatedly triggered reloads. A fresh ignored `DD_NEXT_DIST_DIR` resolved it; all 12 browser cases then passed. Stop other Next instances/builds while switching QA configurations. The normal local server is restored with `.next-local-superadmin`; no package/dependency configuration was changed.
 
 Tests use `scripts/platform-qa-fixture.ts` to create a fresh isolated synthetic local fixture, followed by a separate QA server with that fixture's explicit `LOCAL_DATABASE_PATH` and `DD_NEXT_DIST_DIR`. Its generated login material is written only to ignored private work storage. Browser tests target that QA server, never the original-copy or live database. PostgreSQL verification uses `scripts/verify-postgres.ts --env=.env.qa.local --suites=tests/platform-console.test.ts`, which creates and drops only its own exact disposable database.
+
+
+## Approved new platform identity · 23 October 2026
+
+The requested email was absent from the local database, and the user explicitly chose creation of a new login. Migration058 adds private `platform_sessions` and `platform_enrolments`. This avoids inventing a restaurant, outlet or employee role merely to authenticate a platform administrator. Existing tenant-session authentication and passwords remain unchanged.
+
+The operator-only `scripts/platform-invite-initial.ts` accepts the approved email and exact existing local database through private shell variables. It creates one pending user with an unusable password marker, hashes the one-use enrollment token, and writes the private setup link only to ignored `.data` storage. The link uses a fragment so its secret is not sent in page URLs, server access logs or referrers; it expires after two hours. Reissuing a still-pending identity rotates its token without overwriting a registered account. There is no public enrollment-creation endpoint.
+
+The user enters the display name and a password of at least 12 characters in the private setup page. Enrollment consumes the token atomically, saves a salted password hash, grants the initial SUPERADMIN membership and issues an independent HttpOnly platform session. Concurrent or reused setup links cannot reset the password or duplicate access. Pending/expired links cannot sign in. User disablement, membership revocation, expiry and logout are checked against stored sessions. Passwords and setup/session tokens are excluded from audit payloads and Git.
+
+Platform sign-in is `/superadmin/signin`, also linked from the normal sign-in page. A platform session grants no restaurant employee identity and is rejected by ordinary tenant APIs. Signing out of a separate platform session preserves any existing restaurant session; legacy tenant-based platform access remains supported. Step-up actions still verify the current platform user's password, and the last-superadmin safeguard applies to platform-only accounts too.
+
+Before local provisioning, a cold backup was taken. All **68 original tables / 34,786 existing rows** retained identical fingerprints; exactly one new pending user was added, with zero new restaurant employees/outlets/restaurants. No password was invented or reset. A private enrollment page was opened locally. The user completed it and signed in; the browser displayed the chosen name and Superadmin access. This is not a production deployment.
+
+Verification: **350 full backend tests passed**, including **6 new platform-identity workflows**; typecheck and optimized build passed. The **12 console browser regressions and 2 new desktop/phone enrollment/session workflows passed**, covering confirmation mismatch, actual enrollment, login failure/success, logout, separate tenant cookies, reused/missing links, foreign-origin rejection and phone layout. The additional six-case real-PostgreSQL identity run stalled amid QA connection timeouts and was interrupted before a first case result. It is **not verified/passed**; the verifier ran its cleanup and the exact disposable database removal was confirmed. The earlier 19 distinct console PostgreSQL cases remain historical verified evidence. No new external authentication/email provider was configured.

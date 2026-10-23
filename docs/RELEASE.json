@@ -596,7 +596,8 @@
       "054_web_floor_details.sql",
       "055_web_bill_settings.sql",
       "056_web_loyalty_name.sql",
-      "057_platform_console.sql"
+      "057_platform_console.sql",
+      "058_platform_identities.sql"
     ],
     "productionMigrationsUnchanged": true,
     "originalAccountsPreserved": true,
@@ -903,7 +904,7 @@
       "deployed": false
     },
     "superadmin": {
-      "status": "implemented-local-initial-access-pending",
+      "status": "verified-local-active-initial-platform-identity",
       "scope": "Local web platform console; see A–G implementation/pending matrix.",
       "url": "http://localhost:5090/superadmin",
       "lanUrl": "http://10.37.66.219:5090/superadmin",
@@ -911,12 +912,12 @@
       "migrationAppliedToLocalCopy": true,
       "originalTablesUnchanged": 68,
       "originalRowsUnchanged": 34786,
-      "initialAdminEmailPending": true,
-      "backendTestsPassed": 344,
-      "focusedEmbeddedPassed": 19,
+      "initialAdminEmailPending": false,
+      "backendTestsPassed": 350,
+      "focusedEmbeddedPassed": 25,
       "postgresPreviousCasesPassed": 17,
       "postgresFinalRunStatus": "passed-cleaned-up",
-      "distinctDesktopPhoneWorkflowsPassed": 12,
+      "distinctDesktopPhoneWorkflowsPassed": 14,
       "typecheckPassed": true,
       "buildPassed": true,
       "notes": "docs/LOCAL_SUPERADMIN.md",
@@ -930,7 +931,23 @@
       "postgresFinalOnboardingCasesPassed": 2,
       "postgresDistinctCasesPassed": 19,
       "finalFullBrowserRunPassed": 12,
-      "devCacheRefreshResolved": true
+      "devCacheRefreshResolved": true,
+      "initialAdminAccountExists": true,
+      "initialAdminPasswordSetupPending": false,
+      "identityMigration": "058_platform_identities.sql",
+      "identityMigrationAppliedToLocalCopy": true,
+      "originalAccountsPreserved": true,
+      "addedPendingPlatformUsers": 1,
+      "addedRestaurantRoles": 0,
+      "identityBackendCasesPassed": 6,
+      "identityBrowserCasesPassed": 2,
+      "consoleBrowserRegressionCasesPassed": 12,
+      "identityPostgresStatus": "interrupted-after-qa-connection-timeouts-unverified",
+      "separatePlatformSession": true,
+      "defaultPasswordAssigned": false,
+      "initialAdminAccessActive": true,
+      "initialAdminBrowserSignInVerified": true,
+      "identityPostgresDisposableDatabaseRemoved": true
     }
   }
 }

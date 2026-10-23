@@ -45,7 +45,7 @@ export function SuperadminPanel(){
 
  const submit=async(event:FormEvent<HTMLFormElement>,action:string,build:(form:FormData)=>unknown)=>{event.preventDefault();try{const result=await run(action,build(new FormData(event.currentTarget)));if(action==='startSupport'){setSupport({...await request<Row>('/api/superadmin/support?id='+result.id),id:result.id});setSection('support')}if(action==='bulkQr')setQr(result.tables);setDialog(null);}catch{}};
 
- if(!data)return <main className="sa-access"><Logo/><h1>Diner Dost superadmin</h1>{error?<><p role="alert">{error}</p><p>{forbidden?'Access is explicitly provisioned by a Diner Dost platform operator. Restaurant ownership does not grant superadmin access.':'Sign in with your provisioned platform account.'}</p><Link className="button primary" href="/signin">Sign in</Link><Link className="button" href="/app/overview">Restaurant workspace</Link></>:<p role="status">Loading platform console…</p>}</main>;
+ if(!data)return <main className="sa-access"><Logo/><h1>Diner Dost superadmin</h1>{error?<><p role="alert">{error}</p><p>{forbidden?'Access is explicitly provisioned by a Diner Dost platform operator. Restaurant ownership does not grant superadmin access.':'Sign in with your provisioned platform account.'}</p><Link className="button primary" href="/superadmin/signin">Sign in</Link><Link className="button" href="/app/overview">Restaurant workspace</Link></>:<p role="status">Loading platform console…</p>}</main>;
 
  const allowed=navigation.filter(item=>item.permissions.some(p=>data.admin.permissions.includes(p))),can=(permission:PlatformPermission)=>data.admin.permissions.includes(permission);
 
@@ -57,7 +57,7 @@ export function SuperadminPanel(){
 
  return <div className="sa-shell">
 
-  <aside className="sa-sidebar"><Logo/><span className="sa-eyebrow">PLATFORM CONSOLE</span><nav aria-label="Superadmin navigation">{allowed.map(item=><button key={item.id} type="button" aria-current={section===item.id?'page':undefined} onClick={()=>{setSection(item.id);setKind('');setSearch('');setNotice('')}}><Icon name={item.icon}/>{item.title}</button>)}</nav><Link href="/app/overview">Restaurant workspace <span aria-hidden="true">↗</span></Link><div className="sa-account"><strong>{data.admin.name}</strong><span>{label(data.admin.role)}</span><button type="button" onClick={async()=>{await request('/api/auth/logout',{method:'POST',body:'{}'});location.assign('/signin')}}>Sign out</button></div></aside>
+  <aside className="sa-sidebar"><Logo/><span className="sa-eyebrow">PLATFORM CONSOLE</span><nav aria-label="Superadmin navigation">{allowed.map(item=><button key={item.id} type="button" aria-current={section===item.id?'page':undefined} onClick={()=>{setSection(item.id);setKind('');setSearch('');setNotice('')}}><Icon name={item.icon}/>{item.title}</button>)}</nav><Link href="/app/overview">Restaurant workspace <span aria-hidden="true">↗</span></Link><div className="sa-account"><strong>{data.admin.name}</strong><span>{label(data.admin.role)}</span><button type="button" onClick={async()=>{await request('/api/superadmin/auth',{method:'POST',body:JSON.stringify({action:'logout'})});location.assign('/superadmin/signin')}}>Sign out</button></div></aside>
 
   <div className="sa-main"><header className="sa-topbar"><span>Local web administration</span><span className="sa-role">{label(data.admin.role)}</span><button className="button" type="button" disabled={busy} onClick={()=>void refresh()}>Refresh</button></header>
 

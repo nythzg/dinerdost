@@ -115,6 +115,7 @@ export function AuthForm({ signup = false }: { signup?: boolean }) {
               {signup ? "Sign in" : "Create workspace"}
             </Link>
           </p>
+          {!signup&&<p className="auth-switch"><Link href="/superadmin/signin">Superadmin sign in</Link></p>}
         </div>
       </section>
     </main>

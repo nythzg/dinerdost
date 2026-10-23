@@ -212,7 +212,7 @@ export async function logout(db: Database, token: string | undefined) {
     ]);
   return { ok: true };
 }
-export async function stepUp(db: Database, actor: Actor, password: unknown) {
+export async function stepUp(db: Database, actor: Pick<Actor,'userId'>, password: unknown) {
   ensure(
     typeof password === "string" && password.length > 0,
     "STEP_UP_REQUIRED",

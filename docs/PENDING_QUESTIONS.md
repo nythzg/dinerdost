@@ -166,4 +166,4 @@ The receiving user superseded the broad APK request with **Standard only**, no m
 
 ## Local superadmin provisioning input · 23 October 2026
 
-The panel and isolated QA access are implemented locally. The receiving user has been asked which existing account email should receive the initial platform membership; no answer is recorded yet. This is a local access-setup input, not a new Q/PP feature number. Ordinary owners are not auto-promoted. See [local superadmin scope](LOCAL_SUPERADMIN.md). Q111 and the procurement pause remain unchanged.
+The receiving user supplied the initial email, then explicitly requested a new login after it was not found locally. A separate platform identity was created, the user completed the private password setup and authenticated into the local panel. The identity question and local enrollment are resolved. This is local account enrollment, not a new Q/PP feature number. Ordinary owners are not auto-promoted. See [local superadmin scope](LOCAL_SUPERADMIN.md). Q111 and the procurement pause remain unchanged.

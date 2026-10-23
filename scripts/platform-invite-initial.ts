@@ -1,0 +1,6 @@
+/** Operator-only creation for an explicitly approved new platform email. */
+import {resolve,relative,isAbsolute} from 'node:path';
+import {stat,writeFile} from 'node:fs/promises';
+import {createEmbeddedDatabase} from '@dinerdost/database';
+import {inviteInitialPlatformIdentity} from '@dinerdost/services';
+const path=process.env.DD_PLATFORM_LOCAL_DATABASE,email=process.env.DD_PLATFORM_BOOTSTRAP_EMAIL;if(!path||!email)throw new Error('Set the existing local database path and the approved new email privately. Stop the local server and back up first.');const root=resolve('.data'),resolved=resolve(path),inside=relative(root,resolved);if(!inside||inside.startsWith('..')||isAbsolute(inside)||!(await stat(resolved)).isDirectory())throw new Error('Choose an existing database directory under repository .data.');const db=await createEmbeddedDatabase(resolved);try{await db.migrate();const invite=await inviteInitialPlatformIdentity(db,email);const url='http://localhost:5090/superadmin/setup#token='+invite.token;await writeFile(resolve('.data/platform-initial-setup-url.txt'),url,{mode:0o600});console.log('Private one-use password setup link prepared in ignored local storage. It expires in two hours.')}finally{await db.close()}

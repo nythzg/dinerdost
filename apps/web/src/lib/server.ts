@@ -8,6 +8,8 @@ import { DomainError, ensure } from "@dinerdost/core";
 import {startLocalCalculatorRetention} from './calculator-retention';
 import {
   authenticate,
+  authenticatePlatform,
+  PLATFORM_SESSION_COOKIE,
   platformWebAccess,
   SESSION_COOKIE,
   translateError,
@@ -20,6 +22,7 @@ export async function context(options:{platform?:boolean}={}) {
   startLocalCalculatorRetention(db);
   return { db, actor };
 }
+export async function platformContext(){const db=await getDatabase(),jar=await cookies(),token=jar.get(PLATFORM_SESSION_COOKIE)?.value;const actor=token?await authenticatePlatform(db,token):await authenticate(db,jar.get(SESSION_COOKIE)?.value);return {db,actor};}
 export function csrf(request: NextRequest) {
   const origin = request.headers.get("origin");
   const local = new URL(request.url);

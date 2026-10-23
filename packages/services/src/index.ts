@@ -68,3 +68,5 @@ export * from './web-bill-settings';
 
 export * from "./platform-console";
 export * from "./platform-policy";
+
+export * from './platform-auth';
