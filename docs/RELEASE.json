@@ -1097,7 +1097,33 @@
         "workingRestaurantDataMutated": false,
         "qaDatabasesIsolated": true,
         "pushed": false,
-        "deployed": false
+        "deployed": false,
+        "readabilityAndActionAudit": {
+          "status": "verified-local",
+          "backendTestsPassed": 373,
+          "distinctPostgresCasesPassed": 5,
+          "finalPostgresAuditCasesRepeated": 2,
+          "allDisposablePostgresDatabasesRemoved": true,
+          "distinctBrowserWorkflowsPassed": 32,
+          "finalDesignImpersonationRepeatPassed": 9,
+          "responsiveScreensVerified": 9,
+          "screenWidths": [
+            375,
+            768,
+            1440
+          ],
+          "typecheckPassed": true,
+          "buildPassed": true,
+          "actionEventsOnly": true,
+          "legacyChainPreserved": true,
+          "schemaMigrationAdded": false,
+          "workingRestaurantQaMutations": false,
+          "uiUxProMaxGuidanceApplied": true,
+          "gstackDesignGuidanceApplied": true,
+          "gstackRuntimeAvailable": false,
+          "pushed": false,
+          "deployed": false
+        }
       }
     }
   }

@@ -1,5 +1,5 @@
 import {navigateConsole} from './platform-navigation';
-import {test,expect,type Page} from '@playwright/test';
+import {test,expect,request as playwrightRequest,type Page} from '@playwright/test';
 import {readFile} from 'node:fs/promises';
 import {randomUUID} from 'node:crypto';
 const base=process.env.QA_BASE_URL??'http://localhost:5091';let fixture:any,authCookies:any[];
@@ -16,6 +16,20 @@ test('explicit edit mode enables real owner actions, scopes writes and exit pres
  const current=await (await page.request.get('/api/workspace')).json();expect(current.ingredients.some((r:any)=>r.name===input.name)).toBeTruthy();
  await page.screenshot({path:'../work/impersonation-edit-desktop.png',fullPage:true});await page.setViewportSize({width:390,height:844});await page.reload();await expect(page.getByText('Editable owner support',{exact:false})).toBeVisible();await page.locator('.sidebar').evaluate(e=>Promise.all(e.getAnimations().map(a=>a.finished.catch(()=>{}))));expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();expect(await page.getByRole('status').filter({hasText:'Editable owner support'}).evaluate(e=>e.getBoundingClientRect().right<=innerWidth)).toBeTruthy();await page.screenshot({path:'../work/impersonation-edit-phone.png',fullPage:true});
  await page.getByRole('button',{name:'Exit owner view'}).click();await expect(page).toHaveURL(/\/superadmin$/);expect((await page.context().cookies()).some(c=>c.name==='dd_platform_owner_view')).toBeFalsy();const original=await (await page.request.get('/api/workspace')).json();expect(original.restaurant.id).not.toBe(fixture.tenantId);
+});
+
+test('support reads stay out of the action register and one retried change is clear on desktop and phone',async({page})=>{
+ await enter(page,true);const original=await playwrightRequest.newContext({baseURL:base,storageState:{cookies:authCookies,origins:[]}});
+ try{
+  const actions=async()=>((await (await original.get('/api/superadmin')).json()).audits.filter((r:any)=>r.action==='PLATFORM_OWNER_ACTION'));
+  const before=await actions();for(let n=0;n<3;n++){await page.goto('/app/menu');expect((await page.request.get('/api/workspace')).ok()).toBeTruthy()}expect(await actions()).toEqual(before);
+  const workspace=await (await page.request.get('/api/workspace')).json(),id=randomUUID(),input={outletId:workspace.outletId,name:'Action audit browser '+id.slice(0,8),unit:'kg'},data={action:'ingredient',input},headers={Origin:base,'Idempotency-Key':id};
+  const [a,b]=await Promise.all([page.request.post('/api/commands',{headers,data}),page.request.post('/api/commands',{headers,data})]);expect(a.ok()).toBeTruthy();expect(b.ok()).toBeTruthy();
+  const after=await actions();expect(after.length).toBe(before.length+1);expect(after[0].after_data.action).toBe('INGREDIENT_CREATED');
+  await page.getByRole('button',{name:'Exit owner view'}).click();await expect(page).toHaveURL(/\/superadmin$/);await navigateConsole(page,'Audit history');const register=page.getByRole('region',{name:'Recorded actions'});await expect(register.getByText('Ingredient Created',{exact:true}).first()).toBeVisible();await expect(register.getByText('Platform Owner Transaction',{exact:true})).toHaveCount(0);
+  const row=register.locator('details').filter({hasText:'Ingredient Created'}).first();await row.locator('summary').click();await expect(row.getByText(after[0].after_data.tenantAuditId,{exact:true})).toBeVisible();await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:'../work/superadmin-refine-audit-desktop.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});await expect(page.getByRole('navigation',{name:'Superadmin navigation'})).not.toBeVisible();await page.evaluate(()=>window.scrollTo(0,0));expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();await page.screenshot({path:'../work/superadmin-refine-audit-phone.png',fullPage:true});await register.getByRole('button',{name:'Verify audit chain'}).click();await expect(page.getByText('Audit chain verified',{exact:false})).toBeVisible();
+ }finally{await original.dispose()}
 });
 
 test('ended edit grants reject stale owner cookies instead of falling through to the original account',async({page})=>{

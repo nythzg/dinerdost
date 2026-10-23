@@ -35,3 +35,34 @@ Typecheck and optimized build passed. Desktop1440px and phone390px screenshots w
 An initial combined run hit the existing login rate limit because tests repeatedly logged in. Tests now reuse authenticated sessions per role; application rate limits were not weakened. One old restaurant-data assertion was updated from the previous scope-help wording to the new visible dataset heading; API/data assertions remain. Final reruns passed.
 
 No backend or PostgreSQL suites were rerun for this UI-only change. The previous371backend/3editable-PostgreSQL results remain historical evidence, not new runs. No push/deployment occurred.
+
+
+## Readability and action-register follow-up · 23 October 2026
+
+This is the current local UI/audit checkpoint, superseding the compact typography and generic support transaction events described above.
+
+Applied UI/UX Pro Max's verified UX matches for readable font sizes, line height and a consistent text hierarchy, and gstack design-review principles for scanning, grouping, mobile controls and before/after inspection. The approved green palette and existing fonts/components remain. Labels/metadata now follow a 12/14px scale, reading text 14–16px, section headings 20–24px and page titles 28–32px. Phone form text is 16px and principal controls have 44px touch targets. Missing metrics use a restrained 16px “Not recorded” status, instead of competing with actual numeric values. Mobile audit fields stack cleanly; camel-case field captions also separate numbers into readable words.
+
+The audit register uses Action / Administrator / Recorded at columns on desktop and stacked entries on phones, with expandable reason, IP, sequence and before/after details. New delegated actions show the actual business action and restaurant context. The existing API permission/scope checks and all management forms remain intact.
+
+### Action logging correction
+
+The editable support wrapper previously appended PLATFORM_OWNER_TRANSACTION after every transaction not explicitly marked READ ONLY. Normal dashboard reads also use these transactions, causing repeated page visits to appear as actions.
+
+It now copies only immutable tenant audit events created by the same successful transaction into PLATFORM_OWNER_ACTION records, with the real operator/grant and an exact tenant-audit reference. Tenant sequence bounds keep the scan small; PostgreSQL transaction identity excludes concurrent real-owner events. Empty reads, refreshes and idempotent replays produce no action, and rollback removes both the attempted business action and platform entry. Explicit support open/exit, downloads, configuration and genuine automated business actions remain audited; HTTP telemetry stays separate.
+
+Historical generic support events are preserved byte-for-byte in the immutable chain and excluded from the action register before its 100-row limit. Verify audit chain still verifies every historical event. No deletion, rewriting or backfilling of historical audit/business data occurs. No schema migration is required. The implementation uses PostgreSQL's documented [current transaction identity and xid cast](https://www.postgresql.org/docs/17/functions-info.html#FUNCTIONS-PG-SNAPSHOT), tested on both PGlite and real PostgreSQL.
+
+### Verification and tool limits
+
+- **373 full backend tests passed.** Two new regression cases cover read noise, concurrent exact retries, concurrent owner/operator attribution, actual action references, rollback, legacy-history preservation and full-chain verification.
+- **5 distinct PostgreSQL impersonation/audit cases passed** on a newly created disposable database. The final two audit cases passed again after strengthening concurrent-owner/rollback checks, on another disposable database. Both exact databases were removed by the existing verifier. These are 5 distinct cases, not 7.
+- **32 distinct Chromium browser workflows passed:**12 console,4impersonation/action-register,5design,5restaurant-data,6operations. The 9 design/impersonation cases passed again after final layout changes. Rendered action checks perform three dashboard reads, one concurrently retried change, then inspect the action title/reference and verify the chain on desktop/phone.
+- Final typecheck and optimized build passed. Nine additional responsive screens (Overview, Restaurants and Audit history at 375/768/1440px) had no page overflow or client errors. Desktop/phone before/after screens, expanded action details, missing-metric sizing and the tablet directory were inspected. This is not an exhaustive WCAG/device certification.
+- Repeated QA support submissions hit the existing password-confirmation rate limit. Final runs use fresh isolated fixtures; production rate limits were not relaxed. A phone screenshot initially captured the sidebar's resize transition; final checks wait for the closed drawer before capturing.
+
+UI/UX Pro Max's Next.js-specific typography/accessibility search returned no relevant match after retry; the verified stack-independent UX guidance and installed project docs were used. Gstack's skill-start command could not run because Bash is absent. Its design-review guidance was read and applied, but its own browser runner, detectors, grading, outside reviews and telemetry were not run. Running those requires the installation's ./setup or /gstack-upgrade; no package/OS setup was performed for this task. Browser evidence comes from the project's real Chromium/Playwright setup.
+
+Durable learning: a database transaction that permits writes is not evidence that a user changed anything. Derive delegated action records from immutable business events in that same transaction, preserving idempotency, concurrency and rollback. Keep QA step-up budgets separate across full browser batches by provisioning fresh fixtures, never weakening application limits.
+
+The active Nythz Coooks / Nihal kaman / N1 working database and original credentials/history were not used for QA mutations. No provider/hardware/package/configuration/deployment work was activated. Production/client/Petpooja completion counts are unchanged, Q111 remains unanswered and procurement remains paused.

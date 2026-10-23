@@ -895,3 +895,8 @@ The user authorized real troubleshooting edits. Direct full-dashboard entry now 
 ### Local Superadmin design · 23 October 2026
 
 Implemented the direct UI redesign in the existing green theme: grouped/collapsible navigation, phone drawer, keyboard search, actual overview priorities, analytics views, directory sorting and definition filters. All existing management/support workflows remain guarded. Verified31browser workflows and typecheck/build; desktop/phone screens inspected. Confirmed restaurant data untouched; no migration/provider/hardware/push/deployment. See [design and verification](LOCAL_SUPERADMIN_DESIGN.md). This is a local platform UI checkpoint; Q/PP released counts, Q111 and procurement pause remain unchanged.
+
+
+### Local Superadmin readability and action register · 23 October 2026
+
+Improved the text hierarchy/layout and phone controls using UI/UX Pro Max/gstack guidance. The audit register now shows committed actions rather than delegated dashboard reads; exact retries, rollback and concurrent owner activity are verified, with original audit history retained. Verified 373 backend tests, 5 distinct PostgreSQL cases, 32 distinct browser workflows, responsive375/768/1440px screens and typecheck/build. Tool/runtime and repeat-run limits are recorded in [the current design/audit guide](LOCAL_SUPERADMIN_DESIGN.md). No active N1 data mutation, schema/provider/hardware/package/configuration/push/deployment change. This is local platform work; Q/PP released counts, Q111 and procurement pause remain unchanged.
