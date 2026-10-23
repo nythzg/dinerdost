@@ -10,7 +10,7 @@ import {
 // Interface copy only. Names, menu content, records and server values stay as entered.
 const hindi: Record<string, string> = {
   "Kitchen stages":"रसोई चरण", "On":"चालू", "Off":"बंद", "Kitchen workflow":"रसोई कार्यप्रवाह", "Save kitchen workflow":"रसोई कार्यप्रवाह सहेजें",
-  "Total services":"कुल सेवाएँ", "Completed services":"पूरी हुई सेवाएँ", "Awaiting services":"लंबित सेवाएँ", "Serve requests":"परोसने के अनुरोध", "Completed on":"पूर्ण होने की तारीख", "Whole day":"पूरा दिन", "Select rounds":"राउंड चुनें", "Clear selection":"चयन हटाएँ", "Select all":"सभी चुनें", "Serve selected":"चुने हुए परोसें",
+  "Total services":"कुल सेवाएँ", "Completed services":"पूरी हुई सेवाएँ", "Awaiting services":"लंबित सेवाएँ", "Serve requests":"परोसने के अनुरोध", "Completed on":"पूर्ण होने की तारीख", "Whole day":"पूरा दिन", "Select rounds":"राउंड चुनें", "Clear selection":"चयन हटाएँ", "Select all":"सभी चुनें", "Cancel selection":"चयन रद्द करें", "Serve selected":"चुने हुए परोसें",
   "Calculator": "कैलकुलेटर",
   "Active orders": "सक्रिय ऑर्डर",
   "Clear table": "टेबल खाली करें",

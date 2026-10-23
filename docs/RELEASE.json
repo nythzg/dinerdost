@@ -241,6 +241,23 @@
     "restaurantDataTransferred": false
   },
   "localDevelopment": {
+    "serviceRoundSelection": {
+      "status": "verified-local-unreleased",
+      "scope": "Ready-round checkboxes hidden initially; Select rounds opens unchecked manual/all selection, followed by guarded actions and explicit cancel.",
+      "affectedBackendTestsPassed": 5,
+      "browserWorkflowsPassed": 1,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "backendOrSchemaChanged": false,
+      "postgresRerun": false,
+      "notes": "docs/LOCAL_SERVICE_SELECTION.md",
+      "pushed": false,
+      "deployed": false
+    },
     "rewardSuccessAlerts": {
       "status": "verified-local-unreleased",
       "scope": "Green SweetAlert2 Coupon applied / Loyalty points claimed with total bill discount, prior payable struck through and new server payable highlighted; successful saves only.",
