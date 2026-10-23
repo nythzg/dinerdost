@@ -1,6 +1,7 @@
 "use client";
 import {clientUuid} from "@/lib/browser-crypto";
 import {FixtureLabels,FixtureSymbol,useFixtureLayout} from "./fixture-details";
+import {RoundnessControl} from "./roundness-control";
 import { T } from "@/lib/staff-language";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import {
@@ -268,7 +269,7 @@ export function FloorPlan() {
   }
   const visible: PlanObject[] = draft ?? fallback;
   const current = visible.find((object) => object.id === selected);
-  const fixtureObjects=visible.map(object=>({...object,label:tables.find(table=>table.id===object.tableId)?.label??object.label}));
+  const fixtureObjects=visible.map(object=>({...object,label:tables.find(table=>table.id===object.tableId)?.label??object.label,seats:tables.find(table=>table.id===(object.tableId??object.copyOfTableId))?.seats??object.newTable?.seats}));
   const fixtureLayout=useFixtureLayout(fixtureObjects,zoom,draft&&current?[current]:[],compactLabels,{x:8-pan.x,y:8-pan.y,width:Math.max(0,(canvasSize.width||area.width)-16),height:Math.max(0,(canvasSize.height||area.height)-16)});
   const handleOutset=current?Math.max(0,11/zoom-Math.min(current.width,current.height)/2):0;
   const roundness=draft?boundaryRoundness:Number(saved?.boundary_roundness??0);
@@ -783,9 +784,7 @@ export function FloorPlan() {
               </option>
             </select>
             <SnappingControls value={snapSettings} change={setSnapSettings}/>
-            <label className="floor-roundness-control">Boundary roundness
-              <input aria-label="Boundary roundness" type="number" min="0" max="500" step="5" value={boundaryRoundness} disabled={!!floorEllipse(displayOutline)} onChange={e=>setBoundaryRoundness(Math.max(0,Math.min(500,Math.round(Number(e.target.value)||0))))}/>
-            </label>
+            <RoundnessControl label="Boundary roundness" value={boundaryRoundness} max={500} step={5} disabled={!!floorEllipse(displayOutline)} change={setBoundaryRoundness} start={()=>{historyGesture.current=true}} finish={finishGesture}/>
             <button className="button" disabled={!current} onClick={copy}>
               <T>{"Copy"}</T>
             </button>
@@ -1278,11 +1277,7 @@ export function FloorPlan() {
           {current.kind==='TABLE'&&<label className="check-row"><input type="checkbox" aria-label="Allow outside floor" checked={!!current.allowOutside} onChange={e=>{
             const next={...current,allowOutside:e.target.checked};if(!floorObjectAllowed(next,area,outline,roundness)){notify('Move this table inside the floor before turning this option off.');return;}update(current.id,{allowOutside:e.target.checked});
           }}/>Allow outside floor</label>}
-          <label className="floor-roundness-control">Corner roundness
-            <input aria-label="Corner roundness" type="number" min="0" max="1000" step="1" value={current.cornerRadius??floorObjectCornerRadius(current)} onChange={event=>{
-              const value=event.target.valueAsNumber;if(Number.isInteger(value)&&value>=0&&value<=1000)update(current.id,{cornerRadius:value});
-            }}/>
-          </label>
+          <RoundnessControl label="Corner roundness" value={floorObjectCornerRadius(current)} max={Math.floor(Math.min(current.width,current.height)/2)} change={value=>update(current.id,{cornerRadius:value})} start={()=>{historyGesture.current=true}} finish={finishGesture}/>
           <div className="inline-actions">
             <button
               className="button"

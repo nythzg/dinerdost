@@ -869,6 +869,37 @@
       "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
       "pushed": false,
       "deployed": false
+    },
+    "floorIconAndRoundnessSliders": {
+      "status": "verified-local-unreleased",
+      "scope": "Clearer Private Room door/lock, accurate variable-capacity table symbols and green sliders for every existing web floor roundness control.",
+      "seatVariantsVerified": [
+        2,
+        4,
+        6,
+        8,
+        12
+      ],
+      "additionalCapacityEdgesVerified": [
+        1,
+        100
+      ],
+      "distinctBrowserWorkflowsPassed": 8,
+      "finalFocusedBrowserRepeatsPassed": 3,
+      "viewportWidths": [
+        320,
+        390,
+        650,
+        844,
+        1440
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "backendOrSchemaChanged": false,
+      "backendOrPostgresRerun": false,
+      "notes": "docs/LOCAL_FLOOR_FIXTURES.md",
+      "pushed": false,
+      "deployed": false
     }
   }
 }

@@ -1,3 +1,4 @@
+import {setRangeValue} from "./roundness-helpers";
 import {test,expect,type Page} from '@playwright/test';
 import {randomBytes,randomUUID} from 'node:crypto';
 test.use({actionTimeout:15000});
@@ -23,28 +24,31 @@ test('table chairs follow saved seat changes and rounded fixtures keep icons/lab
   await page.goto('/app/floor-plan');await page.getByLabel('Floor plan floor',{exact:true}).selectOption(floor);await page.getByLabel('Fit floor to view',{exact:true}).click();
   const body=page.locator('[data-plan-object-id="seats"]'),icon=body.locator('.table-detail-icon');
   await expect(icon).toHaveAttribute('data-seat-count','4');await expect(icon.locator('[data-table-chair]')).toHaveCount(4);
-  for(const seats of [6,2,1,8,12,100,4]){
+  for(const seats of [2,4,6,8,12,1,100,4]){
    w=await workspace(page);const current=w.tables.find((t:any)=>t.id===table.id);const plans=w.floorPlans;
    await command(page,'tableCapacity',{tableId:table.id,version:current.version,seats,floor});await page.reload();
-   await expect(icon).toHaveAttribute('data-seat-count',String(seats));await expect(icon.locator('[data-table-chair]')).toHaveCount(seats);
+   await expect(icon).toHaveAttribute('data-seat-count',String(seats));await expect(icon.locator('[data-table-chair]')).toHaveCount(seats);if([2,4,6,8,12].includes(seats))await expect(icon).toHaveAttribute('viewBox','0 0 '+({2:24,4:24,6:32,8:40,12:56} as Record<number,number>)[seats]+' 24');
+   if([2,4,6,8,12].includes(seats)){const b=(await body.locator('.fixture-symbol').boundingBox())!;expect(b.width/b.height).toBeCloseTo(({2:1,4:1,6:32/24,8:40/24,12:56/24} as Record<number,number>)[seats],1);expect(await icon.evaluate(svg=>{
+    const stroke=Number(svg.getAttribute('stroke-width'));return ['0','2'].every(side=>{const bars=Array.from(svg.querySelectorAll<SVGPathElement>('[data-chair-side="'+side+'"]')).map(path=>path.getBBox()).sort((a,b)=>a.x-b.x);return bars.every((bar,i)=>!i||bar.x-bars[i-1].x-bars[i-1].width>stroke);});
+   })).toBe(true);await body.screenshot({path:`verification/local-table-symbol-${seats}-${width}.png`});}
    const after=await workspace(page);expect(after.floorPlans).toEqual(plans);expect(after.sessions).toEqual(w.sessions);expect(after.orders).toEqual(w.orders);
   }
   const before=await workspace(page),saved=before.floorPlans.find((p:any)=>p.floor===floor);
   await page.getByRole('button',{name:'Arrange',exact:true}).click();await body.focus();await body.press('Enter');
-  await page.getByLabel('Corner roundness',{exact:true}).fill('35');await expect(body).toHaveCSS('border-radius','35px');
+  await setRangeValue(page.getByLabel('Corner roundness',{exact:true}),35);await expect(body).toHaveCSS('border-radius','35px');
   await page.getByLabel('Undo layout change',{exact:true}).click();await expect(body).toHaveCSS('border-radius','14px');
   await page.getByLabel('Redo layout change',{exact:true}).click();await expect(body).toHaveCSS('border-radius','35px');
   await page.getByRole('button',{name:'Cancel',exact:true}).click();expect((await workspace(page)).floorPlans.find((p:any)=>p.floor===floor)).toEqual(saved);
   await page.getByRole('button',{name:'Arrange',exact:true}).click();
   for(const [id,value,effective] of [['seats',1000,80],['private',90,90],['small',30,30],['wall',10,10],['fence',0,0]] as const){
    const object=page.locator(`[data-plan-object-id="${id}"]`);await object.focus();await object.press('Enter');
-   const input=page.getByLabel('Corner roundness',{exact:true});await input.fill(String(value));await expect(object).toHaveCSS('border-radius',effective+'px');
+   const input=page.getByLabel('Corner roundness',{exact:true});await expect(input).toHaveAttribute("type","range");await setRangeValue(input,value);await expect(object).toHaveCSS('border-radius',effective+'px');
   }
   await page.screenshot({path:`verification/local-object-corner-controls-${width}.png`});
   await page.getByRole('button',{name:'Save layout',exact:true}).click();await expect(page.getByRole('button',{name:'Arrange',exact:true})).toBeVisible();
   await page.reload();await page.getByLabel('Fit floor to view',{exact:true}).click();
   const after=await workspace(page),plan=after.floorPlans.find((p:any)=>p.floor===floor);
-  expect(plan.objects.map((o:any)=>o.cornerRadius)).toEqual([1000,90,30,10,0]);expect(after.tables).toEqual(before.tables);expect(after.sessions).toEqual(before.sessions);expect(after.orders).toEqual(before.orders);
+  expect(plan.objects.map((o:any)=>o.cornerRadius)).toEqual([80,90,30,10,0]);expect(after.tables).toEqual(before.tables);expect(after.sessions).toEqual(before.sessions);expect(after.orders).toEqual(before.orders);
   for(const object of plan.objects){const original=saved.objects.find((o:any)=>o.id===object.id);for(const key of ['x','y','width','height','rotation','tableId'])expect(object[key]).toEqual(original[key]);}
   await expect(page.locator('[data-fixture-id=small]')).toHaveAttribute('data-label-placement','below');
   for(const label of await page.locator('.fixture-detail strong').all())await expect(label).toHaveCSS('font-size','10px');
@@ -62,7 +66,7 @@ test('table chairs follow saved seat changes and rounded fixtures keep icons/lab
   const copy=page.locator('.plan-table.is-selected');await expect(copy).toHaveCSS('border-radius','80px');await expect(copy.locator('[data-table-chair]')).toHaveCount(4);
   await page.getByRole('button',{name:'Save layout',exact:true}).click();await expect(page.getByRole('button',{name:'Arrange',exact:true})).toBeVisible();
   const copiedWorkspace=await workspace(page),copiedPlan=copiedWorkspace.floorPlans.find((p:any)=>p.floor===floor),copiedObject=copiedPlan.objects.find((o:any)=>o.kind==='TABLE'&&o.tableId!==table.id),copiedTable=copiedWorkspace.tables.find((t:any)=>t.id===copiedObject.tableId);
-  expect(copiedObject.cornerRadius).toBe(1000);expect(copiedTable.seats).toBe(4);expect(copiedTable.public_key).not.toBe(table.public_key);expect(copiedTable.is_occupied).toBe(false);
+  expect(copiedObject.cornerRadius).toBe(80);expect(copiedTable.seats).toBe(4);expect(copiedTable.public_key).not.toBe(table.public_key);expect(copiedTable.is_occupied).toBe(false);
   // Occupancy changes icon contrast, never chair capacity or the saved geometry.
   await command(page,'openSession',{tableId:table.id,guests:2});await page.reload();await expect(body).toHaveClass(/occupied/);await expect(body.locator('.fixture-symbol')).toHaveCSS('color','rgb(255, 255, 255)');await expect(icon.locator('[data-table-chair]')).toHaveCount(4);
  }

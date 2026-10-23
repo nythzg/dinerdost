@@ -19,7 +19,7 @@ test('dense phone floor labels remain readable, nearby, unclipped and stable thr
   {id:'fence',kind:'WALL',label:'Wall',x:740,y:440,width:200,height:20},
  ];
  const placements=[[170,30,60,60],[390,260,140,60],[470,340,60,60],[420,480,120,80],[680,240,180,140],[1050,170,70,150],[930,30,180,90],[1050,360,70,150],[1000,550,120,60],[850,550,120,60],[700,550,120,60],[890,250,150,180],[580,30,160,140],[760,30,160,140]];
- for(const [i,[x,y,width,height]] of placements.entries()){const table=await command(page,'table',{outletId:w.outletId,floor,label:String(i+1),seats:4});objects.push({id:'table-'+i,kind:'TABLE',tableId:table.id,label:table.label,x,y,width,height});}
+ for(const [i,[x,y,width,height]] of placements.entries()){const table=await command(page,'table',{outletId:w.outletId,floor,label:String(i+1),seats:[2,4,6,8,12][i%5]});objects.push({id:'table-'+i,kind:'TABLE',tableId:table.id,label:table.label,x,y,width,height});}
  await command(page,'floorPlan',{outletId:w.outletId,floor,version:0,width:1200,height:650,objects});const before=await workspace(page);
  for(const width of [390,320,650,844,1440]){
   await page.setViewportSize({width,height:width===844?390:844});await page.goto('/app/floor-plan');await page.getByLabel('Floor plan floor',{exact:true}).selectOption(floor);await page.getByLabel('Fit floor to view',{exact:true}).click();

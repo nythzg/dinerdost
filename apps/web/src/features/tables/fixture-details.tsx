@@ -2,21 +2,25 @@
 import {useCallback,useLayoutEffect,useRef,useState} from 'react';
 import {floorObjectCorners,floorObjectCornerRadius,floorFixtureLabel,type FloorPlanObject} from '@dinerdost/core';
 
-function TableIcon({seats}:{seats?:number}){
+function tableIconShape(seats?:number){
  const count=typeof seats==='number'&&Number.isInteger(seats)&&seats>=1&&seats<=100?seats:0;
- // Alternate opposite sides. Each saved seat has one distinct chair; no count cap.
- const sides=[0,2,1,3],counts=[0,0,0,0];for(let i=0;i<count;i++)counts[sides[i%4]]++;
- const extent=Math.max(24,Math.max(...counts)*8+8),edge=extent-12;
- return <svg className="fixture-detail-icon table-detail-icon" data-seat-count={count} aria-hidden="true" viewBox={`0 0 ${extent} ${extent}`} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-  <rect x="6" y="6" width={edge} height={edge} rx="2"/>
+ // Two end seats, then balanced long sides: 2/4 are compact, 6/8/12 grow longer.
+ const counts=count===1?[1,0,0,0]:[Math.ceil(Math.max(0,count-2)/2),count>=2?1:0,Math.floor(Math.max(0,count-2)/2),count>=2?1:0];
+ return {count,counts,width:24+Math.max(0,Math.max(counts[0],counts[2])-1)*8,height:24};
+}
+function TableIcon({seats}:{seats?:number}){
+ const {count,counts,width,height}=tableIconShape(seats);
+ return <svg className="fixture-detail-icon table-detail-icon" data-seat-count={count} aria-hidden="true" viewBox={`0 0 ${width} ${height}`} fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+  <rect x="6" y="6" width={width-12} height="12" rx="2.5"/>
   {counts.flatMap((total,side)=>Array.from({length:total},(_,index)=>{
-   const center=6+(index+1)*edge/(total+1),half=Math.min(3,edge/(total+1)*.5),near=2,far=extent-2;
-   return <path key={side+'-'+index} data-table-chair="" d={side===0?`M${center-half} ${near}h${2*half}`:side===2?`M${center-half} ${far}h${2*half}`:side===1?`M${far} ${center-half}v${2*half}`:`M${near} ${center-half}v${2*half}`}/>;
+   const edge=side%2?12:width-12,spacing=edge/(total+1),center=6+(index+1)*spacing,half=total===1?3:Math.min(3,Math.max(.5,(spacing-3)/2));
+   return <path key={side+'-'+index} data-table-chair="" data-chair-side={side} d={side===0?`M${center-half} 2h${2*half}`:side===2?`M${center-half} 22h${2*half}`:side===1?`M${width-2} ${center-half}v${2*half}`:`M2 ${center-half}v${2*half}`}/>;
   }))}
  </svg>;
 }
 export function FixtureIcon({kind,seats}:{kind:FloorPlanObject['kind'];seats?:number}){
  if(kind==='TABLE')return <TableIcon seats={seats}/>;
+ if(kind==='PRIVATE_ROOM')return <svg className="fixture-detail-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M5 21V3h14v18 M3 21h18 M9 11V8a3 3 0 0 1 6 0v3"/><rect x="8" y="11" width="8" height="7" rx="1"/><circle cx="12" cy="14" r=".8" fill="currentColor" stroke="none"/><path d="M12 14.8v1.4"/></svg>;
  const paths:Record<string,string>={
   ENTRY:'M5 3h9v18H5z M10 8h12m-3-3 3 3-3 3 M22 16H10m3-3-3 3 3 3',
   EXIT:'M5 3h9v18H5z M10 8h12m-3-3 3 3-3 3 M22 16H10m3-3-3 3 3 3',
@@ -45,37 +49,39 @@ function fitsInsideFixture(object:FloorPlanObject,zoom:number,width:number,heigh
   return px<=hw&&py<=hh&&Math.hypot(Math.max(0,px-(hw-r)),Math.max(0,py-(hh-r)))<=r+.001;
  }));
 }
-function fixtureIconSize(object:FloorPlanObject,zoom:number,compact=false){
+type FixtureVisual=FloorPlanObject&{seats?:number};
+function fixtureIconSize(object:FixtureVisual,zoom:number,compact=false){
  const angle=(object.rotation??0)*Math.PI/180;
+ const shape=object.kind==='TABLE'?tableIconShape(object.seats):{width:24,height:24},aspect=shape.width/shape.height;
  const original=Math.min(compact?12:18,Math.min(object.width,object.height)*zoom*(compact&&object.kind==='TABLE'?.4:.8)/(Math.abs(Math.cos(angle))+Math.abs(Math.sin(angle))));
- if(fitsInsideFixture(object,zoom,original,original))return original;
+ if(fitsInsideFixture(object,zoom,original*aspect,original))return {width:original*aspect,height:original};
  // Preserve original icon sizing unless newly rounded corners would clip it.
- let low=0,high=original;for(let i=0;i<16;i++){const mid=(low+high)/2;if(fitsInsideFixture(object,zoom,mid,mid))low=mid;else high=mid;}return low;
+ let low=0,high=original;for(let i=0;i<16;i++){const mid=(low+high)/2;if(fitsInsideFixture(object,zoom,mid*aspect,mid))low=mid;else high=mid;}return {width:low*aspect,height:low};
 }
 
 /** Symbols stay upright and contained in their physical fixture at every zoom. */
 export function FixtureSymbol({object,zoom,offset=0,seats,compact=false}:{object:FloorPlanObject;zoom:number;offset?:number;seats?:number;compact?:boolean}){
- const size=fixtureIconSize(object,zoom,compact),angle=(object.rotation??0)*Math.PI/180;
- return <span className="fixture-symbol" aria-hidden="true" style={{width:size,height:size,left:`calc(50% + ${offset*Math.cos(angle)/zoom}px)`,top:`calc(50% + ${-offset*Math.sin(angle)/zoom}px)`,transform:`translate(-50%,-50%) rotate(${-(object.rotation??0)}deg) scale(${1/zoom})`}}><FixtureIcon kind={object.kind} seats={seats}/></span>;
+ const size=fixtureIconSize({...object,seats},zoom,compact),angle=(object.rotation??0)*Math.PI/180;
+ return <span className="fixture-symbol" aria-hidden="true" style={{...size,left:`calc(50% + ${offset*Math.cos(angle)/zoom}px)`,top:`calc(50% + ${-offset*Math.sin(angle)/zoom}px)`,transform:`translate(-50%,-50%) rotate(${-(object.rotation??0)}deg) scale(${1/zoom})`}}><FixtureIcon kind={object.kind} seats={seats}/></span>;
 }
 
 /** Share measured text placement with physical symbols so the pair stays centered. */
-export function useFixtureLayout(objects:FloorPlanObject[],zoom:number,reserved:FloorPlanObject[]=[],compact=false,viewport?:LabelBox){
+export function useFixtureLayout(objects:FixtureVisual[],zoom:number,reserved:FloorPlanObject[]=[],compact=false,viewport?:LabelBox){
  const [sizes,setSizes]=useState<Record<string,Size>>({});
  const measured=useCallback((id:string,size:Size)=>setSizes(old=>old[id]&&Math.abs(old[id].width-size.width)<.1&&Math.abs(old[id].height-size.height)<.1?old:{...old,[id]:size}),[]);
  const occupied:LabelBox[]=objects.map(object=>{
   const size=fixtureIconSize(object,zoom,compact);
-  return {x:(object.x+object.width/2)*zoom-size/2,y:(object.y+object.height/2)*zoom-size/2,width:size,height:size,fixtureId:object.id};
+  return {x:(object.x+object.width/2)*zoom-size.width/2,y:(object.y+object.height/2)*zoom-size.height/2,...size,fixtureId:object.id};
  });
  const positions=new Map<string,LabelPosition>(),named=objects.filter(object=>object.kind!=='WALL');
  // Fit both upright boxes within the real rotated shape, with text beside its icon.
  for(const object of named){
   const size=sizes[object.id];if(!size)continue;
-  const gap=compact?2:6,icon=fixtureIconSize(object,zoom,compact),offset=(icon+gap)/2,iconOffset=-(size.width+gap)/2;
+  const gap=compact?2:6,icon=fixtureIconSize(object,zoom,compact),offset=(icon.width+gap)/2,iconOffset=-(size.width+gap)/2;
   const fitsBox=(width:number,height:number,dx:number)=>fitsInsideFixture(object,zoom,width,height,dx,compact?1:4);
-  const cx=(object.x+object.width/2)*zoom,cy=(object.y+object.height/2)*zoom,box={x:cx+offset-size.width/2,y:cy-size.height/2,...size},symbol={x:cx+iconOffset-icon/2,y:cy-icon/2,width:icon,height:icon,fixtureId:object.id};
-  const fits=fitsBox(size.width,size.height,offset)&&(!icon||fitsBox(icon,icon,iconOffset));
-  if(fits&&!occupied.some(other=>other.fixtureId!==object.id&&(intersects(box,other)||(icon>0&&intersects(symbol,other))))){
+  const cx=(object.x+object.width/2)*zoom,cy=(object.y+object.height/2)*zoom,box={x:cx+offset-size.width/2,y:cy-size.height/2,...size},symbol={x:cx+iconOffset-icon.width/2,y:cy-icon.height/2,...icon,fixtureId:object.id};
+  const fits=fitsBox(size.width,size.height,offset)&&fitsBox(icon.width,icon.height,iconOffset);
+  if(fits&&!occupied.some(other=>other.fixtureId!==object.id&&(intersects(box,other)||intersects(symbol,other)))){
    const ownIcon=occupied.findIndex(other=>other.fixtureId===object.id);if(ownIcon>=0)occupied[ownIcon]=symbol;
    occupied.push(box);positions.set(object.id,{x:(cx+offset)/zoom,y:cy/zoom,inside:true,iconOffset});
   }

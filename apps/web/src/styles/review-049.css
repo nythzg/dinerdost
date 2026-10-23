@@ -24,8 +24,12 @@
  .plan-object>.fixture-symbol{position:absolute;display:grid;place-items:center;left:50%;top:50%;transform-origin:center;pointer-events:none;background:transparent;color:#285b45;border-radius:2px}
  .fixture-symbol>.fixture-detail-icon{display:block;width:100%;height:100%}
  .plan-table.occupied>.fixture-symbol{color:#fff}
- .floor-roundness-control{display:flex;align-items:center;gap:6px;font-size:12px}
- .floor-roundness-control input{width:75px;min-height:36px;padding:6px}
+ .floor-roundness-control{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;max-width:100%}
+ .roundness-slider-track{display:inline-flex;align-items:center;gap:7px;width:170px;max-width:100%}
+ .floor-roundness-control input[type=range]{width:130px;min-width:80px;min-height:36px;margin:0;padding:0;accent-color:#285b45;background:transparent;border:0;border-radius:0;box-shadow:none;cursor:pointer}
+ .roundness-end{width:12px;height:12px;flex:none;border:1px solid #285b45;border-radius:0}
+ .roundness-end.is-round{border-radius:50%}
+ .floor-roundness-control input[type=range]:disabled{cursor:default;opacity:.45}
  .plan-object.plan-kind-fence{padding:0;border:1px solid #285b45;border-radius:2px;background:repeating-linear-gradient(90deg,#285b45 0 6px,#e7eee2 6px 14px)}
  .plan-object.plan-kind-entry,.plan-object.plan-kind-exit{background:#e5eddf;border:2px solid #527247;border-radius:5px}
  .plan-object.outside-outline{outline:3px solid #a44b24;outline-offset:3px}

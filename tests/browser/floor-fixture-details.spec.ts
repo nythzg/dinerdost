@@ -1,3 +1,4 @@
+import {setRangeValue} from "./roundness-helpers";
 import {test,expect,type Page,type Locator} from '@playwright/test';
 import {randomBytes,randomUUID} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
@@ -40,7 +41,7 @@ test('uniform small labels fit inside or sit beneath fixtures without lines; int
   await expect(page.getByRole('button',{name:'Washroom',exact:true}).locator('.fixture-symbol circle')).toHaveCount(2);
   for(const symbol of await page.locator('.fixture-symbol').all())await expect(symbol).toHaveCSS('background-color','rgba(0, 0, 0, 0)');
   await expect(page.locator('[data-plan-object-id=table] svg')).toHaveAttribute('data-seat-count','4');await expect(page.locator('[data-plan-object-id=table] [data-table-chair]')).toHaveCount(4);
-  const privateIcon=page.locator('[data-plan-object-id=private] .fixture-symbol svg');await expect(privateIcon).toHaveAttribute('fill','none');expect(await privateIcon.locator('path').getAttribute('d')).not.toBe(await page.locator('[data-plan-object-id=narrow] .fixture-symbol path').getAttribute('d'));
+  const privateIcon=page.locator('[data-plan-object-id=private] .fixture-symbol svg');await expect(privateIcon).toHaveAttribute('fill','none');expect(await privateIcon.locator('path').first().getAttribute('d')).not.toBe(await page.locator('[data-plan-object-id=narrow] .fixture-symbol path').getAttribute('d'));
   expect(await page.locator('.fixture-detail').evaluateAll(labels=>labels.every(label=>{
    const object=document.querySelector('.plan-object[data-plan-object-id="'+label.getAttribute('data-fixture-id')+'"]');
    if(!object)return false;const body=object.getBoundingClientRect(),name=label.getBoundingClientRect();
@@ -60,7 +61,7 @@ test('uniform small labels fit inside or sit beneath fixtures without lines; int
   let steps=0;while(await kitchenLabel.getAttribute('data-label-placement')==='inside'&&steps<15){await page.getByLabel('Zoom out floor plan',{exact:true}).click();steps++;}
   await expect(kitchenLabel).toHaveAttribute('data-label-placement','below');await expect(kitchenLabel.locator('strong')).toHaveCSS('font-size','10px');
   for(let i=0;i<steps;i++)await page.getByLabel('Zoom in floor plan',{exact:true}).click();await expect(kitchenLabel).toHaveAttribute('data-label-placement','inside');await expect(kitchenLabel.locator('strong')).toHaveCSS('font-size','10px');await besideIcon();
-  await page.getByLabel('Boundary roundness',{exact:true}).fill('80');await expect(page.locator('.floor-boundary-shape')).toHaveAttribute('d',/ Q/);
+  await setRangeValue(page.getByLabel('Boundary roundness',{exact:true}),80);await expect(page.locator('.floor-boundary-shape')).toHaveAttribute('d',/ Q/);
   const gate=page.getByRole('button',{name:'Entry/Exit',exact:true});await expect(gate).toHaveCount(1);await expect(gate.locator('.fixture-symbol svg path')).toHaveAttribute('d',/M10 8h12.*M22 16H10/);
   await expect(page.getByLabel('Fixture type',{exact:true}).locator('option[value="ENTRY"]')).toHaveText('Entry/Exit');await expect(page.getByLabel('Fixture type',{exact:true}).locator('option[value="EXIT"]')).toHaveCount(0);
   await gate.focus();for(let i=0;i<10;i++)await gate.press('ArrowLeft');expect((await geometry(gate)).x).toBe(-140);
