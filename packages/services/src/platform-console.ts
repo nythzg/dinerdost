@@ -191,11 +191,12 @@ export async function platformRestaurantDirectory(db:Database,actor:PlatformActo
  return db.transaction(null,async tx=>{
   await tx.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY');
   await member(tx,actor,'tenants');
-  const where=`${restaurantScope} AND ($2='' OR strpos(lower(r.name||' '||r.slug||' '||coalesce(p.status,'ACTIVE')),lower($2))>0)`;
+  const where=`${restaurantScope} AND ($2='' OR strpos(lower(r.name||' '||r.slug||' '||coalesce(p.status,'ACTIVE')||' '||coalesce((SELECT string_agg(e.name,' ') FROM employees e WHERE e.restro_id=r.id AND e.role='OWNER' AND e.active),'')),lower($2))>0)`;
   const params=[data.dataset,data.search];
   const total=num((await one(tx,`SELECT count(*) AS count FROM restaurants r LEFT JOIN platform_tenant_policies p ON p.restro_id=r.id WHERE ${where}`,params)).count);
   const pageSize=25,pages=Math.max(1,Math.ceil(total/pageSize)),page=Math.min(data.page,pages);
   const rows=(await tx.query<Row>(`SELECT r.id,r.name,r.slug,r.is_demo,r.created_at,p.status,p.kyc,p.brand_id,p.plan_id,p.details,p.version,
+   (SELECT string_agg(e.name,', ' ORDER BY e.name) FROM employees e WHERE e.restro_id=r.id AND e.role='OWNER' AND e.active) AS owner_names,
    (SELECT count(*) FROM outlets WHERE restro_id=r.id) AS outlets,
    (SELECT count(*) FROM employees WHERE restro_id=r.id AND active) AS staff,
    (SELECT count(*) FROM orders WHERE restro_id=r.id) AS orders,

@@ -95,3 +95,8 @@ Sign into the authorized Prem DM on the new device if reviewing new feedback. Sa
 ## Selected receiving setup · 23 October 2026
 
 For this run, the receiving user explicitly overrode the existing-data handoff by requesting a new database. `prem-2230/dinerdost-web` now uses its own new Production resource, with a separate QA resource and migrations 001–051. Original restaurant data stays in `nythz/dinerdost-app`; it was not transferred. The same-data instructions above apply only to a later explicitly requested existing-data connection. Receiving 0.4.31 is verified at https://dinerdost-web.vercel.app.
+
+
+### Current local single-restaurant data
+
+On 23 October the receiving user explicitly selected Nythz Coooks / Nihal kaman / N1 as the only restaurant in the working local app. Read the ignored `apps/web/.env.local` and `.data/single-restaurant-switch-plan.json` to locate the active database. The earlier original-local database and stopped-server backup are recovery sources, not the active app dataset. Keep both credentials and databases out of Git. Never run QA signup/fixture workflows against port 5090 or the LAN URL: use memory databases or guarded separate QA fixtures on 5091. See LOCAL_SUPERADMIN.md for verified retained counts, identity preservation and operator-only logical-copy safeguards. The new working copy preserves original logins and history; no new password or demo-flag reclassification was introduced.
