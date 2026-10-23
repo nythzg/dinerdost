@@ -1,6 +1,7 @@
 "use client";
 import {Refunds,RefundApprovals} from "./refunds";
 import {RewardEntry} from "./reward-entry";
+import {LoyaltyClaim} from "./loyalty-claim";
 import {showRewardApplied} from "@/lib/reward-applied";
 import { T } from "@/lib/staff-language";
 import { AdjustmentsEditor } from "./adjustments-editor";
@@ -193,6 +194,12 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
   const liveRounds = order.rounds.filter(
     (round: Row) => !["VOIDED", "REJECTED"].includes(round.status),
   );
+  const loyaltyRewards = new Map<string, number>();
+  for (const round of liveRounds) if (Number(round.loyalty_amount)>0) {
+    const name=String(round.loyalty_name??'Loyalty');
+    loyaltyRewards.set(name,(loyaltyRewards.get(name)??0)+Number(round.loyalty_amount));
+  }
+  const loyaltyTotal=[...loyaltyRewards.values()].reduce((sum,amount)=>sum+amount,0);
   const editableRound=(r:Row)=>['DRAFT','PENDING','ACCEPTED'].includes(r.status)&&r.payment_status!=='PAID'&&Number(r.paid)<Math.max(1,Number(r.payable))&&!order.invoices.some((invoice:Row)=>invoice.document_type==='FINAL_TAX_INVOICE')&&!r.payments.some((p:Row)=>['INITIATED','AWAITING_VERIFICATION','UNKNOWN'].includes(p.state));
   const chargeRounds =
     !locked && data.actor.role === "OWNER"
@@ -502,7 +509,7 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
                     <button
                       className="text-button claim-loyalty-button"
                       disabled={round.payment_status === "PAID"}
-                      onClick={()=>{void action('reviewRewards',{},extra).then(result=>{const limit=result.entitlements.webLoyalty,target=result.order.rounds.find((r:Row)=>r.id===round.id),currentLoyalty=target.coupon_code||Number(target.manual_discount)>0?0:Number(target.discount);modal('Claim loyalty points',<RewardEntry fields={[{name:'amount',label:'Loyalty amount (₹)',type:'number',min:0,max:limit.maxRedemptionAmount/100,step:limit.pointValue/100,value:currentLoyalty/100,help:'Current loyalty discount: '+money(currentLoyalty)+'. Enter the total loyalty discount for this round. Maximum '+money(limit.maxRedemptionAmount)+' for this round; '+money(limit.remainingOrderCap)+' remains on this bill. Replaces any existing round discount.'}]} save={values=>action('reward',{version:target.version,amount:Math.round(Number(values.amount)*100)},extra)} onSuccess={applied=>showRewardApplied((applied as Row).order,target,'loyalty')} submit="Claim loyalty"/>) }).catch(()=>{})}}
+                      onClick={()=>{void action('reviewRewards',{},extra).then(result=>{const target=result.order.rounds.find((r:Row)=>r.id===round.id);modal('Claim loyalty points',<LoyaltyClaim outlet={outlet} round={target} limit={result.entitlements.webLoyalty} save={input=>action('reward',input,extra)}/>) }).catch(()=>{})}}
                     >
                       <T>{"Claim loyalty points"}</T>
                     </button>
@@ -914,7 +921,8 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
             </div>
             {[
               ["Subtotal", order.totals.subtotal],
-              ["Discount", -order.totals.discount],
+              ["Discount", -(Number(order.totals.discount)-loyaltyTotal)],
+              ...[...loyaltyRewards].map(([name,amount])=>[name,-amount]),
               ...(order.tax_components?.length
                 ? taxBreakdown(order.totals.tax, order.tax_components).map(
                     (tax) => [tax.name, tax.amount],
@@ -931,8 +939,8 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
                   Math.max(0, -Number(order.totals.roundOff ?? 0)),
               ],
               ["Received", order.totals.paid],
-            ].map(([name, value]) => (
-              <div className="total-row" key={name}>
+            ].map(([name, value],index) => (
+              <div className="total-row" key={String(name)+"-"+index}>
                 <span className="tax-row-label">{name}</span>
                 <strong>{money(value)}</strong>
               </div>

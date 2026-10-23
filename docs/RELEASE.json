@@ -184,7 +184,9 @@
     "providersDeferred": true,
     "oldRoundsPreserved": true,
     "pendingImplementationIds": [],
-    "localUnreleasedIds": ["Q114"]
+    "localUnreleasedIds": [
+      "Q114"
+    ]
   },
   "productionVerificationMethod": "264 backend cases; ten Q89 plus five refund PostgreSQL cases; rendered local/receiving Production desktop/phone workflow; eight public auth/CSRF checks.",
   "petpoojaImplementation": {
@@ -534,7 +536,10 @@
       "scope": "Aligned bill summary; footer removed; owners, assigned managers and existing provisioned platform admins may edit the outlet-wide per-bill default under Adjustments.",
       "fullBackendTestsPassed": 288,
       "browserWorkflowsPassed": 3,
-      "viewportWidths": [1440, 390],
+      "viewportWidths": [
+        1440,
+        390
+      ],
       "typecheckPassed": true,
       "buildPassed": true,
       "postgresCasesPassed": 2,
@@ -551,7 +556,10 @@
       "priorFullBackendTestsPassed": 287,
       "browserWorkflowsPassed": 2,
       "priorRegressionWorkflowsPassed": 6,
-      "viewportWidths": [1440, 390],
+      "viewportWidths": [
+        1440,
+        390
+      ],
       "typecheckPassed": true,
       "buildPassed": true,
       "notes": "docs/LOCAL_ORDER_CONFIRMATIONS.md",
@@ -562,7 +570,10 @@
       "status": "verified-local-unreleased",
       "behavior": "White Ready to serve badge text on the existing green background in both unselected and selected POS cards.",
       "browserWorkflowsPassed": 1,
-      "viewportWidths": [1440, 390],
+      "viewportWidths": [
+        1440,
+        390
+      ],
       "pushed": false,
       "deployed": false
     },
@@ -583,7 +594,8 @@
       "052_web_recipe_profiles.sql",
       "053_web_production.sql",
       "054_web_floor_details.sql",
-      "055_web_bill_settings.sql"
+      "055_web_bill_settings.sql",
+      "056_web_loyalty_name.sql"
     ],
     "productionMigrationsUnchanged": true,
     "originalAccountsPreserved": true,
@@ -597,12 +609,22 @@
       "lastMessageId": "1562853027382042818",
       "messagesReviewed": 7,
       "screenshotsReviewed": 5,
-      "coveredIds": ["Q114", "Q115", "Q116", "Q117", "Q118", "Q119"],
+      "coveredIds": [
+        "Q114",
+        "Q115",
+        "Q116",
+        "Q117",
+        "Q118",
+        "Q119"
+      ],
       "calculatorScope": "Later direct user instruction: Standard only and supplied video",
       "sourceCheckpoint": "db83e9a",
       "affectedBackendPassed": 15,
       "browserWorkflowsPassed": 6,
-      "viewportWidths": [1440, 390],
+      "viewportWidths": [
+        1440,
+        390
+      ],
       "typecheckPassed": true,
       "newProductChangesRequired": false,
       "notes": "docs/DISCORD_PRIORITY_REVIEW.md",
@@ -614,10 +636,20 @@
       "centeredContent": {
         "status": "verified-local-unreleased",
         "behavior": "Balanced horizontal content margins reserve clear space beside the right-edge tabs; wide content remains centered within the main shell.",
-        "horizontalPaddingPx": {"desktop": 56, "upTo850px": 44, "upTo360px": 40},
+        "horizontalPaddingPx": {
+          "desktop": 56,
+          "upTo850px": 44,
+          "upTo360px": 40
+        },
         "minimumContentToTabGapPx": 8,
         "browserWorkflowsPassed": 7,
-        "inventoryViewports": ["1440x1000", "390x844", "320x568", "844x390", "2200x1100"],
+        "inventoryViewports": [
+          "1440x1000",
+          "390x844",
+          "320x568",
+          "844x390",
+          "2200x1100"
+        ],
         "typecheckPassed": true,
         "buildPassed": true
       },
@@ -625,14 +657,24 @@
         "status": "verified-local-unreleased",
         "behavior": "Expanded navigation covers the menu trigger; logo and links remain unobstructed.",
         "browserWorkflowsPassed": 2,
-        "viewports": ["390x844", "320x568", "844x390", "1440x1000"],
+        "viewports": [
+          "390x844",
+          "320x568",
+          "844x390",
+          "1440x1000"
+        ],
         "typecheckPassed": true
       },
       "calculatorPosition": "Right edge, below header/Demo",
       "activeOrdersPosition": "Bottom right edge",
       "theme": "Existing green palette; slim vertical tabs",
       "browserWorkflowsPassed": 7,
-      "viewports": ["1440x1000", "390x844", "320x568", "844x390"],
+      "viewports": [
+        "1440x1000",
+        "390x844",
+        "320x568",
+        "844x390"
+      ],
       "typecheckPassed": true,
       "buildPassed": true,
       "notes": "docs/LOCAL_STANDARD_CALCULATOR.md",
@@ -652,12 +694,36 @@
       "localCleanupIntervalSeconds": 60,
       "retentionAffectedBackendPassed": 15,
       "retentionPostgresPassed": 15,
-      "viewportWidths": [1440, 390],
+      "viewportWidths": [
+        1440,
+        390
+      ],
       "verifiedOnLocalhost5090": true,
       "typecheckPassed": true,
       "buildPassed": true,
       "newMigrations": [],
       "notes": "docs/LOCAL_STANDARD_CALCULATOR.md",
+      "pushed": false,
+      "deployed": false
+    },
+    "namedLoyaltyRewards": {
+      "status": "verified-local-unreleased",
+      "scope": "Outlet-wide editable loyalty reward name in the claim form; separate named Bill summary and success alert; snapshot names and preserve same-amount repeats and prior issued history.",
+      "fullBackendTestsPassed": 321,
+      "affectedBackendTestsPassed": 20,
+      "postgresNamingWorkflowsPassed": 1,
+      "postgresDisposableDatabaseRemoved": true,
+      "browserWorkflowsPassed": 6,
+      "finalPhoneWorkflowRepeated": 1,
+      "viewportWidths": [
+        1440,
+        390
+      ],
+      "typecheckPassed": true,
+      "buildPassed": true,
+      "migration": "056_web_loyalty_name.sql",
+      "localMigrationTableFingerprintsUnchanged": 8,
+      "notes": "docs/LOCAL_LOYALTY_NAME.md",
       "pushed": false,
       "deployed": false
     }

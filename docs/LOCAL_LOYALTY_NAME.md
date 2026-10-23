@@ -1,0 +1,17 @@
+# Local loyalty reward name
+
+The receiving user requested a reusable name for loyalty rewards, edited in the claim form and shown separately from ordinary discounts. Local web scope only.
+
+Owners and assigned outlet managers open Claim loyalty points → Edit reward name, enter up to 80 characters and choose Save reward name. The outlet default persists across reloads and subsequent bills. Other billing roles use the saved name without editing access. The default is Loyalty until the operator supplies their name; no client brand is invented.
+
+The amount label, claim button and green SweetAlert2 confirmation use the configured name. Bill summary groups actual loyalty claims by their recorded name on separate lines; the general Discount line excludes those amounts. Saved amount and payable retain existing server calculations, including tax, rounding, balances and caps. Coupon confirmations retain their existing totals.
+
+Migration 056_web_loyalty_name.sql adds an outlet default and a nullable loyalty-reservation name snapshot. Existing claims fall back to Loyalty without rewriting their records. Future name edits preserve earlier claim names, issued invoice JSON and payment/stock history. Repeating the same active claim keeps its recorded name and never adds a second deduction; a changed/new claim records the current outlet name. Coupon replacement releases the loyalty claim and removes its separate displayed amount.
+
+The name command is web-only, owner/assigned-manager and tenant/outlet scoped, validates a single nonblank line, locks the outlet, checks its version, records an audit event and supports exact idempotent retries. Stale/concurrent edits cannot silently overwrite each other. Native policy, financial formulas and providers remain unchanged.
+
+Verification evidence is recorded after all checks complete in RELEASE.json and the handoff/checklists. Private test logs are in the parent work directory; screenshots and database contents remain ignored. Production metadata and client/Petpooja release counts remain unchanged. Q111 is unanswered; procurement is paused separately.
+
+Verified locally: 321 full backend tests; 20 affected backend cases; one final real PostgreSQL naming workflow (including concurrency, issued-history and same-claim-name preservation) in an exact disposable database, removed by the successful runner; six desktop/phone browser workflows plus one final phone repeat; typecheck and optimized build. Before migration, the stopped local copy was cold-backed-up; eight financial/payment/stock/loyalty fingerprints remained unchanged, excluding only the newly added null snapshot key. The server resumed at http://localhost:5090.
+
+Rendered evidence inspected: verification/local-loyalty-name-editor-WIDTH.png, local-loyalty-named-summary-WIDTH.png and local-loyalty-named-alert-WIDTH.png (1440px/390px). Browser checks cover saved-name reload, retained amount draft, real earned points, actual ₹409 → ₹399 totals, independent old/new named claims, manager edit/cashier denial and coupon regressions. Private parent logs: loyalty-name-full-backend.log, loyalty-name-backend.log, loyalty-name-postgres-final.log, loyalty-name-browser-final.log, loyalty-name-phone-final.log, loyalty-name-typecheck.log, loyalty-name-build.log; server log local-server-loyalty-name.log. React review checked unconditional hooks, sibling forms, labelled controls, text-only name rendering, mutation error states, preserved input/focus and one batched loyalty projection per order.

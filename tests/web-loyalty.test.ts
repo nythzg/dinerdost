@@ -70,3 +70,38 @@ test('web rewards work without phone verification while balances, payments, nati
  await assert.rejects(s.applyEntitlement(db,owner,key(),o.id,r.id,{version:r.version,points:0},true),{code:'QUOTE_LOCKED'});assert.deepEqual(await s.getOrder(db,owner,o.id),paid);assert.deepEqual((await s.workspace(db,owner)).movements,stock);
  assert.equal((await db.query('SELECT otp_verified FROM customers WHERE id=$1',[o.customer_id])).rows[0].otp_verified,false);assert.equal((await s.verifyAudit(db,owner)).valid,true);
 });
+
+
+test('named loyalty is authorized, versioned and snapshotted separately from coupons without changing financial history',async()=>{
+ const getOutlet=async()=>(await s.workspace(db,owner)).outlets.find((o:any)=>o.id===w.outletId);
+ let outlet=await getOutlet();const input={outletId:w.outletId,version:Number(outlet.version),name:'Guest rewards'};
+ for(const role of ['CASHIER','WAITER','KITCHEN','ACCOUNTANT'] as const)await assert.rejects(s.saveWebLoyaltyName(db,{...owner,role},key(),input),{code:'FORBIDDEN'});
+ await assert.rejects(s.saveWebLoyaltyName(db,{...owner,role:'MANAGER',outletIds:[]},key(),input),{code:'OUTLET_FORBIDDEN'});
+ await assert.rejects(s.saveWebLoyaltyName(db,foreign,key(),input));
+ await assert.rejects(s.saveWebLoyaltyName(db,{...owner,application:'POS'},key(),input),{code:'APPLICATION_FORBIDDEN'});
+ for(const name of ['', '   ','x'.repeat(81),'two\nlines'])await assert.rejects(s.saveWebLoyaltyName(db,owner,key(),{...input,name}));
+ const original=await create(),old=(await claim(original,original.rounds[0],1000)).order;
+ assert.equal(old.rounds[0].loyalty_name,'Loyalty');assert.equal(Number(old.rounds[0].loyalty_amount),1000);
+ // A real paid receipt is immutable when future naming changes.
+ let paid=(await s.recordPayment(db,owner,key(),old.id,old.rounds[0].id,{version:old.rounds[0].version,method:'CASH',amount:Number(old.rounds[0].payable)},true)).order;
+ await s.completePreparedService(db,owner,key(),paid.id,paid.rounds[0].id,{version:paid.rounds[0].version,confirmedPreparedAndServed:true});await s.generateBill(db,owner,key(),paid.id,{final:true});paid=await s.getOrder(db,owner,paid.id);assert.ok(paid.invoices.length>0);
+ const tables=['invoices','payment_attempts','stock_batches','stock_movements','loyalty_ledger','loyalty_reservations'];
+ const fingerprints=async()=>{const result=[];for(const table of tables)result.push((await db.query(`SELECT md5(coalesce(jsonb_agg(to_jsonb(t) ORDER BY id)::text,'[]')) AS digest FROM ${table} t`)).rows);return result};
+ const before=await fingerprints(),request=key();const saved=await s.saveWebLoyaltyName(db,owner,request,{...input,name:'  Guest rewards  '});assert.equal(saved.name,'Guest rewards');assert.deepEqual(await fingerprints(),before);assert.deepEqual(await s.getOrder(db,owner,paid.id),paid);
+ const audits=(await db.query("SELECT id FROM audit_events WHERE action='WEB_LOYALTY_NAME_CHANGED' ORDER BY id")).rows;
+ assert.deepEqual(JSON.parse(JSON.stringify(await s.saveWebLoyaltyName(db,owner,request,{...input,name:'Guest rewards'}))),JSON.parse(JSON.stringify(saved)));
+ assert.deepEqual((await db.query("SELECT id FROM audit_events WHERE action='WEB_LOYALTY_NAME_CHANGED' ORDER BY id")).rows,audits);
+ await assert.rejects(s.saveWebLoyaltyName(db,owner,key(),input),{code:'VERSION_CONFLICT'});
+ let next=await create();next=(await claim(next,next.rounds[0],1000)).order;assert.equal(next.rounds[0].loyalty_name,'Guest rewards');assert.equal(Number(next.rounds[0].loyalty_amount),1000);assert.equal(next.rounds[0].coupon_code,null);
+ outlet=await getOutlet();const results=await Promise.allSettled(['Club rewards','Thank you rewards'].map(name=>s.saveWebLoyaltyName(db,{...owner,role:'MANAGER'},key(),{outletId:w.outletId,version:Number(outlet.version),name})));
+ assert.equal(results.filter(r=>r.status==='fulfilled').length,1);assert.equal(results.filter(r=>r.status==='rejected'&&(r.reason as any).code==='VERSION_CONFLICT').length,1);
+ assert.deepEqual(await s.getOrder(db,owner,next.id),next);assert.deepEqual(await s.getOrder(db,owner,paid.id),paid);
+ const repeat=(await claim(next,next.rounds[0],1000)).order;assert.equal(repeat.rounds[0].loyalty_name,'Guest rewards');assert.deepEqual(repeat.totals,next.totals);next=repeat;
+ const fresh=await create(),newName=(await getOutlet()).web_loyalty_name;
+ const claimed=(await claim(fresh,fresh.rounds[0],1000)).order;assert.equal(claimed.rounds[0].loyalty_name,newName);
+ const code='NAMED-'+key();await db.transaction(owner.restroId,tx=>tx.query("INSERT INTO coupons(id,restro_id,outlet_id,code,discount_amount,expires_at) VALUES($1,$2,$3,$4,700,now()+interval '1 day')",[key(),owner.restroId,w.outletId,code]));
+ next=(await s.applyEntitlement(db,owner,key(),next.id,next.rounds[0].id,{version:next.rounds[0].version,couponCode:code},true)).order;
+ assert.equal(Number(next.rounds[0].loyalty_amount),0);assert.equal(next.rounds[0].loyalty_name,null);assert.equal(Number(next.rounds[0].discount),700);
+ next=(await claim(next,next.rounds[0],1000)).order;assert.equal(next.rounds[0].loyalty_name,newName);
+ assert.equal((await s.verifyAudit(db,owner)).valid,true);
+});

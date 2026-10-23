@@ -56,3 +56,11 @@
 }
 
 @media screen { .reward-applied-note{display:block;color:#53664a;font-size:12px;line-height:1.5;margin-top:10px} }
+
+/* Loyalty naming is separate from bill discount adjustments. */
+.loyalty-claim>.form{padding-top:20px}
+.loyalty-name-settings{margin:20px 24px 0;border:1px solid var(--line);border-radius:10px;padding:12px}
+.loyalty-name-settings summary{cursor:pointer;font-size:12px;font-weight:600}
+.loyalty-name-settings .form{padding:12px 0 0}
+.loyalty-name-settings small{font-size:11px;line-height:1.5}
+.total-panel .tax-row-label{overflow-wrap:anywhere}

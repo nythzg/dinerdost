@@ -353,6 +353,9 @@ export async function POST(request: NextRequest) {
       case "loyaltyCap":
         result=await service.savePlatformLoyaltyCap(db,actor,key,data.input);
         break;
+      case "loyaltyName":
+        result=await service.saveWebLoyaltyName(db,actor,key,data.input);
+        break;
       case "billSettings":
         result=await service.saveWebBillSettings(db,actor,key,data.input);
         break;

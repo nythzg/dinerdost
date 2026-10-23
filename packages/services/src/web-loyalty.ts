@@ -21,3 +21,16 @@ export async function webLoyaltyLimit(tx:Sql,order:Row,round:Row,outlet:Row,spen
  const maximum=Math.max(0,Math.min(100000*pointValue,(spendablePoints+num(own.points))*pointValue,remainingCap,num(outlet.max_redemption_paise),Math.floor(num(round.subtotal)*num(outlet.max_redemption_bps)/10000),num(round.subtotal)));
  return{orderCap,usedOnOtherRounds:num(used.amount),remainingOrderCap:remainingCap,maxRedemptionAmount:Math.floor(maximum/pointValue)*pointValue,pointValue};
 }
+/** Naming is an outlet setting, not an adjustment to an existing bill. */
+export async function saveWebLoyaltyName(db:Database,actor:Actor,key:string,input:unknown){
+ ensure(!actor.application||actor.application==='MASTER','APPLICATION_FORBIDDEN','Use web loyalty settings.',403);
+ ensure(isManager(actor),'FORBIDDEN','Only restaurant owners and assigned outlet managers can change the loyalty reward name.',403);
+ const data=z.object({outletId:z.uuid(),version:z.number().int().positive(),name:z.string().trim().min(1).max(80).regex(/^[^\u0000-\u001f\u007f]+$/,'Use a single-line reward name.')}).strict().parse(input);
+ requireOutlet(actor,data.outletId);
+ return command(db,actor,key,'WEB_LOYALTY_NAME_CHANGED',data,async tx=>{
+  const outlet=await one(tx,'SELECT * FROM outlets WHERE id=$1 FOR UPDATE',[data.outletId]);expectedVersion(outlet.version,data.version);
+  await tx.query('UPDATE outlets SET web_loyalty_name=$2,version=version+1 WHERE id=$1',[outlet.id,data.name]);
+  await audit(tx,actor,{action:'WEB_LOYALTY_NAME_CHANGED',entityType:'OUTLET',entityId:outlet.id,outletId:outlet.id,oldState:{name:outlet.web_loyalty_name},newState:{name:data.name},reason:'Changed the outlet name for future web loyalty claims; prior claims and issued financial records preserved'});
+  return {ok:true,name:data.name,version:num(outlet.version)+1};
+ });
+}

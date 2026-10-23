@@ -367,6 +367,9 @@ export async function orderDetail(
       [orderId],
     )
   ).rows;
+  const webLoyaltyClaims=new Map((!actor.application||actor.application==='MASTER'
+    ?(await tx.query("SELECT l.round_id,l.web_reward_name FROM loyalty_reservations l JOIN order_rounds r ON r.id=l.round_id WHERE r.order_id=$1 AND l.state IN ('RESERVED','LOCKED','REDEEMED')",[orderId])).rows
+    :[]).map(claim=>[claim.round_id,claim]));
   for (const round of rounds) {
     round.items = (
       await tx.query(
@@ -376,6 +379,11 @@ export async function orderDetail(
     ).rows;
     if((actor.application&&actor.application!=='MASTER')||(!can(actor,'inventory')&&!['OWNER','MANAGER','ACCOUNTANT'].includes(actor.role)))for(const item of round.items)delete item.recipe_snapshot;
     if(!actor.application||actor.application==='MASTER')round.coupon_code=(await tx.query("SELECT coalesce(d.code,c.code) AS code FROM coupons c LEFT JOIN web_discount_coupons d ON d.id=c.web_discount_coupon_id AND d.restro_id=c.restro_id WHERE c.round_id=$1 AND c.state IN ('RESERVED','LOCKED','REDEEMED') LIMIT 1",[round.id])).rows[0]?.code??null;
+    if(!actor.application||actor.application==='MASTER'){
+      const loyalty=webLoyaltyClaims.get(round.id);
+      round.loyalty_amount=loyalty?Math.max(0,num(round.discount)-num(round.manual_discount)):0;
+      round.loyalty_name=round.loyalty_amount>0?(loyalty?.web_reward_name??'Loyalty'):null;
+    }
     round.payments = (
       await tx.query(
         "SELECT id,method,amount,state,reference,created_at,verified_at FROM payment_attempts WHERE round_id=$1 ORDER BY created_at",
@@ -916,8 +924,10 @@ export async function applyEntitlement(
       // Lock both definitions in stable order before resetting/reusing their tokens.
       // Concurrent coupon switches must use the same definition-before-token order as payment.
       await tx.query("SELECT id FROM web_discount_coupons WHERE id=$1 OR id IN (SELECT web_discount_coupon_id FROM coupons WHERE round_id=$2 AND state IN ('RESERVED','LOCKED')) ORDER BY id FOR UPDATE",[webCouponId??null,roundId]);
+      const priorLoyalty=webFlow&&data.points?(await tx.query("SELECT points,web_reward_name FROM loyalty_reservations WHERE round_id=$1 AND state IN ('RESERVED','LOCKED')",[roundId])).rows[0]:undefined;
       await resetRewards(tx, roundId);
       let discount = 0;
+      let loyaltyName:string|null=null;
       if(webCouponId)data.couponId=await reserveWebDiscountCoupon(tx,actor,order.outlet_id,webCouponId,customer.id);
       if (data.couponId) {
         const coupon = await one(
@@ -980,8 +990,9 @@ export async function applyEntitlement(
           "REDEMPTION_CAP",
           "The selected points exceed this order’s redemption limit.",
         );
+        loyaltyName=webFlow?(priorLoyalty&&num(priorLoyalty.points)===data.points?priorLoyalty.web_reward_name??'Loyalty':outlet.web_loyalty_name):null;
         await tx.query(
-          "INSERT INTO loyalty_reservations(id,restro_id,outlet_id,customer_id,round_id,points,reserved_until) VALUES($1,$2,$3,$4,$5,$6,now()+interval '10 minutes') ON CONFLICT(round_id) DO UPDATE SET customer_id=EXCLUDED.customer_id,points=EXCLUDED.points,state='RESERVED',reserved_until=EXCLUDED.reserved_until",
+          "INSERT INTO loyalty_reservations(id,restro_id,outlet_id,customer_id,round_id,points,reserved_until,web_reward_name) VALUES($1,$2,$3,$4,$5,$6,now()+interval '10 minutes',$7) ON CONFLICT(round_id) DO UPDATE SET customer_id=EXCLUDED.customer_id,points=EXCLUDED.points,state='RESERVED',reserved_until=EXCLUDED.reserved_until,web_reward_name=EXCLUDED.web_reward_name",
           [
             id(),
             actor.restroId,
@@ -989,6 +1000,7 @@ export async function applyEntitlement(
             customer.id,
             roundId,
             data.points,
+            loyaltyName,
           ],
         );
       }
@@ -1022,6 +1034,7 @@ export async function applyEntitlement(
         newState: {
           couponId: data.couponId,
           points: data.points,
+          ...(webFlow?{loyaltyName}:{}),
           ...total,
           payable,
           roundOff,
