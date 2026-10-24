@@ -1,0 +1,47 @@
+{
+  "verifiedAt": "2026-10-24T21:37:11.725204+00:00",
+  "repository": "https://github.com/prasadgourav/dinerdost",
+  "upstream": "https://github.com/nythzg/dinerdost",
+  "branch": "local-web-calculator",
+  "publishedContentCommit": "c1460e4ce3aea13240b724e459964d5f07a9e5c4",
+  "productionSourceCommit": "968bbd9659c705b1a6337f3ec5d7aab63c3a7e4f",
+  "pausedWipBranch": "local-web-procurement",
+  "pausedWipCommit": "242d64374f8cfcb7394e4fbdf20a7a769a42aa23",
+  "publicFilesVerified": [
+    {
+      "path": "docs/RETURN_HANDOFF.md",
+      "commit": "c1460e4ce3aea13240b724e459964d5f07a9e5c4",
+      "publicReadMatchesGit": true,
+      "sha256": "6f3ab6aa2b474a58946de136dd915639de742390f91dfa9438897d8be3794eb8"
+    },
+    {
+      "path": "docs/UPCOMING_WORK.md",
+      "commit": "c1460e4ce3aea13240b724e459964d5f07a9e5c4",
+      "publicReadMatchesGit": true,
+      "sha256": "82a8f0d257eb1d00d1d3b6534a033021f178ff225bea938783609e751de86aec"
+    },
+    {
+      "path": "CONTINUE_IN_CODEX.txt",
+      "commit": "c1460e4ce3aea13240b724e459964d5f07a9e5c4",
+      "publicReadMatchesGit": true,
+      "sha256": "831487cc0c1a3b8d03eaa53a4efa59cf96f7b1b4655715a25d0be36d2ca08ad0"
+    },
+    {
+      "path": "docs/evidence/production-20261025-acceptance.json",
+      "commit": "c1460e4ce3aea13240b724e459964d5f07a9e5c4",
+      "publicReadMatchesGit": true,
+      "sha256": "d45c125cd288e1dee2825bf0ae5470b3c7bb1b87b207631d8b56610c5ebf007c"
+    },
+    {
+      "path": "docs/PROCUREMENT_WIP.md",
+      "commit": "242d64374f8cfcb7394e4fbdf20a7a769a42aa23",
+      "publicReadMatchesGit": true,
+      "sha256": "284ea569f49d8b65f48deb71e372d58ea6fb4d991552780b6645d727a5839dd7"
+    }
+  ],
+  "forkMainPreserved": true,
+  "forcePushUsed": false,
+  "productionChangedByHandoff": false,
+  "fullHistoryPreserved": true,
+  "note": "A following documentation-only acceptance commit records these verified content SHAs. Fetch the final branch-tip SHA from the completion message for this publication record as well."
+}

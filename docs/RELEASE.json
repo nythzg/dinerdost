@@ -2219,6 +2219,9 @@
     "handoff": "docs/RETURN_HANDOFF.md",
     "upcoming": "docs/UPCOMING_WORK.md",
     "productionChangedByHandoff": false,
-    "publicationStatus": "prepared; final remote verification is recorded in return acceptance"
+    "publicationStatus": "content committed, pushed and verified on public fork; following acceptance commit records this checkpoint",
+    "publishedContentCommit": "c1460e4ce3aea13240b724e459964d5f07a9e5c4",
+    "remoteVerified": true,
+    "publicationEvidence": "docs/evidence/RETURN_PUBLICATION.json"
   }
 }

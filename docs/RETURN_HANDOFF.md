@@ -195,3 +195,7 @@ Public evidence: [production acceptance](evidence/production-20261025-acceptance
 ## Next action
 
 Read UPCOMING_WORK and inspect the paused draft without applying it. First reproduce the clean return baseline on isolated QA. PP21 is the first prior-authorized unblocked non-procurement web candidate after checking the existing code. Continue the first confirmed unblocked WEB task only; keep procurement paused unless the user resumes it. Q111 and optional loyalty broadening require answers before dependent changes. Providers/native/hardware/packages/offline/marketplace/client recipes remain deferred. If no confirmed task is unblocked, ask only for the needed resumption/answer; do not invent new scope or reset data.
+
+## Verified publication checkpoint
+
+The content handoff commit`c1460e4ce3aea13240b724e459964d5f07a9e5c4` and paused-work commit`242d64374f8cfcb7394e4fbdf20a7a769a42aa23` were pushed and verified by public branch refs and byte-identical public file reads. RETURN_HANDOFF, UPCOMING_WORK, CONTINUE_IN_CODEX, production acceptance and the WIP note all matched their Git blobs. A following documentation-only commit records[publication evidence](evidence/RETURN_PUBLICATION.json); its final branch-tip SHA is supplied in the completion message. This avoids pretending a commit can embed its own hash. Upstream/fork main remain preserved; no force push or production change.
