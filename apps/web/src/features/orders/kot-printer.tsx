@@ -10,7 +10,9 @@ import {
 import { can } from "@dinerdost/core";
 import { Icon } from "@/components/ui";
 import { command, type Row } from "@/lib/client";
+import {applyKotPaperSize} from "./kot-paper-size";
 import { useDesk } from "../workspace/context";
+type KotSelection={streams:('FOOD'|'BAR')[];layout:'SEPARATE'|'COMBINED'};
 type PrintJob = { url: string; key: string };
 const PrintContext = createContext<{
   print: (
@@ -21,7 +23,7 @@ const PrintContext = createContext<{
   busy: boolean;
 } | null>(null);
 export function KotPrintProvider({ children }: { children: ReactNode }) {
-  const { data, notify } = useDesk(),
+  const { data, notify, modal, close } = useDesk(),
     [queue, setQueue] = useState<PrintJob[]>([]),
     [busy, setBusy] = useState(false),
     known = useRef<{ outlet: string; ids: Set<string> }>({
@@ -32,13 +34,13 @@ export function KotPrintProvider({ children }: { children: ReactNode }) {
   const mode =
     data.outlets.find((o: Row) => o.id === data.outletId)?.kot_print_mode ??
     "OFF";
-  const print = async (orderId: string, roundId: string, automatic = false) => {
-    setBusy(true);
+  const startPrint = async (orderId: string, roundId: string, automatic = false, selection?:KotSelection) => {
     if(data.supportView)return;
+    setBusy(true);
     try {
       const job = await command(
         "kotPrint",
-        { automatic },
+        { automatic, ...selection },
         { orderId, roundId },
       );
       if (job.url)
@@ -51,6 +53,11 @@ export function KotPrintProvider({ children }: { children: ReactNode }) {
     } finally {
       setBusy(false);
     }
+  };
+  const print = async(orderId:string,roundId:string,automatic=false)=>{
+    if(automatic)return startPrint(orderId,roundId,true);
+    const departments:('FOOD'|'BAR')[]=data.actor.role==='BARTENDER'?['BAR']:data.actor.role==='KITCHEN'?['FOOD']:['FOOD','BAR'];
+    modal('Print KOT',<KotPrintOptions departments={departments} cancel={close} print={selection=>{close();void startPrint(orderId,roundId,false,selection)}}/>);
   };
   useEffect(() => {
     if(data.supportView)return;
@@ -95,13 +102,8 @@ export function KotPrintProvider({ children }: { children: ReactNode }) {
               if (!receipt || !doc || !win)
                 throw Error("Kitchen ticket unavailable. Retry Print KOT.");
               await doc.fonts.ready;
-              const height = Math.max(
-                  60,
-                  Math.ceil((receipt.scrollHeight * 25.4) / 96 + 7),
-                ),
-                style = doc.createElement("style");
-              style.textContent = `@media print { @page kitchenTicket { size:80mm ${height}mm; margin:3mm; } }`;
-              doc.head.append(style);
+              applyKotPaperSize(doc);
+              void receipt.offsetHeight;
               win.focus();
               win.print();
             } catch (error) {
@@ -134,4 +136,15 @@ export function KotPrintControl({
       Print KOT
     </button>
   );
+}
+
+function KotPrintOptions({departments,cancel,print}:{departments:('FOOD'|'BAR')[];cancel:()=>void;print:(selection:KotSelection)=>void}){
+ const [streams,setStreams]=useState(departments),[layout,setLayout]=useState<KotSelection['layout']>('SEPARATE');
+ return <form className="form kot-print-options" onSubmit={event=>{event.preventDefault();if(streams.length)print({streams,layout})}}>
+  <p className="muted">Print on a 3-inch paper roll.</p>
+  <fieldset><legend>Departments</legend>{departments.map(stream=><label key={stream}><input type="checkbox" checked={streams.includes(stream)} onChange={event=>setStreams(old=>event.target.checked?[...old,stream]:old.filter(value=>value!==stream))}/>{stream==='FOOD'?'Food':'Bar'}</label>)}</fieldset>
+  <fieldset><legend>Ticket layout</legend><label><input type="radio" name="kot-layout" checked={layout==='SEPARATE'} onChange={()=>setLayout('SEPARATE')}/>Separate Food / Bar KOTs</label><label><input type="radio" name="kot-layout" checked={layout==='COMBINED'} onChange={()=>setLayout('COMBINED')}/>One combined KOT</label></fieldset>
+  {!streams.length&&<small>Select at least one department.</small>}
+  <div className="kot-print-actions"><button type="button" className="button" onClick={cancel}>Cancel</button><button className="button primary" disabled={!streams.length}>Print KOT</button></div>
+ </form>;
 }

@@ -4,6 +4,7 @@ import {randomUUID} from 'node:crypto';
 import {createEmbeddedDatabase,createPostgresDatabase,type Database} from '@dinerdost/database';
 import type {Actor} from '@dinerdost/core';
 import * as s from '@dinerdost/services';
+import {publicMenu} from '../packages/services/src/public-menu';
 let db:Database,owner:Actor,foreign:Actor,manager:Actor,w:any;
 const key=()=>randomUUID();
 before(async()=>{
@@ -102,6 +103,23 @@ test('kitchen/bar bulk operations and read models retain stream isolation',async
  const food=await s.workspace(db,{...owner,role:'KITCHEN'}),bar=await s.workspace(db,{...owner,role:'BARTENDER'});
  assert(food.tickets.every((ticket:any)=>ticket.production_stream==='FOOD'));
  assert(bar.tickets.every((ticket:any)=>ticket.production_stream==='BAR'));
+});
+
+test('restaurant-selected guest tags and regular prices survive older editors and never reprice saved orders',async()=>{
+ const before=await history(),input={outletId:w.outletId,name:'Guest offer '+key().slice(0,6),category:'Beverages',price:8000,taxBps:0,station:'Main kitchen',guestBestChoice:true,compareAtPrice:10000},item=await s.saveMenu(db,owner,key(),input);
+ const catalog=()=>db.transaction(owner.restroId,tx=>publicMenu(tx,w.outletId));
+ const listed=(await catalog()).items.find((row:any)=>row.id===item.id)!;assert.equal(listed.guest_best_choice,true);assert.equal(Number(listed.compare_at_price),10000);assert.equal(Number(listed.price),8000);
+ assert.deepEqual(await history(),before);const order=await s.createRound(db,owner,key(),{outletId:w.outletId,type:'TAKEAWAY',items:[{itemId:item.id,quantity:2}]},true);assert.equal(Number(order.rounds[0].items[0].unit_price),8000);const orderedHistory=await history();
+ let row=(await s.workspace(db,owner)).menu.find((row:any)=>row.id===item.id);const {guestBestChoice,compareAtPrice,...legacy}=input;
+ await s.saveMenu(db,owner,key(),{...legacy,id:item.id,version:row.version});row=(await s.workspace(db,owner)).menu.find((row:any)=>row.id===item.id);assert.equal(row.guest_best_choice,true);assert.equal(Number(row.compare_at_price),10000);
+ await s.saveMenu(db,owner,key(),{...legacy,id:item.id,version:row.version,guestBestChoice:false,compareAtPrice:null,price:12000});const cleared=(await catalog()).items.find((row:any)=>row.id===item.id)!;assert.equal(cleared.guest_best_choice,false);assert.equal(cleared.compare_at_price,null);assert.equal(Number((await s.getOrder(db,owner,order.id)).rounds[0].items[0].unit_price),8000);assert.deepEqual(await history(),orderedHistory);
+});
+test('guest menu offers enforce valid prices and existing tenant, role, outlet and version checks',async()=>{
+ const input={outletId:w.outletId,name:'Guarded guest offer',category:'Food',price:8000,taxBps:0,station:'Main kitchen'};
+ for(const compareAtPrice of [0,7999,8000,1000000001,8.5])await assert.rejects(s.saveMenu(db,owner,key(),{...input,compareAtPrice}));
+ await assert.rejects(s.saveMenu(db,{...owner,role:'CASHIER'},key(),{...input,guestBestChoice:true}),/role/i);await assert.rejects(s.saveMenu(db,foreign,key(),input));await assert.rejects(s.saveMenu(db,{...manager,outletIds:[]},key(),input),/role|outlet/i);
+ const item=await s.saveMenu(db,owner,key(),{...input,compareAtPrice:10000,guestBestChoice:true}),row=(await s.workspace(db,owner)).menu.find((row:any)=>row.id===item.id);
+ await assert.rejects(s.saveMenu(db,owner,key(),{...input,id:item.id,version:row.version-1,guestBestChoice:false}),/changed|version|refresh/i);await assert.rejects(s.saveMenu(db,owner,key(),{...input,id:item.id,version:row.version,price:11000}),/regular base price/i);
 });
 
 

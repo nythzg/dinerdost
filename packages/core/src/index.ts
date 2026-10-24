@@ -18,3 +18,5 @@ export * from "./table-name";
 export * from "./floor-layout";
 
 export * from "./platform-console";
+
+export * from "./restaurant-features";

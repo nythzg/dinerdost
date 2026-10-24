@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import type {Database,Sql} from '@dinerdost/database';
-import {ensure,isManager,requireOutlet,requirePermission,type Actor} from '@dinerdost/core';
-import {audit,command,expectedVersion,id,num,one,type Row} from './shared';
+import {ensure,integer,isManager,requireOutlet,requirePermission,type Actor} from '@dinerdost/core';
+import {audit,command,expectedVersion,id,json,num,one,type Row} from './shared';
 
 function access(actor:Actor,outletId:string){
  ensure(!actor.application||actor.application==='MASTER','APPLICATION_FORBIDDEN','Use web bill settings.',403);
@@ -13,12 +13,13 @@ async function readSettings(tx:Sql,outletId:string){
  (SELECT count(*)::int FROM coupons c WHERE c.web_discount_coupon_id=d.id AND c.state='REDEEMED') AS redeemed,
  (SELECT count(*)::int FROM coupons c WHERE c.web_discount_coupon_id=d.id AND (c.state='LOCKED' OR (c.state='RESERVED' AND c.reserved_until>clock_timestamp()))) AS held
  FROM web_discount_coupons d WHERE d.outlet_id=$1 AND d.active ORDER BY d.created_at,d.id`,[outletId])).rows;
- return {outletId,version:num(outlet.version),loyaltyCap:num(outlet.web_loyalty_cap_paise),roundingMode:outlet.web_rounding_mode_default??(outlet.web_round_down_default?'DOWN':'NONE'),coupons};
+ return {outletId,version:num(outlet.version),loyaltyCap:num(outlet.web_loyalty_cap_paise),charges:outlet.web_default_charges??[],roundingMode:outlet.web_rounding_mode_default??(outlet.web_round_down_default?'DOWN':'NONE'),coupons};
 }
-export async function getWebBillSettings(db:Database,actor:Actor,outletId:string){access(actor,outletId);return db.transaction(actor.restroId,tx=>readSettings(tx,outletId));}
+export async function getWebBillSettings(db:Database,actor:Actor,outletId:string){access(actor,outletId);return db.transaction(actor.restroId,async tx=>({...await readSettings(tx,outletId),canManageCharges:actor.role==='OWNER'}));}
 export async function saveWebBillSettings(db:Database,actor:Actor,key:string,input:unknown){
- const data=z.object({outletId:z.uuid(),version:z.number().int().positive(),loyaltyCap:z.number().int().min(0).max(1000000000),roundingMode:z.enum(['NONE','UP','DOWN']),createCoupons:z.array(z.object({code:z.string().trim().toUpperCase().regex(/^[A-Z0-9][A-Z0-9_-]{0,79}$/),amount:z.number().int().min(1).max(1000000000),validUntil:z.iso.date(),maxUses:z.number().int().min(1).max(1000000)}).strict()).max(100),removeCoupons:z.array(z.uuid()).max(100)}).strict().parse(input);
+ const data=z.object({outletId:z.uuid(),version:z.number().int().positive(),loyaltyCap:z.number().int().min(0).max(1000000000),roundingMode:z.enum(['NONE','UP','DOWN','NEAREST']),createCoupons:z.array(z.object({code:z.string().trim().toUpperCase().regex(/^[A-Z0-9][A-Z0-9_-]{0,79}$/),amount:z.number().int().min(1).max(1000000000),validUntil:z.iso.date(),maxUses:z.number().int().min(1).max(1000000)}).strict()).max(100),removeCoupons:z.array(z.uuid()).max(100),charges:z.array(z.object({name:z.string().trim().min(1).max(60),amount:z.number().int().min(1).max(1000000000)}).strict()).max(20).optional()}).strict().parse(input);
  access(actor,data.outletId);
+ if(data.charges!==undefined){ensure(actor.role==='OWNER','FORBIDDEN','Only the owner can save future bill charges.',403);ensure(new Set(data.charges.map(charge=>charge.name.toLowerCase())).size===data.charges.length,'DUPLICATE_CHARGE','Use each charge name once.');integer(data.charges.reduce((sum,charge)=>sum+charge.amount,0),'Other charges');}
  ensure(new Set(data.createCoupons.map(c=>c.code)).size===data.createCoupons.length,'COUPON_DUPLICATE','Each coupon must have a different code.');
  ensure(new Set(data.removeCoupons).size===data.removeCoupons.length,'COUPON_DUPLICATE','Remove a coupon only once.');
  return command(db,actor,key,'WEB_BILL_SETTINGS_CHANGED',data,async tx=>{
@@ -37,7 +38,8 @@ export async function saveWebBillSettings(db:Database,actor:Actor,key:string,inp
    const couponId=id();await tx.query('INSERT INTO web_discount_coupons(id,restro_id,outlet_id,code,discount_amount,valid_until,expires_at,max_uses,created_by) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)',[couponId,actor.restroId,data.outletId,coupon.code,coupon.amount,coupon.validUntil,expiresAt,coupon.maxUses,actor.employeeId]);created.push({id:couponId,...coupon});
   }
   await tx.query('UPDATE outlets SET web_loyalty_cap_paise=$2,web_round_down_default=$3,web_rounding_mode_default=$4,version=version+1 WHERE id=$1',[data.outletId,data.loyaltyCap,data.roundingMode==='DOWN',data.roundingMode]);
-  await audit(tx,actor,{action:'WEB_BILL_SETTINGS_CHANGED',entityType:'OUTLET',entityId:data.outletId,outletId:data.outletId,oldState:{loyaltyCap:num(outlet.web_loyalty_cap_paise),roundingMode:outlet.web_rounding_mode_default??(outlet.web_round_down_default?'DOWN':'NONE')},newState:{loyaltyCap:data.loyaltyCap,roundingMode:data.roundingMode,createdCoupons:created,removedCoupons:data.removeCoupons},reason:'Saved future web bill adjustments together; coupon removals stop new claims without deleting redemption history or changing existing bills'});
+  if(data.charges!==undefined)await tx.query('UPDATE outlets SET web_default_charges=$2::jsonb WHERE id=$1',[data.outletId,json(data.charges)]);
+  await audit(tx,actor,{action:'WEB_BILL_SETTINGS_CHANGED',entityType:'OUTLET',entityId:data.outletId,outletId:data.outletId,oldState:{charges:outlet.web_default_charges??[],loyaltyCap:num(outlet.web_loyalty_cap_paise),roundingMode:outlet.web_rounding_mode_default??(outlet.web_round_down_default?'DOWN':'NONE')},newState:{charges:data.charges??outlet.web_default_charges??[],loyaltyCap:data.loyaltyCap,roundingMode:data.roundingMode,createdCoupons:created,removedCoupons:data.removeCoupons},reason:'Saved future web bill adjustments together; coupon removals stop new claims without deleting redemption history or changing existing bills'});
   return {ok:true,...await readSettings(tx,data.outletId)};
  });
 }

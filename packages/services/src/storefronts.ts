@@ -1,3 +1,4 @@
+import {assertOutletOrderIntake} from './outlet-order-intake';
 import {assertPlatformNewOrder} from "./platform-policy";
 import {snapshotWebBillDefaults} from './web-bill-policy';
 import { randomBytes } from "node:crypto";
@@ -118,7 +119,7 @@ async function storefront(db: Database, slug: string) {
   slugSchema.parse(slug);
   return one(
     db,
-    "SELECT s.*,b.title AS name,b.data->>'description' AS description,o.name AS outlet_name FROM storefronts s JOIN records b ON b.id=s.brand_id AND b.restro_id=s.restro_id JOIN outlets o ON o.id=s.outlet_id AND o.restro_id=s.restro_id WHERE s.slug=$1 AND s.published AND b.state<>'CANCELLED' AND b.data->>'active'='true'",
+    "SELECT s.*,b.title AS name,b.data->>'description' AS description,o.name AS outlet_name,o.order_intake_enabled FROM storefronts s JOIN records b ON b.id=s.brand_id AND b.restro_id=s.restro_id JOIN outlets o ON o.id=s.outlet_id AND o.restro_id=s.restro_id WHERE s.slug=$1 AND s.published AND b.state<>'CANCELLED' AND b.data->>'active'='true'",
     [slug],
     "This store is unavailable.",
   );
@@ -267,10 +268,13 @@ export async function storefrontCatalog(
           )
         ).rows
       : [];
+    const billing=await one(tx,'SELECT * FROM outlets WHERE id=$1',[store.outlet_id]);
     return {
+      billDefaults:{charges:billing.web_default_charges??[],roundingMode:billing.web_rounding_mode_default??(billing.web_round_down_default?'DOWN':'NONE')},
       name: store.name,
       description: store.description,
       outletName: store.outlet_name,
+      orderingEnabled:store.order_intake_enabled,
       menu: menu.items,
       taxComponents: menu.taxComponents,
       tables,
@@ -459,6 +463,7 @@ export async function submitStorefrontOrder(
     "CUSTOMER_D2C_ORDER_SUBMITTED",
     data,
     async (tx) => {
+      await assertOutletOrderIntake(tx,store.outlet_id);
       await lockCustomerDevice(
         tx,
         actor.restroId,

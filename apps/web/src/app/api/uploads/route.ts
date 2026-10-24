@@ -1,13 +1,14 @@
 import { NextRequest } from "next/server";
 import sharp from "sharp";
 import { ensure, requirePermission, requireOutlet } from "@dinerdost/core";
-import { storeAsset } from "@dinerdost/services";
+import { assertPlatformFeature,storeAsset } from "@dinerdost/services";
 import { context, csrf, failure, response } from "@/lib/server";
 export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   try {
     await csrf(request);
     const { db, actor } = await context();
+    await assertPlatformFeature(db,actor,'uploads');
     const purpose = request.nextUrl.searchParams.get("purpose") ?? "MENU";
     ensure(
       ["MENU", "STAFF_PHOTO", "STAFF_DOCUMENT", "RECEIPT_LOGO"].includes(purpose),

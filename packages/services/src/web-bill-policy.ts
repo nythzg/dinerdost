@@ -1,12 +1,16 @@
 import {z} from 'zod';
 import type {Database,Sql} from '@dinerdost/database';
-import {ensure,isManager,requireOutlet,requirePermission,roundAdjustment,type Actor} from '@dinerdost/core';
-import {audit,command,expectedVersion,num,one,type Row} from './shared';
+import {ensure,integer,isManager,requireOutlet,requirePermission,roundAdjustment,type Actor} from '@dinerdost/core';
+import {audit,command,expectedVersion,json,num,one,type Row} from './shared';
 export async function snapshotWebBillDefaults(tx:Sql,outletId:string,roundId:string,web:boolean){
- if(!web)return;const outlet=await one(tx,'SELECT web_round_down_default,web_rounding_mode_default FROM outlets WHERE id=$1',[outletId]);const mode=outlet.web_rounding_mode_default??(outlet.web_round_down_default?'DOWN':'NONE');if(mode==='NONE')return;
- const round=await one(tx,'SELECT payable FROM order_rounds WHERE id=$1',[roundId]),adjustment=roundAdjustment(num(round.payable),true,mode);
- await tx.query("UPDATE order_rounds SET rounding_enabled=true,rounding_mode=$3,round_off=$2,payable=payable+$2 WHERE id=$1",[roundId,adjustment,mode]);
- return{payable:num(round.payable)+adjustment,roundOff:adjustment,roundingEnabled:true,roundingMode:mode};
+ if(!web)return;
+ const outlet=await one(tx,'SELECT * FROM outlets WHERE id=$1',[outletId]),mode=outlet.web_rounding_mode_default??(outlet.web_round_down_default?'DOWN':'NONE');
+ const round=await one(tx,'SELECT * FROM order_rounds WHERE id=$1',[roundId]),defaults:Row[]=num(round.round_number)===1?(outlet.web_default_charges??[]):[];
+ if(mode==='NONE'&&!defaults.length)return;
+ const charges=[...(round.charges??[]),...defaults],chargesTotal=integer(charges.reduce((sum,charge)=>sum+num(charge.amount),0),'Other charges'),base=integer(num(round.payable)+chargesTotal-num(round.charges_total),'Payable amount'),adjustment=roundAdjustment(base,mode!=='NONE',mode);
+ const payable=integer(base+adjustment,'Payable amount');
+ await tx.query('UPDATE order_rounds SET charges=$2::jsonb,charges_total=$3,rounding_enabled=$4,rounding_mode=$5,round_off=$6,payable=$7 WHERE id=$1',[roundId,json(charges),chargesTotal,mode!=='NONE',mode,adjustment,payable]);
+ return{payable,charges,chargesTotal,roundOff:adjustment,roundingEnabled:mode!=='NONE',roundingMode:mode};
 }
 export async function saveBillDefaults(db:Database,actor:Actor,key:string,input:unknown){
  requirePermission(actor,'bill');ensure(isManager(actor),'FORBIDDEN','Only the owner or outlet manager can change future bill rounding.',403);ensure(!actor.application||actor.application==='MASTER','APPLICATION_FORBIDDEN','Use web bill settings.',403);

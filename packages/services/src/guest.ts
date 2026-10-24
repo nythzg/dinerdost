@@ -1,3 +1,4 @@
+import {assertOutletOrderIntake} from './outlet-order-intake';
 import {assertPlatformNewOrder} from "./platform-policy";
 import {snapshotWebBillDefaults} from './web-bill-policy';
 import { randomBytes } from "node:crypto";
@@ -19,13 +20,14 @@ import {
   type AuditActor,
   type Row,
 } from "./shared";
-import { buildItems, insertItems, roundInput } from "./orders";
+import { buildItems, insertItems, roundInput, applyRoundEntitlement, entitlementInput } from "./orders";
 import { bindCustomer } from "./customer-identity";
 import {
   assertCustomerDeviceAllowed,
   lockCustomerDevice,
 } from "./customer-devices";
 import { expireIdleTables } from "./table-activity";
+import {guestCheckoutInput,quoteGuestCheckout} from './guest-checkout';
 import { ownDeviceIdentities } from "./public-identities";
 
 export async function limitGuestRequest(
@@ -45,7 +47,7 @@ async function tableLink(db: Database, key: string) {
   );
   return one(
     db,
-    "SELECT t.id,t.restro_id,t.outlet_id,t.label,t.public_key,o.name AS outlet_name,o.qr_enabled,o.qr_auto_activate,r.name AS restaurant_name FROM dining_tables t JOIN outlets o ON o.id=t.outlet_id AND o.restro_id=t.restro_id JOIN restaurants r ON r.id=t.restro_id WHERE t.public_key=$1 AND t.retired_at IS NULL",
+    "SELECT t.id,t.restro_id,t.outlet_id,t.label,t.public_key,o.name AS outlet_name,o.order_intake_enabled,o.qr_enabled,o.qr_auto_activate,r.name AS restaurant_name FROM dining_tables t JOIN outlets o ON o.id=t.outlet_id AND o.restro_id=t.restro_id JOIN restaurants r ON r.id=t.restro_id WHERE t.public_key=$1 AND t.retired_at IS NULL",
     [key],
     "This table link is unavailable.",
   );
@@ -93,14 +95,14 @@ async function guestOrder(
   );
   const rounds = (
     await tx.query<Row>(
-      "SELECT id,round_number,status,kot_status,payment_status,subtotal,discount,tax,charges,charges_total,payable,paid,rejection_reason FROM order_rounds WHERE order_id=$1 ORDER BY round_number",
+      "SELECT r.id,r.round_number,r.status,r.kot_status,r.payment_status,r.subtotal,r.discount,r.tax,r.charges,r.charges_total,r.round_off,r.payable,r.paid,r.rejection_reason,(SELECT coalesce(l.web_reward_name,'Loyalty') FROM loyalty_reservations l WHERE l.round_id=r.id AND l.state IN ('RESERVED','LOCKED','REDEEMED') LIMIT 1) AS reward_name,(SELECT coalesce(d.code,c.code) FROM coupons c LEFT JOIN web_discount_coupons d ON d.id=c.web_discount_coupon_id WHERE c.round_id=r.id AND c.state IN ('RESERVED','LOCKED','REDEEMED') LIMIT 1) AS coupon_code FROM order_rounds r WHERE r.order_id=$1 ORDER BY r.round_number",
       [orderId],
     )
   ).rows;
   for (const round of rounds)
     round.items = (
       await tx.query(
-        "SELECT name,unit_price,quantity_milli,unit_snapshot,variant,note FROM order_items WHERE round_id=$1",
+        "SELECT name,unit_price,quantity_milli,tax_bps,unit_snapshot,variant,modifiers,note FROM order_items WHERE round_id=$1",
         [round.id],
       )
     ).rows;
@@ -169,10 +171,13 @@ export async function guestCatalog(
     const menu = active
       ? await publicMenu(tx, table.outlet_id, grant?.order_id, webFlow)
       : { items: [], taxComponents: null };
+    const billing=webFlow?await one(tx,'SELECT * FROM outlets WHERE id=$1',[table.outlet_id]):null;
     return {
+      ...(billing?{billDefaults:{charges:billing.web_default_charges??[],roundingMode:billing.web_rounding_mode_default??(billing.web_round_down_default?'DOWN':'NONE')}}:{}),
       taxComponents: menu.taxComponents,
       restaurant: table.restaurant_name,
       outlet: table.outlet_name,
+      orderingEnabled:table.order_intake_enabled,
       table: table.label,
       menu: menu.items,
       paired: !!grant,
@@ -508,6 +513,11 @@ export async function pairGuest(
   });
   return { token };
 }
+export async function guestCheckoutQuote(db:Database,key:string,token:string|undefined,device:string|undefined,input:unknown){
+ const data=guestCheckoutInput.parse(input),grant=await grantContext(db,key,token,device);
+ await rateLimit(db,'guest-quote:'+key+':'+grant.device_hash,60,60);
+ return db.transaction(grant.restro_id,tx=>quoteGuestCheckout(tx,grant,data));
+}
 export async function guestSubmit(
   db: Database,
   key: string,
@@ -523,9 +533,14 @@ export async function guestSubmit(
       version: z.number().int().optional(),
       name: z.string(),
       phone: z.string(),
+      couponCode:z.string().trim().min(1).max(80).optional(),
+      loyaltyAmount:z.number().int().min(0).max(1000000000).optional(),
+      expectedPayable:z.number().int().min(0).max(1000000000).optional(),
     })
     .strict()
     .parse(input);
+  ensure(webFlow||(!data.couponCode&&!data.loyaltyAmount&&data.expectedPayable===undefined),'APPLICATION_FORBIDDEN','Use web checkout for these rewards.',403);
+  ensure((!data.couponCode&&!data.loyaltyAmount)||data.expectedPayable!==undefined,'QUOTE_REQUIRED','Review your cart before placing this order.',409);
   const name = customerName(data.name),
     phone = normalizePhone(data.phone);
   await expireGuestTable(db, key);
@@ -538,7 +553,9 @@ export async function guestSubmit(
     "CUSTOMER_ORDER_SUBMITTED",
     data,
     async (tx) => {
+      await assertOutletOrderIntake(tx,grant.outlet_id);
       const { locked, session } = await lockGuestVisit(tx, grant);
+      if(webFlow&&data.expectedPayable!==undefined){const checkout=await quoteGuestCheckout(tx,{...grant,...locked},guestCheckoutInput.parse({items:data.items,name,phone,couponCode:data.couponCode,loyaltyAmount:data.loyaltyAmount}));ensure(checkout.payable===data.expectedPayable,'QUOTE_CHANGED','Your cart total changed. Review it before placing the order.',409);}
       let orderId = locked.order_id;
       let order: Row | null = null;
       if (orderId)
@@ -632,14 +649,16 @@ export async function guestSubmit(
         ],
       );
       await snapshotWebKitchenPolicy(tx,grant.outlet_id,roundId,webFlow);
-      const billDefaults=await snapshotWebBillDefaults(tx,grant.outlet_id,roundId,webFlow);
+      await snapshotWebBillDefaults(tx,grant.outlet_id,roundId,webFlow);
       await insertItems(tx, actor.restroId, roundId, items);
+      if(webFlow&&(data.couponCode||data.loyaltyAmount)){const savedOrder=await one(tx,'SELECT * FROM orders WHERE id=$1',[orderId]),savedRound=await one(tx,'SELECT * FROM order_rounds WHERE id=$1',[roundId]);await applyRoundEntitlement(tx,actor,savedOrder,savedRound,entitlementInput.parse({version:num(savedRound.version),couponCode:data.couponCode,...(data.loyaltyAmount?{amount:data.loyaltyAmount}:{})}),true);}
+      const savedTotals=await one(tx,'SELECT subtotal,discount,tax,charges,charges_total,round_off,payable FROM order_rounds WHERE id=$1',[roundId]);
       await audit(tx, actor, {
         action: "CUSTOMER_ORDER_SUBMITTED",
         entityType: "ORDER_ROUND",
         entityId: roundId,
         outletId: grant.outlet_id,
-        newState: { orderId, round: num(sequence.number), ...total,...billDefaults },
+        newState: { orderId, round: num(sequence.number), ...savedTotals },
         reason: "Customer QR order awaiting staff acceptance",
       });
       return guestOrder(tx, orderId);

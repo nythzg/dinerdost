@@ -5,6 +5,7 @@ import { z } from "zod";
 import { getDatabase } from "@dinerdost/database";
 import {
   guestCatalog,
+  guestCheckoutQuote,
   platformPublicAccess,
   connectGuest,
   limitGuestRequest,
@@ -62,7 +63,7 @@ export async function POST(
       store = await cookies();
     const data = z
       .object({
-        action: z.enum(["connect", "pair", "activity", "order", "service"]),
+        action: z.enum(["connect", "pair", "activity", "order", "service", "quote"]),
         input: z.unknown(),
       })
       .strict()
@@ -98,6 +99,7 @@ export async function POST(
       return reply;
     }
     const requestKey = z.uuid().parse(request.headers.get("idempotency-key"));
+    if(data.action==='quote')return response(await guestCheckoutQuote(db,key,store.get(guestCookie)?.value??store.get('dd_guest')?.value,device,data.input));
     // Public table links are shareable. Limit requests and keep every order pending.
     await limitGuestRequest(db, key, device);
     const visit = store.get(guestCookie)?.value ?? store.get("dd_guest")?.value;

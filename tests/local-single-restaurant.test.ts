@@ -13,6 +13,13 @@ test('clean local copy retains one exact restaurant, original logins and immutab
   const removeAuth=await s.signup(source,{name:'Removed QA owner',email:'removed-owner@example.test',password,restaurant:'Removed QA',outlet:'Removed',demo:true,qrEnabled:true},'removed-copy');
   const invite=await s.inviteInitialPlatformIdentity(source,email),platformSession=await s.completePlatformEnrolment(source,{token:invite.token,name:'Kept QA administrator',password},'copy-enrol');
   const w=await s.workspace(source,keep);
+  const supportKey=key(),supportInput={action:'create',outletId:w.outletId,queue:'TECHNICAL',subject:'Retained support request',message:'Keep this exact support conversation.'};
+  const support=await s.sendRestaurantSupport(source,keep,supportKey,supportInput);
+  const supportAdmin=await s.authenticatePlatform(source,platformSession.token);
+  await s.managePlatformSupportChat(source,supportAdmin,key(),{action:'reply',tenantId:keep.restroId,threadId:support.id,message:'Retain this support reply too.'});
+  await s.changeSupportCall(source,keep,key(),{action:'start',threadId:support.id,offer:'v=0\r\ns=Kept call fixture\r\n'});
+  const removed=await s.authenticate(source,removeAuth.token);
+  await s.sendRestaurantSupport(source,removed,key(),{action:'create',outletId:(await s.workspace(source,removed)).outletId,queue:'GENERAL',subject:'Excluded support request',message:'Do not copy this other tenant conversation.'});
   let order=await s.createRound(source,keep,key(),{outletId:w.outletId,type:'TAKEAWAY',items:[{itemId:w.menu[0].id,quantity:1}],customer:{name:'Synthetic retained diner',phone:'9187654321'}},true);
   order=(await s.recordPayment(source,keep,key(),order.id,order.rounds[0].id,{version:order.rounds[0].version,method:'CASH',amount:Number(order.rounds[0].payable)},true)).order;
   await s.generateBill(source,keep,key(),order.id,{final:false});
@@ -22,6 +29,10 @@ test('clean local copy retains one exact restaurant, original logins and immutab
   assert.equal((await destination.query('SELECT id FROM restaurants')).rows.length,1);assert.equal((await source.query('SELECT id FROM restaurants')).rows.length,2);
   const kept=await s.authenticate(destination,keepAuth.token),platform=await s.authenticatePlatform(destination,platformSession.token);
   assert.deepEqual(await s.getOrder(destination,kept,order.id),before);
+  assert.deepEqual((await s.readRestaurantSupport(destination,kept,support.id)).thread,(await s.readRestaurantSupport(source,keep,support.id)).thread);
+  assert.equal((await destination.query('SELECT id FROM platform_support_threads')).rows.length,1);
+  assert.deepEqual((await s.readSupportCall(destination,kept,support.id)).call,(await s.readSupportCall(source,keep,support.id)).call);
+  assert.deepEqual(await s.sendRestaurantSupport(destination,kept,supportKey,supportInput),support);
   assert.deepEqual((await s.workspace(destination,kept)).movements,sourceWorkspace.movements);
   assert.equal((await s.verifyAudit(destination,kept)).valid,true);assert.equal((await s.verifyPlatformAudit(destination,platform)).valid,true);
   assert.equal((await s.platformRestaurantDirectory(destination,platform,{search:'Nihal QA owner'})).rows[0].id,keep.restroId);

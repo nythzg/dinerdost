@@ -1,6 +1,7 @@
 "use client";
+import {OutletOrderSwitch} from './outlet-order-switch';
 import {confirmFormAction} from '@/lib/confirm-action';
-import { T, StaffLanguage, LanguageSelect } from "@/lib/staff-language";
+import { T, StaffLanguage } from "@/lib/staff-language";
 import {
   useCallback,
   useEffect,
@@ -38,14 +39,19 @@ import {
 } from "../management/management-pages";
 import { Records } from "../management/record-pages";
 import { QrPage } from "../qr/qr-page";
+import {SidebarProfile} from '@/components/sidebar-profile';
 import { PageSearch } from "@/components/page-search";
 import { ReservationReminders } from "./reservation-reminders";
 import { Attendance } from "../management/attendance-page";
 import { FloorPlan } from "../tables/floor-plan";
 import { TableBilling } from "../tables/table-billing";
+import {StockCountReminder} from "./stock-count-reminder";
 import { NotificationBell } from "./notification-bell";
 import { WorkspaceTools } from "./workspace-tools";
 import { PackageButton } from "./package-panel";
+import {SupportButton} from '@/features/support/support-center';
+import {restaurantFeatureEnabled} from '@dinerdost/core';
+import {useDesignPreview} from '@/features/design-preview/preview-appearance';
 import { LoyaltyLeaderboard } from "../customers/loyalty-leaderboard";
 const primaryNavigation = new Set([
   "overview",
@@ -72,7 +78,7 @@ const nav: {
     icon: "floor",
     permission: "sessions",
   },
-  { id: "floor", name: "Tables", icon: "floor", permission: "sessions" },
+  { id: "floor", name: "Tables", icon: "table-four", permission: "sessions" },
   {
     id: "table-billing",
     name: "Table billing",
@@ -174,16 +180,17 @@ const nav: {
     icon: "outlets",
     permission: "settings",
   },
-  { id: "reports", name: "Reports", icon: "overview", permission: "reports" },
-  { id: "audit", name: "Activity log", icon: "audit", permission: "audit" },
+  { id: "reports", name: "Reports", icon: "report-activity", permission: "reports" },
   {
     id: "integrations",
     name: "Connections",
     icon: "settings",
     permission: "settings",
   },
+  { id: "audit", name: "Activity log", icon: "audit", permission: "audit" },
 ];
 export function Workspace() {
+  const appearance=useDesignPreview();
   const router = useRouter(),
     pathname = usePathname();
   const [data, setData] = useState<Row | null>(null),
@@ -191,7 +198,7 @@ export function Workspace() {
     [busy, setBusy] = useState(false),
     [notice, setNotice] = useState(""),
     [mobile, setMobile] = useState(false),
-    [manageOpen, setManageOpen] = useState(false),
+
     [searchOpen, setSearchOpen] = useState(false),
     [modal, setModal] = useState<{
       title: string;
@@ -238,7 +245,7 @@ export function Workspace() {
   }, [data?.outletId, data?.actor.role, busy, modal, refresh]);
   useEffect(() => {
     setMobile(false);
-    if (!primaryNavigation.has(section)) setManageOpen(true);
+
   }, [pathname, section]);
   useEffect(() => {
     if (data && section === "overview" && !can(data.actor.role, "reports")) {
@@ -266,7 +273,9 @@ export function Workspace() {
     document.addEventListener("keydown", shortcut);
     return () => document.removeEventListener("keydown", shortcut);
   }, [busy, modal]);
-  const closeSearch = useCallback(() => setSearchOpen(false), []);
+  useEffect(()=>{if(searchOpen)requestAnimationFrame(()=>document.querySelector<HTMLInputElement>('.topbar .page-search input')?.focus())},[searchOpen]);
+  const closeSearch = useCallback(() => {setSearchOpen(false);document.querySelector<HTMLButtonElement>('.topbar .header-search-trigger')?.focus()}, []);
+  useEffect(()=>{if(!searchOpen)return;const outside=(event:PointerEvent)=>{if(!(event.target as Element).closest('.header-search'))setSearchOpen(false)};const escape=(event:KeyboardEvent)=>{if(event.key==='Escape'&&!modal){setSearchOpen(false);document.querySelector<HTMLButtonElement>('.topbar .header-search-trigger')?.focus()}};document.addEventListener('pointerdown',outside);document.addEventListener('keydown',escape);return()=>{document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',escape)}},[searchOpen,modal]);
   const closeModal = useCallback(() => setModal(null), []);
   const run = async (action: string, input?: unknown, extra?: Row) => {
     if (busy) {
@@ -303,6 +312,7 @@ export function Workspace() {
           fields={fields}
           busy={working}
           submit={button}
+          onCancel={closeModal}
           onSubmit={async (values) => {
             try {
               await submit(values);
@@ -337,7 +347,7 @@ export function Workspace() {
       </div>
     );
   const sectionModules:Record<string,string>={pos:'pos',qr:'qr',inventory:'inventory',recipes:'inventory',vendors:'procurement',purchases:'procurement',customers:'crm',campaigns:'crm',loyalty:'loyalty',reports:'reports',reservations:'reservations',expenses:'finance'};
-  const hasModule=(id:string)=>!Array.isArray(data.platformPolicy?.features)||!sectionModules[id]||data.platformPolicy.features.includes(sectionModules[id]);
+  const hasModule=(id:string)=>restaurantFeatureEnabled(data.featureFlags,id==='table-billing'?'invoices':id)&&(!Array.isArray(data.platformPolicy?.features)||!sectionModules[id]||data.platformPolicy.features.includes(sectionModules[id]));
   const allowed = nav.filter((n) => can(data.actor.role, n.permission)&&hasModule(n.id));
   const navigation = allowed.filter((n) => n.sidebar !== false);
   const current = nav.find((n) => n.id === section);
@@ -358,7 +368,7 @@ export function Workspace() {
         This page is not available for your role.
       </Empty>
     );
-  else if(!hasModule(section))content=<Empty>This module is not included in the assigned web plan. Existing bills and payment history remain available.</Empty>;
+  else if(!hasModule(section))content=<Empty>This feature is unavailable under the current platform settings or web plan. Existing records remain intact.</Empty>;
   else if (
     [
       "reservations",
@@ -418,7 +428,7 @@ export function Workspace() {
         }}
       >
         <KotPrintProvider>
-          <div className="app-shell">
+          <div className="app-shell" data-preview-compact={appearance.compact}>
             <button
               className="mobile-menu icon-button"
               aria-label="Open navigation"
@@ -431,33 +441,24 @@ export function Workspace() {
             )}
             <aside
               id="workspace-navigation"
-              className={"sidebar " + (mobile ? "is-open" : "")}
+              className={"sidebar curved-sidebar " + (mobile ? "is-open" : "")}
             >
               <Link
                 href={"/app/" + (allowed[0]?.id ?? "orders")}
-                title="Diner Dost"
                 aria-label="Diner Dost home"
               >
                 <Logo />
               </Link>
-              <div className="workspace-name">
-                <span className="workspace-avatar">
-                  {data.restaurant.name.slice(0, 1)}
-                </span>
-                <span>
-                  <strong>{data.restaurant.name}</strong>
-                </span>
-              </div>
               <nav aria-label="Main navigation">
                 {navigation
-                  .filter((n) => primaryNavigation.has(n.id))
+                  .filter(() => true)
                   .map((n) => (
                     <Link
                       href={"/app/" + n.id}
                       scroll={false}
                       key={n.id}
                       onClick={() => setMobile(false)}
-                      title={n.name}
+                      title={appearance.compact?n.name:undefined}
                       aria-label={n.name}
                       className={section === n.id ? "active" : ""}
                       aria-current={section === n.id ? "page" : undefined}
@@ -480,95 +481,23 @@ export function Workspace() {
                         )}
                     </Link>
                   ))}
-                {navigation.some((n) => !primaryNavigation.has(n.id)) && (
-                  <>
-                    <button
-                      className={
-                        "nav-manage " +
-                        (!primaryNavigation.has(section) ? "selected" : "")
-                      }
-                      aria-expanded={manageOpen}
-                      aria-controls="management-navigation"
-                      onClick={() => setManageOpen(!manageOpen)}
-                      title="Manage"
-                      aria-label="Manage"
-                    >
-                      <Icon name="settings" />
-                      <span>
-                        <T>{"Manage"}</T>
-                      </span>
-                      <span className="nav-toggle" aria-hidden="true">
-                        {manageOpen ? "−" : "+"}
-                      </span>
-                    </button>
-                    {manageOpen && (
-                      <div
-                        id="management-navigation"
-                        className="management-navigation"
-                      >
-                        {navigation
-                          .filter((n) => !primaryNavigation.has(n.id))
-                          .map((n) => (
-                            <Link
-                              href={"/app/" + n.id}
-                              scroll={false}
-                              key={n.id}
-                              onClick={() => setMobile(false)}
-                              title={n.name}
-                              aria-label={n.name}
-                              className={section === n.id ? "active" : ""}
-                              aria-current={
-                                section === n.id ? "page" : undefined
-                              }
-                            >
-                              <Icon name={n.icon} />
-                              <span>
-                                <T>{n.name}</T>
-                              </span>
-                            </Link>
-                          ))}
-                      </div>
-                    )}
-                  </>
-                )}
                 {data.enterpriseReports&&<Link href="/enterprise"><Icon name="reports"/><span>Brand reports</span></Link>}
                 {data.platformConsole&&<Link href="/superadmin"><Icon name="settings"/><span>Superadmin</span></Link>}
               </nav>
-              <div className="sidebar-footer">
-                <div className="profile">
-                  <span className="avatar" title={data.actor.name}>
-                    {data.actor.name
-                      .split(" ")
-                      .map((n: string) => n[0])
-                      .slice(0, 2)
-                      .join("")}
-                  </span>
-                  <span>
-                    <strong>{data.actor.name}</strong>
-                    <small>{data.actor.role.toLowerCase()}</small>
-                  </span>
-                  <button
-                    className="icon-button"
-                    title="Sign out"
-                    aria-label="Sign out"
-                    onClick={async () => {
-                      await request("/api/auth/logout", {
-                        method: "POST",
-                        body: "{}",
-                      });
-                      router.push("/signin");
-                      router.refresh();
-                    }}
-                  >
-                    <Icon name="logout" />
-                  </button>
-                </div>
-              </div>
+              <div className="sidebar-footer"><SidebarProfile name={data.actor.name} role={data.actor.role.toLowerCase()} properties={[{label:'Name',value:data.actor.name},{label:'Role',value:data.actor.role.toLowerCase()},{label:'Restaurant',value:data.restaurant.name},{label:'Outlet',value:data.outlets.find((outlet:Row)=>outlet.id===data.outletId)?.name??''}]} onSignOut={async()=>{await request('/api/auth/logout',{method:'POST',body:'{}'});router.push('/signin');router.refresh()}}/></div>
             </aside>
             <div className="main-shell">
               <header className="topbar">
+                {<button type="button" className="icon-button working-nav-toggle" aria-label={appearance.compact?'Expand navigation':'Collapse navigation'} aria-expanded={!appearance.compact} aria-controls="workspace-navigation" onClick={appearance.toggleCompact}><Icon name="navigation"/></button>}
+<div className="workspace-name" title={data.restaurant.name}>
+                <span className="workspace-avatar">
+                  {data.restaurant.name.slice(0, 1)}
+                </span>
+                <span>
+                  <strong>{data.restaurant.name}</strong>
+                </span>
+              </div>
                 <div className="outlet-switch">
-                  <span className="status-dot" />
                   <select
                     aria-label="Current outlet"
                     value={data.outletId}
@@ -584,24 +513,14 @@ export function Workspace() {
                       </option>
                     ))}
                   </select>
+                  <OutletOrderSwitch/>
                 </div>
-                <LanguageSelect />
-                <button
-                  className="page-search-trigger"
-                  aria-label="Search pages"
-                  aria-keyshortcuts="Control+k Meta+k"
-                  onClick={() => setSearchOpen(true)}
-                  disabled={busy || !!modal}
-                >
-                  <Icon name="search" />
-                  <span>
-                    <T>{"Search"}</T>
-                  </span>
-                  <kbd>Ctrl K</kbd>
-                </button>
-                <NotificationBell key={data.outletId + data.actor.role} />
+                <div className="header-search" data-open={searchOpen}><button type="button" className="header-search-trigger" aria-label="Search pages" aria-keyshortcuts="Control+k Meta+k" aria-expanded={searchOpen} aria-controls="workspace-page-search" disabled={busy||!!modal} onClick={()=>searchOpen?closeSearch():setSearchOpen(true)}><Icon name="search"/><span><T>Search</T></span><kbd>Ctrl K</kbd></button>{searchOpen&&<div id="workspace-page-search"><PageSearch items={allowed} close={closeSearch} navigate={path=>router.push(path)}/></div>}</div>
+                {restaurantFeatureEnabled(data.featureFlags,'notifications')&&<NotificationBell key={data.outletId + data.actor.role} />}
+                <SupportButton outletId={data.outletId} restaurantName={data.restaurant.name} outletName={data.outlets.find((outlet:Row)=>outlet.id===data.outletId)?.name??''} disabled={!!data.supportView}/>
                 <PackageButton />
               </header>
+              <WorkspaceTools key={data.actor.employeeId} />
               <main
                 className={
                   "main-content" +
@@ -610,7 +529,8 @@ export function Workspace() {
               >
                 {data.supportView&&<div className="notice" role="status" style={{maxWidth:"min(100%, calc(100vw - 88px))",overflowWrap:"anywhere"}}><strong>{data.supportView.mode==='EDIT'?'Editable owner support':'Read-only owner view'} · {data.supportView.operatorName}</strong><p>Expires {new Date(data.supportView.expiresAt).toLocaleTimeString()}. {data.supportView.mode==='EDIT'?'Changes affect this restaurant’s real data and are audited under your administrator identity.':'Changes, payments and stock actions are blocked.'}</p><button type="button" className="button" onClick={async()=>{await request('/api/superadmin/support-view',{method:'POST',body:JSON.stringify({action:'end'})});location.assign('/superadmin')}}>Exit owner view</button></div>}
                 <div className="page-heading">
-                  <div>
+                  <div className="page-title">
+                    {section==='qr'&&<Link href="/app/floor" className="button page-back" aria-label="Back to Tables" title="Back to Tables"><Icon name="back"/></Link>}
                     <h1>
                       <T>
                         {detailId && section === "orders"
@@ -618,8 +538,11 @@ export function Workspace() {
                           : (current?.name ?? "Workspace")}
                       </T>
                     </h1>
+                    <span id="workspace-heading-subtitle"/>
                   </div>
-                  {can(data.actor.role, "orders") && data.supportView?.mode!=='READ_ONLY' && section === "overview" && (
+                  {(['tasks','kitchen','floor','pos'].includes(section)||(!!detailId&&['orders','table-billing'].includes(section)))&&<fieldset id="workspace-heading-tools" className="page-heading-tools" disabled={busy||data.supportView?.mode==='READ_ONLY'}>{section==='pos'&&hasModule("pos")&&<StockCountReminder/>}</fieldset>}
+                  {section==='orders'&&!detailId&&hasModule('orders')&&<small className="orders-list-note">Counts include all orders · Latest 200 listed</small>}
+                  {can(data.actor.role, "orders") && hasModule("pos") && data.supportView?.mode!=='READ_ONLY' && section === "overview" && (
                     <Link className="button primary" href="/app/pos">
                       <Icon name="plus" />
                       <T>{"New order"}</T>
@@ -628,7 +551,7 @@ export function Workspace() {
                 </div>
                 <fieldset
                   disabled={busy||data.supportView?.mode==='READ_ONLY'}
-                  className="workspace-controls"
+                  className={"workspace-controls workspace-page-"+section}
                   aria-busy={busy}
                 >
                   {data.platformPolicy&&data.platformPolicy.status!=='ACTIVE'&&<div className="notice" role="status">Restaurant {data.platformPolicy.status.toLowerCase()}. Historical records remain available; new web operations are paused.</div>}
@@ -649,17 +572,10 @@ export function Workspace() {
                 </button>
               </div>
             )}
-            {searchOpen && (
-              <PageSearch
-                items={allowed}
-                close={closeSearch}
-                navigate={(path) => router.push(path)}
-              />
-            )}
+
             <ReservationReminders />
-            <WorkspaceTools key={data.actor.employeeId} />
             {modal && (
-              <Modal title={modal.title} onClose={closeModal}>
+              <Modal title={modal.title} onClose={closeModal} className={section==='outlets'?'outlet-editor-dialog':undefined}>
                 {modal.render(busy)}
               </Modal>
             )}

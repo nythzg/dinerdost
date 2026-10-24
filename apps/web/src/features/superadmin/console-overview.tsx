@@ -7,7 +7,7 @@ const amount=(value:unknown)=>value===null||value===undefined?'Not recorded':mon
 export function ConsoleOverview({data,onNavigate}:{data:Row;onNavigate:(id:string)=>void}){
  const m=data.metrics,can=(permission:string)=>data.admin.permissions.includes(permission);
  const reviews=data.tenants.filter((row:Row)=>row.kyc!=='VERIFIED'),paused=data.tenants.filter((row:Row)=>['HOLD','SUSPENDED'].includes(row.status));
- const tickets=data.records.filter((row:Row)=>row.kind==='TICKET'&&!row.archived&&row.data.status!=='RESOLVED');
+ const tickets=data.records.filter((row:Row)=>row.kind==='TICKET'&&!row.archived&&['OPEN','IN_PROGRESS'].includes(row.data.status));
  const items=[...(can('tenants')?[{name:'Verification reviews',count:reviews.length,detail:'Listed restaurants awaiting review',page:'tenants',icon:'audit'},{name:'Accounts on hold',count:paused.length,detail:'Listed restaurants needing attention',page:'tenants',icon:'outlets'}]:[]),...(can('support')?[{name:'Open support cases',count:tickets.length,detail:'Listed cases awaiting resolution',page:'support',icon:'bell'}]:[])];
  const activity=[...data.tenants].sort((a:Row,b:Row)=>Number(b.current_orders)-Number(a.current_orders)).slice(0,4),maximum=Math.max(1,...activity.flatMap((r:Row)=>[Number(r.current_orders),Number(r.previous_orders)]));
  return <>

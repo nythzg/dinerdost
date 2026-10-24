@@ -28,7 +28,7 @@ export async function publicMenu(tx: Sql, outletId: string, orderId?: string, hi
       : null;
   const rows = (
     await tx.query<Row>(
-      "SELECT m.id,m.name,m.category,m.description,m.price,m.tax_bps,m.unit,m.variants,m.modifiers,m.image_url,m.image_is_sample,(m.ready_food_batch_id IS NOT NULL) AS ready_to_serve,b.on_hand-b.reserved AS ready_quantity,b.expires_at AS ready_use_by FROM menu_items m LEFT JOIN prepared_food_batches b ON b.id=m.ready_food_batch_id AND b.restro_id=m.restro_id WHERE m.outlet_id=$1 AND m.active=true AND (m.ready_food_batch_id IS NULL OR (b.on_hand>b.reserved AND b.expires_at>now())) ORDER BY (m.ready_food_batch_id IS NOT NULL) DESC,m.category,m.name",
+      "SELECT m.id,m.name,m.category,c.menu_course,m.description,m.price,m.tax_bps,m.unit,m.variants,m.modifiers,m.image_url,m.image_is_sample,m.guest_best_choice,m.compare_at_price,(m.ready_food_batch_id IS NOT NULL) AS ready_to_serve,b.on_hand-b.reserved AS ready_quantity,b.expires_at AS ready_use_by FROM menu_items m LEFT JOIN menu_categories c ON c.restro_id=m.restro_id AND c.outlet_id=m.outlet_id AND lower(c.name)=lower(m.category) LEFT JOIN prepared_food_batches b ON b.id=m.ready_food_batch_id AND b.restro_id=m.restro_id WHERE m.outlet_id=$1 AND m.active=true AND (m.ready_food_batch_id IS NULL OR (b.on_hand>b.reserved AND b.expires_at>now())) ORDER BY (m.ready_food_batch_id IS NOT NULL) DESC,m.category,m.name",
       [outletId],
     )
   ).rows;

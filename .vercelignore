@@ -18,3 +18,5 @@ scripts/**
 apps/android/**
 output/**
 tmp/**
+
+**/.next*/**

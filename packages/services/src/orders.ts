@@ -1,3 +1,4 @@
+import {assertOutletOrderIntake} from './outlet-order-intake';
 import {assertPlatformNewOrder} from "./platform-policy";
 import {reserveWebDiscountCoupon} from './web-discount-coupons';
 import {webLoyaltyLimit} from './web-loyalty';
@@ -31,6 +32,7 @@ import {
   one,
   scopedOrder,
   type Row,
+  type AuditActor,
 } from "./shared";
 import { consumeStock, reserveStock, releaseStock } from "./stock";
 import { expireInventory } from "./stock-expiry";
@@ -200,9 +202,7 @@ export async function createRound(
     403,
   );
   return command(db, actor, key, "ORDER_ROUND_CREATED", data, async (tx) => {
-    await one(tx, "SELECT id FROM outlets WHERE id=$1 FOR SHARE", [
-      data.outletId,
-    ]);
+    await assertOutletOrderIntake(tx,data.outletId);
     if (data.sessionId) {
       const session = await one(
         tx,
@@ -486,6 +486,7 @@ export async function editRound(
           "SELECT * FROM order_rounds WHERE id=$1 AND order_id=$2 FOR UPDATE",
           [roundId, orderId],
         );
+      await assertOutletOrderIntake(tx,order.outlet_id);
       expectedVersion(round.version, data.version);
       ensure(
         !["SETTLED", "VOIDED", "REJECTED"].includes(order.status) &&
@@ -790,6 +791,10 @@ export async function evaluateEntitlements(
     "SELECT * FROM order_rounds WHERE id=$1 AND order_id=$2",
     [roundId, orderId],
   );
+  return evaluateRoundEntitlements(tx,actor,order,round);
+}
+async function evaluateRoundEntitlements(tx:Sql,actor:Pick<AuditActor,'restroId'|'application'>,order:Row,round:Row){
+  const orderId=order.id,roundId=round.id;
   const outlet = await one(tx, "SELECT * FROM outlets WHERE id=$1", [
     order.outlet_id,
   ]);
@@ -836,6 +841,16 @@ export async function evaluateEntitlements(
     quoteVersion: num(round.version),
   };
 }
+export const entitlementInput = z
+    .object({
+      version: z.number().int(),
+      couponId: z.uuid().nullable().optional(),
+      couponCode:z.string().trim().min(1).max(80).optional(),
+      amount:z.number().int().min(0).max(1000000000).optional(),
+      points: z.number().int().min(0).max(100000).default(0),
+    })
+    .strict()
+;
 export async function applyEntitlement(
   db: Database,
   actor: Actor,
@@ -845,36 +860,25 @@ export async function applyEntitlement(
   input: unknown,
   webFlow=false,
 ) {
-  requirePermission(actor, "orders");
-  const data = z
-    .object({
-      version: z.number().int(),
-      couponId: z.uuid().nullable().optional(),
-      couponCode:z.string().trim().min(1).max(80).optional(),
-      amount:z.number().int().min(0).max(1000000000).optional(),
-      points: z.number().int().min(0).max(100000).default(0),
-    })
-    .strict()
-    .parse(input);
+  requirePermission(actor,'orders');
+  const data=entitlementInput.parse(input);
   ensure(webFlow||(!data.couponCode&&data.amount===undefined),'APPLICATION_FORBIDDEN','Use the web reward workflow for rupee claims or coupon codes.',403);
   ensure(!webFlow||!actor.application||actor.application==='MASTER','APPLICATION_FORBIDDEN','Use the application reward workflow.',403);
-  return command(
-    db,
-    actor,
-    key,
-    "ENTITLEMENT_RESERVED",
-    { orderId, roundId, ...data },
-    async (tx) => {
-      const order = await scopedOrder(tx, actor, orderId, true);
+  return command(db,actor,key,'ENTITLEMENT_RESERVED',{orderId,roundId,...data},async tx=>{
+    const order=await scopedOrder(tx,actor,orderId,true),round=await one(tx,'SELECT * FROM order_rounds WHERE id=$1 AND order_id=$2 FOR UPDATE',[roundId,orderId]);
+    const entitlements=await applyRoundEntitlement(tx,actor,order,round,data,webFlow);
+    return {order:await orderDetail(tx,actor,orderId),entitlements};
+  });
+}
+/** Caller must first authorize and lock this order/round in its tenant transaction. */
+export async function applyRoundEntitlement(tx:Sql,actor:AuditActor,order:Row,round:Row,data:z.infer<typeof entitlementInput>,webFlow=false){
+  const orderId=order.id,roundId=round.id;
+  ensure(webFlow||(!data.couponCode&&data.amount===undefined),'APPLICATION_FORBIDDEN','Use the web reward workflow for rupee claims or coupon codes.',403);
+  ensure(!webFlow||!actor.application||actor.application==='MASTER','APPLICATION_FORBIDDEN','Use the application reward workflow.',403);
       ensure(
         order.customer_id,
         "IDENTITY_REQUIRED",
         "Add customer details before choosing rewards.",
-      );
-      const round = await one(
-        tx,
-        "SELECT * FROM order_rounds WHERE id=$1 AND order_id=$2 FOR UPDATE",
-        [roundId, orderId],
       );
       expectedVersion(round.version, data.version);
       ensure(
@@ -973,7 +977,7 @@ export async function applyEntitlement(
           "OTP_REQUIRED",
           "Phone verification is required to redeem loyalty points.",
         );
-        const balance = await evaluateEntitlements(tx, actor, orderId, roundId);
+        const balance = await evaluateRoundEntitlements(tx,actor,order,round);
         ensure(
           balance.spendablePoints >= data.points,
           "INSUFFICIENT_POINTS",
@@ -1044,15 +1048,7 @@ export async function applyEntitlement(
         risk: order.bill_print_count > 0 && discount ? "CRITICAL" : "INFO",
         impact: payable - num(round.payable),
       });
-      const entitlements = await evaluateEntitlements(
-        tx,
-        actor,
-        orderId,
-        roundId,
-      );
-      return { order: await orderDetail(tx, actor, orderId), entitlements };
-    },
-  );
+      return evaluateRoundEntitlements(tx,actor,order,await one(tx,'SELECT * FROM order_rounds WHERE id=$1',[roundId]));
 }
 export async function releaseKot(
   tx: Sql,

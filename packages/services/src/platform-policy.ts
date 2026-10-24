@@ -1,3 +1,5 @@
+import {platformFeatureFlags} from './platform-features';
+import {restaurantFeatureEnabled,restaurantActionFeature,restaurantPlanModules,platformFeatures} from '@dinerdost/core';
 import type {Database,Sql} from '@dinerdost/database';
 import {ensure,type Actor} from '@dinerdost/core';
 export async function platformPolicy(tx:Sql,lock=false){
@@ -9,6 +11,8 @@ export async function platformPolicy(tx:Sql,lock=false){
 const actionModules:[RegExp,string][]=[[/INVENTORY|STOCK|INGREDIENT|RECIPE|PRODUCTION|MATERIAL|EXPIRY|WASTE/,'inventory'],[/PURCHASE|VENDOR|PROCUREMENT|SUPPLIER/,'procurement'],[/LOYALTY|ENTITLEMENT|COUPON|REWARD/,'loyalty'],[/CUSTOMER_PROFILE|CUSTOMER_SAVED/,'crm'],[/RESERVATION/,'reservations'],[/EXPENSE|PAYROLL|SALARY/,'finance']];
 export async function guardPlatformCommand(tx:Sql,actor:{role:string;application?:string},action:string,input:any){
  if(actor.role==='SYSTEM'||(actor.role==='CUSTOMER'&&!actor.application)||(actor.application&&actor.application!=='MASTER'))return;
+ const flags=await platformFeatureFlags(tx),recordKind=action==='RECORD_DECISION'?(await tx.query('SELECT kind FROM records WHERE id=$1',[input?.recordId])).rows[0]?.kind:undefined,feature=restaurantActionFeature(recordKind?'RECORD_SAVED':action,recordKind?{kind:recordKind}:input);
+ for(const key of [...(feature?[feature]:[]),...((actor as {webFeatures?:string[]}).webFeatures??[])])ensure(restaurantFeatureEnabled(flags,key),'FEATURE_DISABLED','This feature is disabled by platform administration.',403);
  const policy=await platformPolicy(tx,true);if(!policy)return;
  ensure(policy.status==='ACTIVE','TENANT_PAUSED','This restaurant is paused. Historical records remain available; contact Diner Dost support.',403);
  const recordModule:Record<string,string>={vendors:'procurement',purchases:'procurement',expenses:'finance',reservations:'reservations',campaigns:'crm'};
@@ -30,6 +34,8 @@ export async function platformPublicAccess(db:Database,target:{tableKey?:string;
  const query=target.tableKey?'SELECT restro_id FROM dining_tables WHERE public_key=$1':'SELECT restro_id FROM storefronts WHERE slug=$1';
  const row=(await db.query<{restro_id:string}>(query,[target.tableKey??target.slug])).rows[0];if(!row)return;
  const policy=await db.transaction(row.restro_id,tx=>platformPolicy(tx));ensure(!policy||policy.status==='ACTIVE','RESTAURANT_UNAVAILABLE','This restaurant is not currently accepting web requests.',403);
+ const flags=await db.transaction(row.restro_id,tx=>platformFeatureFlags(tx));
+ if(module)ensure(restaurantFeatureEnabled(flags,target.slug?'storefront':'qr'),'FEATURE_DISABLED','This ordering feature is unavailable.',403);
  if(module&&policy&&Array.isArray(policy.features))ensure(policy.features.includes(module),'PLAN_FEATURE_UNAVAILABLE','This web ordering feature is unavailable.',403);
 }
 
@@ -46,6 +52,8 @@ export async function assertPlatformInviteAcceptance(tx:Sql,web:boolean){
 
 export async function assertPlatformFeature(db:Database,actor:Actor,feature:string){
  if(actor.application&&actor.application!=='MASTER')return;
- const policy=await db.transaction(actor.restroId,tx=>platformPolicy(tx));
- if(policy&&Array.isArray(policy.features))ensure(policy.features.includes(feature),'PLAN_FEATURE_UNAVAILABLE','This web module is not included in the assigned plan.',403);
+ const {policy,flags}=await db.transaction(actor.restroId,async tx=>({policy:await platformPolicy(tx),flags:await platformFeatureFlags(tx)}));
+ ensure(restaurantFeatureEnabled(flags,feature),'FEATURE_DISABLED','This feature is disabled by platform administration.',403);
+ const module=restaurantPlanModules[feature]??feature;
+ if(policy&&Array.isArray(policy.features)&&platformFeatures.includes(module as typeof platformFeatures[number]))ensure(policy.features.includes(module),'PLAN_FEATURE_UNAVAILABLE','This web module is not included in the assigned plan.',403);
 }

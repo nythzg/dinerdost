@@ -1,16 +1,19 @@
 import {test,expect,type Page} from '@playwright/test';
 import {randomBytes,randomUUID} from 'node:crypto';
+import {readFile} from 'node:fs/promises';
 async function register(page:Page){
+ if(process.env.QA_AUTH_STATE_FILE){if(process.env.QA_BASE_URL!=='http://localhost:5091')throw Error('Disposable QA origin required');const auth=JSON.parse(await readFile(process.env.QA_AUTH_STATE_FILE,'utf8'));await page.context().addCookies(auth.cookies);await page.goto('/app/overview');await expect(page.getByRole('heading',{name:'Overview',exact:true})).toBeVisible();return}
+
  await page.setExtraHTTPHeaders({'x-forwarded-for':'10.'+[...randomBytes(3)].join('.')});await page.goto('/signup');
  for(const [name,value] of [['Your name','Standard calculator QA'],['Restaurant name','Calculator isolated QA'],['First outlet','Main'],['Email','calc-standard-'+randomUUID()+'@example.test'],['Password',randomBytes(24).toString('base64url')]])await page.getByLabel(name,{exact:true}).fill(value);
  await page.getByLabel('Customer QR ordering').selectOption('on');await page.getByLabel('Add a sample menu and 12 tables').press('Space');await page.getByRole('button',{name:'Create workspace',exact:true}).click();await page.waitForURL('**/app/overview');
 }
 test.use({actionTimeout:15000});
 const calculator=(page:Page)=>page.getByRole('region',{name:'Calculator',exact:true});
-const entries=async(page:Page)=>(await(await page.request.get('/api/calculator')).json()).rows as any[];
+async function entries(page:Page){const rows:any[]=[];for(let index=0;;index++){const result=await(await page.request.get('/api/calculator?page='+index)).json();rows.push(...result.rows);if(!result.more)return rows}}
 const count=async(page:Page,total:number)=>expect.poll(async()=>(await entries(page)).length).toBe(total);
 test('equals retries interrupted autosaves without duplication and Save note is always available',async({page})=>{
- await register(page);await page.locator('.calculator-dock>.workspace-dock-trigger').click();const calc=calculator(page),field=calc.getByLabel('Calculation',{exact:true}),save=calc.getByRole('button',{name:'Save note',exact:true}),equals=calc.getByRole('button',{name:'=',exact:true});
+ await register(page);await page.locator('.calculator-dock .workspace-dock-trigger').click();const calc=calculator(page),field=calc.getByLabel('Calculation',{exact:true}),save=calc.getByRole('button',{name:'Save note',exact:true}),equals=calc.getByRole('button',{name:'=',exact:true});
  await expect(save).toBeEnabled();await field.fill('25+5');let posts=0;
  await page.route('**/api/calculator',async route=>{
   if(route.request().method()!=='POST'){await route.continue();return}
@@ -30,9 +33,9 @@ test('equals retries interrupted autosaves without duplication and Save note is 
 test('the supplied video sequence has live results, circular 4×5 keys, 00 and result chaining in the green theme',async({page})=>{
  await register(page);
  for(const width of [1440,390]){
-  await page.setViewportSize({width,height:width===390?844:1000});await page.goto('/app/overview');await page.locator('.calculator-dock>.workspace-dock-trigger').click();const calc=calculator(page),button=(key:string)=>calc.getByRole('button',{name:key,exact:true});
+  await page.setViewportSize({width,height:width===390?844:1000});await page.goto('/app/overview');await page.locator('.calculator-dock .workspace-dock-trigger').click();const calc=calculator(page),button=(key:string)=>calc.getByRole('button',{name:key,exact:true});
   expect((await calc.locator('.calculator-keypad button').allTextContents()).map(t=>t.trim())).toEqual(['AC','%','','÷','7','8','9','×','4','5','6','−','1','2','3','+','00','0','.','=']);
-  await expect(button('7')).toHaveCSS('border-radius','50%');await expect(button('7')).toHaveCSS('font-size','24px');const keyBox=await button('7').boundingBox();expect(keyBox!.width).toBeLessThanOrEqual(65);expect(keyBox!.height).toBeLessThanOrEqual(65);await expect(button('=')).toHaveCSS('color','rgb(255, 255, 255)');await expect(calc.getByRole('button',{name:'Calculate',exact:true})).toHaveCount(0);
+  await expect(button('7')).toHaveCSS('border-radius','50%');await expect(button('7')).toHaveCSS('font-size','22px');const keyBox=await button('7').boundingBox();expect(keyBox!.width).toBeLessThanOrEqual(65);expect(keyBox!.height).toBeLessThanOrEqual(65);await expect(button('=')).toHaveCSS('color','rgb(255, 255, 255)');await expect(calc.getByRole('button',{name:'Calculate',exact:true})).toHaveCount(0);
   const panelBox=await calc.boundingBox();expect(panelBox!.width).toBeLessThanOrEqual(320);expect(panelBox!.height).toBeLessThanOrEqual(width===390?734:890);
   const before=(await entries(page)).length;
   for(const key of ['4','5','×','2','5'])await button(key).click();await expect(calc.getByLabel('Calculation preview',{exact:true})).toHaveText('1,125');await expect(calc.getByRole('button',{name:'Save note',exact:true})).toBeVisible();await button('=').click();await expect(calc.getByLabel('Calculation result',{exact:true})).toHaveText('1,125');await expect(calc.locator('.calculator-display')).toHaveClass(/is-complete/);
@@ -48,7 +51,7 @@ test('the supplied video sequence has live results, circular 4×5 keys, 00 and r
 test('standard-only green calculator saves optional notes per result and uses a working SVG backspace at desktop and phone sizes',async({page,browser})=>{
  await register(page);
  for(const width of [1440,390]){
-  await page.setViewportSize({width,height:width===390?844:1000});await page.goto('/app/overview');const trigger=page.locator('.calculator-dock>.workspace-dock-trigger');if(await trigger.getAttribute('aria-expanded')==='false')await trigger.click();let calc=calculator(page);
+  await page.setViewportSize({width,height:width===390?844:1000});await page.goto('/app/overview');const trigger=page.locator('.calculator-dock .workspace-dock-trigger');if(await trigger.getAttribute('aria-expanded')==='false')await trigger.click();let calc=calculator(page);
   await expect(calc.locator('select')).toHaveCount(0);await expect(calc.getByText('Calculation mode',{exact:true})).toHaveCount(0);await expect(calc.getByRole('button',{name:'sin',exact:true})).toHaveCount(0);await expect(calc.getByRole('button',{name:'Backspace',exact:true}).locator('svg')).toHaveCount(1);await expect(calc.getByRole('button',{name:'Backspace',exact:true})).toHaveText('');
   const field=calc.getByLabel('Calculation',{exact:true});await expect(calc.getByRole('button',{name:'Save note',exact:true})).toBeEnabled();await calc.getByRole('button',{name:'Save note',exact:true}).click();await expect(calc.getByRole('alert')).toHaveText('Enter a calculation before saving a note.');await field.fill('123');await calc.getByRole('button',{name:'Backspace',exact:true}).click();await expect(field).toHaveValue('12');await field.fill('1234');await field.selectText();await calc.getByRole('button',{name:'Backspace',exact:true}).click();await expect(field).toHaveValue('');
   await calc.getByLabel('Calculation note',{exact:true}).fill('Optional note '+width);await field.fill('200+10%');const before=(await entries(page)).length;await calc.getByRole('button',{name:'=',exact:true}).click();await expect(calc.getByLabel('Calculation result',{exact:true})).toHaveText('220');await count(page,before+1);await expect(calc.getByRole('button',{name:'Save note',exact:true})).toBeEnabled();

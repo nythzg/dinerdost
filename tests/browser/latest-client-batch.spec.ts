@@ -54,8 +54,9 @@ test('persistent dismissals, table icons, kitchen All/bulk, named charges and lo
  test.setTimeout(process.env.QA_BASE_URL?360000:240000);
  await register(page);
  let w=await workspace(page);
+ await command(page,'kitchenStages',{outletId:w.outletId,version:w.outlets.find((o:any)=>o.id===w.outletId).version,enabled:true});
  const table=w.tables[0];
- await command(page,'openSession',{tableId:table.id,guests:2});
+ if(!w.sessions.some((session:any)=>session.table_id===table.id))await command(page,'openSession',{tableId:table.id,guests:2});
  const barName='Latest bar '+randomUUID().slice(0,6);
  const bar=await command(page,'menu',{outletId:w.outletId,name:barName,category:'Bar',price:12000,taxBps:0,station:'Latest bar',unit:'portion',stream:'BAR'});
  const food=w.menu.find((item:any)=>item.name==='Butter naan');
@@ -96,10 +97,10 @@ test('persistent dismissals, table icons, kitchen All/bulk, named charges and lo
   const preparing=page.locator('.kitchen-column').filter({has:page.getByRole('heading',{name:'Preparing',exact:true})});
   const ready=page.locator('.kitchen-column').filter({has:page.getByRole('heading',{name:'Ready',exact:true})});
   const own=released.locator('.ticket').filter({has:page.getByText('#'+order.number,{exact:true})});await expect(own).toHaveCount(2);
-  await own.first().getByRole('checkbox').check();await released.getByRole('button',{name:'Forward selected',exact:true}).click();
+  await expect(released.getByRole('checkbox')).toHaveCount(0);await released.getByRole('button',{name:'Select',exact:true}).click();await own.first().getByRole('checkbox').check();await released.getByRole('button',{name:/^Forward/}).click();
   await expect(own).toHaveCount(1);
-  await released.getByRole('button',{name:'Forward all',exact:true}).click();await expect(own).toHaveCount(0);
-  await preparing.getByRole('button',{name:'Forward all',exact:true}).click();
+  await released.getByRole('button',{name:'Select',exact:true}).click();await released.getByRole('button',{name:'Select all',exact:true}).click();await released.getByRole('button',{name:/^Forward/}).click();await expect(own).toHaveCount(0);
+  await preparing.getByRole('button',{name:'Select',exact:true}).click();await preparing.getByRole('button',{name:'Select all',exact:true}).click();await preparing.getByRole('button',{name:/^Forward/}).click();
   await expect(ready.locator('.ticket').filter({has:page.getByText('#'+order.number,{exact:true})})).toHaveCount(2);
   await page.screenshot({path:`verification/kitchen-all-bulk-${width}.png`});
   await tabs.getByRole('button',{name:'Food',exact:true}).click();await expect(page.locator('.ticket').filter({hasText:barName})).toHaveCount(0);
@@ -109,7 +110,7 @@ test('persistent dismissals, table icons, kitchen All/bulk, named charges and lo
   await page.goto('/app/floor-plan');
   const viewport=page.getByLabel('Floor canvas viewport',{exact:true}),camera=page.locator('.floor-camera');
   await expect(page.getByLabel('Floor layout bounding box',{exact:true})).toBeAttached();
-  await expect(page.locator('.floor-outline-boundary polygon')).toHaveAttribute('fill','#eaf1e6');
+  await expect(page.locator('.floor-outline-boundary .floor-boundary-shape')).toHaveAttribute('fill','url(#floor-mapping-dots)');
   await page.getByLabel('Fit floor to view',{exact:true}).click();await page.getByLabel('Zoom in floor plan',{exact:true}).click();
   const bounds=await viewport.boundingBox();const x=bounds!.x+bounds!.width/2,y=bounds!.y+30;
   await page.getByRole('button',{name:'Lock floor view',exact:true}).click();

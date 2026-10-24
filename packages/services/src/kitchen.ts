@@ -4,12 +4,42 @@ import {
   ensure,
   requireOutlet,
   requirePermission,
+  isManager,
   type Actor,
 } from "@dinerdost/core";
 import { audit, command, one, scopedOrder,expectedVersion } from "./shared";
 import { orderDetail } from "./orders";
 import { refreshOrderStatus } from "./order-state";
 import { requireTicketStream } from "./operational-access";
+import {releaseStock} from './stock';
+
+/** Rejection is explicit cancellation, never a refund or a return of consumed food. */
+export async function rejectKitchenRounds(db:Database,actor:Actor,key:string,input:unknown){
+ requirePermission(actor,'accept');ensure(isManager(actor),'FORBIDDEN','A manager must authorize rejection of released food.',403);
+ ensure(!actor.application||actor.application==='MASTER','APPLICATION_FORBIDDEN','Use the web kitchen selection workflow.',403);
+ const data=z.object({outletId:z.uuid(),from:z.enum(['RELEASED','PREPARING','READY']),reason:z.string().trim().min(5).max(500),rounds:z.array(z.object({orderId:z.uuid(),roundId:z.uuid(),version:z.number().int().positive()}).strict()).min(1).max(20)}).strict().parse(input);
+ requireOutlet(actor,data.outletId);ensure(new Set(data.rounds.map(r=>r.roundId)).size===data.rounds.length,'DUPLICATE_ROUND','Select each round once.');
+ return command(db,actor,key,'KITCHEN_ROUNDS_REJECTED',data,async tx=>{
+  const orders=new Map<string,any>();for(const orderId of [...new Set(data.rounds.map(r=>r.orderId))].sort()){const order=await scopedOrder(tx,actor,orderId,true);ensure(order.outlet_id===data.outletId,'OUTLET_FORBIDDEN','All selected rounds must belong to this outlet.',403);orders.set(orderId,order);}
+  for(const entry of [...data.rounds].sort((a,b)=>a.roundId.localeCompare(b.roundId))){
+   const round=await one(tx,'SELECT * FROM order_rounds WHERE id=$1 AND order_id=$2 FOR UPDATE',[entry.roundId,entry.orderId]);expectedVersion(round.version,entry.version);
+   ensure(round.status==='ACCEPTED'&&['RELEASED','PREPARING','READY'].includes(round.kot_status),'TICKET_CHANGED','A selected round has changed. Refresh and select again.',409);
+   ensure(!['SETTLED','VOIDED','REJECTED'].includes(orders.get(entry.orderId).status)&&Number(round.paid)===0,'REJECTION_BLOCKED','Paid food needs the existing refund workflow; it cannot be rejected here.',409);
+   ensure(!(await tx.query("SELECT id FROM payment_attempts WHERE round_id=$1 AND state NOT IN ('FAILED','REJECTED')",[entry.roundId])).rows.length,'PAYMENT_RECONCILIATION_REQUIRED','Reconcile the payment before rejecting food.',409);
+   ensure(!(await tx.query('SELECT id FROM invoices WHERE order_id=$1',[entry.orderId])).rows.length,'ISSUED_DOCUMENT_LOCKED','An issued bill must use the existing correction workflow.',409);
+   const tickets=(await tx.query('SELECT * FROM kot_tickets WHERE round_id=$1 ORDER BY id FOR UPDATE',[entry.roundId])).rows;
+   ensure(tickets.length>0&&tickets.some(t=>t.status===data.from)&&tickets.every(t=>['RELEASED','PREPARING','READY'].includes(String(t.status))),'TICKET_CHANGED','Only unserved food can be rejected.',409);
+   await releaseStock(tx,entry.roundId); // Only still-reserved stock; consumed FIFO/cost movements stay immutable.
+   await tx.query("UPDATE coupons SET state='AVAILABLE',round_id=NULL,round_version=NULL,reserved_until=NULL WHERE round_id=$1 AND state IN ('RESERVED','LOCKED')",[entry.roundId]);
+   await tx.query("UPDATE loyalty_reservations SET state='RELEASED' WHERE round_id=$1 AND state IN ('RESERVED','LOCKED')",[entry.roundId]);
+   await tx.query("UPDATE kot_tickets SET status='CANCELLED',updated_at=now() WHERE round_id=$1",[entry.roundId]);
+   await tx.query("UPDATE order_rounds SET status='REJECTED',kot_status='CANCELLED',rejection_reason=$2,version=version+1,quote_version=NULL WHERE id=$1",[entry.roundId,data.reason]);
+   await audit(tx,actor,{action:'KITCHEN_ROUND_REJECTED',entityType:'ORDER_ROUND',entityId:entry.roundId,outletId:data.outletId,reason:data.reason,newState:{from:data.from,consumedStockRetained:true},impact:-Number(round.payable),risk:'WARNING'});
+  }
+  for(const orderId of orders.keys())await refreshOrderStatus(tx,orderId);
+  return {ok:true,rejected:data.rounds.length};
+ });
+}
 
 export async function kitchenDecision(
   db: Database,

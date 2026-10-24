@@ -242,13 +242,7 @@ export function Records({ kind }: { kind: string }) {
       label(state),
     );
   return (
-    <section className="panel">
-      {kind === "campaigns" && (
-        <div className="panel-heading campaign-setup">
-          <IntegrationRequirementsButton kind="messaging" />
-          <IntegrationRequirementsButton kind="orderTokens" />
-        </div>
-      )}
+    <section className={"panel"+(kind === "campaigns" ? " campaigns-panel" : "")}>
       <div className="panel-heading">
         {kind === "checklists" && can(data.actor, "inventory") && (
           <button
@@ -258,6 +252,8 @@ export function Records({ kind }: { kind: string }) {
             Prep plan
           </button>
         )}
+        <div>
+        {kind === "campaigns" && <h2>Drafts</h2>}
         <span className="muted">
           {kind === "campaigns"
             ? "Drafts · sending requires a messaging provider"
@@ -265,6 +261,7 @@ export function Records({ kind }: { kind: string }) {
               ? "Purchase records · receive stock separately after delivery"
               : records.length + " records"}
         </span>
+        </div>
         <button
           className="button primary"
           disabled={kind === "purchases" && loading}
@@ -287,6 +284,12 @@ export function Records({ kind }: { kind: string }) {
                       : "reservation"}
         </button>
       </div>
+      {kind === "campaigns" && (
+        <div className="campaign-setup">
+          <IntegrationRequirementsButton kind="messaging" />
+          <IntegrationRequirementsButton kind="orderTokens" />
+        </div>
+      )}
       {error && <p className="error">{error}</p>}
       {filtered && activity.controls}
       <DataTable

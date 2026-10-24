@@ -125,7 +125,7 @@
 }
 .kot-receipt {
   box-sizing: border-box;
-  width: 74mm;
+  width: 70.2mm;
   margin: 3mm auto;
   padding: 0;
   color: #000;
@@ -174,7 +174,7 @@
 }
 @media print {
   @page kitchenTicket {
-    size: 80mm 250mm;
+    size: 76.2mm 250mm;
     margin: 3mm;
   }
   body:has(.kot-receipt) {
@@ -183,8 +183,8 @@
     background: #fff;
   }
   .kot-receipt {
-    page: kitchenTicket;
-    width: 74mm;
+    page: auto;
+    width: 70.2mm;
     max-width: none;
     margin: 0;
   }
@@ -242,3 +242,6 @@
   min-width: 0;
   line-height: 1.4;
 }
+
+.kot-group{overflow-wrap:anywhere}.kot-station h3{font-size:13px;line-height:1.4;margin:0 0 6px}.kot-group+.kot-group{margin-top:12px}
+@media print{.kot-group{page:kitchenTicket;break-after:page}.kot-group:last-child{break-after:auto}.kot-group+.kot-group{margin-top:0}}

@@ -1,0 +1,26 @@
+import type {ReactNode} from 'react';
+
+export const interfaceIconShapes:Record<string,ReactNode>={
+ cart:<><path d="m3 3 2 2 2 11h12l2-9H6M9 20h.01M18 20h.01"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></>,
+ skip:<><path d="m5 5 9 7-9 7V5ZM19 5v14"/></>,
+ games:<><path d="M7 7h10a4 4 0 0 1 4 4l1 6a3 3 0 0 1-5 2l-3-3h-4l-3 3a3 3 0 0 1-5-2l1-6a4 4 0 0 1 4-4Z"/><path d="M7 10v4m-2-2h4m7-1h.01M18 13h.01"/></>,
+ back:<><path d="m11 5-7 7 7 7M4 12h16"/></>,
+ filter:<><path d="M4 4h16l-6 7v7l-4 2v-9z"/></>,
+ sort:<><path d="M8 4v16m-3-3 3 3 3-3M14 5h6m-6 5h4m-4 5h2"/></>,
+ details:<><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/></>,
+ 'table-four':<><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M10 2h4M10 22h4M2 10v4M22 10v4"/></>,
+ overview:<><rect x="3.5" y="3.5" width="6" height="7" rx="1.2" fill="currentColor" fillOpacity=".16"/><rect x="14.5" y="3.5" width="6" height="4" rx="1.2"/><rect x="3.5" y="15.5" width="6" height="5" rx="1.2"/><rect x="14.5" y="12.5" width="6" height="8" rx="1.2"/></>,
+ reports:<><path d="M4 3v17h17M8 15v-4m5 4V7m5 8V4"/><path d="M7 20h12" strokeWidth="2"/></>,
+ floor:<><path d="M9 3H3v7m0 4v7h8m4 0h6v-7m0-4V3h-8"/><rect x="8" y="8" width="8" height="8" rx="1.5"/><path d="M11 5h2m-2 14h2M5 11v2m14-2v2"/></>,
+ orders:<><path d="M6 3.5h12v17l-3-1.5-3 1.5-3-1.5-3 1.5v-17Z"/><path d="M9 8h6m-6 4h6m-6 4h3"/></>,
+ customers:<><circle cx="12" cy="7.5" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></>,
+ team:<><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2m1-15a3 3 0 0 1 0 6m3 3a5 5 0 0 1 2 4v2"/></>,
+ support:<><path d="M4 13V9a8 8 0 0 1 16 0v4M20 16v2a3 3 0 0 1-3 3h-3"/><rect x="2.5" y="10" width="4" height="7" rx="1.5"/><rect x="17.5" y="10" width="4" height="7" rx="1.5"/><path d="M11 21h3" strokeWidth="2.4"/></>,
+ outlets:<><path d="M4 9v12h16V9M3 9l2-6h14l2 6M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M9 21v-7h6v7"/></>,
+ audit:<><path d="M14 3H5v18h14V8l-5-5Zm0 0v5h5M8 12h3m-3 4h3m3-1 1.5 1.5L18 13"/></>,
+ inventory:<><path d="m3.5 7 8.5-4 8.5 4v10L12 21l-8.5-4V7Zm0 0 8.5 4 8.5-4M12 11v10M8 5l8.5 4"/></>,
+ payments:<><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M7 15h3"/><path d="M3 8h18" strokeWidth="2.2" opacity=".4"/></>,
+ navigation:<><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M5.5 8h1m-1 4h1m-1 4h1"/></>,
+ upload:<path d="M12 16V3m-4 4 4-4 4 4M4 14v6h16v-6"/>,
+ calculator:<><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h1m4 0h3M8 15h1m4 0h3M8 18h1m4 0h3"/></>,
+};

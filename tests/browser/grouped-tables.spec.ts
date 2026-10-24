@@ -153,10 +153,10 @@ test("POS category buttons stay large and rounded on desktop and phone while fil
     await expect(cards).toHaveCount(1);
     await all.click();
     await expect(cards).toHaveCount(6);
-    await page.getByLabel("Search menu", { exact: true }).fill("Mint cooler");
+    if(!await page.getByRole('searchbox',{name:'Search menu',exact:true}).isVisible())await page.getByRole('button',{name:'Search menu',exact:true}).click();await page.getByRole('searchbox',{name:'Search menu',exact:true}).fill("Mint cooler");
     await expect(cards).toHaveCount(1);
     await expect(cards).toContainText("Mint cooler");
-    await page.getByLabel("Search menu", { exact: true }).fill("");
+    if(!await page.getByRole('searchbox',{name:'Search menu',exact:true}).isVisible())await page.getByRole('button',{name:'Search menu',exact:true}).click();await page.getByRole('searchbox',{name:'Search menu',exact:true}).fill("");
     expect(await cart.innerText()).toBe(before);
     await page.screenshot({
       path: `verification/pos-category-boxes-${width}.png`,

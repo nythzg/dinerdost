@@ -3,12 +3,19 @@ import type { Database, Sql } from "@dinerdost/database";
 import { can, ensure, requirePermission, type Actor } from "@dinerdost/core";
 import { audit, command, one, scopedOrder, type Row } from "./shared";
 import { actorStream } from "./operational-access";
+const printOptions = z.object({
+  streams: z.array(z.enum(['FOOD','BAR'])).min(1).max(2).refine(values=>new Set(values).size===values.length,'Choose each department once.').optional(),
+  layout: z.enum(['SEPARATE','COMBINED']).default('SEPARATE'),
+}).strict();
+const receiptOptions = printOptions.extend({ticketIds:z.array(z.uuid()).min(1).max(200).optional()});
+type PrintOptions = z.infer<typeof receiptOptions>;
 async function printable(
   tx: Sql,
   actor: Actor,
   orderId: string,
   roundId: string,
   lock = false,
+  options: PrintOptions = {layout:'SEPARATE'},
 ) {
   ensure(
     can(actor, "orders") || can(actor, "kitchen"),
@@ -33,7 +40,7 @@ async function printable(
     "SELECT round_number,course FROM order_rounds WHERE id=$1 AND order_id=$2",
     [roundId, orderId],
   );
-  const tickets = (
+  let tickets = (
     await tx.query<Row>(
       "SELECT id,station,production_stream,created_at,auto_print_requested_at FROM kot_tickets WHERE order_id=$1 AND round_id=$2 AND ($3::text IS NULL OR production_stream=$3) ORDER BY station,production_stream,id" +
         (lock ? " FOR UPDATE" : ""),
@@ -49,10 +56,13 @@ async function printable(
   for (const ticket of tickets)
     ticket.items = (
       await tx.query(
-        "SELECT name,quantity_milli,variant,modifiers,note FROM order_items WHERE round_id=$1 AND station=$2 AND (production_stream=$3 OR $3='LEGACY') ORDER BY id",
+        "SELECT name,quantity_milli,variant,modifiers,note,production_stream FROM order_items WHERE round_id=$1 AND station=$2 AND (production_stream=$3 OR $3='LEGACY') ORDER BY id",
         [roundId, ticket.station, ticket.production_stream],
       )
     ).rows;
+  if(options.streams) tickets=tickets.map(ticket=>({...ticket,items:ticket.items.filter((item:Row)=>options.streams!.includes(item.production_stream))})).filter(ticket=>ticket.items.length);
+  if(options.ticketIds) tickets=tickets.filter(ticket=>options.ticketIds!.includes(ticket.id));
+  ensure(tickets.length>0,'KOT_NOT_RELEASED','No released KOT items match the selected departments.',409);
   const table = order.session_id
     ? (
         await tx.query(
@@ -67,6 +77,7 @@ async function printable(
     outletId: order.outlet_id,
     outlet: outlet.name,
     mode: outlet.kot_print_mode,
+    layout: options.layout,
     number: order.number,
     type: order.type,
     table,
@@ -80,11 +91,13 @@ export async function kotReceipt(
   actor: Actor,
   orderId: string,
   roundId: string,
+  input: unknown = {},
 ) {
+  const options=receiptOptions.parse(input);
   z.uuid().parse(orderId);
   z.uuid().parse(roundId);
   return db.transaction(actor.restroId, (tx) =>
-    printable(tx, actor, orderId, roundId),
+    printable(tx, actor, orderId, roundId, false, options),
   );
 }
 export async function requestKotPrint(
@@ -95,10 +108,7 @@ export async function requestKotPrint(
   roundId: string,
   input: unknown,
 ) {
-  const data = z
-    .object({ automatic: z.boolean().default(false) })
-    .strict()
-    .parse(input);
+  const data = printOptions.extend({automatic:z.boolean().default(false)}).parse(input);
   if (data.automatic) requirePermission(actor, "payments");
   return command(
     db,
@@ -107,7 +117,7 @@ export async function requestKotPrint(
     "KOT_PRINT_REQUESTED",
     { orderId, roundId, ...data },
     async (tx) => {
-      const receipt = await printable(tx, actor, orderId, roundId, true);
+      const receipt = await printable(tx, actor, orderId, roundId, true, data);
       ensure(
         !data.automatic || receipt.mode === "AUTO",
         "KOT_AUTO_DISABLED",
@@ -131,6 +141,8 @@ export async function requestKotPrint(
         outletId: receipt.outletId,
         newState: {
           automatic: data.automatic,
+          layout: data.layout,
+          streams: data.streams,
           ticketIds,
           physicalDeliveryConfirmed: false,
         },
@@ -139,7 +151,7 @@ export async function requestKotPrint(
           : "Staff requested KOT print / reprint",
       });
       return {
-        url: `/kot/${orderId}/${roundId}`,
+        url: `/kot/${orderId}/${roundId}?`+new URLSearchParams({layout:data.layout,tickets:ticketIds.join(','),...(data.streams?{streams:data.streams.join(',')}:{})}).toString(),
         alreadyRequested: false,
         ticketIds,
       };

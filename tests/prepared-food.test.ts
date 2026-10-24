@@ -541,6 +541,28 @@ test("customer listing sorts complete outlet visits, searches full phone server-
   });
   assert.equal(second.items.length, 3);
   assert.equal(second.hasMore, false);
+  const byName = await s.listCustomers(db, owner, {outletId:w.outletId,query:"Visit QA",sort:"NAME_ASC"});
+  assert.equal(byName.items[0].id,ids[0]);
+  const reverseName = await s.listCustomers(db, owner, {outletId:w.outletId,query:"Visit QA",sort:"NAME_DESC",page:1});
+  assert.equal(reverseName.items[0].id,ids[2]);
+  const noVisits = await s.listCustomers(db, owner, {outletId:w.outletId,query:"Visit QA",filter:"UNSETTLED"});
+  assert.equal(noVisits.total,0);
+  for (const sort of ["SPEND_DESC","POINTS_DESC"]) {
+    const result = await s.listCustomers(db, owner, {outletId:w.outletId,query:"Visit QA",sort,filter:"SETTLED"});
+    assert.equal(result.total,53);assert.equal(result.items.length,50);
+  }
+  const noPoints=await s.listCustomers(db,owner,{outletId:w.outletId,query:"Visit QA",filter:"HAS_POINTS"});
+  assert.equal(noPoints.total,0);
+  await db.transaction(owner.restroId,async tx=>{
+    const order=(await tx.query<any>("SELECT id FROM orders WHERE customer_id=$1 LIMIT 1",[ids[51]])).rows[0].id;
+    const round=key();
+    await tx.query("INSERT INTO order_rounds(id,restro_id,order_id,round_number,payable,paid) VALUES($1,$2,$3,1,12300,12300)",[round,owner.restroId,order]);
+    await tx.query("INSERT INTO loyalty_ledger(id,restro_id,outlet_id,customer_id,order_id,round_id,state,points,reason) VALUES($1,$2,$3,$4,$5,$6,'EARNED',99,'Synthetic sort coverage')",[key(),owner.restroId,w.outletId,ids[51],order,round]);
+  });
+  for(const sort of ["SPEND_DESC","POINTS_DESC"]){const sorted=await s.listCustomers(db,owner,{outletId:w.outletId,query:"Visit QA",sort});assert.equal(sorted.items[0].id,ids[51]);}
+  const positive=await s.listCustomers(db,owner,{outletId:w.outletId,query:"Visit QA",filter:"HAS_POINTS"});assert.equal(positive.total,1);assert.equal(positive.items[0].id,ids[51]);
+  await assert.rejects(()=>s.listCustomers(db,owner,{outletId:w.outletId,sort:"name; DROP TABLE customers"}));
+  await assert.rejects(()=>s.listCustomers(db,owner,{outletId:w.outletId,filter:"UNKNOWN"}));
   const phone = await s.listCustomers(db, owner, {
     outletId: w.outletId,
     query: "8000000052",

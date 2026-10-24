@@ -9,15 +9,12 @@ export function ActivationSwitch() {
   if (!isManager(data.actor)) return null;
   return (
     <div className="qr-ordering-control activation-control">
-      <span>
-        Auto activation{" "}
-        <small>{outlet.qr_auto_activate ? "ON" : "OFF · Staff approval"}</small>
-      </span>
+      <span>QR auto activation</span>
       <button
         type="button"
         role="switch"
-        className="qr-ordering-switch"
-        aria-label="Auto activation of tables"
+        className="feature-switch"
+        aria-label="QR auto activation"
         aria-checked={!!outlet.qr_auto_activate}
         disabled={busy}
         onClick={() =>
@@ -37,7 +34,7 @@ export function ActivationSwitch() {
             .catch(() => {})
         }
       >
-        <span />
+        <span>{outlet.qr_auto_activate ? "On" : "Off"}</span>
       </button>
     </div>
   );

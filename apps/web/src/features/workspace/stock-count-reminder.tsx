@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { can } from "@dinerdost/core";
+import { restaurantFeatureEnabled,can } from "@dinerdost/core";
 import { T } from "@/lib/staff-language";
 import { useDesk } from "./context";
 export function StockCountReminder() {
@@ -12,7 +12,7 @@ export function StockCountReminder() {
       <span>
         <T>{"Opening stock counts pending"}</T> · {count}
       </span>
-      {can(data.actor, "inventory") && (
+      {can(data.actor, "inventory") && restaurantFeatureEnabled(data.featureFlags,'inventory') && (
         <Link className="text-button" href="/app/inventory?view=counts">
           <T>{"Record counts"}</T>
         </Link>

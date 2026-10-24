@@ -1,3 +1,4 @@
+import {assertOutletOrderIntake} from './outlet-order-intake';
 import { z } from 'zod';
 import type { Database, Sql } from '@dinerdost/database';
 import { ensure, integer, isManager, quote, requireOutlet, requirePermission, roundAdjustment, type Actor } from '@dinerdost/core';
@@ -46,6 +47,7 @@ export async function replacePaidOrder(db:Database,actor:Actor,key:string,orderI
  ensure(new Set(data.charges.map(c=>c.name.toLowerCase())).size===data.charges.length,'DUPLICATE_CHARGE','Use each charge name once.');
  return command(db,actor,key,'PAID_ORDER_REPLACED',{orderId,...data},async tx=>{
   const {order,detail,rounds,payments,available}=await sourceRead(tx,actor,orderId,true);expectedVersion(order.version,data.version);
+  await assertOutletOrderIntake(tx,order.outlet_id);
   if(rounds.some(r=>!['HELD','SERVED'].includes(r.kot_status)))ensure(data.discardUnserved,'FOOD_DISPOSITION_REQUIRED','Confirm the original unserved food is discarded; it will not be restored or offered for resale.',409);
   const sessionId=data.fulfillment==='TAKEAWAY'?null:order.session_id;
   if(sessionId){const session=await one(tx,'SELECT status FROM table_sessions WHERE id=$1',[sessionId]);ensure(session.status==='OPEN','SESSION_CLOSED','The original visit is closed. Paid replacement cannot attach to another guest visit.',409);}

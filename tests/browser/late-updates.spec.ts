@@ -340,6 +340,7 @@ test("late KOT printing follows authorized release, supports manual reprint and 
   await page.reload();
   // Reload establishes the baseline; manual printing tests the iframe and print dialog entry.
   await page.getByRole("button", { name: "Print KOT", exact: true }).click();
+  await page.getByRole("dialog",{name:"Print KOT",exact:true}).getByRole("button",{name:"Print KOT",exact:true}).click();
   await expect(page.locator("html")).toHaveAttribute(
     "data-qa-print-count",
     "1",
@@ -404,7 +405,7 @@ test("late future downward rounding and compact descriptions agree with persiste
   await page.goto("/app/orders/" + order.id);
   await page.getByRole("button", { name: "Adjustments", exact: true }).click();
   await page
-    .getByRole("checkbox", { name: "Round down to ₹1", exact: true })
+    .getByRole("switch", { name: "Auto round down", exact: true })
     .check();
   await expect(page.getByRole("dialog")).toContainText("Saving does not change the current bill.");
   await page

@@ -69,7 +69,7 @@ test('counter/filter layout, calculator persistence, active orders, dot grid and
  await command(page,'recordPayment',{version:reviewed.order.rounds[0].version,method:'CASH',amount:Number(reviewed.order.rounds[0].payable)},{orderId:order.id,roundId:order.rounds[0].id});
  for(const ticket of (await workspace(page)).tickets.filter((t:any)=>t.order_id===order.id))await command(page,'kitchen',{state:'PREPARING'},{id:ticket.id});
  const original=await(await page.request.get('/api/orders/'+order.id)).json();
- const calcTrigger=page.locator('.calculator-dock>.workspace-dock-trigger'),calc=page.getByRole('region',{name:'Calculator',exact:true}),activeTrigger=page.locator('.active-orders-dock>.workspace-dock-trigger'),active=page.getByRole('region',{name:'Active orders',exact:true});
+ const calcTrigger=page.locator('.calculator-dock .workspace-dock-trigger'),calc=page.getByRole('region',{name:'Calculator',exact:true}),activeTrigger=page.locator('.active-orders-dock>.workspace-dock-trigger'),active=page.getByRole('region',{name:'Active orders',exact:true});
  for(const width of [1440,390]){
   await page.setViewportSize({width,height:width===390?844:1000});await page.goto('/app/orders');
   const counts=page.getByRole('group',{name:'Order counts',exact:true}),filters=page.getByRole('group',{name:'Filter orders',exact:true});

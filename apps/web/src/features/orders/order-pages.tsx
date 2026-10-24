@@ -13,7 +13,6 @@ import {
   can,
   isManager,
   taxBreakdown,
-  paymentMethods,
   paymentMethodNames,
   type PaymentMethod,
 } from "@dinerdost/core";
@@ -27,6 +26,7 @@ import { PaymentRecorder } from "./payment-recorder";
 import { IdentityForm } from "../customers/identity-form";
 import { ChargesEditor } from "./charges-editor";
 import { KotPrintControl } from "./kot-printer";
+import { PageHeadingTools } from "../workspace/page-heading-tools";
 import { ClearTableButton } from "../tables/clear-table-button";
 import { OrderIngredientUsage } from "../management/inventory-tools";
 import { OrderActionsMenu } from "./order-actions-menu";
@@ -59,40 +59,7 @@ export function Orders() {
       </div>
     <section className="panel orders-panel">
       <div className="panel-heading">
-        <div
-          className="tabs order-filter-tabs"
-          role="group"
-          aria-label="Filter orders"
-        >
-          {[
-            "Active",
-            "Accepted",
-            "Pending",
-            "Cancelled",
-            "Rejected",
-            "Settled",
-            "Reallocated",
-            "All",
-          ].map((s) => (
-            <button
-              key={s}
-              className={s === status ? "selected" : ""}
-              aria-pressed={s === status}
-              data-view={s}
-              onClick={() => setStatus(s)}
-            >
-              <span>
-                <T>{s === "All" ? "All orders" : s}</T>
-              </span>
-            </button>
-          ))}
-        </div>
-        <Link href="/app/pos" className="button primary">
-          <Icon name="plus" />
-          <T>{"New order"}</T>
-        </Link>
-      </div>
-      <div className="panel-tools">
+        <div className="order-header-actions">
         <div className="search-box">
           <Icon name="search" />
           <input
@@ -102,7 +69,11 @@ export function Orders() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <small>Counts include all orders · Latest 200 listed</small>
+        <Link href="/app/pos" className="button primary">
+          <Icon name="plus" />
+          <T>{"New order"}</T>
+        </Link>
+        </div>
       </div>
       <DataTable
         headers={[
@@ -338,7 +309,16 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
   };
   return (
     <>
-      {order.table && <p className="order-table-heading"><T>Table</T> {order.table.label}</p>}
+      <PageHeadingTools>
+        <div className="order-header-reference">
+          <strong aria-label={"Order number " + order.number}>#{order.number}</strong>
+          <small><time dateTime={order.created_at}>{new Intl.DateTimeFormat("en-IN", {weekday:"short",day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit",timeZone:"Asia/Kolkata"}).format(new Date(order.created_at))} IST</time></small>
+        </div>
+      </PageHeadingTools>
+      <div className="order-heading-context">
+        <p className={"order-table-heading"+(!order.table?" order-fulfilment-heading":"")}>{order.table ? <><T>Table</T> {order.table.label}</> : <T>{label(order.type)}</T>}</p>
+        <small className="order-channel-type" aria-label="Order channel and type">{label(order.source)} · {label(order.type)}</small>
+      </div>
       {(order.replacements??[]).map((r:Row)=><p className="panel" key={r.id}>Paid replacement · <a className="text-button" href={'/replacement/'+r.id} target="_blank" rel="noreferrer">{r.number}</a> · <Link className="text-button" href={'/app/orders/'+(r.source_order_id===order.id?r.target_order_id:r.source_order_id)}>{r.source_order_id===order.id?'Open replacement order':'Original order'}</Link> · Payment credit {money(r.amount)}</p>)}
       <div className="detail-toolbar">
         <Link className="subtle-link" href="/app/orders">
@@ -416,32 +396,6 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
       </div>
       <div className="order-layout">
         <div className="rounds">
-          <div className="order-summary-strip">
-            <div>
-              <small>
-                <T>{"Order"}</T>
-              </small>
-              <strong>#{order.number}</strong>
-            </div>
-            <div>
-              <small>
-                <T>{"Channel"}</T>
-              </small>
-              <strong>{label(order.source)}</strong>
-            </div>
-            <div>
-              <small>
-                <T>{"Type"}</T>
-              </small>
-              <strong>{label(order.type)}</strong>
-            </div>
-            <div>
-              <small>
-                <T>{"Opened"}</T>
-              </small>
-              <strong>{date(order.created_at)}</strong>
-            </div>
-          </div>
           {order.rounds.map((round: Row) => {
             const reward = rewards[round.id];
             const extra = { roundId: round.id };
@@ -840,31 +794,24 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
                 <T>{"Customer"}</T>
               </h2>
               {!locked && (
-                <button className="text-button" onClick={customer}>
-                  {order.customer_id ? "Edit" : "Add details"}
+                <button type="button" className="icon-button customer-details-trigger" aria-label={order.customer_id ? "Edit customer details" : "Add customer details"} title={order.customer_id ? "Edit customer details" : "Add customer details"} onClick={customer}>
+                  <Icon name="customers" />
                 </button>
               )}
             </div>
             {order.customer_snapshot ? (
-              <div className="customer-card">
-                <div className="customer-visit-row">
-                  <span className="avatar">
-                    {order.customer_snapshot.name.slice(0, 1)}
-                  </span>
-                  <span className="customer-visits">
-                    <strong>{order.customerVisits ?? 0}</strong>
-                    <T>{"Settled visits"}</T>
-                  </span>
+              <div className="customer-card order-customer-card">
+                <div className="order-customer-identity">
+                  <span className="avatar" aria-hidden="true">{order.customer_snapshot.name.slice(0, 1)}</span>
+                  <div className="order-customer-contact">
+                    <strong>{order.customer_snapshot.name}</strong>
+                    <span>{order.customer_snapshot.phone}</span>
+                  </div>
                 </div>
-                <strong>{order.customer_snapshot.name}</strong>
-                <span>{order.customer_snapshot.phone}</span>
-                <Badge
-                  value={
-                    order.customer_snapshot.otpVerified
-                      ? "PHONE_VERIFIED"
-                      : "PHONE_CAPTURED"
-                  }
-                />
+                <div className="order-customer-visits">
+                  <span><T>Settled visits</T></span>
+                  <strong>{order.customerVisits ?? 0}</strong>
+                </div>
               </div>
             ) : (
               <Empty
@@ -940,7 +887,7 @@ export function OrderDetail({ id, tableBills }: { id: string; tableBills?: Row }
               ],
               ["Received", order.totals.paid],
             ].map(([name, value],index) => (
-              <div className="total-row" key={String(name)+"-"+index}>
+              <div className={"total-row"+(name==="Total"?" bill-total-row":"")} key={String(name)+"-"+index}>
                 <span className="tax-row-label">{name}</span>
                 <strong>{money(value)}</strong>
               </div>
@@ -1030,30 +977,15 @@ function resolvePaymentForm(
 export function Payments() {
   const desk = useDesk(),
     { data, go, run } = desk;
-  const [method, setMethod] = useState("All");
-  const activity = useActivity(
-    "payments",
-    true,
-    method === "All" ? undefined : method,
-  );
+  const activity = useActivity("payments");
   const outlet = data.outlets.find((entry: Row) => entry.id === data.outletId);
   return (
-    <section className="panel">
+    <section className="panel payments-panel">
       <div className="panel-heading payment-page-toolbar">
-        {isManager(data.actor)&&<button className="button" onClick={()=>desk.modal('Refund requests',<RefundApprovals/>)}>Refund requests</button>}
-        <div className="tabs" aria-label="Payment methods">
-          {["All", ...paymentMethods].map((entry) => (
-            <button
-              key={entry}
-              className={method === entry ? "selected" : ""}
-              onClick={() => setMethod(entry)}
-            >
-              {entry === "All"
-                ? "All"
-                : paymentMethodNames[entry as PaymentMethod]}
-            </button>
-          ))}
-        </div>
+        <strong className="payment-history-title"><Icon name="payments"/>Payment history</strong>
+        {activity.controls}
+        <div className="payment-toolbar-actions">
+        {isManager(data.actor)&&<button className="button" onClick={()=>desk.modal('Refund requests',<RefundApprovals/>)}><Icon name="back"/>Refund requests</button>}
         {isManager(data.actor) && (
           <button
             className="button"
@@ -1067,8 +999,8 @@ export function Payments() {
             Payment methods
           </button>
         )}
+        </div>
       </div>
-      {activity.controls}
       <DataTable
         headers={[
           "Order",
@@ -1080,7 +1012,6 @@ export function Payments() {
           "",
         ]}
         rows={activity.items
-          .filter((entry: Row) => method === "All" || entry.method === method)
           .map((p: Row) => [
             <button
               className="text-button"
@@ -1116,19 +1047,15 @@ export function Invoices() {
   const { data } = useDesk();
   const [type, setType] = useState("All");
   const activity = useActivity(
-    "invoices",
+    type === "KOT" ? "kot" : "invoices",
     true,
-    type === "All"
-      ? undefined
-      : type === "Final invoices"
-        ? "FINAL_TAX_INVOICE"
-        : "PROVISIONAL_BILL",
+    type === "Final invoices" ? "FINAL_TAX_INVOICE" : undefined,
   );
   return (
     <section className="panel">
       <div className="panel-heading">
         <div className="tabs">
-          {["All", "Final invoices", "Provisional"].map((t) => (
+          {["All", "Final invoices", "KOT"].map((t) => (
             <button
               key={t}
               className={type === t ? "selected" : ""}
@@ -1140,15 +1067,26 @@ export function Invoices() {
         </div>
       </div>
       {activity.controls}
-      <DataTable
+      {type === "KOT" ? <DataTable
+        headers={["Order", "Round", "Table", "Department", "Station", "Quantity", "Status", "Created", ""]}
+        rows={activity.items.map((ticket: Row) => [
+          can(data.actor,"orders") ? <Link className="text-button" href={"/app/orders/"+ticket.order_id}>#{ticket.number}</Link> : '#'+ticket.number,
+          ticket.round_number,
+          ticket.table_label ?? label(ticket.order_type),
+          label(ticket.production_stream),
+          ticket.station,
+          Number(ticket.filter_quantity)/1000,
+          <Badge value={ticket.status}/>,
+          date(ticket.created_at),
+          (can(data.actor,"orders")||can(data.actor,"kitchen"))&&data.outlets.find((outlet:Row)=>outlet.id===data.outletId)?.kot_print_mode!=='OFF' ? <Link className="button small" href={'/kot/'+ticket.order_id+'/'+ticket.round_id+'?tickets='+ticket.id}>Open KOT</Link> : null,
+        ])}
+        empty="Kitchen order tickets will appear here once released."
+      /> : <DataTable
         headers={["Number", "Document", "Customer", "Amount", "Created", ""]}
         rows={activity.items
           .filter(
             (i: Row) =>
-              type === "All" ||
-              (type === "Final invoices"
-                ? i.document_type === "FINAL_TAX_INVOICE"
-                : i.document_type === "PROVISIONAL_BILL"),
+              type === "All" || i.document_type === "FINAL_TAX_INVOICE",
           )
           .map((i: Row) => [
             <Link className="text-button" href={"/invoice/" + i.id}>
@@ -1162,7 +1100,7 @@ export function Invoices() {
               Open
             </Link>,
           ])}
-      />
+      />}
       {activity.pagination}
     </section>
   );

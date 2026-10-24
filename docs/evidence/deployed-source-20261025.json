@@ -1,0 +1,2587 @@
+{
+  "deploymentId": "dpl_DW2u9iuRG8WfmL3Dtx7FQGEYREAd",
+  "sourceSnapshot": "8bc4d62a04496c75fb258b573e401ed66458900347509b43919858de5e83a280",
+  "runtimeFilesVerifiedIdentical": 430,
+  "files": [
+    {
+      "path": "apps/web/package.json",
+      "size": 480,
+      "mode": 33206,
+      "sha": "6ad65b88a134298018fed41fac5f375c70c48157"
+    },
+    {
+      "path": "apps/web/public/images/guest/teasing-face.svg",
+      "size": 1710,
+      "mode": 33206,
+      "sha": "ae6199f8062ec9fb8a2095800bc8e69bcdc964d5"
+    },
+    {
+      "path": "apps/web/src/app/api/active-orders/route.ts",
+      "size": 553,
+      "mode": 33206,
+      "sha": "bfa6c938f16b96b4f9d0a551747c98ae28373a5a"
+    },
+    {
+      "path": "apps/web/src/app/api/activity/[kind]/route.ts",
+      "size": 557,
+      "mode": 33206,
+      "sha": "48829cac54aacbaa4b7c16918873b91ed9faa0b3"
+    },
+    {
+      "path": "apps/web/src/app/api/auth/[action]/route.ts",
+      "size": 1367,
+      "mode": 33206,
+      "sha": "f015fdc2e3d6a5b14baae900c50f931a5c4f15af"
+    },
+    {
+      "path": "apps/web/src/app/api/bill-settings/route.ts",
+      "size": 463,
+      "mode": 33206,
+      "sha": "0c5c2e0f9b9ab0bc69994532471ac2ddd1fdcb03"
+    },
+    {
+      "path": "apps/web/src/app/api/calculator/route.ts",
+      "size": 853,
+      "mode": 33206,
+      "sha": "0c27b57864057a36bb9dac2e81904372eddf9d51"
+    },
+    {
+      "path": "apps/web/src/app/api/commands/route.ts",
+      "size": 14555,
+      "mode": 33206,
+      "sha": "ddb09fd575e072a63d4aed0a4b87d7ac4b5cfb84"
+    },
+    {
+      "path": "apps/web/src/app/api/customers/[id]/route.ts",
+      "size": 477,
+      "mode": 33206,
+      "sha": "0ebaab36a5370b0bc7dc34b43c1b069b506fff29"
+    },
+    {
+      "path": "apps/web/src/app/api/customers/route.ts",
+      "size": 628,
+      "mode": 33206,
+      "sha": "9edba9b8270757f1eb33513a697ffc8918610a18"
+    },
+    {
+      "path": "apps/web/src/app/api/customers/search/route.ts",
+      "size": 463,
+      "mode": 33206,
+      "sha": "79734535ca905823061640431428370b013d77ca"
+    },
+    {
+      "path": "apps/web/src/app/api/dish-report/route.ts",
+      "size": 525,
+      "mode": 33206,
+      "sha": "700f7fb4920832f8aeba2689c05d7718d7a244a2"
+    },
+    {
+      "path": "apps/web/src/app/api/enterprise/route.ts",
+      "size": 616,
+      "mode": 33206,
+      "sha": "0c7ca6d0793bfe1cacafedbfbbbbe90122ab5f5d"
+    },
+    {
+      "path": "apps/web/src/app/api/guest/[key]/route.ts",
+      "size": 4116,
+      "mode": 33206,
+      "sha": "865b457692ba44968691abf4b806b0a81ca2eaac"
+    },
+    {
+      "path": "apps/web/src/app/api/internal/push/dispatch/route.ts",
+      "size": 1109,
+      "mode": 33206,
+      "sha": "8af3ff272d8664a0eb33c7d92435d0ea240ce5d1"
+    },
+    {
+      "path": "apps/web/src/app/api/inventory-tools/route.ts",
+      "size": 1029,
+      "mode": 33206,
+      "sha": "10afad9011c9d1c87a863cdb3c3c2320240d813d"
+    },
+    {
+      "path": "apps/web/src/app/api/invites/[token]/route.ts",
+      "size": 1169,
+      "mode": 33206,
+      "sha": "ccab305a529d5545215dbf6b6d47f1264dfecc6d"
+    },
+    {
+      "path": "apps/web/src/app/api/invoices/[id]/route.ts",
+      "size": 455,
+      "mode": 33206,
+      "sha": "145d5e33ed0df836c47afdc24c52a84ad457cde0"
+    },
+    {
+      "path": "apps/web/src/app/api/loyalty/route.ts",
+      "size": 485,
+      "mode": 33206,
+      "sha": "3c1b60995643e9a351e1815af115367aa05beb93"
+    },
+    {
+      "path": "apps/web/src/app/api/menu-images/[id]/route.ts",
+      "size": 686,
+      "mode": 33206,
+      "sha": "d858860dba619c5db0e21d0e063698f6c96db916"
+    },
+    {
+      "path": "apps/web/src/app/api/notifications/route.ts",
+      "size": 1014,
+      "mode": 33206,
+      "sha": "79082e2354681e582855aedf461b08c99536505e"
+    },
+    {
+      "path": "apps/web/src/app/api/order-refunds/route.ts",
+      "size": 497,
+      "mode": 33206,
+      "sha": "89a839b3bc66424309ec502af461df2580a7c44b"
+    },
+    {
+      "path": "apps/web/src/app/api/order-replacements/route.ts",
+      "size": 416,
+      "mode": 33206,
+      "sha": "6654c794737f49842077711af2057e8b753ce4c1"
+    },
+    {
+      "path": "apps/web/src/app/api/orders/[id]/route.ts",
+      "size": 451,
+      "mode": 33206,
+      "sha": "959e01aaafbb4a9cd4fc1c1c9d9b53f2ca92eb3e"
+    },
+    {
+      "path": "apps/web/src/app/api/prep/route.ts",
+      "size": 466,
+      "mode": 33206,
+      "sha": "f20a9d738124ec39204abb000af3651a0ed2b841"
+    },
+    {
+      "path": "apps/web/src/app/api/production/route.ts",
+      "size": 407,
+      "mode": 33206,
+      "sha": "d90b93838bf05b38ba33267bbbc0fc679f3ce9d4"
+    },
+    {
+      "path": "apps/web/src/app/api/push/route.ts",
+      "size": 859,
+      "mode": 33206,
+      "sha": "c80824ddcc43a001d8911f75e59729ba14852d68"
+    },
+    {
+      "path": "apps/web/src/app/api/receipt-images/[id]/route.ts",
+      "size": 714,
+      "mode": 33206,
+      "sha": "bea39208e34258f0150dfeb64b4196093ded3567"
+    },
+    {
+      "path": "apps/web/src/app/api/recipe-profiles/route.ts",
+      "size": 395,
+      "mode": 33206,
+      "sha": "522587ddde38167794c7c6029ba22bd35a1b30b3"
+    },
+    {
+      "path": "apps/web/src/app/api/records/[kind]/route.ts",
+      "size": 598,
+      "mode": 33206,
+      "sha": "7477b75470f63f6931e7cec222399a791ee528dc"
+    },
+    {
+      "path": "apps/web/src/app/api/reports/route.ts",
+      "size": 501,
+      "mode": 33206,
+      "sha": "e204148eb7c6838dfb55cc5aa119e5d4ba9aef34"
+    },
+    {
+      "path": "apps/web/src/app/api/service-board/route.ts",
+      "size": 507,
+      "mode": 33206,
+      "sha": "fe6976fa592fbf734926f75a6321124d0286867d"
+    },
+    {
+      "path": "apps/web/src/app/api/staff-files/[id]/route.ts",
+      "size": 840,
+      "mode": 33206,
+      "sha": "17786ffad41c5166c81e1ea9bd6d15b60b26de62"
+    },
+    {
+      "path": "apps/web/src/app/api/staff/[id]/route.ts",
+      "size": 410,
+      "mode": 33206,
+      "sha": "f60bc194d914c3c143b7febc78af69b8dd6a252b"
+    },
+    {
+      "path": "apps/web/src/app/api/stock-counts/route.ts",
+      "size": 481,
+      "mode": 33206,
+      "sha": "087ce431b1fa587420c62a4884823cf1960c7c06"
+    },
+    {
+      "path": "apps/web/src/app/api/stock-reports/route.ts",
+      "size": 646,
+      "mode": 33206,
+      "sha": "e6c626a403e3588e1bb5306fdbcced861541e6d7"
+    },
+    {
+      "path": "apps/web/src/app/api/stock-summary/route.ts",
+      "size": 473,
+      "mode": 33206,
+      "sha": "c14743698255414eeccb7dcdb3645109fa62171c"
+    },
+    {
+      "path": "apps/web/src/app/api/store/[slug]/route.ts",
+      "size": 2252,
+      "mode": 33206,
+      "sha": "103c03816f36e4a6832fe727e34fd64018c6f80c"
+    },
+    {
+      "path": "apps/web/src/app/api/superadmin/auth/route.ts",
+      "size": 1570,
+      "mode": 33206,
+      "sha": "84df9d50bfdb72f165d68b3938a8967e39cf4fd3"
+    },
+    {
+      "path": "apps/web/src/app/api/superadmin/documents/route.ts",
+      "size": 2202,
+      "mode": 33206,
+      "sha": "a53b11db0e34997a5a4edbcda19e6531389d83bf"
+    },
+    {
+      "path": "apps/web/src/app/api/superadmin/files/route.ts",
+      "size": 2434,
+      "mode": 33206,
+      "sha": "1997f86fdcd70e1bc1984ef1eb7052974d04e1bc"
+    },
+    {
+      "path": "apps/web/src/app/api/superadmin/operations/route.ts",
+      "size": 2028,
+      "mode": 33206,
+      "sha": "6452fce86b1fedec47b3f3016908425bf05a3601"
+    },
+    {
+      "path": "apps/web/src/app/api/superadmin/route.ts",
+      "size": 2139,
+      "mode": 33206,
+      "sha": "124298c6ac6dd1e9c95f16e9d082e426ddcd5eca"
+    },
+    {
+      "path": "apps/web/src/app/api/superadmin/saas-document/route.ts",
+      "size": 3243,
+      "mode": 33206,
+      "sha": "16c319c6eefc00b203d6367a68dcf1aaab2d3ee6"
+    },
+    {
+      "path": "apps/web/src/app/api/superadmin/support-call/route.ts",
+      "size": 868,
+      "mode": 33206,
+      "sha": "ed772bc6b61dce0bf3af12ed8b0021f6c90a0cfa"
+    },
+    {
+      "path": "apps/web/src/app/api/superadmin/support-chat/route.ts",
+      "size": 1273,
+      "mode": 33206,
+      "sha": "04c0d81fbcdc338645c0028e660110e8975a953f"
+    },
+    {
+      "path": "apps/web/src/app/api/superadmin/support-view/route.ts",
+      "size": 1456,
+      "mode": 33206,
+      "sha": "5e5147d8b16620dd44401de0fe2ba0d0d5ffb4e2"
+    },
+    {
+      "path": "apps/web/src/app/api/superadmin/support/route.ts",
+      "size": 395,
+      "mode": 33206,
+      "sha": "680088abd31f39f6c05efd52aa4c661f171f0b44"
+    },
+    {
+      "path": "apps/web/src/app/api/support/call/route.ts",
+      "size": 864,
+      "mode": 33206,
+      "sha": "a7f801be5e97dfe7ab93dcf8417abda6d55b9ae2"
+    },
+    {
+      "path": "apps/web/src/app/api/support/route.ts",
+      "size": 1026,
+      "mode": 33206,
+      "sha": "814e44bc0931e0783a8aa2948f8db234aeba6952"
+    },
+    {
+      "path": "apps/web/src/app/api/tables/[id]/billing/route.ts",
+      "size": 523,
+      "mode": 33206,
+      "sha": "fd2548e18583b0b6dadce3ad096fef7c9174ed8f"
+    },
+    {
+      "path": "apps/web/src/app/api/uploads/route.ts",
+      "size": 3049,
+      "mode": 33206,
+      "sha": "87699caddebd123d0cd4bbc9fff8ceb17a4ed991"
+    },
+    {
+      "path": "apps/web/src/app/api/workspace/route.ts",
+      "size": 695,
+      "mode": 33206,
+      "sha": "a13aa6916e69b050e707159efc79ca895c27028e"
+    },
+    {
+      "path": "apps/web/src/app/app/[[...path]]/page.tsx",
+      "size": 424,
+      "mode": 33206,
+      "sha": "f19d582800c54cd8c6856d536aa7917ecb9d4beb"
+    },
+    {
+      "path": "apps/web/src/app/app/layout.tsx",
+      "size": 600,
+      "mode": 33206,
+      "sha": "acc8efb6cfc182a9d26a96a340504b80ec0dddd0"
+    },
+    {
+      "path": "apps/web/src/app/brand/[slug]/page.tsx",
+      "size": 1020,
+      "mode": 33206,
+      "sha": "4d012f39f2cbc4ad791a6fed57e93e591776d274"
+    },
+    {
+      "path": "apps/web/src/app/design-preview/page.tsx",
+      "size": 493,
+      "mode": 33206,
+      "sha": "23681213ac655d8baddb2c153a2e13fa832ad81e"
+    },
+    {
+      "path": "apps/web/src/app/design-preview/reference/page.tsx",
+      "size": 137,
+      "mode": 33206,
+      "sha": "fd2737ba7d367efdea1d8a6c7bf8cd0b20796c61"
+    },
+    {
+      "path": "apps/web/src/app/enterprise/page.tsx",
+      "size": 146,
+      "mode": 33206,
+      "sha": "7cb66e5d77efb520a656cc2833f393492e50cd07"
+    },
+    {
+      "path": "apps/web/src/app/globals.css",
+      "size": 50300,
+      "mode": 33206,
+      "sha": "5b85cad4a1d6883051d3d8e0a1b5576d45ee313f"
+    },
+    {
+      "path": "apps/web/src/app/invite/[token]/page.tsx",
+      "size": 417,
+      "mode": 33206,
+      "sha": "127bdf0094726f6503278deee553c9cc6bf7f86d"
+    },
+    {
+      "path": "apps/web/src/app/invoice/[id]/page.tsx",
+      "size": 1143,
+      "mode": 33206,
+      "sha": "e2aaed214ff5774489b31b51633a0510bf343b5a"
+    },
+    {
+      "path": "apps/web/src/app/kot/[orderId]/[roundId]/page.tsx",
+      "size": 2664,
+      "mode": 33206,
+      "sha": "1787d8a52c3185d769abe204fe2cc5b949c0fce8"
+    },
+    {
+      "path": "apps/web/src/app/layout.tsx",
+      "size": 1384,
+      "mode": 33206,
+      "sha": "20b6ef1ed1d513f591f9a4c2d59105693a87019b"
+    },
+    {
+      "path": "apps/web/src/app/page.tsx",
+      "size": 112,
+      "mode": 33206,
+      "sha": "f89bf200c7c4f7854366b6a1031243fa655abfe0"
+    },
+    {
+      "path": "apps/web/src/app/preview/route.ts",
+      "size": 3019,
+      "mode": 33206,
+      "sha": "bb786fb7f4e78c8decf0a0d1c2a78e0d4961b1d1"
+    },
+    {
+      "path": "apps/web/src/app/q/[key]/page.tsx",
+      "size": 247,
+      "mode": 33206,
+      "sha": "3ce4bce07f9c4eebda667af82b8857bf184312ad"
+    },
+    {
+      "path": "apps/web/src/app/refund/[id]/page.tsx",
+      "size": 2188,
+      "mode": 33206,
+      "sha": "a3c6863d02394c86af8bc4a2b322ec3eba06f522"
+    },
+    {
+      "path": "apps/web/src/app/replacement/[id]/page.tsx",
+      "size": 2305,
+      "mode": 33206,
+      "sha": "fd4fa3f2444fae8603eda97e27ce8b32795b5883"
+    },
+    {
+      "path": "apps/web/src/app/signin/page.tsx",
+      "size": 118,
+      "mode": 33206,
+      "sha": "828207af36c8051a3055697d8c5da550489637b3"
+    },
+    {
+      "path": "apps/web/src/app/signup/page.tsx",
+      "size": 125,
+      "mode": 33206,
+      "sha": "bc25f0dfadb7438c79c7058ef8b29d1ad8ec8b53"
+    },
+    {
+      "path": "apps/web/src/app/store/[slug]/page.tsx",
+      "size": 222,
+      "mode": 33206,
+      "sha": "70a031ee186c0bd64fa0fe24ce337cae6f35a2b8"
+    },
+    {
+      "path": "apps/web/src/app/superadmin/page.tsx",
+      "size": 223,
+      "mode": 33206,
+      "sha": "c30eb5434a446667ef70a7a3f9bf6edd7de72417"
+    },
+    {
+      "path": "apps/web/src/app/superadmin/setup/page.tsx",
+      "size": 192,
+      "mode": 33206,
+      "sha": "ef68cfe9ed788eea300ef824f03e3ab81b588c64"
+    },
+    {
+      "path": "apps/web/src/app/superadmin/signin/page.tsx",
+      "size": 180,
+      "mode": 33206,
+      "sha": "83a6dd34f4d78670935d03d92a0ee9d99bca3cdb"
+    },
+    {
+      "path": "apps/web/src/app/v2/orders/[id]/[operation]/route.ts",
+      "size": 894,
+      "mode": 33206,
+      "sha": "6d38c5accae9815f85dcd12228bfbe828160b3e7"
+    },
+    {
+      "path": "apps/web/src/app/v2/orders/[id]/rounds/[roundId]/[operation]/route.ts",
+      "size": 986,
+      "mode": 33206,
+      "sha": "6a8b4923399da796c7ab4d067f25bec02d4621f1"
+    },
+    {
+      "path": "apps/web/src/app/v2/orders/route.ts",
+      "size": 242,
+      "mode": 33206,
+      "sha": "608484bb2a1ced4a336fd0ecda0f69a0f3bf1929"
+    },
+    {
+      "path": "apps/web/src/app/v2/sessions/open/route.ts",
+      "size": 242,
+      "mode": 33206,
+      "sha": "3c9899c6a9a840c38089a9859d06c7013f0f6973"
+    },
+    {
+      "path": "apps/web/src/components/activity-filter.tsx",
+      "size": 12843,
+      "mode": 33206,
+      "sha": "467fed464280561f04bd9216147bba01d259e079"
+    },
+    {
+      "path": "apps/web/src/components/expiry-input.tsx",
+      "size": 1457,
+      "mode": 33206,
+      "sha": "dd152a8300a0b01e51969b0224644c68d45d5943"
+    },
+    {
+      "path": "apps/web/src/components/file-upload.tsx",
+      "size": 1684,
+      "mode": 33206,
+      "sha": "b06e29cf51efe9a932665fb18e0bee04f49c63da"
+    },
+    {
+      "path": "apps/web/src/components/interface-icons.tsx",
+      "size": 2565,
+      "mode": 33206,
+      "sha": "6b81daee7f3b5f893db4c5aaca64c9e825fcfd11"
+    },
+    {
+      "path": "apps/web/src/components/menu-picture.tsx",
+      "size": 766,
+      "mode": 33206,
+      "sha": "c9fd26dca115b604d4b2a83d2ae02f6a59d147be"
+    },
+    {
+      "path": "apps/web/src/components/page-search.tsx",
+      "size": 3477,
+      "mode": 33206,
+      "sha": "17bf9c67483b0c941bbc3e84db4959ea189b6f6e"
+    },
+    {
+      "path": "apps/web/src/components/password-input.tsx",
+      "size": 784,
+      "mode": 33206,
+      "sha": "6691dfdf8d6778bed4ae043c98037a4f988de809"
+    },
+    {
+      "path": "apps/web/src/components/ready-elapsed.tsx",
+      "size": 775,
+      "mode": 33206,
+      "sha": "c6c7d79948dd6e3838d3f0e13a53bc7b0a22e6e0"
+    },
+    {
+      "path": "apps/web/src/components/sidebar-profile.tsx",
+      "size": 3565,
+      "mode": 33206,
+      "sha": "30a5493a7819643c1ed5576c25cb41d551496135"
+    },
+    {
+      "path": "apps/web/src/components/table-qr.tsx",
+      "size": 3857,
+      "mode": 33206,
+      "sha": "8ee5e0a5e2a1d700638d2d1063d1ae6e1df83c84"
+    },
+    {
+      "path": "apps/web/src/components/ui.tsx",
+      "size": 14973,
+      "mode": 33206,
+      "sha": "a633c40b422b9c66df1ed76ce387c916def503f1"
+    },
+    {
+      "path": "apps/web/src/components/upload-field.css",
+      "size": 5512,
+      "mode": 33206,
+      "sha": "58c05bc08b425d2173a45e71329953defbfe61b3"
+    },
+    {
+      "path": "apps/web/src/components/upload-field.tsx",
+      "size": 7095,
+      "mode": 33206,
+      "sha": "d4e12edd992a27e2ad6fab52e8fff23e431fbb88"
+    },
+    {
+      "path": "apps/web/src/features/auth/auth-form.tsx",
+      "size": 4049,
+      "mode": 33206,
+      "sha": "a0315590bd37c679d8b0ec444760bcb66883c226"
+    },
+    {
+      "path": "apps/web/src/features/customers/customer-fields.tsx",
+      "size": 5001,
+      "mode": 33206,
+      "sha": "37e66083c2cea3c4823977bb39ec1494b5ee5ec4"
+    },
+    {
+      "path": "apps/web/src/features/customers/customer-profile.tsx",
+      "size": 2921,
+      "mode": 33206,
+      "sha": "cd3cd364a48e4817a68c865910316a43e3ca2a8e"
+    },
+    {
+      "path": "apps/web/src/features/customers/identity-form.tsx",
+      "size": 1543,
+      "mode": 33206,
+      "sha": "45264e73f9ce9be47adddc21d0d9fdfadf99c5da"
+    },
+    {
+      "path": "apps/web/src/features/customers/loyalty-leaderboard.tsx",
+      "size": 3346,
+      "mode": 33206,
+      "sha": "0e26624dcec5f6e6d53c9767d5d061e2a21e0ff5"
+    },
+    {
+      "path": "apps/web/src/features/design-preview/ecosystem-preview.css",
+      "size": 55525,
+      "mode": 33206,
+      "sha": "b7ee255007c69b4db979600c09e83093ce507d23"
+    },
+    {
+      "path": "apps/web/src/features/design-preview/ecosystem-preview.tsx",
+      "size": 42867,
+      "mode": 33206,
+      "sha": "7f3fa2be229cdeb6539f916b38384eab2813fda4"
+    },
+    {
+      "path": "apps/web/src/features/design-preview/preview-appearance.tsx",
+      "size": 4246,
+      "mode": 33206,
+      "sha": "799480672f7b0469b48d2075e28eb2fcc698decd"
+    },
+    {
+      "path": "apps/web/src/features/design-preview/selected-refinements.css",
+      "size": 105062,
+      "mode": 33206,
+      "sha": "f835f31980bf661ce8ccc2825d4896435cb725ad"
+    },
+    {
+      "path": "apps/web/src/features/design-preview/working-alerts.css",
+      "size": 5445,
+      "mode": 33206,
+      "sha": "ac185a7e8bd734ab894cda376d0525d028be92f5"
+    },
+    {
+      "path": "apps/web/src/features/design-preview/working-interface.css",
+      "size": 21820,
+      "mode": 33206,
+      "sha": "ec6f9488854b6a945b081c5de9997046f1492b2a"
+    },
+    {
+      "path": "apps/web/src/features/design-preview/working-preview-entry.tsx",
+      "size": 615,
+      "mode": 33206,
+      "sha": "9cf4db9db5dc53c535edeb838f59b9e0a9ea7755"
+    },
+    {
+      "path": "apps/web/src/features/guest/guest-bill-breakdown.tsx",
+      "size": 1198,
+      "mode": 33206,
+      "sha": "427ff7e021d67c593e4532ffac00e8961cceb595"
+    },
+    {
+      "path": "apps/web/src/features/guest/guest-checkout.tsx",
+      "size": 6473,
+      "mode": 33206,
+      "sha": "65323059556269375eacc31048a644f3ca38fbcb"
+    },
+    {
+      "path": "apps/web/src/features/guest/guest-games.tsx",
+      "size": 1792,
+      "mode": 33206,
+      "sha": "df7aa2d97f09e8d87410fb542342eacbcef46eca"
+    },
+    {
+      "path": "apps/web/src/features/guest/guest-journey.ts",
+      "size": 1477,
+      "mode": 33206,
+      "sha": "598da68a70bd75db70a09e9627d95766b9d5ebbb"
+    },
+    {
+      "path": "apps/web/src/features/guest/guest-page.tsx",
+      "size": 29448,
+      "mode": 33206,
+      "sha": "ac69bfad9f0cea46a5310f27f35b3ccf2811be0c"
+    },
+    {
+      "path": "apps/web/src/features/guest/guest.css",
+      "size": 4767,
+      "mode": 33206,
+      "sha": "f3eee647321d8d28108d96854ea5c594b3eb24d7"
+    },
+    {
+      "path": "apps/web/src/features/management/attendance-page.tsx",
+      "size": 6009,
+      "mode": 33206,
+      "sha": "0da5e435e530d3e046ec6a9566a690254fa94302"
+    },
+    {
+      "path": "apps/web/src/features/management/audit-changes.tsx",
+      "size": 6187,
+      "mode": 33206,
+      "sha": "8e132086b042d7b362f51545c357316cd67cf546"
+    },
+    {
+      "path": "apps/web/src/features/management/category-manager.tsx",
+      "size": 2911,
+      "mode": 33206,
+      "sha": "cc9a691d7847ad34bce376bf472c6e1eed450457"
+    },
+    {
+      "path": "apps/web/src/features/management/daily-stock-counts.tsx",
+      "size": 12556,
+      "mode": 33206,
+      "sha": "27bbbb607d27c08bba2ce443a15f942b6c80ebec"
+    },
+    {
+      "path": "apps/web/src/features/management/dish-report.tsx",
+      "size": 3387,
+      "mode": 33206,
+      "sha": "55fb3921739433d47434559b5c14715de0d2e110"
+    },
+    {
+      "path": "apps/web/src/features/management/ingredient-expiry.tsx",
+      "size": 1685,
+      "mode": 33206,
+      "sha": "eae442fabe4ac3167fe8c27593bfbf614ad87229"
+    },
+    {
+      "path": "apps/web/src/features/management/ingredient-planner.tsx",
+      "size": 4637,
+      "mode": 33206,
+      "sha": "87c890393e4bb5eb31640a5ded8f6875031a09cf"
+    },
+    {
+      "path": "apps/web/src/features/management/integration-requirements.tsx",
+      "size": 2997,
+      "mode": 33206,
+      "sha": "c881a469a544a3d0e07c45ffa0cb829f4ed6678f"
+    },
+    {
+      "path": "apps/web/src/features/management/inventory-actions.tsx",
+      "size": 3420,
+      "mode": 33206,
+      "sha": "01e21c3a4723570ba1eba33604bbdb53667aa818"
+    },
+    {
+      "path": "apps/web/src/features/management/inventory-csv.ts",
+      "size": 423,
+      "mode": 33206,
+      "sha": "cc27a8aadcef1ebc1825878d6d24ea3d50097a3b"
+    },
+    {
+      "path": "apps/web/src/features/management/inventory-tools.tsx",
+      "size": 6236,
+      "mode": 33206,
+      "sha": "fd4b0f34e6fc1a15fc3a75796c8828e47a947f38"
+    },
+    {
+      "path": "apps/web/src/features/management/management-pages.tsx",
+      "size": 35893,
+      "mode": 33206,
+      "sha": "2ee4e32b15b5ea9c325c485d5498966d8409a51d"
+    },
+    {
+      "path": "apps/web/src/features/management/material-setup.tsx",
+      "size": 3565,
+      "mode": 33206,
+      "sha": "ed5e6ef62d29d58ed8a83136f8403d4f9de2f1ee"
+    },
+    {
+      "path": "apps/web/src/features/management/menu-editor.tsx",
+      "size": 6951,
+      "mode": 33206,
+      "sha": "68fbcaee0d30a4a7d7278c468ce81e16a177b6d2"
+    },
+    {
+      "path": "apps/web/src/features/management/menu-options.tsx",
+      "size": 3905,
+      "mode": 33206,
+      "sha": "83d38b6f7437db97c2707b855b57f4feefc71b07"
+    },
+    {
+      "path": "apps/web/src/features/management/outlet-expiry-review.tsx",
+      "size": 3598,
+      "mode": 33206,
+      "sha": "6571f649ee15049414092338317234644baf8e82"
+    },
+    {
+      "path": "apps/web/src/features/management/prep-plan.tsx",
+      "size": 1382,
+      "mode": 33206,
+      "sha": "0640f31a483804859dd31fbdfc0e4fd3d30170b5"
+    },
+    {
+      "path": "apps/web/src/features/management/production.tsx",
+      "size": 9292,
+      "mode": 33206,
+      "sha": "9dbadc1f87a9dcbf0a83ffdfb5f66330f1e03bdd"
+    },
+    {
+      "path": "apps/web/src/features/management/purchase-receipt.tsx",
+      "size": 5874,
+      "mode": 33206,
+      "sha": "96727ae67516b055ec035f8a08eff63ad5e825d9"
+    },
+    {
+      "path": "apps/web/src/features/management/receipt-settings.tsx",
+      "size": 2751,
+      "mode": 33206,
+      "sha": "878a18bfcb8819906cb05f2416a0b8112bd08e87"
+    },
+    {
+      "path": "apps/web/src/features/management/recipe-choices.tsx",
+      "size": 5379,
+      "mode": 33206,
+      "sha": "fd399e6d0bac12c75a192c4170c481f3fdcb2237"
+    },
+    {
+      "path": "apps/web/src/features/management/record-pages.tsx",
+      "size": 18132,
+      "mode": 33206,
+      "sha": "144000a92265f40a7a1a2a940c8749f6070a4e4b"
+    },
+    {
+      "path": "apps/web/src/features/management/report-charts.tsx",
+      "size": 6054,
+      "mode": 33206,
+      "sha": "d24a7fc897f370349b7483e8b2b327755881ddb1"
+    },
+    {
+      "path": "apps/web/src/features/management/reports-page.tsx",
+      "size": 10960,
+      "mode": 33206,
+      "sha": "e25fb4dd12e50fa1fdcc14803486c7070ea5b952"
+    },
+    {
+      "path": "apps/web/src/features/management/reservation-editor.tsx",
+      "size": 7620,
+      "mode": 33206,
+      "sha": "6e24938f23952d78aa85a56a5d475cdd8b97e3bc"
+    },
+    {
+      "path": "apps/web/src/features/management/saved-recipe-choices.tsx",
+      "size": 774,
+      "mode": 33206,
+      "sha": "49acd7b4a26d56b9908d9dd7866edd0fa04f69e7"
+    },
+    {
+      "path": "apps/web/src/features/management/stock-receipt.tsx",
+      "size": 4749,
+      "mode": 33206,
+      "sha": "962c614c741a9d361b95399174b40cef6650e68c"
+    },
+    {
+      "path": "apps/web/src/features/management/waste-report.tsx",
+      "size": 3425,
+      "mode": 33206,
+      "sha": "7243d7afb105bf398359b778ca573567994057f6"
+    },
+    {
+      "path": "apps/web/src/features/orders/adjustments-editor.tsx",
+      "size": 7561,
+      "mode": 33206,
+      "sha": "fec06394c47e0a8f6711333762e634e0f7f7c885"
+    },
+    {
+      "path": "apps/web/src/features/orders/charges-editor.tsx",
+      "size": 4677,
+      "mode": 33206,
+      "sha": "c526303dacab28db1e0d9541546e1311ecc01851"
+    },
+    {
+      "path": "apps/web/src/features/orders/device-ban-control.tsx",
+      "size": 2526,
+      "mode": 33206,
+      "sha": "09946dfac2baec9217f462274679cbdec6d49f5c"
+    },
+    {
+      "path": "apps/web/src/features/orders/kot-paper-size.tsx",
+      "size": 931,
+      "mode": 33206,
+      "sha": "067b4765c42e843cec42039ad2fd0fae6e152740"
+    },
+    {
+      "path": "apps/web/src/features/orders/kot-printer.tsx",
+      "size": 5797,
+      "mode": 33206,
+      "sha": "79ff35205f90d86797ede48b36e26ecb9d70d47f"
+    },
+    {
+      "path": "apps/web/src/features/orders/loyalty-claim.tsx",
+      "size": 2564,
+      "mode": 33206,
+      "sha": "ca8572f3b5971f9f6024fedb8b01ff9dacd3dd03"
+    },
+    {
+      "path": "apps/web/src/features/orders/order-actions-menu.tsx",
+      "size": 3815,
+      "mode": 33206,
+      "sha": "970f3ccbcc7e9ffc9906bf297517d43fea5e733f"
+    },
+    {
+      "path": "apps/web/src/features/orders/order-pages.tsx",
+      "size": 48500,
+      "mode": 33206,
+      "sha": "1dce6d7e75c9508a9d5b882604e78ebcf352da26"
+    },
+    {
+      "path": "apps/web/src/features/orders/paid-replacement.tsx",
+      "size": 7286,
+      "mode": 33206,
+      "sha": "f8df42758451d5fa098e05405be9c1ce89d77b51"
+    },
+    {
+      "path": "apps/web/src/features/orders/payment-method-settings.tsx",
+      "size": 1930,
+      "mode": 33206,
+      "sha": "380e6e9ea2143e224b567f7a792464f5c715362e"
+    },
+    {
+      "path": "apps/web/src/features/orders/payment-recorder.tsx",
+      "size": 2590,
+      "mode": 33206,
+      "sha": "75928a91ef5358dc187dc392a17dd280828f1131"
+    },
+    {
+      "path": "apps/web/src/features/orders/print-button.tsx",
+      "size": 2242,
+      "mode": 33206,
+      "sha": "815d3a5b3727efd00c3493c7dcb3d1b6ef376dd0"
+    },
+    {
+      "path": "apps/web/src/features/orders/refund-print.tsx",
+      "size": 139,
+      "mode": 33206,
+      "sha": "7492be6012ed489c7c2819e95e0efe431ce648c8"
+    },
+    {
+      "path": "apps/web/src/features/orders/refunds.tsx",
+      "size": 4562,
+      "mode": 33206,
+      "sha": "c3365cdb75741d5bfb3125b208362aec14a5d1df"
+    },
+    {
+      "path": "apps/web/src/features/orders/replacement-print.tsx",
+      "size": 147,
+      "mode": 33206,
+      "sha": "41a5891f601811bca682cb87a2700483a5af3aad"
+    },
+    {
+      "path": "apps/web/src/features/orders/reward-entry.tsx",
+      "size": 1157,
+      "mode": 33206,
+      "sha": "f976dd4afd378ffe3b8536c920b8896f5dc6dd6d"
+    },
+    {
+      "path": "apps/web/src/features/orders/round-editor.tsx",
+      "size": 8804,
+      "mode": 33206,
+      "sha": "ffbd6361ebc4bbe23ab9d930055c3f34bedd064a"
+    },
+    {
+      "path": "apps/web/src/features/orders/selected-round-actions.tsx",
+      "size": 9335,
+      "mode": 33206,
+      "sha": "3a171c59f9f4ac05c4f3dd25d60b3891cdca2aed"
+    },
+    {
+      "path": "apps/web/src/features/orders/tax-editor.tsx",
+      "size": 2546,
+      "mode": 33206,
+      "sha": "2ad89c3c56460cb185f88ebd5f5ec39ea5cdc463"
+    },
+    {
+      "path": "apps/web/src/features/orders/tax-settings.tsx",
+      "size": 4349,
+      "mode": 33206,
+      "sha": "b53fa5c9008c1f30a80ebe5ecf6e370c6423c882"
+    },
+    {
+      "path": "apps/web/src/features/orders/thermal-receipt.css",
+      "size": 4599,
+      "mode": 33206,
+      "sha": "e3a5b5fefe681d1b7af2cff2799c2da175c7a9bb"
+    },
+    {
+      "path": "apps/web/src/features/orders/thermal-receipt.tsx",
+      "size": 8534,
+      "mode": 33206,
+      "sha": "9710d1ece87f82bd77cb65df22cf2ac08cd35657"
+    },
+    {
+      "path": "apps/web/src/features/qr/qr-page.tsx",
+      "size": 10143,
+      "mode": 33206,
+      "sha": "ad3f37cb387dcffba8f8417281ed40917e7ad658"
+    },
+    {
+      "path": "apps/web/src/features/qr/qr-workspace.css",
+      "size": 5581,
+      "mode": 33206,
+      "sha": "9fc1a16d0e251dd0f7e5a3b833c511e310ced26d"
+    },
+    {
+      "path": "apps/web/src/features/qr/qr.css",
+      "size": 3281,
+      "mode": 33206,
+      "sha": "d44605d7ff942724e826f21c665dc4f82ed5b5f5"
+    },
+    {
+      "path": "apps/web/src/features/storefront/storefront-page.tsx",
+      "size": 17709,
+      "mode": 33206,
+      "sha": "533ff106daab151f6e134b8e05751eca0b2a416a"
+    },
+    {
+      "path": "apps/web/src/features/storefront/storefront.css",
+      "size": 2245,
+      "mode": 33206,
+      "sha": "50526c82a188cb04cb6313e252e3c87be552ff67"
+    },
+    {
+      "path": "apps/web/src/features/superadmin/console-navigation.ts",
+      "size": 2072,
+      "mode": 33206,
+      "sha": "c2e2aa664d618496b7a1dad9657dbc353d4227a5"
+    },
+    {
+      "path": "apps/web/src/features/superadmin/console-overview.tsx",
+      "size": 5993,
+      "mode": 33206,
+      "sha": "288d91a28d175ba694f902428aa36529aaae8010"
+    },
+    {
+      "path": "apps/web/src/features/superadmin/console-shell.tsx",
+      "size": 9487,
+      "mode": 33206,
+      "sha": "502899ed3d08eea9bbf5aa568a30f1c8de218b49"
+    },
+    {
+      "path": "apps/web/src/features/superadmin/enterprise-reports.tsx",
+      "size": 2590,
+      "mode": 33206,
+      "sha": "889b2b09fe1a7240425eee703de6cc775ad62ea4"
+    },
+    {
+      "path": "apps/web/src/features/superadmin/feature-controls.tsx",
+      "size": 4107,
+      "mode": 33206,
+      "sha": "15aee0fd283c6114351aff6634b9f7de000907c6"
+    },
+    {
+      "path": "apps/web/src/features/superadmin/operations-panel.tsx",
+      "size": 30818,
+      "mode": 33206,
+      "sha": "813c392881a8e81f742e18ef96b64ded005b1fb3"
+    },
+    {
+      "path": "apps/web/src/features/superadmin/platform-signin.tsx",
+      "size": 3158,
+      "mode": 33206,
+      "sha": "9420acbaa66e98d532f155fa41cb1cae20330b8f"
+    },
+    {
+      "path": "apps/web/src/features/superadmin/restaurant-data.tsx",
+      "size": 9700,
+      "mode": 33206,
+      "sha": "d5473c5b1c057fa33fc0520e8602cd08e0d036a5"
+    },
+    {
+      "path": "apps/web/src/features/superadmin/superadmin-panel.tsx",
+      "size": 27469,
+      "mode": 33206,
+      "sha": "5454d84211f8a9f0bc7624f12c2da6f6af8e0dee"
+    },
+    {
+      "path": "apps/web/src/features/superadmin/superadmin.css",
+      "size": 38142,
+      "mode": 33206,
+      "sha": "49c3287f43aaf8e00fdd7281f6626a080841977e"
+    },
+    {
+      "path": "apps/web/src/features/superadmin/support-notifications.tsx",
+      "size": 5711,
+      "mode": 33206,
+      "sha": "c705759cc76d8cd082c6b7a7f982d64ec367d307"
+    },
+    {
+      "path": "apps/web/src/features/support/support-call.tsx",
+      "size": 7547,
+      "mode": 33206,
+      "sha": "24ab8921443412ca9ba5c522c57bf878d3da4326"
+    },
+    {
+      "path": "apps/web/src/features/support/support-center.css",
+      "size": 17675,
+      "mode": 33206,
+      "sha": "6486028800133fbf7ccc26a17b8787c57a78d98f"
+    },
+    {
+      "path": "apps/web/src/features/support/support-center.tsx",
+      "size": 21198,
+      "mode": 33206,
+      "sha": "15413247876f87be74627b19a26786bea0ec6455"
+    },
+    {
+      "path": "apps/web/src/features/tables/activation-switch.tsx",
+      "size": 1285,
+      "mode": 33206,
+      "sha": "3b2e7407e8b9e1e5a50aaee3936073f00bfe8562"
+    },
+    {
+      "path": "apps/web/src/features/tables/clear-table-button.tsx",
+      "size": 1890,
+      "mode": 33206,
+      "sha": "926790f3ad7da41f2484ffb90136dfea2348643d"
+    },
+    {
+      "path": "apps/web/src/features/tables/explore-header.tsx",
+      "size": 3420,
+      "mode": 33206,
+      "sha": "afaf8b959e15614917e40fd4ca6327e279a942fc"
+    },
+    {
+      "path": "apps/web/src/features/tables/explore-viewport.tsx",
+      "size": 4118,
+      "mode": 33206,
+      "sha": "5ea1db155f7d5e6280173dc035339bd95f799042"
+    },
+    {
+      "path": "apps/web/src/features/tables/fixture-details.tsx",
+      "size": 12872,
+      "mode": 33206,
+      "sha": "7da1bc8c1ce0e7bdec77b002f4c6fcdc929a6991"
+    },
+    {
+      "path": "apps/web/src/features/tables/floor-editor-state.ts",
+      "size": 4040,
+      "mode": 33206,
+      "sha": "4b2050623ed3e6e1ee7f3b0f3791d4bb36ab82eb"
+    },
+    {
+      "path": "apps/web/src/features/tables/floor-plan.tsx",
+      "size": 61254,
+      "mode": 33206,
+      "sha": "afc031c94e8a1394b46710d035ddd57015dabf9e"
+    },
+    {
+      "path": "apps/web/src/features/tables/floor-snapping.ts",
+      "size": 14828,
+      "mode": 33206,
+      "sha": "1fbf284a379fe578bb7616e5c93ec658c0a39994"
+    },
+    {
+      "path": "apps/web/src/features/tables/group-controls.tsx",
+      "size": 3206,
+      "mode": 33206,
+      "sha": "a1a83c481bd6a9ca6f59c2887a110c2c8ad91643"
+    },
+    {
+      "path": "apps/web/src/features/tables/outline-editor.tsx",
+      "size": 11397,
+      "mode": 33206,
+      "sha": "5ef574f5550c8efcbb5ea147ea8b08e362a36198"
+    },
+    {
+      "path": "apps/web/src/features/tables/rename-table.tsx",
+      "size": 1008,
+      "mode": 33206,
+      "sha": "6dace6348d29a557fcd926cf7e8dae85cb0a842c"
+    },
+    {
+      "path": "apps/web/src/features/tables/roundness-control.tsx",
+      "size": 1504,
+      "mode": 33206,
+      "sha": "cb2cb7f085371323d33856be7b1a68c81507ecbc"
+    },
+    {
+      "path": "apps/web/src/features/tables/snapping-controls.tsx",
+      "size": 1756,
+      "mode": 33206,
+      "sha": "10a56f71f575b3fb6aa41e1b53440eda318fe79d"
+    },
+    {
+      "path": "apps/web/src/features/tables/table-actions.tsx",
+      "size": 5639,
+      "mode": 33206,
+      "sha": "5b697fe25f020c8e160f151ca0d23e6f3c00aa58"
+    },
+    {
+      "path": "apps/web/src/features/tables/table-billing.tsx",
+      "size": 3761,
+      "mode": 33206,
+      "sha": "c458587c1f317d30281fe0a8c46987d45e03d308"
+    },
+    {
+      "path": "apps/web/src/features/tables/tables.css",
+      "size": 11842,
+      "mode": 33206,
+      "sha": "b0c12966a026b828607c8733e7305787271ebe8d"
+    },
+    {
+      "path": "apps/web/src/features/tables/use-table-activity.ts",
+      "size": 366,
+      "mode": 33206,
+      "sha": "fea1763d9a4c99d9110f56a65b70689ec52d381c"
+    },
+    {
+      "path": "apps/web/src/features/team/accept-invitation.tsx",
+      "size": 3522,
+      "mode": 33206,
+      "sha": "caac79e3db7662f85fdd140bbf546c72502e6517"
+    },
+    {
+      "path": "apps/web/src/features/team/member-editor.tsx",
+      "size": 5404,
+      "mode": 33206,
+      "sha": "9e931d75b02815626abffeff048231c60a36f5f0"
+    },
+    {
+      "path": "apps/web/src/features/team/team-access.tsx",
+      "size": 5415,
+      "mode": 33206,
+      "sha": "4cb6ceb24c1e6ff587d07472ca4e796cbb8127c5"
+    },
+    {
+      "path": "apps/web/src/features/team/team-page.tsx",
+      "size": 5029,
+      "mode": 33206,
+      "sha": "74c4a34eb066cbe75e62b37163f97945007d8d79"
+    },
+    {
+      "path": "apps/web/src/features/team/team.css",
+      "size": 806,
+      "mode": 33206,
+      "sha": "f2c5d5c85fe2362fe2db27e684bbe2d724f9b0e3"
+    },
+    {
+      "path": "apps/web/src/features/workspace/calculator-display.ts",
+      "size": 980,
+      "mode": 33206,
+      "sha": "0b3404fe693c3a19217837b07efb695cc8292844"
+    },
+    {
+      "path": "apps/web/src/features/workspace/context.tsx",
+      "size": 827,
+      "mode": 33206,
+      "sha": "c88ac34e1f92c03b8d7ea798142889b3e516e638"
+    },
+    {
+      "path": "apps/web/src/features/workspace/dish-picker.tsx",
+      "size": 4729,
+      "mode": 33206,
+      "sha": "65aa5405462f630cb12affeed3d993a032da8dcb"
+    },
+    {
+      "path": "apps/web/src/features/workspace/kitchen-stage-switch.tsx",
+      "size": 957,
+      "mode": 33206,
+      "sha": "52e1743aaec9c558993d309640da8ba7aa7ce478"
+    },
+    {
+      "path": "apps/web/src/features/workspace/notification-bell.tsx",
+      "size": 5036,
+      "mode": 33206,
+      "sha": "d57124ad500210a3eaa9258a7acabe9747f7294b"
+    },
+    {
+      "path": "apps/web/src/features/workspace/outlet-order-switch.tsx",
+      "size": 941,
+      "mode": 33206,
+      "sha": "538821d8e982405f4c092d89d3c9e92937e77efe"
+    },
+    {
+      "path": "apps/web/src/features/workspace/package-panel.tsx",
+      "size": 941,
+      "mode": 33206,
+      "sha": "a7ec0861752e05e12429e5cc99a838029939252b"
+    },
+    {
+      "path": "apps/web/src/features/workspace/page-heading-tools.tsx",
+      "size": 512,
+      "mode": 33206,
+      "sha": "a4248acef5d27bb3f868ed409d3294da21d81037"
+    },
+    {
+      "path": "apps/web/src/features/workspace/reservation-reminders.tsx",
+      "size": 1915,
+      "mode": 33206,
+      "sha": "2286459dc544dfcc6443f9773a41e837ff855685"
+    },
+    {
+      "path": "apps/web/src/features/workspace/service-board.tsx",
+      "size": 7124,
+      "mode": 33206,
+      "sha": "4ef5722e8ecd60633d836ae4af9bf32a1f99f46d"
+    },
+    {
+      "path": "apps/web/src/features/workspace/service-pages.tsx",
+      "size": 52036,
+      "mode": 33206,
+      "sha": "5a2e589a52db77ae05ba4fb38c15330d59cb7231"
+    },
+    {
+      "path": "apps/web/src/features/workspace/standard-calculator.tsx",
+      "size": 14261,
+      "mode": 33206,
+      "sha": "65851d9bd028790e6cef9eaa58da842e62083d07"
+    },
+    {
+      "path": "apps/web/src/features/workspace/stock-alerts.tsx",
+      "size": 3401,
+      "mode": 33206,
+      "sha": "2e6ef27be28992072579cfedf173db10749e75a2"
+    },
+    {
+      "path": "apps/web/src/features/workspace/stock-count-reminder.tsx",
+      "size": 756,
+      "mode": 33206,
+      "sha": "ab5aefeecebd46a9966877806f2424a4195d4503"
+    },
+    {
+      "path": "apps/web/src/features/workspace/stock-summary.tsx",
+      "size": 3607,
+      "mode": 33206,
+      "sha": "6c94d7e3761efe5709446a691f34d366f9c14021"
+    },
+    {
+      "path": "apps/web/src/features/workspace/workspace-tools.tsx",
+      "size": 5586,
+      "mode": 33206,
+      "sha": "ef8957a6e1a3f94163105f53e1e27eda02c200e3"
+    },
+    {
+      "path": "apps/web/src/features/workspace/workspace.tsx",
+      "size": 22867,
+      "mode": 33206,
+      "sha": "e19fe8d140770081899ae55e1811337debbde859"
+    },
+    {
+      "path": "apps/web/src/lib/browser-crypto.ts",
+      "size": 3255,
+      "mode": 33206,
+      "sha": "d59cc5e2cd65772078b0e55ad288ca916ba1c88a"
+    },
+    {
+      "path": "apps/web/src/lib/calculator-retention.ts",
+      "size": 906,
+      "mode": 33206,
+      "sha": "da71e6bb2f6169c9db0a0b4255e4220d34ad6026"
+    },
+    {
+      "path": "apps/web/src/lib/client.ts",
+      "size": 2535,
+      "mode": 33206,
+      "sha": "dd25e737076d1cb64e1dc96894d8707489e89667"
+    },
+    {
+      "path": "apps/web/src/lib/confirm-action.ts",
+      "size": 1885,
+      "mode": 33206,
+      "sha": "91fd0729e8cd21165063f2f62b03efffdc1f7d39"
+    },
+    {
+      "path": "apps/web/src/lib/order-placed.ts",
+      "size": 3147,
+      "mode": 33206,
+      "sha": "e8b27c090355db84c9f5f969931912ba1d3f104c"
+    },
+    {
+      "path": "apps/web/src/lib/platform-local-runtime.ts",
+      "size": 1511,
+      "mode": 33206,
+      "sha": "357d6355a0df22a5e86a1d1ccd235a4705799920"
+    },
+    {
+      "path": "apps/web/src/lib/reward-applied.ts",
+      "size": 3029,
+      "mode": 33206,
+      "sha": "c5390d74c18fe47990b2d0e829379e2a215b7154"
+    },
+    {
+      "path": "apps/web/src/lib/server.ts",
+      "size": 4507,
+      "mode": 33206,
+      "sha": "bcbb1649de521b4d2457b3be157b06e021684d91"
+    },
+    {
+      "path": "apps/web/src/lib/staff-language.tsx",
+      "size": 17150,
+      "mode": 33206,
+      "sha": "cb0b0d5c3e9a53eab77300453d5e60b1f025c977"
+    },
+    {
+      "path": "apps/web/src/lib/support-live.ts",
+      "size": 1965,
+      "mode": 33206,
+      "sha": "c7ddd3808d262367f3259b1f50a6e027a3af2e36"
+    },
+    {
+      "path": "apps/web/src/lib/use-activity-heartbeat.ts",
+      "size": 1123,
+      "mode": 33206,
+      "sha": "a8e40a5cb9e0853347640b4d8cb3f3b8e7281529"
+    },
+    {
+      "path": "apps/web/src/lib/versioned-command.ts",
+      "size": 769,
+      "mode": 33206,
+      "sha": "0d6a4bd3299f52467f46067dd83b5eed78621ccc"
+    },
+    {
+      "path": "apps/web/src/styles/calculator.css",
+      "size": 2714,
+      "mode": 33206,
+      "sha": "57f1d324269c3bffa1a413b37859ee4e182668dc"
+    },
+    {
+      "path": "apps/web/src/styles/client-feedback.css",
+      "size": 18204,
+      "mode": 33206,
+      "sha": "ee047a1d5b96d420002a6974b6be670ce7d743c5"
+    },
+    {
+      "path": "apps/web/src/styles/curved-sidebar.css",
+      "size": 12515,
+      "mode": 33206,
+      "sha": "3c2f305e29de62384d9158d3751e8b54a88c36a4"
+    },
+    {
+      "path": "apps/web/src/styles/interface.css",
+      "size": 28619,
+      "mode": 33206,
+      "sha": "12afede223fd52b5357c00d2818ec62bf34c226b"
+    },
+    {
+      "path": "apps/web/src/styles/inventory-tools.css",
+      "size": 1933,
+      "mode": 33206,
+      "sha": "acc5e53f9f40abb729803121bb3bd68de0bd1d92"
+    },
+    {
+      "path": "apps/web/src/styles/late-updates.css",
+      "size": 4792,
+      "mode": 33206,
+      "sha": "87fb39564b244beb687e9832b6499833b137f92c"
+    },
+    {
+      "path": "apps/web/src/styles/responsive.css",
+      "size": 24912,
+      "mode": 33206,
+      "sha": "cc8314e1e953bfd2605e16fea87a3e8492cf0b0d"
+    },
+    {
+      "path": "apps/web/src/styles/review-045.css",
+      "size": 2813,
+      "mode": 33206,
+      "sha": "0b5e723583a88b60a57b08f594db015d6e3129c1"
+    },
+    {
+      "path": "apps/web/src/styles/review-046.css",
+      "size": 12031,
+      "mode": 33206,
+      "sha": "1902c79b5ca48f3caa40918ba6d04c95e67f3ebc"
+    },
+    {
+      "path": "apps/web/src/styles/review-048.css",
+      "size": 7017,
+      "mode": 33206,
+      "sha": "e8f3da5f7d4f36cd3c8113ef400acc64262d77be"
+    },
+    {
+      "path": "apps/web/src/styles/review-049.css",
+      "size": 5336,
+      "mode": 33206,
+      "sha": "7d1251d5406f3ed504cdf6caff07e743e5bc066a"
+    },
+    {
+      "path": "apps/web/src/styles/topbar-theme.css",
+      "size": 3982,
+      "mode": 33206,
+      "sha": "e4f05b341096be797a4d828c016b54e7934c5001"
+    },
+    {
+      "path": "apps/web/src/styles/workspace-controls.css",
+      "size": 3988,
+      "mode": 33206,
+      "sha": "661c81b6376e664e2d11e0fdbcf30293693fedfe"
+    },
+    {
+      "path": "apps/web/src/styles/workspace-side-tabs.css",
+      "size": 5113,
+      "mode": 33206,
+      "sha": "ca38cc055869534f3e5d6c7207defcafd43b5fc2"
+    },
+    {
+      "path": "apps/web/src/styles/workspace-tools.css",
+      "size": 9770,
+      "mode": 33206,
+      "sha": "47df37628bc39f816e861730d8f8fdd651bf1863"
+    },
+    {
+      "path": "apps/web/src/types/sweetalert2.d.ts",
+      "size": 117,
+      "mode": 33206,
+      "sha": "2b8b263b42c824afaba3946711f9c135b0aa3d7e"
+    },
+    {
+      "path": "package-lock.json",
+      "size": 81099,
+      "mode": 33206,
+      "sha": "ffe668d215dfaf2f9f7bf2c23540e091b3f2111c"
+    },
+    {
+      "path": "package.json",
+      "size": 825,
+      "mode": 33206,
+      "sha": "5c9122141f032960fbf62b74ea5b2b5deb05122b"
+    },
+    {
+      "path": "packages/core/package.json",
+      "size": 132,
+      "mode": 33206,
+      "sha": "20b740d359cb83f19e319df0664ca6239fac57c2"
+    },
+    {
+      "path": "packages/core/src/allocation.ts",
+      "size": 1125,
+      "mode": 33206,
+      "sha": "a904d752025430bda8c6f62565bf89ba9326eaa9"
+    },
+    {
+      "path": "packages/core/src/applications.ts",
+      "size": 1606,
+      "mode": 33206,
+      "sha": "9f9fd2a818946e95dd17bd7c2634beb1a5bca72a"
+    },
+    {
+      "path": "packages/core/src/calculator.ts",
+      "size": 2160,
+      "mode": 33206,
+      "sha": "834a939008a379559494e20115a2f98c1a62c8c3"
+    },
+    {
+      "path": "packages/core/src/errors.ts",
+      "size": 394,
+      "mode": 33206,
+      "sha": "48d88c8c058c3737600391945075d2513a4e4d62"
+    },
+    {
+      "path": "packages/core/src/floor-gates.ts",
+      "size": 2098,
+      "mode": 33206,
+      "sha": "3b11f89442c6f09338466b0024b0e7bd4e5ca1ce"
+    },
+    {
+      "path": "packages/core/src/floor-layout.ts",
+      "size": 5033,
+      "mode": 33206,
+      "sha": "7d103b431f941c9d83ec0036b9f79576f6676d45"
+    },
+    {
+      "path": "packages/core/src/floor-outline.ts",
+      "size": 6482,
+      "mode": 33206,
+      "sha": "5e61e0a88979a59bc8df3569557e70638019778e"
+    },
+    {
+      "path": "packages/core/src/floor-placement.ts",
+      "size": 1044,
+      "mode": 33206,
+      "sha": "0c130d77cb5ac54f7f9d7584870d98d319ba99b2"
+    },
+    {
+      "path": "packages/core/src/floor-plan.ts",
+      "size": 6510,
+      "mode": 33206,
+      "sha": "7793c05599cd0245ebce54513c4e9df6b296607d"
+    },
+    {
+      "path": "packages/core/src/identity.ts",
+      "size": 819,
+      "mode": 33206,
+      "sha": "d8554e1c58a9725b538db17c5d5fa43cebc3abe5"
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "size": 587,
+      "mode": 33206,
+      "sha": "57632b1b78bf676c39b41e3d00ce990362b28ff0"
+    },
+    {
+      "path": "packages/core/src/money.ts",
+      "size": 3832,
+      "mode": 33206,
+      "sha": "efb07bceb49260b737f9de08d20a2714173e6e80"
+    },
+    {
+      "path": "packages/core/src/payment-methods.ts",
+      "size": 411,
+      "mode": 33206,
+      "sha": "df505e6179b2856df38806b2e335d0f8e7ccb716"
+    },
+    {
+      "path": "packages/core/src/permissions.ts",
+      "size": 3932,
+      "mode": 33206,
+      "sha": "8f5c39f068b360e26d403c90e74ebdb9c9ec4055"
+    },
+    {
+      "path": "packages/core/src/platform-console.ts",
+      "size": 7618,
+      "mode": 33206,
+      "sha": "22c563de0f1847edccca02fd41af5e09965a9462"
+    },
+    {
+      "path": "packages/core/src/restaurant-features.ts",
+      "size": 6050,
+      "mode": 33206,
+      "sha": "41fb30998f152a8c910604ae0ba817864aa65819"
+    },
+    {
+      "path": "packages/core/src/table-groups.ts",
+      "size": 1565,
+      "mode": 33206,
+      "sha": "5836ffd302d900621bd1b8c945dd2fba8f755062"
+    },
+    {
+      "path": "packages/core/src/table-name.ts",
+      "size": 1014,
+      "mode": 33206,
+      "sha": "355db374fd53699f72941af2f2c0340bf2121cf6"
+    },
+    {
+      "path": "packages/core/src/taxes.ts",
+      "size": 909,
+      "mode": 33206,
+      "sha": "9dda996add0f82198791399d15a5379753a20879"
+    },
+    {
+      "path": "packages/core/src/time.ts",
+      "size": 1203,
+      "mode": 33206,
+      "sha": "e16ef5f8edccfcd414e2d6a363743e189be952cf"
+    },
+    {
+      "path": "packages/database/migrations/001_initial.sql",
+      "size": 18825,
+      "mode": 33206,
+      "sha": "e977e1f7d7d2cd2776bbd06504a1dd6e34ccbd22"
+    },
+    {
+      "path": "packages/database/migrations/002_loyalty_and_quotes.sql",
+      "size": 1079,
+      "mode": 33206,
+      "sha": "28585461514b1441f69c192f11ffaecca0a5ca43"
+    },
+    {
+      "path": "packages/database/migrations/003_scope_hardening.sql",
+      "size": 1219,
+      "mode": 33206,
+      "sha": "994696722d1577f215b959910a3bf4077acf28a4"
+    },
+    {
+      "path": "packages/database/migrations/004_runtime_role_and_ledger.sql",
+      "size": 634,
+      "mode": 33206,
+      "sha": "cdaf4861f55e4df18a5b15c02f55becec3ded802"
+    },
+    {
+      "path": "packages/database/migrations/005_receipt_deduplication.sql",
+      "size": 215,
+      "mode": 33206,
+      "sha": "37a16b2226e20c5278633d3677d5927da034ebb0"
+    },
+    {
+      "path": "packages/database/migrations/006_scan_to_order.sql",
+      "size": 494,
+      "mode": 33206,
+      "sha": "175050fb0e59dae72ad0e0daab2e2629dc4b3660"
+    },
+    {
+      "path": "packages/database/migrations/007_customer_device_bans.sql",
+      "size": 2976,
+      "mode": 33206,
+      "sha": "58b38f30f8bf35532ccc97308be9b6e3d4cf7d4c"
+    },
+    {
+      "path": "packages/database/migrations/008_client_feedback.sql",
+      "size": 2778,
+      "mode": 33206,
+      "sha": "a7696f7f15f237760b2c4c9d7d723839735aa253"
+    },
+    {
+      "path": "packages/database/migrations/009_attendance_and_liquor.sql",
+      "size": 3095,
+      "mode": 33206,
+      "sha": "ece69250c0ebb72ba2ec60b44602ff8ccf552b2f"
+    },
+    {
+      "path": "packages/database/migrations/010_unseated_table_service.sql",
+      "size": 768,
+      "mode": 33206,
+      "sha": "135c00d08ecef13c4e39c7a7c3106661241d6590"
+    },
+    {
+      "path": "packages/database/migrations/011_floor_plans_and_table_activity.sql",
+      "size": 2705,
+      "mode": 33206,
+      "sha": "d8e42bd41af6db106d131abac4a21f1b1f91480f"
+    },
+    {
+      "path": "packages/database/migrations/012_order_tax.sql",
+      "size": 345,
+      "mode": 33206,
+      "sha": "2743903d7d275d90ecb34e8e4068b278ff00f40a"
+    },
+    {
+      "path": "packages/database/migrations/013_staff_invitations.sql",
+      "size": 1267,
+      "mode": 33206,
+      "sha": "18b668dd41ecf48a89249586c334b1f77b2a0512"
+    },
+    {
+      "path": "packages/database/migrations/014_notification_reads.sql",
+      "size": 807,
+      "mode": 33206,
+      "sha": "dfde1413a6117f651498387a9a5fcbbad6e32061"
+    },
+    {
+      "path": "packages/database/migrations/015_resizable_floor_plans.sql",
+      "size": 196,
+      "mode": 33206,
+      "sha": "25a8e13ffe9b6799f5a35ada45f54072206ef884"
+    },
+    {
+      "path": "packages/database/migrations/016_application_sessions.sql",
+      "size": 604,
+      "mode": 33206,
+      "sha": "c7c58be05b83d41be10b37fc8e13d00004f3ab4a"
+    },
+    {
+      "path": "packages/database/migrations/017_food_and_bar_streams.sql",
+      "size": 1055,
+      "mode": 33206,
+      "sha": "79b18c1bf2ecfcbdf70485170da17cb84a89a341"
+    },
+    {
+      "path": "packages/database/migrations/018_procurement_streams.sql",
+      "size": 269,
+      "mode": 33206,
+      "sha": "c043aa27da583d5c1e2c10bae3a6d8d4a938a7af"
+    },
+    {
+      "path": "packages/database/migrations/019_catalog_streams.sql",
+      "size": 415,
+      "mode": 33206,
+      "sha": "355851295cffd253f704c7eb5f045ea162a7e159"
+    },
+    {
+      "path": "packages/database/migrations/020_public_storefronts.sql",
+      "size": 2125,
+      "mode": 33206,
+      "sha": "61554e33344dc0b21133e35715cfe2498316fe72"
+    },
+    {
+      "path": "packages/database/migrations/021_purchase_receipts.sql",
+      "size": 1040,
+      "mode": 33206,
+      "sha": "a12a113b8e8fa409d0d2f928a683eb7fe4bf938e"
+    },
+    {
+      "path": "packages/database/migrations/022_android_push.sql",
+      "size": 2336,
+      "mode": 33206,
+      "sha": "77808d0c716fee2d014d0614afeeaf7073c7f30c"
+    },
+    {
+      "path": "packages/database/migrations/023_web_catalog_profiles.sql",
+      "size": 215,
+      "mode": 33206,
+      "sha": "98a99673a0d0aaf32b67ed8d4ff1ef932257b86e"
+    },
+    {
+      "path": "packages/database/migrations/024_named_taxes.sql",
+      "size": 792,
+      "mode": 33206,
+      "sha": "49e20b10a8e0332063ced1663b3fe71ead4f801b"
+    },
+    {
+      "path": "packages/database/migrations/025_split_legacy_kots.sql",
+      "size": 1614,
+      "mode": 33206,
+      "sha": "de1fc6131553765a180e7a04f20f0b998f28b3af"
+    },
+    {
+      "path": "packages/database/migrations/026_menu_photos.sql",
+      "size": 394,
+      "mode": 33206,
+      "sha": "b4d0b45473f96e84e00a42f06f2146e600e9186d"
+    },
+    {
+      "path": "packages/database/migrations/027_floor_outlines.sql",
+      "size": 219,
+      "mode": 33206,
+      "sha": "e0af87d00837a770b3677f61334aef328c4dd288"
+    },
+    {
+      "path": "packages/database/migrations/028_explicit_activation_policy.sql",
+      "size": 242,
+      "mode": 33206,
+      "sha": "8496da464b19c994ebdab5e5e8780cd5c763c04b"
+    },
+    {
+      "path": "packages/database/migrations/029_uploaded_assets_staff_details.sql",
+      "size": 1895,
+      "mode": 33206,
+      "sha": "2aa19581bdce7076dec07dcc67eb7fd3d300de3f"
+    },
+    {
+      "path": "packages/database/migrations/030_inventory_versions.sql",
+      "size": 72,
+      "mode": 33206,
+      "sha": "7b121fcf1b096c45e756f0166839324c1c92fd64"
+    },
+    {
+      "path": "packages/database/migrations/031_backfill_purchase_expenses.sql",
+      "size": 1347,
+      "mode": 33206,
+      "sha": "1a2ddb1d0bddf1a61d7eca65e84089d6f2e9acd4"
+    },
+    {
+      "path": "packages/database/migrations/032_receipt_layout.sql",
+      "size": 311,
+      "mode": 33206,
+      "sha": "284d9368fd659058ebdc0c24a6bc7de9ff862abf"
+    },
+    {
+      "path": "packages/database/migrations/033_web_feedback.sql",
+      "size": 574,
+      "mode": 33206,
+      "sha": "5ae6beb5432dbd2b0f69d8cc6d1ac4c68159cd6e"
+    },
+    {
+      "path": "packages/database/migrations/034_web_stock_kot.sql",
+      "size": 451,
+      "mode": 33206,
+      "sha": "a340b99dc56e575944df127c9ca4c509bace1c92"
+    },
+    {
+      "path": "packages/database/migrations/035_dish_costs.sql",
+      "size": 2088,
+      "mode": 33206,
+      "sha": "4cb59e66afbacca41532f7bf99344a1ab6167c0e"
+    },
+    {
+      "path": "packages/database/migrations/036_rounding_direction.sql",
+      "size": 495,
+      "mode": 33206,
+      "sha": "c4369022a791b7a22aa6039eb04f7af946c162de"
+    },
+    {
+      "path": "packages/database/migrations/037_active_table_labels.sql",
+      "size": 276,
+      "mode": 33206,
+      "sha": "f84d0392706812f91e5c3a37f1154babb04dcfa8"
+    },
+    {
+      "path": "packages/database/migrations/038_inventory_value_and_archive.sql",
+      "size": 1525,
+      "mode": 33206,
+      "sha": "de02c8a5f33e4558dc225c71951cbafb5fa93976"
+    },
+    {
+      "path": "packages/database/migrations/039_web_order_payment_flow.sql",
+      "size": 1205,
+      "mode": 33206,
+      "sha": "13ea9736421bedf1d7667ec53cd0a29761ff6e0f"
+    },
+    {
+      "path": "packages/database/migrations/040_daily_stock_counts.sql",
+      "size": 1690,
+      "mode": 33206,
+      "sha": "9cd6251def4b7cd0d90c78b54141ba4b325cc6ff"
+    },
+    {
+      "path": "packages/database/migrations/041_prepared_food.sql",
+      "size": 3561,
+      "mode": 33206,
+      "sha": "08276f0451ba75aba43f85af6a92aa34f4f06b24"
+    },
+    {
+      "path": "packages/database/migrations/042_alert_dismissals.sql",
+      "size": 861,
+      "mode": 33206,
+      "sha": "b296cdf33987b324b56baeb72a6f57f24d322549"
+    },
+    {
+      "path": "packages/database/migrations/043_menu_piece_unit.sql",
+      "size": 261,
+      "mode": 33206,
+      "sha": "eec553b7351dfe10760c78f3d9137586a1ea47d1"
+    },
+    {
+      "path": "packages/database/migrations/044_calculator_history.sql",
+      "size": 930,
+      "mode": 33206,
+      "sha": "cda570fa18e9af9e6e98024fdacb452b4e7ef3e9"
+    },
+    {
+      "path": "packages/database/migrations/045_material_setup_and_packs.sql",
+      "size": 1749,
+      "mode": 33206,
+      "sha": "52ecf103e19ba9dbc9d544cb823267120a04a1b1"
+    },
+    {
+      "path": "packages/database/migrations/046_order_pins.sql",
+      "size": 722,
+      "mode": 33206,
+      "sha": "5c13bb9d91719ac4907a65e9869e209d4fb05c5a"
+    },
+    {
+      "path": "packages/database/migrations/047_web_kitchen_policy.sql",
+      "size": 247,
+      "mode": 33206,
+      "sha": "86b11772748675166512b27b6c902321096055a4"
+    },
+    {
+      "path": "packages/database/migrations/048_web_bill_defaults.sql",
+      "size": 180,
+      "mode": 33206,
+      "sha": "55762a35654e8913c23e0566dac600fb668c97a1"
+    },
+    {
+      "path": "packages/database/migrations/049_web_loyalty_cap.sql",
+      "size": 229,
+      "mode": 33206,
+      "sha": "9ac84614bee471b5d6295c95d94dc95e165281a1"
+    },
+    {
+      "path": "packages/database/migrations/050_web_refunds.sql",
+      "size": 2744,
+      "mode": 33206,
+      "sha": "3093d10cb08b34dd38766ac4e6bfbac0717ecf3d"
+    },
+    {
+      "path": "packages/database/migrations/051_web_paid_replacements.sql",
+      "size": 1657,
+      "mode": 33206,
+      "sha": "685ab08dbde5edf272722102d00d1f65957464da"
+    },
+    {
+      "path": "packages/database/migrations/052_web_recipe_profiles.sql",
+      "size": 1203,
+      "mode": 33206,
+      "sha": "f609bf58ac093515ad5c8442d6cfbd3b63c5b0fe"
+    },
+    {
+      "path": "packages/database/migrations/053_web_production.sql",
+      "size": 2483,
+      "mode": 33206,
+      "sha": "82795c5baf66cf4ae020f57aad2eba70ee1c09d5"
+    },
+    {
+      "path": "packages/database/migrations/054_web_floor_details.sql",
+      "size": 128,
+      "mode": 33206,
+      "sha": "23cafc938b9b8769279e07985e14f5f22b31a9f8"
+    },
+    {
+      "path": "packages/database/migrations/055_web_bill_settings.sql",
+      "size": 2313,
+      "mode": 33206,
+      "sha": "e21cb496c4807b0464c369dc738e61a1efe02441"
+    },
+    {
+      "path": "packages/database/migrations/056_web_loyalty_name.sql",
+      "size": 367,
+      "mode": 33206,
+      "sha": "630227077352e39c2a4c672916fb8d5bd4fd52a3"
+    },
+    {
+      "path": "packages/database/migrations/057_platform_console.sql",
+      "size": 5811,
+      "mode": 33206,
+      "sha": "5eb08b956f5ad71824daba440b1e67dfe67392c4"
+    },
+    {
+      "path": "packages/database/migrations/058_platform_identities.sql",
+      "size": 644,
+      "mode": 33206,
+      "sha": "10c1a63d80f4fbc768a0cd96841cec008b6f1918"
+    },
+    {
+      "path": "packages/database/migrations/059_platform_operations.sql",
+      "size": 8234,
+      "mode": 33206,
+      "sha": "11f09b90bb05f4c087d092474fe54397de9b6003"
+    },
+    {
+      "path": "packages/database/migrations/060_platform_fee_corrections.sql",
+      "size": 736,
+      "mode": 33206,
+      "sha": "a48b87a6906207750ca81563fb49ce87c9603a2f"
+    },
+    {
+      "path": "packages/database/migrations/061_platform_editable_support.sql",
+      "size": 205,
+      "mode": 33206,
+      "sha": "7ab73d3d38a5b990d7d8fce09c189b03b55e5256"
+    },
+    {
+      "path": "packages/database/migrations/062_manual_feature_controls.sql",
+      "size": 1370,
+      "mode": 33206,
+      "sha": "92701d023b2e2ec60d7d31c4c4339e24dbe3af82"
+    },
+    {
+      "path": "packages/database/migrations/063_outlet_order_intake.sql",
+      "size": 280,
+      "mode": 33206,
+      "sha": "9c84417dc3550bba886459c9e9ab7080d5c6dfd2"
+    },
+    {
+      "path": "packages/database/migrations/064_guest_menu_offers.sql",
+      "size": 305,
+      "mode": 33206,
+      "sha": "804b79357450364d8be70f14b851b947e75625f2"
+    },
+    {
+      "path": "packages/database/migrations/065_support_chat.sql",
+      "size": 1310,
+      "mode": 33206,
+      "sha": "a2c858be7163cf3b2162d06b67b65948e0e3700d"
+    },
+    {
+      "path": "packages/database/migrations/066_support_voice_calls.sql",
+      "size": 838,
+      "mode": 33206,
+      "sha": "f9c6c9833e2f55938f69ced1646db4005f8b192c"
+    },
+    {
+      "path": "packages/database/migrations/067_web_default_charges.sql",
+      "size": 185,
+      "mode": 33206,
+      "sha": "b43f363e4308f0489fd1e622860803dcfb28d955"
+    },
+    {
+      "path": "packages/database/migrations/068_nearest_web_rounding.sql",
+      "size": 323,
+      "mode": 33206,
+      "sha": "c51e01686d087f1a8821c535e6c52b63a8f7be35"
+    },
+    {
+      "path": "packages/database/migrations/069_menu_category_courses.sql",
+      "size": 211,
+      "mode": 33206,
+      "sha": "be11121fdbda242d05f763bf9bfcbc04bcf292ad"
+    },
+    {
+      "path": "packages/database/package.json",
+      "size": 251,
+      "mode": 33206,
+      "sha": "700fc942cfe2828db71162df959e380888e03e06"
+    },
+    {
+      "path": "packages/database/src/index.ts",
+      "size": 5321,
+      "mode": 33206,
+      "sha": "6abaeb78b306a375c361098cf5c92ff57f24175b"
+    },
+    {
+      "path": "packages/services/package.json",
+      "size": 284,
+      "mode": 33206,
+      "sha": "f382cb1b632b16c56f2687ab2856406409358ac2"
+    },
+    {
+      "path": "packages/services/src/activity.ts",
+      "size": 9924,
+      "mode": 33206,
+      "sha": "4cc9352e55f995eb35172433187b4efb902323da"
+    },
+    {
+      "path": "packages/services/src/alert-dismissals.ts",
+      "size": 892,
+      "mode": 33206,
+      "sha": "72341043d6bf87d99de7a56067f77d8d5cbbd7c5"
+    },
+    {
+      "path": "packages/services/src/application-commands.ts",
+      "size": 2420,
+      "mode": 33206,
+      "sha": "80b7c2519a4f5cbd9135bec341a6538b085fda79"
+    },
+    {
+      "path": "packages/services/src/assets.ts",
+      "size": 5899,
+      "mode": 33206,
+      "sha": "2d5beb60cb542c9bee39d53437454f8aa1b13042"
+    },
+    {
+      "path": "packages/services/src/attendance.ts",
+      "size": 6886,
+      "mode": 33206,
+      "sha": "ccb5a7fbe794639bd646748dd4e8cefe332d56f7"
+    },
+    {
+      "path": "packages/services/src/auth.ts",
+      "size": 8848,
+      "mode": 33206,
+      "sha": "59193e86f2e0e92040cceb3b17c2d5d7021b5e73"
+    },
+    {
+      "path": "packages/services/src/billing.ts",
+      "size": 11938,
+      "mode": 33206,
+      "sha": "944c5643b2e2a0206f3444d12a3007c636032c9e"
+    },
+    {
+      "path": "packages/services/src/calculator-retention.ts",
+      "size": 1123,
+      "mode": 33206,
+      "sha": "def9a62cc18e4c3dc8240e50b072467b9acf1ca9"
+    },
+    {
+      "path": "packages/services/src/catalog.ts",
+      "size": 20356,
+      "mode": 33206,
+      "sha": "171bf1434f547a4a579cb980783421db923a82e4"
+    },
+    {
+      "path": "packages/services/src/customer-devices.ts",
+      "size": 3865,
+      "mode": 33206,
+      "sha": "4901a4afe14a625d955c26ce693f59142298c0c9"
+    },
+    {
+      "path": "packages/services/src/customer-identity.ts",
+      "size": 1206,
+      "mode": 33206,
+      "sha": "ffed15d0dc95b3be9a0ed938d4e42e60aeeffcc3"
+    },
+    {
+      "path": "packages/services/src/customers.ts",
+      "size": 7654,
+      "mode": 33206,
+      "sha": "f5feb7f410d831affbf0555c50fec84b34da126e"
+    },
+    {
+      "path": "packages/services/src/dish-report.ts",
+      "size": 3862,
+      "mode": 33206,
+      "sha": "c932cc5aa7a1b6680412e2d99c62e6e2de73fb12"
+    },
+    {
+      "path": "packages/services/src/firebase-sender.ts",
+      "size": 2859,
+      "mode": 33206,
+      "sha": "7cb731d9f7c914007addc9af502203cbcf945caf"
+    },
+    {
+      "path": "packages/services/src/floor-plans.ts",
+      "size": 16154,
+      "mode": 33206,
+      "sha": "89d04049665716f8ad75e7003085b56f97262097"
+    },
+    {
+      "path": "packages/services/src/guest-checkout.ts",
+      "size": 6204,
+      "mode": 33206,
+      "sha": "86b06a4c00021776809612dbbc9f6f94874dda48"
+    },
+    {
+      "path": "packages/services/src/guest.ts",
+      "size": 25014,
+      "mode": 33206,
+      "sha": "191fdb53dc38cb75ea6eab6b27dfde2927be97e8"
+    },
+    {
+      "path": "packages/services/src/inbox.ts",
+      "size": 8349,
+      "mode": 33206,
+      "sha": "e6c9d04c734077bf351df18f157d29a84302dabe"
+    },
+    {
+      "path": "packages/services/src/index.ts",
+      "size": 2350,
+      "mode": 33206,
+      "sha": "3bfead1c05131ff34157682e326f0dbd976bab6d"
+    },
+    {
+      "path": "packages/services/src/inventory-tools.ts",
+      "size": 9814,
+      "mode": 33206,
+      "sha": "c123aed013bfc8b40b841234e72d7f19676e6a06"
+    },
+    {
+      "path": "packages/services/src/inventory.ts",
+      "size": 11675,
+      "mode": 33206,
+      "sha": "bbe16d85df450702a37b81f7bbd6901fba9b6337"
+    },
+    {
+      "path": "packages/services/src/kitchen-policy.ts",
+      "size": 1795,
+      "mode": 33206,
+      "sha": "e00207bae44d7a4c906523851a0602262a8ed90a"
+    },
+    {
+      "path": "packages/services/src/kitchen.ts",
+      "size": 12995,
+      "mode": 33206,
+      "sha": "b7f7ccb9028eb467bf66150876680f15cb7b4629"
+    },
+    {
+      "path": "packages/services/src/kot-print.ts",
+      "size": 5515,
+      "mode": 33206,
+      "sha": "8f0a559c151020c18304ba4f12bbaf9a40fdb8a8"
+    },
+    {
+      "path": "packages/services/src/leaderboard.ts",
+      "size": 2058,
+      "mode": 33206,
+      "sha": "2ef08ad3cabc556089097f9f91ecff3e8b6902a5"
+    },
+    {
+      "path": "packages/services/src/material-setup.ts",
+      "size": 3641,
+      "mode": 33206,
+      "sha": "ca457828e83b291f32b7fc632b1fc9eed6202cae"
+    },
+    {
+      "path": "packages/services/src/menu-categories.ts",
+      "size": 4321,
+      "mode": 33206,
+      "sha": "c400eeb5859fc17db3181053c91125049ab47b77"
+    },
+    {
+      "path": "packages/services/src/operational-access.ts",
+      "size": 799,
+      "mode": 33206,
+      "sha": "9693a223ad0e285b834754ad93a0b27e2dcc5453"
+    },
+    {
+      "path": "packages/services/src/operations.ts",
+      "size": 8463,
+      "mode": 33206,
+      "sha": "9ff10148b1bbf09d67149023c0f6c860d4a4c653"
+    },
+    {
+      "path": "packages/services/src/order-adjustments.ts",
+      "size": 5242,
+      "mode": 33206,
+      "sha": "d175399a2dbdb238dab5fa3a4fd563c645fc46ba"
+    },
+    {
+      "path": "packages/services/src/order-charges.ts",
+      "size": 5402,
+      "mode": 33206,
+      "sha": "13bd0988fcb52aba218afe56d0678ba774dba3db"
+    },
+    {
+      "path": "packages/services/src/order-state.ts",
+      "size": 1184,
+      "mode": 33206,
+      "sha": "e30f4e967a7188f271bac0523834fe454361bb90"
+    },
+    {
+      "path": "packages/services/src/order-summary.ts",
+      "size": 1687,
+      "mode": 33206,
+      "sha": "4572c2d9105e250a450c46a2b8802827143642e0"
+    },
+    {
+      "path": "packages/services/src/order-tax.ts",
+      "size": 5542,
+      "mode": 33206,
+      "sha": "f5805286d71009e37467c4bfe23f78f365c6feb5"
+    },
+    {
+      "path": "packages/services/src/orders.ts",
+      "size": 44109,
+      "mode": 33206,
+      "sha": "c727f322d61a89c6dc9a87e5b56803c9a5a4d83e"
+    },
+    {
+      "path": "packages/services/src/outlet-order-intake.ts",
+      "size": 2131,
+      "mode": 33206,
+      "sha": "c08097b6231caaa9bb94e26c2c2b16d92a5c643c"
+    },
+    {
+      "path": "packages/services/src/payments.ts",
+      "size": 17715,
+      "mode": 33206,
+      "sha": "b708cc62c6ac700276ccfb5f66133ccc5890b1ee"
+    },
+    {
+      "path": "packages/services/src/platform-analytics.ts",
+      "size": 8521,
+      "mode": 33206,
+      "sha": "a91f9f8818c8d4751e4a5dace2527af89d35ddaf"
+    },
+    {
+      "path": "packages/services/src/platform-auth.ts",
+      "size": 6315,
+      "mode": 33206,
+      "sha": "6727bee8411f358b1ee10c1cc0c40ae07f9d22f3"
+    },
+    {
+      "path": "packages/services/src/platform-billing.ts",
+      "size": 26139,
+      "mode": 33206,
+      "sha": "0fc244f7f91dc7a1b2e4911c517d67aec49a1a4f"
+    },
+    {
+      "path": "packages/services/src/platform-console.ts",
+      "size": 41917,
+      "mode": 33206,
+      "sha": "301d0c5cf233714c8c6159c0888c2e51123adc9d"
+    },
+    {
+      "path": "packages/services/src/platform-features.ts",
+      "size": 2322,
+      "mode": 33206,
+      "sha": "16bb627ba3377e341d79a565baecf3f824c9e79e"
+    },
+    {
+      "path": "packages/services/src/platform-maintenance.ts",
+      "size": 7325,
+      "mode": 33206,
+      "sha": "9bb6b8f9ab79e650edcd47f9ca543e7cc9d438a3"
+    },
+    {
+      "path": "packages/services/src/platform-operations.ts",
+      "size": 21499,
+      "mode": 33206,
+      "sha": "a8da2b31a3429df44d137393a6b52e2d88910ee4"
+    },
+    {
+      "path": "packages/services/src/platform-owner-view.ts",
+      "size": 5317,
+      "mode": 33206,
+      "sha": "6cc734ce0ddef1ff56866528133b796a4299405b"
+    },
+    {
+      "path": "packages/services/src/platform-policy.ts",
+      "size": 7203,
+      "mode": 33206,
+      "sha": "b5b1be71cf3288071a4722d5f8c88787ed84ab05"
+    },
+    {
+      "path": "packages/services/src/platform-restaurant-data.ts",
+      "size": 878,
+      "mode": 33206,
+      "sha": "8f6197b879f181c4432b4a6b1bf890d53ba3df84"
+    },
+    {
+      "path": "packages/services/src/platform-setup.ts",
+      "size": 2709,
+      "mode": 33206,
+      "sha": "664a7b625677c2a95e55974d2b2fe2f5868b54f8"
+    },
+    {
+      "path": "packages/services/src/prepared-food.ts",
+      "size": 7940,
+      "mode": 33206,
+      "sha": "d8902e6eac8af357242c5097ac982abe706d0050"
+    },
+    {
+      "path": "packages/services/src/prepared-stock.ts",
+      "size": 4525,
+      "mode": 33206,
+      "sha": "23432f96511d68a84e6412bf4d0c51f9998bbeb5"
+    },
+    {
+      "path": "packages/services/src/procurement.ts",
+      "size": 5699,
+      "mode": 33206,
+      "sha": "01e133c53796c245c0d91779261146011ace3ffb"
+    },
+    {
+      "path": "packages/services/src/production.ts",
+      "size": 11615,
+      "mode": 33206,
+      "sha": "55031f29ca0dea7a612b36f279db7669d1c6f483"
+    },
+    {
+      "path": "packages/services/src/public-identities.ts",
+      "size": 852,
+      "mode": 33206,
+      "sha": "59963490088010fb5b0998ad933f07f68536f2ac"
+    },
+    {
+      "path": "packages/services/src/public-menu.ts",
+      "size": 2103,
+      "mode": 33206,
+      "sha": "02a2a053979c0952c7dd7e9c6ccc922b6918bcb6"
+    },
+    {
+      "path": "packages/services/src/push.ts",
+      "size": 9069,
+      "mode": 33206,
+      "sha": "dde0235fa5036310f3cc63756be3a78212f9b786"
+    },
+    {
+      "path": "packages/services/src/qr.ts",
+      "size": 1792,
+      "mode": 33206,
+      "sha": "fb16f75bbe859cfe2e58f4a09c1334c4fd064de5"
+    },
+    {
+      "path": "packages/services/src/receipt-settings.ts",
+      "size": 2100,
+      "mode": 33206,
+      "sha": "4a21c7fb7c3e162f04e2272804cae52756283b3e"
+    },
+    {
+      "path": "packages/services/src/recipe-profiles.ts",
+      "size": 6856,
+      "mode": 33206,
+      "sha": "efdc28d5d4ca00d37cef8e9bbf3abe7422ab82ed"
+    },
+    {
+      "path": "packages/services/src/records.ts",
+      "size": 14958,
+      "mode": 33206,
+      "sha": "f923e0011edef01cb470ab104f9dc86b0c730867"
+    },
+    {
+      "path": "packages/services/src/reports.ts",
+      "size": 12226,
+      "mode": 33206,
+      "sha": "bf24d8e7dc6f7d695e10b3e662e86e551376f017"
+    },
+    {
+      "path": "packages/services/src/reservations.ts",
+      "size": 2551,
+      "mode": 33206,
+      "sha": "a6e11d5205e0aca9ac785fdccf2dec7f993732c8"
+    },
+    {
+      "path": "packages/services/src/rewards.ts",
+      "size": 4769,
+      "mode": 33206,
+      "sha": "9739dfdda25c83e56efb281220823887579f3992"
+    },
+    {
+      "path": "packages/services/src/service-board.ts",
+      "size": 4828,
+      "mode": 33206,
+      "sha": "33bfce3d97337d74ee3eec88af1210507a991b25"
+    },
+    {
+      "path": "packages/services/src/sessions.ts",
+      "size": 15538,
+      "mode": 33206,
+      "sha": "53e7e07d1250f1d9976074437f0ee78f5351297c"
+    },
+    {
+      "path": "packages/services/src/shared.ts",
+      "size": 10092,
+      "mode": 33206,
+      "sha": "718f2cc843240d8f1802cc156045af5aa08e7a4e"
+    },
+    {
+      "path": "packages/services/src/stock-counts.ts",
+      "size": 13042,
+      "mode": 33206,
+      "sha": "55550d8f0c044d24f9e484c3a2e6787d5ab9c9c8"
+    },
+    {
+      "path": "packages/services/src/stock-expiry.ts",
+      "size": 4822,
+      "mode": 33206,
+      "sha": "6338683863c4ca9122d229c377c93cc840ed5816"
+    },
+    {
+      "path": "packages/services/src/stock-reports.ts",
+      "size": 7000,
+      "mode": 33206,
+      "sha": "475371189ba485f4bbc3411886c71344bc9deeda"
+    },
+    {
+      "path": "packages/services/src/stock-summary.ts",
+      "size": 2302,
+      "mode": 33206,
+      "sha": "c634bd8d50909a986f2435f4ee80ac7ee08d6835"
+    },
+    {
+      "path": "packages/services/src/stock-valuation.ts",
+      "size": 7486,
+      "mode": 33206,
+      "sha": "202afd53586729f3810bd1f7edf1b677528c3bc0"
+    },
+    {
+      "path": "packages/services/src/stock.ts",
+      "size": 8693,
+      "mode": 33206,
+      "sha": "d73eeb2951e233f344401d76efa45194c64bfd8e"
+    },
+    {
+      "path": "packages/services/src/storefronts.ts",
+      "size": 16916,
+      "mode": 33206,
+      "sha": "ab4c6a605bc7654c84dc13e1ebe584b18fac8999"
+    },
+    {
+      "path": "packages/services/src/support-chat.ts",
+      "size": 21497,
+      "mode": 33206,
+      "sha": "af278cebd0f67c61094c331e44d43ae2e65a15cd"
+    },
+    {
+      "path": "packages/services/src/table-activity.ts",
+      "size": 4713,
+      "mode": 33206,
+      "sha": "6492a8b4d94abf9e973df905c9de224623169259"
+    },
+    {
+      "path": "packages/services/src/table-capacity.ts",
+      "size": 5829,
+      "mode": 33206,
+      "sha": "5e5db50dce537f03b530006620fddcb9fcfaf700"
+    },
+    {
+      "path": "packages/services/src/table-controls.ts",
+      "size": 8254,
+      "mode": 33206,
+      "sha": "b9209b88f70e93b9f35a70e23a3945d3d8b91fd6"
+    },
+    {
+      "path": "packages/services/src/table-placement.ts",
+      "size": 1677,
+      "mode": 33206,
+      "sha": "a72b868535903a516998be43c38df9ca348e8ef6"
+    },
+    {
+      "path": "packages/services/src/table-removal.ts",
+      "size": 3183,
+      "mode": 33206,
+      "sha": "601e464a7e40f0b4b454409a2295217a9f14cd21"
+    },
+    {
+      "path": "packages/services/src/tax-settings.ts",
+      "size": 2162,
+      "mode": 33206,
+      "sha": "96379c30d5a575f479cee3361640d747c5911c41"
+    },
+    {
+      "path": "packages/services/src/team.ts",
+      "size": 11173,
+      "mode": 33206,
+      "sha": "c958ef2938fa5a499c7fc5d9b0ffb866304d7261"
+    },
+    {
+      "path": "packages/services/src/web-bill-policy.ts",
+      "size": 3663,
+      "mode": 33206,
+      "sha": "3c4a221812fa4f2b590fe55c938c25babb8aae1c"
+    },
+    {
+      "path": "packages/services/src/web-bill-settings.ts",
+      "size": 5853,
+      "mode": 33206,
+      "sha": "56e52d8c519b33999f5fcf68965e509a7f7dc4a3"
+    },
+    {
+      "path": "packages/services/src/web-discount-coupons.ts",
+      "size": 2422,
+      "mode": 33206,
+      "sha": "fc77d9d8f3815d3214ae764da9e66f8da60990e0"
+    },
+    {
+      "path": "packages/services/src/web-loyalty.ts",
+      "size": 4633,
+      "mode": 33206,
+      "sha": "dfb01a6af1626e59647f6039ca0f6e36e06c3b74"
+    },
+    {
+      "path": "packages/services/src/web-refunds.ts",
+      "size": 11213,
+      "mode": 33206,
+      "sha": "20845da97b99c3320e028a98ca0ffd0dfccbe9d1"
+    },
+    {
+      "path": "packages/services/src/web-replacements.ts",
+      "size": 14277,
+      "mode": 33206,
+      "sha": "0d9f24f4c8ac0e4d1863ae049ddac8e6eefe9d38"
+    },
+    {
+      "path": "packages/services/src/workspace-tools.ts",
+      "size": 6126,
+      "mode": 33206,
+      "sha": "f297052ba3bb637595cda78bb5bc463f0fb316f6"
+    },
+    {
+      "path": "packages/services/src/workspace.ts",
+      "size": 23019,
+      "mode": 33206,
+      "sha": "bf30af0c7c5e4d6cee30e93466928ecf03aaef7f"
+    },
+    {
+      "path": "vercel.json",
+      "size": 138,
+      "mode": 33206,
+      "sha": "6b9df62d2fbd3ce83b009e50249ccfd7bad63640"
+    }
+  ]
+}

@@ -1,10 +1,13 @@
 "use client";
 import { T, useStaffTranslation } from "@/lib/staff-language";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import {useSearchParams} from "next/navigation";
 import {
   can,
+  isManager,
   quote,
+  roundAdjustment,
   quantityMilli,
   taxBreakdown,
   wholeUnit,
@@ -20,14 +23,18 @@ import { DishPicker } from "./dish-picker";
 import { useTableActivity } from "../tables/use-table-activity";
 import { CustomerFields } from "../customers/customer-fields";
 import { MenuPicture } from "@/components/menu-picture";
+import {AdjustmentsEditor} from "../orders/adjustments-editor";
 import { TaxSettings } from "../orders/tax-settings";
 import { TableActions } from "../tables/table-actions";
 import { StockSummary } from "./stock-summary";
-import { StockCountReminder } from "./stock-count-reminder";
+
 import { StockAlerts } from "./stock-alerts";
 import { ActivationSwitch } from "../tables/activation-switch";
 import { GroupQr, GroupCapacity } from "../tables/group-controls";
 import {useServiceBoard,ServiceRounds} from "./service-board";
+import {confirmAction,rejectionReason} from '@/lib/confirm-action';
+import {PageHeadingTools} from './page-heading-tools';
+import {guestCourses,guestMenuCourse} from '../guest/guest-journey';
 import {KitchenStageSwitch} from "./kitchen-stage-switch";
 export function Overview() {
   const { data, go, run } = useDesk();
@@ -247,8 +254,8 @@ export function Floor() {
     );
   return (
     <>
-      <div className="toolbar">
-        <div className="tabs">
+      <div className="toolbar tables-toolbar">
+        <div className="tabs table-floor-tabs">
           {floors.map((f) => (
             <button
               className={f === floor ? "selected" : ""}
@@ -260,10 +267,10 @@ export function Floor() {
           ))}
         </div>
         {data.outlets.find((o: Row) => o.id === data.outletId)?.qr_enabled && (
-          <Link className="button" href="/app/qr">
+          <PageHeadingTools><Link className="button" href="/app/qr">
             <Icon name="qr" />
             <T>{"Table QR"}</T>
-          </Link>
+          </Link></PageHeadingTools>
         )}
         <ActivationSwitch />
         {can(data.actor.role, "settings") && (
@@ -295,6 +302,66 @@ export function Floor() {
             new Date(booking.starts_at).getTime() <= Date.now() + 15 * 60000;
           const reservedNow =
             booking && new Date(booking.starts_at).getTime() <= Date.now();
+          const openSeating = () =>
+          form(
+            sessions.length
+              ? "Split table session"
+              : (activationRequest ? "Activate " : "Open ") +
+                  table.label,
+            [
+              ...(merged
+                ? [
+                    {
+                      name: "tableId",
+                      label: "Table",
+                      type: "select",
+                      value: table.id,
+                      options: members.map((t) => ({
+                        value: t.id,
+                        label: t.label,
+                      })),
+                    } as Field,
+                  ]
+                : []),
+              {
+                name: "guests",
+                label: "Guests",
+                type: "number",
+                min: 1,
+                max: 100,
+                value:
+                  !sessions.length && seatBooking
+                    ? booking.guests
+                    : 2,
+              },
+              ...(sessions.length
+                ? [
+                    {
+                      name: "label",
+                      label: "Separate bill label",
+                      placeholder: "A or B",
+                    } as Field,
+                  ]
+                : []),
+            ],
+            async (v) => {
+              const session = await run("openSession", {
+                tableId: v.tableId ?? table.id,
+                guests: v.guests,
+                ...(!sessions.length && activationRequest
+                  ? { activationRequestId: activationRequest.id }
+                  : {}),
+                ...(!sessions.length && seatBooking
+                  ? { reservationId: booking.id }
+                  : {}),
+                ...(v.label ? { label: v.label.toUpperCase() } : {}),
+              });
+              go("/app/pos?session=" + session.id);
+            },
+            !sessions.length && activationRequest
+              ? "Activate table"
+              : "Open table",
+          );
           return (
             <article
               className={
@@ -328,9 +395,7 @@ export function Floor() {
                   )}
                 </div>
                 <TableActions table={{ ...table, members }} />
-                {!occupied && activationRequest && (
-                  <span className="badge">Activation requested</span>
-                )}
+
               </div>
               {booking && (
                 <div className="table-reservation">
@@ -473,6 +538,7 @@ export function Floor() {
                   </div>
                 ))}
               </div>
+              {!occupied && activationRequest && <button type="button" className="table-activation-request" disabled={desk.busy} onClick={openSeating}><Icon name="bell"/><T>Activation requested</T><Icon name="chevron"/></button>}
               <div className="table-card-actions">
                 {occupied && sessions.length > 0 && (
                   <button
@@ -480,7 +546,7 @@ export function Floor() {
                     aria-label="Details" title="Details"
                     onClick={() => go("/app/table-billing/" + table.id)}
                   >
-                    <Icon name="orders" />
+                    <Icon name="details" />
                   </button>
                 )}
 
@@ -489,67 +555,7 @@ export function Floor() {
                   aria-label={sessions.length ? "Separate bill" : undefined}
                   title={sessions.length ? "Separate bill" : undefined}
                   disabled={occupied && !sessions.length}
-                  onClick={() =>
-                    form(
-                      sessions.length
-                        ? "Split table session"
-                        : (activationRequest ? "Activate " : "Open ") +
-                            table.label,
-                      [
-                        ...(merged
-                          ? [
-                              {
-                                name: "tableId",
-                                label: "Table",
-                                type: "select",
-                                value: table.id,
-                                options: members.map((t) => ({
-                                  value: t.id,
-                                  label: t.label,
-                                })),
-                              } as Field,
-                            ]
-                          : []),
-                        {
-                          name: "guests",
-                          label: "Guests",
-                          type: "number",
-                          min: 1,
-                          max: 100,
-                          value:
-                            !sessions.length && seatBooking
-                              ? booking.guests
-                              : 2,
-                        },
-                        ...(sessions.length
-                          ? [
-                              {
-                                name: "label",
-                                label: "Separate bill label",
-                                placeholder: "A or B",
-                              } as Field,
-                            ]
-                          : []),
-                      ],
-                      async (v) => {
-                        const session = await run("openSession", {
-                          tableId: v.tableId ?? table.id,
-                          guests: v.guests,
-                          ...(!sessions.length && activationRequest
-                            ? { activationRequestId: activationRequest.id }
-                            : {}),
-                          ...(!sessions.length && seatBooking
-                            ? { reservationId: booking.id }
-                            : {}),
-                          ...(v.label ? { label: v.label.toUpperCase() } : {}),
-                        });
-                        go("/app/pos?session=" + session.id);
-                      },
-                      !sessions.length && activationRequest
-                        ? "Activate table"
-                        : "Open table",
-                    )
-                  }
+                  onClick={openSeating}
                 >
                   {occupied && !sessions.length
                     ? "Occupied"
@@ -613,19 +619,21 @@ export function Floor() {
   );
 }
 export function Pos() {
-  const { data, run, go, busy, notify, modal } = useDesk();
+  const { data, run, go, busy, notify, modal, close } = useDesk();
+  const params=useSearchParams(),requestedSession=params.get("session")??(data.orders??[]).find((order:Row)=>order.id===params.get("order"))?.session_id??"";
   const [search, setSearch] = useState(""),
     [category, setCategory] = useState("All"),
+    [lead,setLead]=useState(""),
+    [searchOpen,setSearchOpen]=useState(false),
     [cart, setCart] = useState<Row[]>([]),
     [type, setType] = useState("TAKEAWAY"),
-    [sessionId, setSessionId] = useState(() =>
-      typeof window !== "undefined"
-        ? (new URLSearchParams(window.location.search).get("session") ?? "")
-        : "",
-    ),
+    [sessionId, setSessionId] = useState(requestedSession),
     [course, setCourse] = useState("IMMEDIATE"),
     [customerName, setCustomerName] = useState(""),
     [customerPhone, setCustomerPhone] = useState("");
+  useEffect(()=>setSessionId(requestedSession),[requestedSession]);
+  const selectedSession=(data.sessions??[]).find((session:Row)=>session.id===sessionId);
+  const searchTrigger=useRef<HTMLButtonElement>(null);
   useTableActivity(
     (data.sessions ?? []).find((session: Row) => session.id === sessionId)
       ?.table_id,
@@ -637,9 +645,10 @@ export function Pos() {
         ...(data.categories ?? []).map((entry: Row) => entry.name),
         ...menu.map((m: Row) => m.category),
       ]),
-    ],
+    ].filter(category=>category==='All'||!lead||guestMenuCourse(category,data.categories?.find((entry:Row)=>entry.name.toLowerCase()===category.toLowerCase())?.menu_course)===lead),
     shown = menu.filter(
       (m: Row) =>
+        (!lead||guestMenuCourse(m.category,m.menu_course)===lead) &&
         (category === "All" || m.category === category) &&
         m.name.toLowerCase().includes(search.toLowerCase()),
     );
@@ -679,6 +688,8 @@ export function Pos() {
       return sum;
     }
   }, 0);
+  const defaultCharges:Row[]=editingOrder?[]:(outlet.web_default_charges??[]),chargesTotal=cart.length?defaultCharges.reduce((sum,charge)=>sum+Number(charge.amount),0):0;
+  const roundingMode=outlet.web_rounding_mode_default??(outlet.web_round_down_default?'DOWN':'NONE'),estimatedBase=amount+estimatedTax+chargesTotal,estimatedRoundOff=cart.length?roundAdjustment(estimatedBase,roundingMode!=='NONE',roundingMode):0;
   const add = (item: Row) =>
     setCart((previous) => {
       const lineKey =
@@ -758,16 +769,10 @@ export function Pos() {
   return (
     <div className="pos-layout">
       <section className="catalog">
-        <StockCountReminder />
-        <div className="search-box">
-          <Icon name="search" />
-          <input
-            aria-label="Search menu"
-            placeholder="Search the menu"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+
+        <PageHeadingTools slot="subtitle">{selectedSession&&<small className="pos-table-context" aria-label="Selected table"><span>Table no.</span><strong>{selectedSession.table_label}</strong></small>}</PageHeadingTools>
+        <PageHeadingTools><div className="pos-heading-search" data-open={searchOpen}>{searchOpen&&<input autoFocus type="search" aria-label="Search menu" placeholder="Search the menu" value={search} onChange={e=>{setSearch(e.target.value);setLead('');setCategory('All')}} onKeyDown={e=>{if(e.key==='Escape'){setSearchOpen(false);setSearch('');searchTrigger.current?.focus()}}}/>}<button ref={searchTrigger} type="button" className="icon-button pos-search-trigger" aria-label="Search menu" aria-expanded={searchOpen} title={searchOpen?'Close search':'Search menu'} onClick={()=>{setSearchOpen(!searchOpen);if(searchOpen)setSearch('')}}><Icon name={searchOpen?'close':'search'}/></button></div></PageHeadingTools>
+        <nav className="guest-journey pos-course-tabs" aria-label="POS menu courses"><ol>{guestCourses.map((entry,index)=><li key={entry.id}><button type="button" aria-current={lead===entry.id?'step':undefined} onClick={()=>{setLead(entry.id);setCategory('All');setSearch('')}}><Icon name={entry.icon}/><span>Step {index+1}</span><strong>{entry.label}</strong></button></li>)}</ol></nav>
         <div
           className="tabs category-tabs"
           role="group"
@@ -777,9 +782,9 @@ export function Pos() {
             <button
               key={c}
               type="button"
-              aria-pressed={category === c}
-              className={category === c ? "selected" : ""}
-              onClick={() => setCategory(c)}
+              aria-pressed={category === c&&(c!=='All'||!lead)}
+              className={category === c&&(c!=='All'||!lead) ? "selected" : ""}
+              onClick={() => {setCategory(c);if(c==='All')setLead('')}}
             >
               {c}
             </button>
@@ -974,36 +979,15 @@ export function Pos() {
             </span>
             <strong>{money(amount)}</strong>
           </div>
-          {(taxes?.length
-            ? taxBreakdown(estimatedTax, taxes).map((tax) => [
-                tax.name,
-                tax.amount,
-              ])
-            : [["Tax", estimatedTax]]
-          ).map(([name, tax], index) => (
-            <div className="total-row" key={String(name)}>
-              <span className="tax-row-label">
-                {String(name)}
-                {index === 0 &&
-                  !editingOrder &&
-                  can(data.actor, "settings") && (
-                    <button
-                      className="icon-button"
-                      aria-label="Edit tax settings"
-                      onClick={() => modal("Tax settings", <TaxSettings />)}
-                    >
-                      <Icon name="edit" />
-                    </button>
-                  )}
-              </span>
-              <strong>{money(Number(tax))}</strong>
-            </div>
-          ))}
+          {(taxes?.length?taxBreakdown(estimatedTax,taxes):[{name:'Tax',amount:estimatedTax,rateBps:override??null}]).map((tax,index)=><div className="total-row" key={index}><span className="tax-row-label">{tax.name}{tax.rateBps!==null&&<small>{Number(tax.rateBps)/100}%</small>}{index===0&&!editingOrder&&can(data.actor,'settings')&&<button className="icon-button" aria-label="Edit tax settings" onClick={()=>modal('Tax settings',<TaxSettings/>)}><Icon name="edit"/></button>}</span><strong>{money(tax.amount)}</strong></div>)}
+          {cart.length>0&&defaultCharges.map((charge,index)=><div className="total-row" key={'charge-'+index}><span>{charge.name}</span><strong>{money(charge.amount)}</strong></div>)}
+          {!!estimatedRoundOff&&<div className="total-row"><span>Round off</span><strong>{money(estimatedRoundOff)}</strong></div>}
+          {isManager(data.actor)&&can(data.actor,'bill')&&<button className="text-button pos-bill-settings" onClick={()=>modal('Future bill settings',<AdjustmentsEditor outletId={data.outletId} save={input=>run('billSettings',input).then(result=>{close();return result})}/>)}><Icon name="settings"/>Future bill settings</button>}
           <div className="total-row grand-total">
             <span>
               <T>{"Total"}</T>
             </span>
-            <strong>{money(amount + estimatedTax)}</strong>
+            <strong>{money(estimatedBase + estimatedRoundOff)}</strong>
           </div>
 
           <button
@@ -1044,12 +1028,27 @@ export function Kitchen() {
   const tickets: Row[] = (data.tickets ?? []).filter(
     (ticket: Row) => stream === "ALL" || ticket.production_stream === stream,
   );
-  const [selected,setSelected]=useState<string[]>([]),[forwarding,setForwarding]=useState(false),[bulkMessage,setBulkMessage]=useState('');
-  const forward=async(from:string,all:boolean)=>{
-    const candidates=tickets.filter(ticket=>ticket.status===from && (all || selected.includes(ticket.id)));
-    if(!candidates.length || forwarding)return;
+  const [selected,setSelected]=useState<string[]>([]),[selecting,setSelecting]=useState<string|null>(null),[forwarding,setForwarding]=useState(false),[bulkMessage,setBulkMessage]=useState('');
+  useEffect(()=>{setSelected([]);setSelecting(null);setBulkMessage('')},[data.outletId,stream]);
+  useEffect(()=>{setSelected(old=>old.filter(id=>tickets.some(t=>t.id===id&&t.status===selecting)))},[data.tickets,selecting]);
+  const act=async(from:string,reject=false)=>{
+    const candidates=tickets.filter(ticket=>ticket.status===from&&selected.includes(ticket.id));
+    if(!candidates.length||forwarding)return;
+    const rounds=Array.from(new Map(candidates.map(t=>[t.round_id,{orderId:t.order_id,roundId:t.round_id,version:Number(t.round_version)}])).values());
     setForwarding(true);setBulkMessage('');let completed=0;
-    try{for(let index=0;index<candidates.length;index+=20){const batch=candidates.slice(index,index+20);await run('kitchenBulk',{outletId:data.outletId,from,ticketIds:batch.map(ticket=>ticket.id)});completed+=batch.length;setBulkMessage('Forwarded '+completed+' of '+candidates.length+' tickets.');}setSelected(previous=>previous.filter(id=>!candidates.some(ticket=>ticket.id===id)))}catch(e){setBulkMessage('Forwarded '+completed+' of '+candidates.length+'. '+(e as Error).message)}finally{setForwarding(false)}
+    try{
+      let reason:string|null=null;
+      if(reject){reason=await rejectionReason('Reject '+rounds.length+' entire round(s), including every station. Paid or issued bills require their correction workflow. Consumed food is not returned to stock.');if(!reason)return;}
+      else if(from==='READY'&&!await confirmAction('Confirm every selected round has actually been served. All stations must be ready.','Forward · Mark served'))return;
+      const entries:Row[]=reject||from==='READY'?rounds:candidates;
+      for(let index=0;index<entries.length;index+=20){const batch=entries.slice(index,index+20);
+        if(reject)await run('rejectKitchenRounds',{outletId:data.outletId,from,reason,rounds:batch});
+        else if(from==='READY')await run('serveSelected',{outletId:data.outletId,confirmedServed:true,rounds:batch});
+        else await run('kitchenBulk',{outletId:data.outletId,from,ticketIds:batch.map(ticket=>ticket.id)});
+        completed+=batch.length;
+      }
+      setSelected([]);setSelecting(null);setBulkMessage((reject?'Rejected ':'Forwarded ')+completed+'.');
+    }catch(e){setBulkMessage('Completed '+completed+'. '+(e as Error).message)}finally{setForwarding(false)}
   };
   return (
     <>
@@ -1076,7 +1075,7 @@ export function Kitchen() {
         )}
         <span className="muted">{tickets.length} active tickets</span>
       </div>
-      <KitchenStageSwitch/>
+      <PageHeadingTools><KitchenStageSwitch/></PageHeadingTools>
       {bulkMessage && <p role="status">{bulkMessage}</p>}
       <div className="kitchen-board">
         {["RELEASED", "PREPARING", "READY"].map((state) => (
@@ -1086,14 +1085,19 @@ export function Kitchen() {
               <h2>
                 <T>{label(state)}</T>
               </h2>
-              <span>{tickets.filter((t) => t.status === state).length}</span>
+              <button type="button" className="button small kitchen-stage-select" disabled={busy||forwarding} aria-expanded={selecting===state} onClick={()=>{setSelected([]);setSelecting(selecting===state?null:state)}}>{selecting===state?'Cancel selection':'Select'}</button>
+              <span className="kitchen-stage-count">{tickets.filter((t) => t.status === state).length}</span>
             </div>
-            {state!=="READY" && <div className="kitchen-bulk-actions"><button className="button small" disabled={busy || forwarding || !tickets.some(ticket=>ticket.status===state)} onClick={()=>void forward(state,true)}>Forward all</button><button className="button small" disabled={busy || forwarding || !tickets.some(ticket=>ticket.status===state && selected.includes(ticket.id))} onClick={()=>void forward(state,false)}>Forward selected</button></div>}
+            {selecting===state&&<div className="kitchen-bulk-actions" role="group" aria-label={label(state)+' selection'}>
+              <button className="button small" disabled={busy||forwarding||!tickets.some(t=>t.status===state)} onClick={()=>setSelected(tickets.filter(t=>t.status===state).map(t=>t.id))}>Select all</button>
+              <button className="button small primary" disabled={busy||forwarding||!selected.length||(state==='READY'&&(!can(data.actor,'orders')||!can(data.actor,'sessions')))} onClick={()=>void act(state)}>Forward ({selected.length})</button>
+              <button className="button small danger" title={isManager(data.actor)?'Reject entire selected rounds':'Manager authorization required'} disabled={busy||forwarding||!selected.length||!isManager(data.actor)} onClick={()=>void act(state,true)}>Reject</button>
+            </div>}
             {tickets
               .filter((t) => t.status === state)
               .map((ticket) => (
                 <article className={'ticket'+(ticket.pinned?' vip-ticket':'')} key={ticket.id}>
-                  {state!=="READY" && <label className="kitchen-ticket-select"><input type="checkbox" aria-label={"Select order #"+ticket.number+" round "+ticket.round_number+" · "+ticket.station} checked={selected.includes(ticket.id)} disabled={busy || forwarding} onChange={event=>setSelected(previous=>event.target.checked?[...previous,ticket.id]:previous.filter(id=>id!==ticket.id))}/>Select</label>}
+                  {selecting===state && <label className="kitchen-ticket-select"><input type="checkbox" aria-label={"Select order #"+ticket.number+" round "+ticket.round_number+" · "+ticket.station} checked={selected.includes(ticket.id)} disabled={busy || forwarding} onChange={event=>setSelected(previous=>event.target.checked?[...previous,ticket.id]:previous.filter(id=>id!==ticket.id))}/>Select</label>}
                   <div className="ticket-heading">
                     <strong>{ticket.pinned&&<span className="vip-order-marker">VIP · </span>}#{ticket.number}</strong>
                     <Badge value={ticket.table_label ?? "TAKEAWAY"} />

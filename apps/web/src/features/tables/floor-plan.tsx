@@ -304,7 +304,7 @@ export function FloorPlan() {
     setSelected("");
     setDraftArea({ ...area });
     setDraftOutline(saved?.outline ?? null);
-    setBoundaryStyle(saved?.boundary_style ?? "STROKE");
+    setBoundaryStyle("STROKE");
     setBoundaryRoundness(Number(saved?.boundary_roundness??0));
     setDeletedTables([]);
   };
@@ -478,8 +478,8 @@ export function FloorPlan() {
   const displayOutline = outline ?? floorOutline("Rectangle", area);
   const boundaryGeometry=roundedFloorBoundary(displayOutline,roundness);
   const shownBoundary = draft
-    ? boundaryStyle
-    : (saved?.boundary_style ?? "STROKE");
+    ? "STROKE"
+    : "STROKE";
   const manageFloor = (rename = false) =>
     form(
       rename ? "Rename floor" : "Add floor",
@@ -551,16 +551,7 @@ export function FloorPlan() {
               <T>{"Add table"}</T>
             </button>
           )}
-          {floor && (
-            <button
-              className="icon-button"
-              aria-label="Rename floor"
-              title="Rename floor"
-              onClick={() => manageFloor(true)}
-            >
-              <Icon name="edit" />
-            </button>
-          )}
+
         </>
       )}
     </>
@@ -592,6 +583,8 @@ export function FloorPlan() {
         arranging={!!draft}
       >
         <div className="toolbar floor-plan-toolbar">
+          <div className="floor-plan-picker">
+            {isManager(data.actor) && floor && <button type="button" className="icon-button" aria-label="Edit floor name" title="Edit floor name" disabled={!!draft} onClick={() => manageFloor(true)}><Icon name="edit" /></button>}
           <select
             aria-label="Floor plan floor"
             value={floor}
@@ -605,6 +598,7 @@ export function FloorPlan() {
               <option key={name}>{name}</option>
             ))}
           </select>
+          </div>
           {floorControls}
           <div className="floor-plan-legend">
             <span>
@@ -771,18 +765,6 @@ export function FloorPlan() {
             >
               <T>{"Floor outline"}</T>
             </button>
-            <select
-              aria-label="Boundary style"
-              value={boundaryStyle}
-              onChange={(e) => setBoundaryStyle(e.target.value)}
-            >
-              <option value="STROKE">
-                <T>{"Clean stroke"}</T>
-              </option>
-              <option value="WALLS">
-                <T>{"Walls"}</T>
-              </option>
-            </select>
             <SnappingControls value={snapSettings} change={setSnapSettings}/>
             <RoundnessControl label="Boundary roundness" value={boundaryRoundness} max={500} step={5} disabled={!!floorEllipse(displayOutline)} change={setBoundaryRoundness} start={()=>{historyGesture.current=true}} finish={finishGesture}/>
             <button className="button" disabled={!current} onClick={copy}>
@@ -1013,7 +995,7 @@ export function FloorPlan() {
                   viewBox={`0 0 ${area.width} ${area.height}`}
                   aria-label="Floor boundary"
                 >
-                  <defs><pattern id="floor-mapping-dots" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#fff"/><rect className="floor-background-tint" width="20" height="20" fill="#eaf1e6" fillOpacity="0.25"/><circle cx="2" cy="2" r="1" fill="#8b9f83" fillOpacity="0.45"/></pattern></defs>
+                  <defs><pattern id="floor-mapping-dots" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#fff"/><rect className="floor-background-tint" width="20" height="20" fill="#eaf1e6" fillOpacity="0.65"/><circle cx="2" cy="2" r="1" fill="#8b9f83" fillOpacity="0.45"/></pattern></defs>
                   {floorEllipse(displayOutline) ? (
                     (() => {
                       const oval = floorEllipse(displayOutline)!;
@@ -1024,22 +1006,16 @@ export function FloorPlan() {
                           rx={oval.width / 2}
                           ry={oval.height / 2}
                           fill="url(#floor-mapping-dots)"
-                          stroke={
-                            shownBoundary === "WALLS" ? "#53664a" : "#819574"
-                          }
-                          strokeWidth={shownBoundary === "WALLS" ? 18 : 3}
+                          stroke="#819574"
+                          strokeWidth={3}
                         />
                       );
                     })()
                   ) : (
                     <path className="floor-boundary-shape" d={boundaryGeometry.path}
                       fill="url(#floor-mapping-dots)"
-                      stroke={
-                        shownBoundary === "WALLS"
-                          ? "#53664a"
-                          : "#819574"
-                      }
-                      strokeWidth={shownBoundary === "WALLS" ? 18 : 3}
+                      stroke="#819574"
+                      strokeWidth={3}
                     />
                   )}
                   <rect

@@ -1,5 +1,6 @@
 "use client";
 import { T, useStaffTranslation } from "@/lib/staff-language";
+import {interfaceIconShapes} from './interface-icons';
 import {
   useEffect,
   useId,
@@ -9,7 +10,19 @@ import {
   type FormEvent,
 } from "react";
 import { label } from "@/lib/client";
+import {PasswordInput} from "./password-input";
 const shapes: Record<string, ReactNode> = {
+ phone:<path d="M7 3H3v4c0 8 6 14 14 14h4v-4l-5-2-2 2a13 13 0 0 1-7-7l2-2-2-5Z"/>,
+ support:<><path d="M4 13v-2a8 8 0 0 1 16 0v6a4 4 0 0 1-4 4h-3"/><rect x="2" y="10" width="5" height="8" rx="2"/><rect x="17" y="10" width="5" height="8" rx="2"/><path d="M10 21h3"/></>,
+ mail:<><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/></>,
+ chat:<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>,
+ send:<><path d="m21 3-7 18-4-7-7-4 18-7ZM10 14 21 3"/></>,
+ external:<><path d="M14 3h7v7m0-7L10 14M10 3H4v17h17v-6"/></>,
+ back:interfaceIconShapes.back,
+ filter:interfaceIconShapes.filter,
+ sort:interfaceIconShapes.sort,
+ 'table-four':interfaceIconShapes['table-four'],
+ details:interfaceIconShapes.details,
   bell: (
     <>
       <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" />
@@ -31,13 +44,15 @@ const shapes: Record<string, ReactNode> = {
       <path d="M4 5h16v14H4zM4 13h5l2 3h2l2-3h5" />
     </>
   ),
-  navigation: <path d="M4 6h16M4 12h16M4 18h16" />,
+  navigation: interfaceIconShapes.navigation,
   dish: (
     <>
       <circle cx="13" cy="12" r="7" />
       <path d="M3 3v5m3-5v5M3 6h3M4.5 8v13" />
     </>
   ),
+  gift: <><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8C4 9 4 1 8 3l4 5Zm0 0c8 1 8-7 4-5l-4 5Z"/></>,
+  dessert: <><path d="M5 12h14v8H5zM4 20h16M5 12c0-5 14-5 14 0M12 8V5"/><circle cx="12" cy="3" r="2"/></>,
   cup: (
     <>
       <path d="M4 6h13v10a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V6ZM17 8h2a3 3 0 0 1 0 6h-2M7 2v1M12 2v1" />
@@ -173,6 +188,8 @@ export function Icon({
   name: string;
   className?: string;
 }) {
+  const original=(name==='report-activity'?shapes.overview:shapes[name])??shapes.orders;
+  const artwork=name==='audit'?undefined:name==='report-activity'?interfaceIconShapes.audit:interfaceIconShapes[name];
   return (
     <svg
       className={"icon " + className}
@@ -184,7 +201,7 @@ export function Icon({
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      {shapes[name] ?? shapes.orders}
+      {artwork?<><g className="working-preview-icon-art">{artwork}</g><g className="working-original-icon-art">{original}</g></>:original}
     </svg>
   );
 }
@@ -226,8 +243,10 @@ export function Modal({
   title,
   children,
   onClose,
+  className,
 }: {
   title: string;
+  className?: string;
   children: ReactNode;
   onClose: () => void;
 }) {
@@ -277,7 +296,7 @@ export function Modal({
       }}
     >
       <div
-        className="modal"
+        className={"modal"+(className?" "+className:"")}
         ref={ref}
         role="dialog"
         aria-modal="true"
@@ -323,6 +342,7 @@ export function Form({
   busy = false,
   children,
   before,
+  onCancel,
 }: {
   fields: Field[];
   onSubmit: (data: Record<string, any>) => void | Promise<void>;
@@ -330,6 +350,7 @@ export function Form({
   busy?: boolean;
   children?: ReactNode;
   before?: ReactNode;
+  onCancel?: () => void;
 }) {
   const formId = useId();
   const t = useStaffTranslation();
@@ -351,7 +372,7 @@ export function Form({
     void onSubmit(data);
   }
   return (
-    <form className="form" onSubmit={send}>
+    <form className={"form"+(onCancel?" popup-form"+(fields.length<=4?" popup-form-compact":""):"")} onSubmit={send}>
       {before}
       {fields.map((field) => (
         <div
@@ -381,6 +402,8 @@ export function Form({
                 </option>
               ))}
             </select>
+          ) : field.type === "password" ? (
+            <PasswordInput label={t(field.label).toLowerCase()} id={formId+field.name} name={field.name} defaultValue={field.value??""} required={field.required??true} min={field.min} max={field.max} step={field.step} placeholder={field.placeholder?t(field.placeholder):undefined} autoComplete={field.autoComplete??"new-password"} maxLength={128}/>
           ) : field.type === "textarea" ? (
             <textarea
               id={formId + field.name}
@@ -422,9 +445,9 @@ export function Form({
         </div>
       ))}
       {children}
-      <button className="button primary" disabled={busy} type="submit">
+      {onCancel?<div className="popup-form-actions"><button className="button" disabled={busy} type="button" onClick={onCancel}><T>Cancel</T></button><button className="button primary" disabled={busy} type="submit"><T>{busy?"Saving…":submit}</T></button></div>:<button className="button primary" disabled={busy} type="submit">
         <T>{busy ? "Saving…" : submit}</T>
-      </button>
+      </button>}
     </form>
   );
 }

@@ -9,11 +9,28 @@ import {
 } from "@dinerdost/core";
 import { actorStream } from "./operational-access";
 import type { Row } from "./shared";
+const paymentSorts={
+ DATE_DESC:'activity_date DESC,created_at DESC,id DESC',DATE_ASC:'activity_date ASC,created_at ASC,id ASC',
+ AMOUNT_DESC:'filter_amount DESC,created_at DESC,id DESC',AMOUNT_ASC:'filter_amount ASC,created_at DESC,id DESC',
+ ORDER_DESC:'number DESC,created_at DESC,id DESC',ORDER_ASC:'number ASC,created_at DESC,id DESC',
+ METHOD_ASC:'method ASC,created_at DESC,id DESC',METHOD_DESC:'method DESC,created_at DESC,id DESC',
+ STATE_ASC:"CASE WHEN state='VERIFIED' THEN 'RECEIVED' ELSE state END ASC,created_at DESC,id DESC",STATE_DESC:"CASE WHEN state='VERIFIED' THEN 'RECEIVED' ELSE state END DESC,created_at DESC,id DESC",
+ REFERENCE_ASC:"NULLIF(reference,'') ASC NULLS LAST,created_at DESC,id DESC",REFERENCE_DESC:"NULLIF(reference,'') DESC NULLS LAST,created_at DESC,id DESC",
+} as const;
+const historySortColumns:Record<string,Record<string,string>>={
+ kot:{QUANTITY:'filter_quantity',STATUS:'filter_status',NUMBER:'number',TITLE:'lower(station)'},
+ invoices:{AMOUNT:'filter_amount',QUANTITY:'filter_quantity',STATUS:'filter_status',NUMBER:'number',CUSTOMER:"NULLIF(lower(snapshot->'customer'->>'name'),'')"},
+ movements:{AMOUNT:'filter_amount',QUANTITY:'filter_quantity',STATUS:'filter_status',ITEM:'lower(name)'},
+ purchases:{AMOUNT:'filter_amount',QUANTITY:'filter_quantity',STATUS:'filter_status',TITLE:'lower(title)',REFERENCE:"NULLIF(lower(data->>'reference'),'')"},
+ expenses:{AMOUNT:'filter_amount',STATUS:'filter_status',TITLE:'lower(title)',REFERENCE:"NULLIF(lower(data->>'reference'),'')"},
+ checklists:{STATUS:'filter_status',TITLE:'lower(title)'},
+};
 const filterSchema = z
   .object({
     outletId: z.uuid(),
     kind: z.enum([
       "invoices",
+      "kot",
       "payments",
       "movements",
       "purchases",
@@ -28,12 +45,17 @@ const filterSchema = z
     maxQuantity: z.coerce.number().int().min(0).max(1e12).optional(),
     search: z.string().trim().max(120).default(""),
     status: z.string().trim().max(80).default(""),
+    paymentState:z.enum(['AWAITING_VERIFICATION','UNKNOWN','INITIATED','VERIFIED','REJECTED','FAILED']).optional(),
+    sort:z.enum(['DATE_DESC','DATE_ASC','AMOUNT_DESC','AMOUNT_ASC','ORDER_DESC','ORDER_ASC','METHOD_ASC','METHOD_DESC','STATE_ASC','STATE_DESC','REFERENCE_ASC','REFERENCE_DESC','QUANTITY_ASC','QUANTITY_DESC','STATUS_ASC','STATUS_DESC','TITLE_ASC','TITLE_DESC','NUMBER_ASC','NUMBER_DESC','CUSTOMER_ASC','CUSTOMER_DESC','ITEM_ASC','ITEM_DESC']).optional(),
     offset: z.coerce.number().int().min(0).max(1000000).default(0),
   })
   .strict();
 export async function listActivity(db: Database, actor: Actor, input: unknown) {
   const f = filterSchema.parse(input);
   requireOutlet(actor, f.outletId);
+  ensure(f.kind==='payments'||!f.paymentState,'PAYMENT_FILTER_ONLY','Payment state applies only to payment history.');
+  const [property,direction]=(f.sort??'DATE_DESC').split('_');
+  ensure(f.kind==='payments'?(!f.sort||f.sort in paymentSorts):property==='DATE'||property in historySortColumns[f.kind],'ACTIVITY_SORT_NOT_SUPPORTED','This sorting property is not available for this history.');
   ensure(
     !f.from || !f.to || f.from <= f.to,
     "DATE_RANGE",
@@ -55,7 +77,7 @@ export async function listActivity(db: Database, actor: Actor, input: unknown) {
   );
   const ownExpense = f.kind === "expenses" && !can(actor, "finance"),
     ownChecklist = f.kind === "checklists" && can(actor, "ownChecklists");
-  if (f.kind === "invoices") {
+  if (f.kind === "invoices" || f.kind === "kot") {
     if (!can(actor, "finance")) requirePermission(actor, "bill");
   } else
     requirePermission(
@@ -78,6 +100,8 @@ export async function listActivity(db: Database, actor: Actor, input: unknown) {
   let base: string;
   if (f.kind === "invoices")
     base = `SELECT v.*, (v.created_at AT TIME ZONE 'Asia/Kolkata')::date AS activity_date,(v.snapshot->'totals'->>'payable')::bigint AS filter_amount,(SELECT coalesce(sum((i->>'quantity_milli')::bigint),0) FROM jsonb_array_elements(coalesce(v.snapshot->'items','[]'::jsonb)) i) AS filter_quantity,v.number||' '||coalesce(v.snapshot->'customer'->>'name','') AS filter_search,v.document_type AS filter_status FROM invoices v WHERE v.outlet_id=$1`;
+  else if (f.kind === "kot")
+    base = `SELECT k.*,o.number,o.type AS order_type,r.round_number,r.course,t.label AS table_label,(k.created_at AT TIME ZONE 'Asia/Kolkata')::date AS activity_date,NULL::bigint AS filter_amount,(SELECT coalesce(sum(i.quantity_milli),0) FROM order_items i WHERE i.round_id=k.round_id AND i.restro_id=k.restro_id AND i.station=k.station AND (k.production_stream='LEGACY' OR i.production_stream=k.production_stream)) AS filter_quantity,o.number::text||' '||r.round_number::text||' '||k.station||' '||k.production_stream||' '||coalesce(t.label,'') AS filter_search,k.status AS filter_status FROM kot_tickets k JOIN orders o ON o.id=k.order_id AND o.restro_id=k.restro_id JOIN order_rounds r ON r.id=k.round_id AND r.restro_id=k.restro_id LEFT JOIN table_sessions s ON s.id=o.session_id AND s.restro_id=o.restro_id LEFT JOIN dining_tables t ON t.id=s.table_id AND t.restro_id=s.restro_id WHERE k.outlet_id=$1 AND ($2::text IS NULL OR k.production_stream=$2)${actor.role==='WAITER'?' AND s.owner_employee_id=$3':''}`;
   else if (f.kind === "payments")
     base = `SELECT p.*,o.number,(p.created_at AT TIME ZONE 'Asia/Kolkata')::date AS activity_date,p.amount AS filter_amount,NULL::bigint AS filter_quantity,o.number::text||' '||coalesce(p.reference,'') AS filter_search,p.method AS filter_status FROM payment_attempts p JOIN orders o ON o.id=p.order_id AND o.restro_id=p.restro_id WHERE p.outlet_id=$1`;
   else if (f.kind === "movements")
@@ -115,11 +139,13 @@ export async function listActivity(db: Database, actor: Actor, input: unknown) {
       "%" + f.search.replace(/[\\%_]/g, "\\$&") + "%",
     );
   if (f.status) add("filter_status=?", f.status);
+  if(f.paymentState)add('state=?',f.paymentState);
   args.push(f.offset);
+  const order=f.kind==='payments'?paymentSorts[(f.sort??'DATE_DESC') as keyof typeof paymentSorts]:property==='DATE'?`activity_date ${direction},created_at ${direction},id ${direction}`:`${historySortColumns[f.kind][property]} ${direction} NULLS LAST,created_at DESC,id DESC`;
   return db.transaction(actor.restroId, async (tx) => {
     const rows = (
       await tx.query<Row>(
-        `SELECT * FROM (${base}) activity ${where.length ? "WHERE " + where.join(" AND ") : ""} ORDER BY activity_date DESC,created_at DESC,id DESC LIMIT 101 OFFSET $${args.length}`,
+        `SELECT * FROM (${base}) activity ${where.length ? "WHERE " + where.join(" AND ") : ""} ORDER BY ${order} LIMIT 101 OFFSET $${args.length}`,
         args,
       )
     ).rows;

@@ -81,6 +81,8 @@ export const menuSchema = z
       }, "Use a public HTTPS image URL.")
       .optional(),
     price: z.number().int().min(0).max(1000000000),
+    guestBestChoice: z.boolean().optional(),
+    compareAtPrice: z.number().int().min(1).max(1000000000).nullable().optional(),
     taxBps: z.number().int().min(0).max(10000),
     unit: z.enum(["portion", "piece", "kg", "L", "peg"]).default("portion"),
     pegMl: z.number().int().min(1).max(1000).nullable().default(null),
@@ -130,6 +132,8 @@ export async function saveMenu(
         )
       : null;
     ensure(!previous?.ready_food_batch_id,"PREPARED_MENU_READ_ONLY","Prepared-food listings retain the cancelled dish snapshot and cannot be edited as a new recipe.",409);
+    const compareAtPrice=data.compareAtPrice===undefined?(previous?.compare_at_price??null):data.compareAtPrice;
+    ensure(compareAtPrice===null||Number(compareAtPrice)>data.price,"MENU_OFFER_PRICE","The regular base price must be greater than the selling price. Clear it to remove the offer.");
     const itemId = data.id ?? id();
     const stream =
       data.unit === "peg"
@@ -165,7 +169,7 @@ export async function saveMenu(
       expectedVersion(previous!.version, data.version ?? 0);
       requireTicketStream(actor, previous!.production_stream);
       await tx.query(
-        "UPDATE menu_items SET name=$2,category=$3,description=$4,price=$5,tax_bps=$6,unit=$7,station=$8,active=$9,variants=$10::jsonb,modifiers=$11::jsonb,peg_ml=$12,liquor_ingredient_id=$13,version=version+1 WHERE id=$1",
+        "UPDATE menu_items SET name=$2,category=$3,description=$4,price=$5,tax_bps=$6,unit=$7,station=$8,active=$9,variants=$10::jsonb,modifiers=$11::jsonb,peg_ml=$12,liquor_ingredient_id=$13,compare_at_price=$14,version=version+1 WHERE id=$1",
         [
           itemId,
           data.name,
@@ -180,6 +184,7 @@ export async function saveMenu(
           json(data.modifiers),
           data.unit === "peg" ? data.pegMl : null,
           data.unit === "peg" ? data.liquorIngredientId : null,
+          compareAtPrice,
         ],
       );
     } else
@@ -249,8 +254,8 @@ export async function saveMenu(
         "Choose a menu photo from this outlet.",
       );
     await tx.query(
-      "UPDATE menu_items SET production_stream=$2,image_url=$3,image_is_sample=$4 WHERE id=$1",
-      [itemId, stream, imageUrl, imageUrl.startsWith("/images/menu/samples/")],
+      "UPDATE menu_items SET production_stream=$2,image_url=$3,image_is_sample=$4,guest_best_choice=$5,compare_at_price=$6 WHERE id=$1",
+      [itemId, stream, imageUrl, imageUrl.startsWith("/images/menu/samples/"),data.guestBestChoice??previous?.guest_best_choice??false,compareAtPrice],
     );
     if (data.recipe !== undefined) {
       ensure(

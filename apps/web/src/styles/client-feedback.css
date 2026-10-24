@@ -143,10 +143,14 @@
     padding: 12px 0;
     border-bottom: 1px solid var(--line);
   }
-  .category-manager-row > strong {
+  .category-manager-name {
     flex: 1;
+    min-width: 0;
     overflow-wrap: anywhere;
   }
+  .category-manager-name strong { display: block; }
+  .category-manager-name small { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
+  .category-manager > p { margin: 0; font-size: 12px; line-height: 1.6; }
   .pos-customer-fields {
     display: grid;
     grid-template-columns: 1fr 1fr;

@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-25",
+  "verifiedAt": "2026-10-24T20:42:27.387Z",
+  "version": "0.4.31",
+  "productionUrl": "https://dinerdost-web.vercel.app",
+  "deploymentId": "dpl_DW2u9iuRG8WfmL3Dtx7FQGEYREAd",
+  "deploymentUrl": "https://dinerdost-rjg5gao0v-prem-2230.vercel.app",
+  "sourceSnapshot": "8bc4d62a04496c75fb258b573e401ed66458900347509b43919858de5e83a280",
+  "sourceUploadSha256": "346a230537ae26125d948c50903b7dfdb7f7fb2c4404ac9cffac211ef11132e9",
+  "sourceFiles": 497,
+  "directDirtySourceDeployment": true,
+  "gitPushed": false,
+  "fullBackendPassed": 418,
+  "hostedPostgresPassed": 55,
+  "hostedPostgresScope": {
+    "platformConsole": 19,
+    "guestCheckout": 6,
+    "supportChat": 9,
+    "outletOrderIntake": 6,
+    "manualFeatureControls": 4,
+    "webBillSettings": 10,
+    "vipSettlement": 1
+  },
+  "browserWorkflows": {
+    "calculatorAndPasswordChromiumWebkit": 4,
+    "existingCalculator": 3,
+    "stagedEntryAndQrDesktopPhone": true,
+    "productionEntryAndQrDesktopPhone": true
+  },
+  "typecheckPassed": true,
+  "vercelOptimizedBuildReady": true,
+  "migrationsApplied": 69,
+  "originalProductionData": {
+    "tables": 65,
+    "rows": 264,
+    "allPriorColumnsAndRowsPreserved": true
+  },
+  "approvedRestaurantImport": {
+    "name": "Nythz Coooks",
+    "tables": 50,
+    "rows": 2858,
+    "ownerPasswordPreserved": true,
+    "financialAndAuditRowsExact": true,
+    "counts": {
+      "outlets": 2,
+      "dining_tables": 29,
+      "orders": 47,
+      "order_rounds": 50,
+      "invoices": 16
+    },
+    "authSessionsCopied": false,
+    "supportAccessGrantsCopied": false,
+    "approvedSuperadminSetupComplete": true
+  },
+  "publicChecks": [
+    {
+      "path": "/signin",
+      "status": 200
+    },
+    {
+      "path": "/superadmin/signin",
+      "status": 200
+    },
+    {
+      "path": "/api/workspace",
+      "status": 401
+    },
+    {
+      "path": "/api/calculator",
+      "status": 401
+    },
+    {
+      "path": "/api/active-orders",
+      "status": 401
+    },
+    {
+      "path": "/api/superadmin",
+      "status": 401
+    },
+    {
+      "path": "/api/auth/login invalid origin",
+      "status": 403
+    }
+  ],
+  "temporaryDatabasesRemaining": 0,
+  "physicalDevicesTested": false,
+  "limitations": [
+    "Local and cloud databases do not synchronize after the approved copy.",
+    "Calculator size preference is stored per employee in the current browser; clearing site data removes it.",
+    "No native APK, provider connection, paid upgrade or deferred procurement/Q111 implementation is claimed."
+  ],
+  "note": "Deployment acceptance recorded before this return handoff; publication status is documented separately."
+}

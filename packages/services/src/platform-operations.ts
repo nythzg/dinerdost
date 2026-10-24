@@ -6,6 +6,7 @@ import {id,json,one,expectedVersion,hash,num,type Row} from './shared';
 import {stepUp} from './auth';
 import {platformMutation,requirePlatformMember,assertPlatformScope,appendPlatformAudit,type PlatformActor} from './platform-console';
 import {setupSelection,applyPlatformSetup} from './platform-setup';
+import {supportChannelsSchema} from './support-chat';
 
 export const operationReason=z.string().trim().min(5).max(500);
 export const issuerSchema=z.object({name:z.string().trim().min(2).max(150),address:z.string().trim().min(5).max(500),gstin:z.string().regex(/^\d{2}[A-Z0-9]{13}$/),stateCode:z.string().regex(/^\d{2}$/),stateName:z.string().trim().min(2).max(80),sac:z.string().regex(/^\d{4,8}$/),prefix:z.string().regex(/^[A-Z0-9]{1,4}$/),taxRate:z.number().min(0).max(100).multipleOf(.01),signatory:z.string().trim().min(2).max(100),eInvoiceRequired:z.boolean(),eInvoiceExemptionDeclaration:z.string().trim().max(1500).default('')}).strict();
@@ -13,9 +14,9 @@ const riskSchema=z.object({enabled:z.boolean(),baselineOrders:z.number().int().m
 const deskSchema=z.object({escalateAfterHours:z.number().int().min(1).max(720)}).strict();
 const scopeSql='($1::uuid[] IS NULL OR restro_id=ANY($1))';
 export async function savePlatformConfiguration(db:Database,actor:PlatformActor,key:string,input:unknown){
- const data=z.object({key:z.enum(['issuer','onboarding','risk','serviceDesk']),data:z.unknown(),version:z.number().int().min(0),reason:operationReason}).strict().parse(input);
- const payload=({issuer:issuerSchema,onboarding:setupSelection,risk:riskSchema,serviceDesk:deskSchema}[data.key]).parse(data.data);
- const permission:PlatformPermission=data.key==='issuer'?'plans':data.key==='serviceDesk'?'support':'tenants';
+ const data=z.object({key:z.enum(['issuer','onboarding','risk','serviceDesk','supportChannels']),data:z.unknown(),version:z.number().int().min(0),reason:operationReason}).strict().parse(input);
+ const payload=({issuer:issuerSchema,onboarding:setupSelection,risk:riskSchema,serviceDesk:deskSchema,supportChannels:supportChannelsSchema}[data.key]).parse(data.data);
+ const permission:PlatformPermission=data.key==='issuer'?'plans':['serviceDesk','supportChannels'].includes(data.key)?'support':'tenants';
  return platformMutation(db,actor,key,permission,'PLATFORM_CONFIG_SAVED',data,data.reason,async tx=>{
   const admin=await requirePlatformMember(tx,actor);assertPlatformScope(admin);
   const before=(await tx.query<Row>('SELECT * FROM platform_operational_config WHERE key=$1 FOR UPDATE',[data.key])).rows[0];expectedVersion(before?.version??0,data.version);

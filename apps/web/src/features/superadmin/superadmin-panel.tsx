@@ -10,17 +10,19 @@ import {request,idempotentPost,money,date,label,type Row,ApiError} from '@/lib/c
 
 import {Logo,Icon,Modal} from '@/components/ui';
 
-import {useQrImage,downloadQrCard} from '@/components/table-qr';
+
 
 import {clientUuid} from '@/lib/browser-crypto';
 
 import './superadmin.css';
 import {OperationsPanel} from './operations-panel';
+import {SupportCenter} from '@/features/support/support-center';
 import {UploadField} from '@/components/upload-field';
 import {RestaurantDirectory,DatasetFilter} from './restaurant-data';
 
 import {consoleNavigation as navigation} from './console-navigation';
 import {ConsoleShell} from './console-shell';
+import {FeatureControls} from './feature-controls';
 import {ConsoleOverview} from './console-overview';
 
 type Dialog={type:'record'|'tenant'|'newTenant'|'member'|'support'|'qr'|'document'|'promo';kind?:string;row?:Row};
@@ -46,13 +48,13 @@ export function SuperadminPanel(){
 
  const refresh=useCallback(async(signal?:AbortSignal)=>{const sequence=++refreshSequence.current;setRefreshing(true);try{const next=await request<Row>('/api/superadmin?dataset='+dataset,{signal});if(signal?.aborted||sequence!==refreshSequence.current)return;setData(next);setForbidden(false);setError('');setSection(current=>navigation.some(item=>item.id===current&&item.permissions.some(p=>next.admin.permissions.includes(p)))?current:navigation.find(item=>item.permissions.some(p=>next.admin.permissions.includes(p)))?.id??'overview');}catch(issue){if(signal?.aborted||sequence!==refreshSequence.current)return;setError((issue as Error).message);if(issue instanceof ApiError&&issue.status===403){setForbidden(true);setData(null)}}finally{if(sequence===refreshSequence.current)setRefreshing(false)}},[dataset]);
 
- useEffect(()=>{setOrigin(location.origin);const abort=new AbortController();void refresh(abort.signal);return()=>abort.abort()},[refresh]);
+ useEffect(()=>{if(new URLSearchParams(location.search).get('supportChat')||sessionStorage.getItem('dd-return-support-thread'))setSection('messages');setOrigin(location.origin);const abort=new AbortController();void refresh(abort.signal);return()=>abort.abort()},[refresh]);
 
  useEffect(()=>{if(!notice)return;const timer=setTimeout(()=>setNotice(''),7000);return()=>clearTimeout(timer)},[notice]);
  const changeSection=(id:string)=>{setSection(id);setKind('');setSearch('');setRecordState('all');setNotice('')};
  const run=async(action:string,input:unknown)=>{setBusy(true);setError('');try{const result=await idempotentPost<Row>('/api/superadmin',{action,input});await refresh();setNotice('Changes saved.');return result;}catch(issue){setError((issue as Error).message);throw issue;}finally{setBusy(false)}};
 
- const submit=async(event:FormEvent<HTMLFormElement>,action:string,build:(form:FormData)=>unknown)=>{event.preventDefault();try{const result=await run(action,build(new FormData(event.currentTarget)));if(action==='startSupport'){setBusy(true);try{await request('/api/superadmin/support-view',{method:'POST',body:JSON.stringify({action:'start',id:result.id})});location.assign('/app/overview');return}finally{setBusy(false)}}if(action==='bulkQr')setQr(result.tables);setDialog(null);}catch{}};
+ const submit=async(event:FormEvent<HTMLFormElement>,action:string,build:(form:FormData)=>unknown)=>{event.preventDefault();try{const result=await run(action,build(new FormData(event.currentTarget)));if(action==='startSupport'){setBusy(true);try{await request('/api/superadmin/support-view',{method:'POST',body:JSON.stringify({action:'start',id:result.id})});location.assign('/app/overview');return}finally{setBusy(false)}}setDialog(null);}catch{}};
 
  if(!data)return <main className="sa-access"><Logo/><h1>Diner Dost superadmin</h1>{error?<><p role="alert">{error}</p><p>{forbidden?'Access is explicitly provisioned by a Diner Dost platform operator. Restaurant ownership does not grant superadmin access.':'Sign in with your provisioned platform account.'}</p><Link className="button primary" href="/superadmin/signin">Sign in</Link><Link className="button" href="/app/overview">Restaurant workspace</Link></>:<p role="status">Loading platform console…</p>}</main>;
 
@@ -67,8 +69,10 @@ export function SuperadminPanel(){
  return <ConsoleShell data={data} section={section} refreshing={refreshing} busy={busy} modalOpen={!!dialog} onNavigate={changeSection} onRefresh={()=>void refresh()} onRestaurant={row=>setDialog({type:'tenant',row})}>
    <main id="sa-main-content" tabIndex={-1} className="sa-content"><div className="sa-heading"><div><span className="sa-section-label">{navigation.find(item=>item.id===section)?.group}</span><h1>{navigation.find(item=>item.id===section)?.title}</h1><p>{navigation.find(item=>item.id===section)?.description}</p></div>{section==='tenants'&&data.admin.tenantScope===null&&<button className="button primary" onClick={()=>setDialog({type:'newTenant'})}><Icon name="plus"/>Create restaurant</button>}</div>
 
+    {section==='messages'&&can('support')&&<SupportCenter platform/>}
     {error&&<div className="error" role="alert">{error}</div>}{notice&&<div className="sa-notice sa-toast" role="status"><Icon name="check"/>{notice}<button aria-label="Dismiss notification" onClick={()=>setNotice('')}>×</button></div>}
 
+    {section==='features'&&data.admin.role==='SUPERADMIN'&&<FeatureControls data={data} refresh={()=>refresh()}/>}
     {section==='overview'&&data.metrics&&<><div className="sa-toolbar"><DatasetFilter value={dataset} onChange={setDataset}/>{can('tenants')&&<button className="button primary" onClick={()=>changeSection('tenants')}>Browse restaurant data</button>}</div><ConsoleOverview data={data} onNavigate={changeSection}/></>}
 
     {section==='tenants'&&<>{data.brandReports.length>0&&<div className="sa-card-grid">{data.brandReports.map((brand:Row)=><article className="sa-card" key={brand.id}><h2>{brand.name}</h2><p className="sa-help">Brand totals · all stored records</p><Terms row={{restaurants:brand.restaurants,outlets:brand.outlets,ordersIn30Days:brand.orders_30d}}/></article>)}</div>}<RestaurantDirectory dataset={dataset} onDataset={setDataset} revision={data.readAt} onManage={row=>setDialog({type:'tenant',row})} onDocuments={row=>setDialog({type:'document',row})}/></>}
@@ -84,15 +88,14 @@ export function SuperadminPanel(){
 
     {section==='plans'&&<section className="sa-card"><div className="sa-section-heading"><div><h2>SaaS account balances</h2><p>Manual invoices less credits and recorded payments. These do not change diner payments or bank accounts.</p></div><button className="button" onClick={()=>setDialog({type:'promo'})}>Apply onboarding promotion</button></div>{data.balances.length?data.balances.map((b:Row)=><p key={b.id}>{b.name} <strong>{money(b.balance)}</strong></p>):<p>No subscription billing records yet.</p>}</section>}
 
-    {section==='ecosystem'&&<section className="sa-card"><div className="sa-section-heading"><div><h2>Table QR provisioning</h2><p>Create an explicit batch of tables and independent QR keys in the selected outlet.</p></div><button className="button primary" onClick={()=>setDialog({type:'qr'})}>Create QR batch</button></div>{(qr.length>0||data.qrTables.length>0)&&<><p className="sa-help">{qr.length?'Latest created batch':'Current table QR codes · up to 200 shown'}</p><div className="sa-qr-grid">{(qr.length?qr:data.qrTables).map((row:Row)=><QrPreview key={row.id} table={row} origin={origin}/>)}</div></>}</section>}
-
     {section==='team'&&<section className="sa-card"><div className="sa-section-heading"><div><h2>Internal platform access</h2><p>Grant existing accounts a platform role. Tenant employee roles are separate.</p></div><button className="button primary" onClick={()=>setDialog({type:'member'})}>Grant access</button></div><div className="sa-table-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Permissions</th><th>State</th><th/></tr></thead><tbody>{data.members.map((row:Row)=><tr key={row.user_id}><td><strong>{row.name}</strong><small>{row.email}</small></td><td>{label(row.role)}</td><td>{row.permissions.map((p:string)=>label(p)).join(', ')}</td><td>{row.enabled?'Enabled':'Disabled'}</td><td><button className="button" onClick={()=>setDialog({type:'member',row})}>Edit access</button></td></tr>)}</tbody></table></div></section>}
 
     {section==='audit'&&<section className="sa-card sa-audit-panel" aria-label="Recorded actions"><div className="sa-section-heading"><div><span className="sa-section-label">Activity register</span><h2>Recorded actions</h2><p>Latest 100 actions. Reads and refreshes are excluded. Earlier activity stays in the verified chain.</p></div><button className="button" disabled={busy} onClick={async()=>{try{const result=await run('verifyAudit',{});setNotice(result.valid?'Audit chain verified · '+result.count+' events.':'Audit chain verification failed.')}catch{}}}><Icon name="audit"/>Verify audit chain</button></div><div className="sa-audit-columns" aria-hidden="true"><span>Action</span><span>Administrator</span><span>Recorded at</span></div>{data.audits.map((row:Row)=><details className="sa-audit" key={row.id}><summary><div className="sa-audit-title"><Icon className="sa-audit-chevron" name="chevron"/><div><strong>{label(row.action==='PLATFORM_OWNER_ACTION'?row.after_data?.action??row.action:String(row.action).replace(/^PLATFORM_/,''))}</strong><small>{row.action==='PLATFORM_OWNER_ACTION'?'Owner support':'Platform action'}{data.tenants.find((r:Row)=>r.id===row.entity_id)?.name?' · '+data.tenants.find((r:Row)=>r.id===row.entity_id).name:''}</small></div></div><span className="sa-audit-actor">{row.actor_name}</span><time className="sa-audit-time" dateTime={new Date(row.occurred_at).toISOString()}>{date(row.occurred_at)}</time></summary><div className="sa-audit-body"><p>{row.reason}</p><div className="sa-audit-meta"><span>IP: {row.ip??'Local operator'}</span><span>Sequence {row.sequence}</span></div><div className="sa-audit-diff"><div><h3>Before</h3><Terms row={row.before_data??{state:'None'}}/></div><div><h3>After</h3><Terms row={row.after_data??{state:'None'}}/></div></div></div></details>)}{!data.audits.length&&<p className="sa-empty">No actions recorded yet.</p>}</section>}
 
     {section==='support'&&can('support')&&<section className="sa-card"><div className="sa-section-heading"><div><h2>Restaurant dashboard support</h2><p>Enter the restaurant’s full owner dashboard for 15 minutes. Read-only by default; Superadmin can explicitly enable real troubleshooting changes.</p></div><button className="button primary" onClick={()=>setDialog({type:'support'})}>Open restaurant dashboard</button></div></section>}
 
-   {['overview','tenants','plans','ecosystem','support'].includes(section)&&<OperationsPanel section={section} snapshot={data} onRefresh={()=>refresh()}/>}</main>
+
+   {['overview','tenants','plans','support'].includes(section)&&<OperationsPanel section={section} snapshot={data} onRefresh={()=>refresh()}/>}</main>
 
   {dialog&&<Modal title={dialog.type==='record'?(dialog.row?'Edit ':'New ')+platformResources[dialog.kind!].title:({tenant:'Manage restaurant',newTenant:'Create restaurant',member:'Internal platform access',support:'Open restaurant dashboard',qr:'Create table QR batch',document:'Private KYC documents',promo:'Apply SaaS promotion'} as Row)[dialog.type]} onClose={()=>{if(!busy)setDialog(null)}}><div className="sa-dialog">{error&&<p className="error" role="alert">{error}</p>}
 
@@ -109,8 +112,6 @@ export function SuperadminPanel(){
    {dialog.type==='document'&&<><p>{dialog.row!.name} · Documents are private, downloaded as attachments and recorded in the audit log.</p>{data.documents.filter((d:Row)=>d.restro_id===dialog.row!.id).map((doc:Row)=><p key={doc.id}><a href={'/api/superadmin/documents?id='+doc.id}>{doc.name}</a><small> · {date(doc.created_at)}</small></p>)}<KycUploadForm tenantId={dialog.row!.id} busy={busy} upload={async(form,key)=>{setBusy(true);setError('');try{const reply=await fetch('/api/superadmin/documents',{method:'POST',headers:{'Idempotency-Key':key},body:form}),result=await reply.json();if(!reply.ok)throw new Error(result.error?.message??'Document upload failed.');await refresh();setNotice('Private KYC document saved.');setDialog(null)}catch(issue){setError((issue as Error).message);throw issue}finally{setBusy(false)}}}/></>}
 
    {dialog.type==='promo'&&<form onSubmit={e=>submit(e,'redeemPromo',form=>({tenantId:fieldValue(form,'tenantId'),promoId:fieldValue(form,'promoId'),reason:fieldValue(form,'reason')}))}><fieldset disabled={busy}><p>Records one immutable SaaS account credit. A restaurant can use each onboarding promotion once; expiry and total-use limits are enforced.</p><SelectTenant tenants={data.tenants} required/><label>Promotion<select name="promoId" required><option value="">Choose promotion</option>{data.records.filter((r:Row)=>r.kind==='PROMO'&&!r.archived).map((r:Row)=><option key={r.id} value={r.id}>{r.name} · {r.data.code}</option>)}</select></label><Reason/><button className="button primary">Apply SaaS credit</button></fieldset></form>}
-
-   {dialog.type==='qr'&&<form onSubmit={e=>submit(e,'bulkQr',form=>({outletId:fieldValue(form,'outletId'),prefix:fieldValue(form,'prefix'),floor:fieldValue(form,'floor'),start:Number(form.get('start')),count:Number(form.get('count')),seats:Number(form.get('seats')),reason:fieldValue(form,'reason')}))}><fieldset disabled={busy}><label>Outlet<select name="outletId" required><option value="">Choose outlet</option>{data.outlets.map((row:Row)=><option key={row.id} value={row.id}>{data.tenants.find((t:Row)=>t.id===row.restro_id)?.name} · {row.name}</option>)}</select></label><label>Table label prefix<input name="prefix" required maxLength={20}/></label><label>Floor name<input name="floor" required maxLength={80}/></label>{[['start','First number',1,100000],['count','Number of tables',1,50],['seats','Seats per table',1,100]].map(([name,caption,min,max])=><label key={name}>{caption}<input name={String(name)} type="number" min={Number(min)} max={Number(max)} required/></label>)}<Reason/><button className="button primary">Create tables and QR codes</button></fieldset></form>}
 
   </div></Modal>}
 
@@ -136,7 +137,7 @@ function ResourceField({field,value,data}:{field:PlatformField;value:any;data:Ro
 
  if(field.key==='planId')control=<select name={field.key} defaultValue={value??''} required><option value="">Choose plan</option>{data.records.filter((row:Row)=>row.kind==='PLAN'&&!row.archived).map((row:Row)=><option key={row.id} value={row.id}>{row.name}</option>)}</select>;
 
- else if(field.type==='select')control=<select name={field.key} defaultValue={value??''} required={field.required}><option value="">Choose</option>{field.options!.map(option=><option key={option}>{option}</option>)}</select>;
+ else if(field.type==='select')control=<select name={field.key} defaultValue={value??''} required={field.required}><option value="">Choose</option>{field.options!.filter(option=>option!=='CLOSED'||data.admin.role==='SUPERADMIN'||value==='CLOSED').map(option=><option key={option}>{option}</option>)}</select>;
 
  else if(field.type==='textarea')control=<textarea name={field.key} required={field.required} maxLength={2000} rows={3} defaultValue={value??''}/>;
 
@@ -145,10 +146,6 @@ function ResourceField({field,value,data}:{field:PlatformField;value:any;data:Ro
  return <label>{field.label}{field.type==='datetime-local'?' · India time':''}{control}</label>;
 
 }
-
-
-function QrPreview({table,origin}:{table:Row;origin:string}){const url=origin+'/q/'+table.key,{image,error}=useQrImage(url);return <article><h3>{table.label}</h3>{error?<p role="alert">{error}</p>:image?<img src={image} width={180} height={180} alt={'QR for '+table.label}/>:<span>Preparing QR…</span>}<button className="button" disabled={!image} onClick={()=>void downloadQrCard({url,label:table.label},image)}>Download QR card</button></article>}
-
 
 
 function KycUploadForm({tenantId,busy,upload}:{tenantId:string;busy:boolean;upload:(form:FormData,key:string)=>Promise<void>}){const requestKey=useRef(''),[uploadError,setUploadError]=useState('');return <form onChange={()=>{requestKey.current='';setUploadError('')}} onSubmit={async event=>{event.preventDefault();setUploadError('');const form=new FormData(event.currentTarget);requestKey.current||=clientUuid();try{await upload(form,requestKey.current)}catch(issue){setUploadError((issue as Error).message)}}}><fieldset disabled={busy}><input type="hidden" name="tenantId" value={tenantId}/><UploadField label="Business license / KYC evidence" name="file" accept="application/pdf,image/png,image/jpeg" help="PDF, PNG or JPEG · up to 2 MiB" maxBytes={2097152} required busy={busy} error={uploadError}/><p className="sa-help">Upload authentic supplied evidence only.</p><Reason/><button className="button primary">Save private document</button></fieldset></form>}

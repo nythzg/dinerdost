@@ -5,6 +5,8 @@ import {
   businessLocalToISO,
   quote,
   quantityMilli,
+  roundAdjustment,
+  taxBreakdown,
 } from "@dinerdost/core";
 import { Badge, Empty, Form, Icon, Logo, Modal } from "@/components/ui";
 import {
@@ -18,6 +20,7 @@ import {
 import { DishPicker } from "../workspace/dish-picker";
 import { MenuPicture } from "@/components/menu-picture";
 import { CustomerFields } from "../customers/customer-fields";
+import {GuestBillBreakdown} from '../guest/guest-bill-breakdown';
 import { showOrderPlaced } from "@/lib/order-placed";
 
 export function StorefrontPage({ slug }: { slug: string }) {
@@ -131,6 +134,7 @@ export function StorefrontPage({ slug }: { slug: string }) {
       tax_bps: line.tax_bps,
     })),
   );
+  const charges:Row[]=data.billDefaults?.charges??[],chargesTotal=charges.reduce((sum,charge)=>sum+Number(charge.amount),0),roundingMode=data.billDefaults?.roundingMode??'NONE',roundOff=roundAdjustment(total.payable+chargesTotal,roundingMode!=='NONE',roundingMode),payable=total.payable+chargesTotal+roundOff;
   return (
     <main className="storefront">
       <header className="storefront-header">
@@ -138,6 +142,7 @@ export function StorefrontPage({ slug }: { slug: string }) {
         <span>{data.outletName}</span>
       </header>
       <h1>{data.name}</h1>
+      {data.orderingEnabled===false&&<p className="notice" role="status">This outlet is not accepting new orders right now. Your existing orders remain available in My visits.</p>}
       <nav className="storefront-tabs" aria-label="Customer store">
         {["Menu", "Floor plan", "My visits"].map((name) => (
           <button
@@ -211,12 +216,13 @@ export function StorefrontPage({ slug }: { slug: string }) {
               ))}
               <button
                 className="button primary"
+                disabled={busy || data.orderingEnabled===false}
                 onClick={() => {
                   setError("");
                   setCheckout(true);
                 }}
               >
-                Takeaway · {money(total.payable)}
+                {data.orderingEnabled===false?'Ordering paused':<>Takeaway · {money(payable)}</>}
               </button>
             </section>
           )}
@@ -472,10 +478,10 @@ export function StorefrontPage({ slug }: { slug: string }) {
             </p>
           )}
           <Form
-            busy={busy}
-            submit={"Send order · " + money(total.payable)}
+            busy={busy || data.orderingEnabled===false}
+            submit={data.orderingEnabled===false?'Ordering paused':"Send order · " + money(payable)}
             before={
-              <CustomerFields
+              <><GuestBillBreakdown bill={{...total,payable,charges,roundOff,taxes:taxBreakdown(total.tax,data.taxComponents)}}/><CustomerFields
                 known={data.identities}
                 required
                 labels={["Name", "Phone"]}
@@ -485,7 +491,7 @@ export function StorefrontPage({ slug }: { slug: string }) {
                   setCustomerName(n);
                   setCustomerPhone(p);
                 }}
-              />
+              /></>
             }
             fields={[]}
             onSubmit={async (values) => {

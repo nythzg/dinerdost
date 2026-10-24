@@ -23,6 +23,18 @@ test('round up always uses the next whole rupee while down and legacy nearest re
  for(let paise=0;paise<300;paise++){assert.equal(paise+roundAdjustment(paise,true,'UP'),Math.ceil(paise/100)*100);assert.equal(paise+roundAdjustment(paise,true,'DOWN'),Math.floor(paise/100)*100);assert.equal(paise+roundAdjustment(paise,true,'NEAREST'),Math.round(paise/100)*100);assert.equal(roundAdjustment(paise,false,'UP'),0);}
 });
 
+test('nearest future rounding saves and applies exact whole-rupee boundaries without changing prior bills or native orders',async()=>{
+ const original=await read(),existing=await create(),base=Number(existing.rounds[0].payable)-Number(existing.rounds[0].round_off),frozen=await s.getOrder(db,owner,existing.id);
+ for(const ending of [0,49,50,99]){
+  const fee=(ending-base%100+100)%100;
+  const saved=await save({roundingMode:'NEAREST',charges:fee?[{name:'Boundary charge',amount:fee}]:[]});assert.equal(saved.roundingMode,'NEAREST');assert.equal((await read()).roundingMode,'NEAREST');
+  const next=await create(),round=next.rounds[0],unrounded=base+fee,expected=Math.floor((unrounded+50)/100)*100;
+  assert.equal(round.rounding_mode,'NEAREST');assert.equal(round.rounding_enabled,true);assert.equal(Number(round.round_off),expected-unrounded);assert.equal(Number(round.payable),expected);assert.equal(Number(round.manual_discount),0);
+  const native=await create(false);assert.equal(native.rounds[0].rounding_enabled,false);assert.equal(Number(native.rounds[0].charges_total),0);assert.deepEqual(await s.getOrder(db,owner,existing.id),frozen);
+ }
+ await save({roundingMode:'NONE',charges:[]});assert.equal((await create()).rounds[0].rounding_enabled,false);await save({roundingMode:original.roundingMode,charges:original.charges});
+});
+
 test('combined settings are atomic, versioned, audited and preserve current bills, receipts, stock and native totals',async()=>{
  const old=await create(),round=old.rounds[0];await s.recordPayment(db,owner,key(),old.id,round.id,{version:round.version,method:'CASH',amount:1000},true);const snapshot=await s.getOrder(db,owner,old.id),stock=(await s.workspace(db,owner)).movements,current=await read(),request=key(),input={outletId:w.outletId,version:current.version,loyaltyCap:7350,roundingMode:'UP',createCoupons:[{code:'COMBINED-'+key(),amount:1500,validUntil:date(),maxUses:3}],removeCoupons:[]};
  const saved=await s.saveWebBillSettings(db,owner,request,input);assert.equal(saved.loyaltyCap,7350);assert.equal(saved.roundingMode,'UP');assert.equal(saved.version,current.version+1);assert.deepEqual(await s.saveWebBillSettings(db,owner,request,input),saved);

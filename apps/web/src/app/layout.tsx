@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import {DesignPreviewProvider} from '@/features/design-preview/preview-appearance';
 import "./globals.css";
 import "@/features/qr/qr.css";
 import "@/features/guest/guest.css";
@@ -19,6 +20,9 @@ import "@/styles/inventory-tools.css";
 import "sweetalert2/dist/sweetalert2.css";
 import "@/styles/review-048.css";
 import "@/styles/review-049.css";
+import "@/styles/responsive.css";
+import "@/styles/topbar-theme.css";
+import "@/styles/curved-sidebar.css";
 export const metadata: Metadata = {
   title: { default: "Diner Dost", template: "%s · Diner Dost" },
   description: "Your restaurant, in good company.",
@@ -31,7 +35,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body><DesignPreviewProvider>{children}</DesignPreviewProvider></body>
     </html>
   );
 }

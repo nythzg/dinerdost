@@ -32,7 +32,7 @@ test('inventory content stays centered with a clear gutter beside the tool tabs 
  for(const [width,height] of [[1440,1000],[390,844],[320,568],[844,390],[2200,1100]]){
   await page.setViewportSize({width,height});await page.goto('/app/inventory');
   await expect(page.getByRole('heading',{name:'Daily counts',exact:true})).toBeVisible();
-  const shell=(await page.locator('.main-shell').boundingBox())!,heading=(await page.locator('.page-heading').boundingBox())!,tab=(await page.locator('.calculator-dock>.workspace-dock-trigger').boundingBox())!;
+  const shell=(await page.locator('.main-shell').boundingBox())!,heading=(await page.locator('.page-heading').boundingBox())!,tab=(await page.locator('.calculator-dock .workspace-dock-trigger').boundingBox())!;
   expect(Math.abs(heading.x+heading.width/2-(shell.x+shell.width/2))).toBeLessThanOrEqual(1);
   expect(tab.x-heading.x-heading.width).toBeGreaterThanOrEqual(width<=360?8:12);
   for(const selector of ['.inventory-metrics','.inventory-tools','#daily-stock-counts']){
@@ -47,7 +47,7 @@ test('inventory content stays centered with a clear gutter beside the tool tabs 
 });
 test('original green tool tabs stack at the bottom right and open inward without blocking page controls',async({page})=>{
  await register(page);
- const calcTab=page.locator('.calculator-dock>.workspace-dock-trigger'),ordersTab=page.locator('.active-orders-dock>.workspace-dock-trigger');
+ const calcTab=page.locator('.calculator-dock .workspace-dock-trigger'),ordersTab=page.locator('.active-orders-dock>.workspace-dock-trigger');
  for(const [width,height] of [[1440,1000],[390,844],[320,568],[844,390]]){
   await page.setViewportSize({width,height});await page.goto('/app/overview');
   if(await calcTab.getAttribute('aria-expanded')==='true')await calcTab.click();

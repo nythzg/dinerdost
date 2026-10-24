@@ -29,3 +29,17 @@
 .sa-metric strong.sa-unrecorded{font-size:16px;letter-spacing:0;line-height:1.5;font-weight:500;color:var(--sa-muted)}
 
 .sa-card.sa-audit-panel{padding:0}@media(max-width:580px){.sa-audit-panel .sa-audit summary{grid-template-columns:1fr}.sa-audit-time{padding-left:30px;max-width:none}}
+
+@media screen {
+ .sa-support-toast { align-items: start; bottom: max(16px,env(safe-area-inset-bottom)); }
+ .sa-support-toast>div { display: grid; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
+ .sa-support-toast p { margin: 0; font-size: 13px; line-height: 1.5; }
+ .sa-support-toast .text-button { justify-self: start; padding: 4px 0; font-size: 13px; font-weight: 700; color: #193f30; }
+ .sa-support-toast>.icon-button { display: grid; place-items: center; flex: none; width: 44px; height: 44px; min-width: 44px; padding: 10px; margin: -6px -6px 0 0; border-radius: 8px; }
+ .sa-support-toast>.icon-button>.icon { width: 18px; height: 18px; }
+}
+
+@media screen {
+ html body .sa-support-notifications-modal .modal-header>.icon-button { display: grid; place-items: center; color: #193f30; background: #edf3e7; border: 1px solid #b5c9a9; }
+ html body .sa-support-notifications-modal .modal-header>.icon-button:is(:hover,:focus-visible) { color: #fff; background: #285b45; border-color: #285b45; }
+}

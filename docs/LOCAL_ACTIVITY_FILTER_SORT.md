@@ -1,0 +1,13 @@
+# Local activity dropdowns and guest hierarchy
+
+24 October 2026. Local web changes; no deployment.
+
+Payments, invoices, inventory movements, purchases, expenses and checklists use the shared icon-only Filter and Sort controls. Each labelled dropdown retains its applicable original date, amount, quantity, search and status fields. Apply submits the draft together; Reset preserves sorting. Sorting exposes only relevant properties and runs across the full authorized matching history before pagination. Server-side enums and fixed SQL expressions retain tenant, outlet, employee, stream and role boundaries. No schema, dependency, financial calculation or recorded-history changes were added.
+
+Dropdowns support Escape, outside dismissal, focus return and viewport fitting, including single-column filters on narrow phones. Screen-only styling preserves printing.
+
+Guest home retains the requested 14px welcome text with 4px downward adjustment, outlet text 3px down and equal logo/text-block outer alignment. The four-course progress bar stacks a course icon, quiet 9px step number and larger 14px course name (12px on phones). Icons, step numbers and course names now use the same 15px offset with course names aligned at their top edge across all four steps. Mouse selection has no rectangular outline; keyboard focus retains a visible underline. The permanent search bar is replaced by a heading-end search icon opening the existing dialog, retaining filtering and clear-search controls. Skip uses a dark green bounded button with white text. The helper text uses top:-10px after the requested15px upward and5px downward adjustments. Existing active/completed states and navigation remain.
+
+Verification: 404 full embedded backend cases, three focused activity cases on embedded and real disposable PostgreSQL, 12 new dropdown browser workflows across Chromium/WebKit, the existing payment regression and two guest browser workflows. Final guest replay checks icon/step/title ordering and separate icon/step/title offsets without overlap. Final typecheck and optimized build results are recorded in RELEASE.json; final browser/source matching verifies the layout. Screens at320px were inspected. Full legacy browser suite and physical iPhone/Safari were not rerun. No agent QA writes reached retained Nythz Coooks / Nihal kaman / N1.
+
+Production metadata and released completion counts remain unchanged. Q111 and procurement remain paused/pending as previously recorded. Separate staging is selected for internet voice calling; HTTPS staging deployment and TURN provisioning remain pending provider configuration. No internet-call completion is claimed.

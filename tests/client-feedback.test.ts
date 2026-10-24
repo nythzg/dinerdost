@@ -8,6 +8,7 @@ import {
 } from "@dinerdost/database";
 import { businessDate, paymentMethods, type Actor } from "@dinerdost/core";
 import * as s from "@dinerdost/services";
+import {publicMenu} from '../packages/services/src/public-menu';
 let db: Database, actor: Actor, outletId: string, menu: any[], tables: any[];
 const key = () => randomUUID();
 before(async () => {
@@ -952,4 +953,44 @@ test("reserved table guests can call a waiter before seating and repeats do not 
 
 test("feedback changes and rejected requests leave a valid audit chain", async () => {
   assert.equal((await s.verifyAudit(db, actor)).valid, true);
+});
+
+test('category course assignment persists across renames and reads without changing dishes or recorded orders',async()=>{
+ await s.changeMenuCategory(db,manager(),key(),{outletId,name:'Coffee sweets',menuCourse:'dessert'});
+ let category=(await s.workspace(db,actor)).categories.find((row:any)=>row.name==='Coffee sweets');
+ const dish=await s.saveMenu(db,actor,key(),{outletId,name:'Category course pastry',category:category.name,price:10000,taxBps:500,station:'Kitchen'});
+ const order=await newOrder([{itemId:dish.id,quantity:'1'}]),original=await s.getOrder(db,actor,order.id);
+ const before=(await s.workspace(db,actor)).menu.find((row:any)=>row.id===dish.id);
+ assert.equal(before.menu_course,'dessert');
+ const input={outletId,id:category.id,version:category.version,name:category.name,menuCourse:'starter'},request=key();
+ await s.changeMenuCategory(db,manager(),request,input);await s.changeMenuCategory(db,manager(),request,input);
+ const data=await s.workspace(db,actor);category=data.categories.find((row:any)=>row.id===category.id);
+ assert.equal(category.menu_course,'starter');assert.equal(category.version,input.version+1);
+ assert.equal(data.menu.find((row:any)=>row.id===dish.id).version,before.version);
+ await assert.rejects(s.changeMenuCategory(db,actor,key(),input),{code:'VERSION_CONFLICT'});
+ await s.changeMenuCategory(db,manager(),key(),{outletId,id:category.id,version:category.version,name:'Sweet bites'});
+ let catalog=await db.transaction(actor.restroId,tx=>publicMenu(tx,outletId));
+ assert.equal(catalog.items.find(row=>row.id===dish.id)!.menu_course,'starter');
+ assert.equal(catalog.items.find(row=>row.id===dish.id)!.category,'Sweet bites');
+ assert.deepEqual(await s.getOrder(db,actor,order.id),original);
+ const target=(await s.workspace(db,actor)).categories.find((row:any)=>row.name==='Desserts');
+ await s.changeMenuCategory(db,actor,key(),{outletId,id:target.id,version:target.version,name:target.name,menuCourse:'dessert'});
+ category=(await s.workspace(db,actor)).categories.find((row:any)=>row.id===category.id);
+ await s.changeMenuCategory(db,actor,key(),{outletId,id:category.id,version:category.version,mode:'DELETE',moveTo:target.id});
+ catalog=await db.transaction(actor.restroId,tx=>publicMenu(tx,outletId));assert.equal(catalog.items.find(row=>row.id===dish.id)!.menu_course,'dessert');
+ assert.deepEqual(await s.getOrder(db,actor,order.id),original);
+});
+
+test('category course assignment validates values, tenant and outlet scopes, permissions and database constraints',async()=>{
+ const input={outletId,name:'Category guard',menuCourse:'main'};
+ await assert.rejects(s.changeMenuCategory(db,waiter(),key(),input),{code:'FORBIDDEN'});
+ await assert.rejects(s.changeMenuCategory(db,{...manager(),outletIds:[]},key(),input),{code:'OUTLET_FORBIDDEN'});
+ await assert.rejects(s.changeMenuCategory(db,actor,key(),{...input,menuCourse:'unknown'}),{name:'ZodError'});
+ const signed=await s.signup(db,{name:'Category foreign',email:'category-foreign@example.test',password:'category-foreign-password',restaurant:'Category foreign',outlet:'Main',qrEnabled:true,demo:true},'category-foreign');
+ const foreign=await s.authenticate(db,signed.token);await assert.rejects(s.changeMenuCategory(db,foreign,key(),input),{code:'NOT_FOUND'});
+ const category=(await s.workspace(db,actor)).categories[0];
+ await assert.rejects(db.transaction(actor.restroId,tx=>tx.query('UPDATE menu_categories SET menu_course=$2 WHERE id=$1',[category.id,'unknown'])),{code:'23514'});
+ await s.saveOutlet(db,actor,key(),{name:'Category second outlet',code:'C2',qrEnabled:true,paymentPolicy:'PREPAID',taxBps:0});
+ const second=(await s.workspace(db,actor)).outlets.find((row:any)=>row.id!==outletId);
+ await assert.rejects(s.changeMenuCategory(db,actor,key(),{...input,outletId:second.id,id:category.id,version:category.version}),{code:'NOT_FOUND'});
 });

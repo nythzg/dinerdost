@@ -1,7 +1,7 @@
 "use client";
 import { T, useStaffTranslation } from "@/lib/staff-language";
 import { useEffect, useId, useRef, useState } from "react";
-import { Icon, Modal } from "./ui";
+import { Icon } from "./ui";
 
 export type PageSearchItem = { id: string; name: string; icon: string };
 
@@ -34,12 +34,11 @@ export function PageSearch({
     activeRef.current?.scrollIntoView({ block: "nearest" });
   }, [selected]);
   return (
-    <Modal title="Go to" onClose={close}>
-      <div className="page-search">
+      <div className="page-search inline-search-content" role="region" aria-label="Page search" onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();close()}}}>
         <label className="page-search-input">
           <Icon name="search" />
           <input
-            data-autofocus
+            autoFocus
             aria-label="Search pages"
             role="combobox"
             aria-expanded="true"
@@ -74,7 +73,7 @@ export function PageSearch({
               }
             }}
           />
-          <kbd>esc</kbd>
+          <button type="button" className="icon-button" aria-label="Close page search" onClick={close}><Icon name="close"/></button>
         </label>
         <div
           className="page-search-results"
@@ -104,6 +103,5 @@ export function PageSearch({
           )}
         </div>
       </div>
-    </Modal>
   );
 }

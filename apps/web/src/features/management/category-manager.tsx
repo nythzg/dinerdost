@@ -2,14 +2,16 @@
 import { Icon } from "@/components/ui";
 import type { Row } from "@/lib/client";
 import { useDesk } from "../workspace/context";
+import {guestCourses,guestMenuCourse} from '../guest/guest-journey';
 
 export function CategoryManager() {
   const { data, form, run } = useDesk();
   const categories: Row[] = data.categories ?? [];
   const edit = (category?: Row) =>
     form(
-      category ? "Rename category" : "Add category",
-      [{ name: "name", label: "Category name", value: category?.name }],
+      category ? "Edit category" : "Add category",
+      [{ name: "name", label: "Category name", value: category?.name },
+       {name:'menuCourse',label:'Main menu',type:'select',value:category?guestMenuCourse(category.name,category.menu_course):'main',options:guestCourses.map(course=>({value:course.id,label:course.label}))}],
       (values) =>
         run("menuCategory", {
           ...values,
@@ -49,6 +51,7 @@ export function CategoryManager() {
   }
   return (
     <div className="category-manager">
+      <p className="muted">Assign each category to a main menu. Its dishes will appear there in Cashier POS and the customer menu.</p>
       <button className="button primary" onClick={() => edit()}>
         <Icon name="plus" />
         Add category
@@ -58,13 +61,13 @@ export function CategoryManager() {
       )}
       {categories.map((category) => (
         <div className="category-manager-row" key={category.id}>
-          <strong>{category.name}</strong>
+          <div className="category-manager-name"><strong>{category.name}</strong><small>{guestCourses.find(course=>course.id===guestMenuCourse(category.name,category.menu_course))?.label}</small></div>
           <button
             className="button small"
-            aria-label={"Rename " + category.name}
+            aria-label={"Edit " + category.name}
             onClick={() => edit(category)}
           >
-            Rename
+            Edit
           </button>
           <button
             className="icon-button danger-text"

@@ -32,7 +32,7 @@ const number = (
 export function Menu() {
   const { data, form, run, modal } = useDesk();
   const [search, setSearch] = useState(""),
-    [category, setCategory] = useState("All"),[masterTag,setMasterTag]=useState('');
+    [category, setCategory] = useState("All");
   const categories: Row[] = data.categories ?? [];
   const canEditDishes = can(data.actor.role, "settings");
   const edit = (item?: Row, liquor = item?.unit === "peg") =>
@@ -67,6 +67,8 @@ export function Menu() {
             value: item?.description,
           },
           number("price", "Price (₹)", Number(item?.price ?? 0) / 100, 0.01),
+          {name:"compareAtPrice",label:"Regular base price before offer (₹)",type:"number",min:0.01,step:0.01,required:false,preserveBlank:true,value:item?.compare_at_price==null?'':Number(item.compare_at_price)/100,help:"Optional. Price above is the selling price. Enter a higher regular base price to show the saving; leave blank to remove the offer. Add-ons keep their own prices."},
+          {name:"guestBestChoice",label:"Show Best choice on customer menu",type:"checkbox",value:item?.guest_best_choice??false},
           number(
             "tax",
             "Tax (%)",
@@ -140,6 +142,8 @@ export function Menu() {
             description: v.description,
             imageUrl: v.imageUrl,
             price: Math.round(v.price * 100),
+            compareAtPrice: v.compareAtPrice===''||v.compareAtPrice==null?null:Math.round(Number(v.compareAtPrice)*100),
+            guestBestChoice: v.guestBestChoice,
             taxBps: Math.round(v.tax * 100),
             unit: v.unit,
             ...(liquor
@@ -181,7 +185,7 @@ export function Menu() {
             </option>
           ))}
         </select>
-        <select aria-label="Master dietary / cuisine tag" value={masterTag} onChange={e=>setMasterTag(e.target.value)}><option value="">All master tags</option>{Array.from(new Map<string,Row>((data.menu??[]).flatMap((m:Row)=>(m.masterTags??[]).map((t:Row)=>[t.id,t]))).values()).map((t:Row)=><option key={t.id} value={t.id}>{t.name}</option>)}</select>
+
         <div className="search-box">
           <Icon name="search" />
           <input
@@ -220,7 +224,7 @@ export function Menu() {
         rows={(data.menu ?? [])
           .filter(
             (m: Row) =>
-              !m.ready_food_batch_id && (!masterTag||(m.masterTags??[]).some((t:Row)=>t.id===masterTag)) &&
+              !m.ready_food_batch_id &&
               (category === "All" ||
                 m.category.toLowerCase() === category.toLowerCase()) &&
               m.name.toLowerCase().includes(search.toLowerCase()),
@@ -388,7 +392,7 @@ export function Inventory() {
         </div>
         <DailyStockCounts outletId={data.outletId} />
       </section>
-      <section className="panel">
+      <section className="panel inventory-stock-panel">
         <div className="panel-heading">
           <div className="tabs">
             {[
@@ -642,6 +646,7 @@ export function Recipes() {
 }
 export function Customers() {
   const { data, modal } = useDesk();
+  const [sort,setSort]=useState("VISITS_DESC"),[filter,setFilter]=useState("ALL");
   const [query, setQuery] = useState(""),
     [page, setPage] = useState(0),
     [listing, setListing] = useState<Row | null>(null),
@@ -657,7 +662,7 @@ export function Customers() {
           "&q=" +
           encodeURIComponent(query) +
           "&page=" +
-          page,
+          page + "&sort=" + encodeURIComponent(sort) + "&filter=" + encodeURIComponent(filter),
       )
         .then((result) => {
           if (live) setListing(result);
@@ -670,7 +675,7 @@ export function Customers() {
       live = false;
       clearTimeout(timer);
     };
-  }, [data.outletId, query, page]);
+  }, [data.outletId, query, page, sort, filter]);
   return (
     <section className="panel">
       <div className="panel-heading">
@@ -687,7 +692,10 @@ export function Customers() {
             }}
           />
         </label>
-        <span className="muted">Most settled visits first</span>
+        <div className="customer-list-controls">
+          <label><span><Icon name="filter"/> Filter</span><select aria-label="Filter customers" value={filter} onChange={e=>{setFilter(e.target.value);setPage(0)}}><option value="ALL">All customers</option><option value="SETTLED">With settled visits</option><option value="UNSETTLED">No settled visits</option><option value="HAS_POINTS">With points</option></select></label>
+          <label><span><Icon name="sort"/> Sort by</span><select aria-label="Sort customers" value={sort} onChange={e=>{setSort(e.target.value);setPage(0)}}><option value="VISITS_DESC">Most settled visits</option><option value="SPEND_DESC">Highest settled spend</option><option value="POINTS_DESC">Most points</option><option value="NAME_ASC">Name: A–Z</option><option value="NAME_DESC">Name: Z–A</option></select></label>
+        </div>
       </div>
       {error && <p role="alert">{error}</p>}
       <DataTable

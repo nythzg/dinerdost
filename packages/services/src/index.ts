@@ -76,3 +76,8 @@ export * from './platform-billing';
 export * from './platform-analytics';
 export * from './platform-maintenance';
 export * from './platform-owner-view';
+
+export * from "./platform-features";
+
+export * from './outlet-order-intake';
+export * from './support-chat';

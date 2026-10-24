@@ -3,7 +3,7 @@ import {ensure,type Actor} from '@dinerdost/core';
 import {id,num,one,type Row} from './shared';
 
 /** Coupon definitions are immutable apart from activation; each use is a separate token. */
-export async function reserveWebDiscountCoupon(tx:Sql,actor:Actor,outletId:string,definitionId:string,customerId:string){
+export async function reserveWebDiscountCoupon(tx:Sql,actor:Pick<Actor,'restroId'|'application'>,outletId:string,definitionId:string,customerId:string){
  ensure(!actor.application||actor.application==='MASTER','APPLICATION_FORBIDDEN','Discount coupon codes are available in the web app only.',403);
  const definition=await one(tx,'SELECT *,expires_at>clock_timestamp() AS unexpired FROM web_discount_coupons WHERE id=$1 AND outlet_id=$2 FOR UPDATE',[definitionId,outletId]);
  ensure(definition.active&&definition.unexpired,'COUPON_INELIGIBLE','This coupon is expired or has been removed.',409);

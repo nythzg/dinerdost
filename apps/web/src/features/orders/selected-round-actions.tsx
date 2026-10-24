@@ -89,7 +89,7 @@ export function SelectedRoundActions({
   methods: PaymentMethod[];
   perform: (action: string, input?: unknown, extra?: Row) => Promise<any>;
 }) {
-  const { data } = useDesk();
+  const { data, close } = useDesk();
   const remaining = Number(round.payable) - Number(round.paid);
   const options = [
     ...(order.customer_id
@@ -118,10 +118,19 @@ export function SelectedRoundActions({
       ? [{ key: "serve", label: "Mark prepared food served" }]
       : []),
   ];
-  const [selected, setSelected] = useState<string[]>([]),
+  const preferenceKey = `dd-select-all-round-actions:${data.actor.restroId}:${data.actor.supportView?.operatorId ?? data.actor.employeeId}`;
+  const [selected, setSelected] = useState<string[]>(() => {
+      try { return localStorage.getItem(preferenceKey) === "true" ? options.map(option => option.key) : []; }
+      catch { return []; }
+    }),
     [done, setDone] = useState<string[]>([]),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
+  const allSelected = options.length > 0 && options.every(option => done.includes(option.key) || selected.includes(option.key));
+  const someSelected = options.some(option => done.includes(option.key) || selected.includes(option.key));
+  const remember = (value: boolean) => {
+    try { localStorage.setItem(preferenceKey, String(value)); } catch {}
+  };
   return (
     <form
       className="form"
@@ -131,6 +140,7 @@ export function SelectedRoundActions({
         setBusy(true);
         setError("");
         try {
+          const completed = new Set(done);
           for (const option of options.filter(
             (option) =>
               selected.includes(option.key) && !done.includes(option.key),
@@ -161,8 +171,10 @@ export function SelectedRoundActions({
                   ? { version: current.version }
                   : undefined;
             await perform(option.key, input, { roundId: round.id });
+            completed.add(option.key);
             setDone((previous) => [...previous, option.key]);
           }
+          if (options.length && options.every(option => completed.has(option.key))) close();
         } catch (e) {
           setError((e as Error).message);
         } finally {
@@ -175,19 +187,24 @@ export function SelectedRoundActions({
         have received the shown amount; service selection confirms the food has
         been served.
       </p>
+      {options.length > 0 && <label className="selected-action">
+        <input type="checkbox" aria-label="Select all actions" checked={allSelected}
+          ref={node => { if (node) node.indeterminate = someSelected && !allSelected; }}
+          disabled={busy || options.every(option => done.includes(option.key))}
+          onChange={event => { setSelected(event.target.checked ? options.map(option => option.key) : [...done]); remember(event.target.checked); }}/>
+        <span>Select all<small style={{display:"block",marginTop:4}}>Remember for future rounds on this browser. Actions still require the button below.</small></span>
+      </label>}
       {options.map((option) => (
         <label className="selected-action" key={option.key}>
           <input
             type="checkbox"
             disabled={busy || done.includes(option.key)}
             checked={selected.includes(option.key)}
-            onChange={(e) =>
-              setSelected((previous) =>
-                e.target.checked
-                  ? [...previous, option.key]
-                  : previous.filter((key) => key !== option.key),
-              )
-            }
+            onChange={event => {
+              const next = event.target.checked ? [...selected, option.key] : selected.filter(key => key !== option.key);
+              setSelected(next);
+              remember(options.every(entry => done.includes(entry.key) || next.includes(entry.key)));
+            }}
           />
           <span>
             {option.label}

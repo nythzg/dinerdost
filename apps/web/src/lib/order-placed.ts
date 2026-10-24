@@ -3,7 +3,7 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 import { roundRatio } from '@dinerdost/core';
 import { label, money, type Row } from './client';
 
-type OrderContext = { table?: string; type?: string; customer?: string };
+type OrderContext = { table?: string; type?: string; customer?: string; confirmText?: string; cancelText?: string };
 
 /** Build a receipt-style summary from saved order snapshots, never HTML from user input. */
 export function showOrderPlaced(order: Row, context: OrderContext = {}) {
@@ -48,10 +48,11 @@ export function showOrderPlaced(order: Row, context: OrderContext = {}) {
  const totals = node('div', '', 'order-placed-totals');
  pairs(totals, [['Grand total', money(payable)]]);
  body.append(totals);
- void Swal.fire({
+ return Swal.fire({
   titleText: 'Order placed', icon: 'success', iconColor: '#285b45', html: body,
-  confirmButtonText: 'Done', buttonsStyling: false, heightAuto: false, returnFocus: false,
-  customClass: { container: 'desk-confirm-container', popup: 'desk-confirm-popup order-placed-popup', htmlContainer: 'order-placed-html', confirmButton: 'button primary' },
+  confirmButtonText: context.confirmText ?? 'Done', buttonsStyling: false, heightAuto: false, returnFocus: false,
+  showCancelButton: !!context.cancelText, cancelButtonText: context.cancelText,
+  customClass: { container: 'desk-confirm-container', popup: 'desk-confirm-popup order-placed-popup', htmlContainer: 'order-placed-html', confirmButton: 'button primary',cancelButton:'button' },
   keydownListenerCapture: true,
  });
 }

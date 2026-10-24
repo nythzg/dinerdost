@@ -1,0 +1,69 @@
+/* Approved curved navigation; printed documents keep their existing layout. */
+@media screen {
+  html body :is(.app-shell,.sa-shell) { background: #fff; }
+  html body :is(.main-shell,.sa-main) { min-height: 100dvh; background: #fff; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar { --rail-surface: #163c32; --rail-active: #fff; --rail-label-width: 180px; --rail-label-opacity: 1; --rail-brand-gap: 10px; --rail-profile-gap: 8px; --rail-profile-pad: 8px; --rail-profile-end-pad: 48px; --rail-logout-width: 44px; --rail-detail-visibility: visible; background: var(--rail-surface); color: #e4eee7; padding: 0 !important; gap: 0; border: 0; overflow: hidden; transition: width 280ms cubic-bezier(.4,0,.2,1),transform 280ms cubic-bezier(.4,0,.2,1),visibility 280ms linear; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav { display: flex; flex-direction: column; gap: 4px; flex: 1; min-height: 0; width: 100%; margin: -16px 0 0 !important; padding: 16px 0; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; scrollbar-gutter: auto; background: linear-gradient(#123329 16px,transparent 16px); border: 0; border-radius: 0; box-shadow: none; }
+  aside.curved-sidebar>nav::-webkit-scrollbar { display: none; }
+  html body .sa-shell[data-compact] aside.sa-sidebar.curved-sidebar>nav { gap: 4px; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav :is(a,button) { position: relative; display: flex; align-items: center; justify-content: flex-start; flex: none; gap: 12px; width: calc(100% - 8px); min-height: 48px; height: 48px; margin: 0 0 0 8px; padding: 9px 16px 9px 8px; box-sizing: border-box; border: 0; border-radius: 15px 0 0 15px; background: transparent; color: #e4eee7; font-size: 14px; line-height: 20px; text-align: left; overflow: visible; transition: background-color 200ms ease,color 200ms ease,padding 280ms cubic-bezier(.4,0,.2,1),gap 280ms cubic-bezier(.4,0,.2,1); }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav :is(a,button)>.icon { flex: none; width: 22px; height: 22px; margin-inline: 2px; color: #a5bfb0; transition: width 200ms ease,height 200ms ease,margin 200ms ease,color 200ms ease; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav :is(a,button)>span:not(.nav-count):not(.sa-nav-active) { display: block; flex: 1; max-width: 180px; opacity: 1; transition: max-width 280ms cubic-bezier(.4,0,.2,1),opacity 200ms ease; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav :is(a,button):not([aria-current=page]):hover { background: #ffffff08; color: #e4eee7; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav :is(a,button):not([aria-current=page]):hover>.icon { color: #a5bfb0; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav [aria-current=page] { z-index: 1; width: calc(100% - 8px); margin-left: 8px; padding-left: 8px; border-radius: 15px 0 0 15px; background: var(--rail-active); color: #193f30; border-color: var(--rail-active); font-weight: 650; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav [aria-current=page]>.icon { width: 26px; height: 26px; margin-inline: 0; color: #193f30; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav :is(a,button)::before,
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav :is(a,button)::after { content: ''; position: absolute; width: 16px; height: 16px; right: 0; pointer-events: none; box-shadow: none; border-radius: 0; opacity: 0; transition: opacity 200ms ease; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav :is(a,button)::before { top: -16px; background: radial-gradient(circle at top left,transparent 16px,var(--rail-active) 16.5px); }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav :is(a,button)::after { bottom: -16px; background: radial-gradient(circle at bottom left,transparent 16px,var(--rail-active) 16.5px); }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav [aria-current=page]::before,html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav [aria-current=page]::after { opacity: 1; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav :is(a,button):focus-visible { outline: 2px solid #80ac91; outline-offset: -3px; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav .nav-count { flex: none; display: grid; place-items: center; margin-left: auto; margin-right: 8px; padding: 0 4px; min-width: 20px; height: 20px; border-radius: 5px; background: #244d40; color: #e4eee7; font-size: 10px; line-height: 20px; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>nav [aria-current=page]>.nav-count { background: #e2ebdc; color: #193f30; }
+  html body aside.curved-sidebar .sa-nav-active { display: none; }
+  html body aside.curved-sidebar>a,html body aside.curved-sidebar :is(.logo,.logo>span,.logo b,.sa-brand-caption) { text-decoration: none; }
+  html body aside.curved-sidebar>:is(a,.sa-brand,.sidebar-footer,.sidebar-profile),html body aside.curved-sidebar .sidebar-profile-row { border: 0; box-shadow: none; text-decoration: none; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>:is(a,.sa-brand) { background: #123329; box-shadow: none; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>:is(.sidebar-footer,.sidebar-profile) { background: #123329; box-shadow: none; padding-bottom: 8px; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar>:is(.sidebar-footer,.sidebar-profile) { width: 100%; box-sizing: border-box; padding-inline: 12px; }
+  html body .app-shell[data-preview-compact] aside.sidebar.curved-sidebar>.sidebar-footer,html body .sa-shell[data-compact] aside.sa-sidebar.curved-sidebar>.sidebar-profile { padding-inline: 12px; }
+  html body .app-shell[data-preview-compact] aside.curved-sidebar>a { display: flex; align-items: center; justify-content: center; flex: none; width: 100%; height: 64px; min-height: 64px; margin: 0; padding: 0; }
+  html body .app-shell[data-preview-compact] aside.curved-sidebar>a>.logo { display: flex; align-items: center; justify-content: center; width: auto; gap: var(--rail-brand-gap); transition: gap 280ms cubic-bezier(.4,0,.2,1); }
+  html body .app-shell[data-preview-compact] aside.curved-sidebar>a>.logo>span:last-child { display: block; min-width: 0; max-width: var(--rail-label-width); opacity: var(--rail-label-opacity); visibility: var(--rail-detail-visibility); white-space: nowrap; overflow: hidden; transition: max-width 280ms cubic-bezier(.4,0,.2,1),opacity 200ms ease,visibility 200ms linear; }
+  html body .sa-shell[data-compact] aside.curved-sidebar>.sa-brand { display: grid; flex: none; width: 100%; height: 64px; min-height: 64px; grid-template-columns: 34px max-content; grid-template-rows: 24px 16px; column-gap: var(--rail-brand-gap); align-content: center; justify-content: center; margin: 0; padding: 0; border: 0; transition: column-gap 280ms cubic-bezier(.4,0,.2,1); }
+  html body .sa-shell[data-compact] aside.curved-sidebar>.sa-brand>.logo { display: contents; }
+  html body .sa-shell[data-compact] aside.curved-sidebar>.sa-brand>.logo>span:last-child,html body .sa-shell[data-compact] aside.curved-sidebar>.sa-brand>.sa-brand-caption { display: block; min-width: 0; max-width: var(--rail-label-width); opacity: var(--rail-label-opacity); visibility: var(--rail-detail-visibility); white-space: nowrap; overflow: hidden; transition: max-width 280ms cubic-bezier(.4,0,.2,1),opacity 200ms ease,visibility 200ms linear; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar .sidebar-profile-row { position: relative; top: 4px; height: 59px; gap: var(--rail-profile-gap); transition: gap 280ms cubic-bezier(.4,0,.2,1); }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar .sidebar-profile-row>.sidebar-profile-trigger { height: 58px; min-height: 58px; justify-content: flex-start; gap: var(--rail-brand-gap); padding: 12px var(--rail-profile-end-pad) 12px var(--rail-profile-pad); overflow: hidden; transition: padding 280ms cubic-bezier(.4,0,.2,1),gap 280ms cubic-bezier(.4,0,.2,1); }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar .sidebar-profile-trigger>.sidebar-profile-copy { flex: 0 1 auto; display: flex; max-width: var(--rail-label-width); opacity: var(--rail-label-opacity); visibility: var(--rail-detail-visibility); overflow: hidden; text-decoration: none; transition: max-width 280ms cubic-bezier(.4,0,.2,1),opacity 200ms ease,visibility 200ms linear; }
+  html body aside.curved-sidebar .sidebar-profile-copy :is(strong,small) { width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar .sidebar-profile-logout { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: grid; min-width: 0; width: var(--rail-logout-width); opacity: var(--rail-label-opacity); visibility: var(--rail-detail-visibility); overflow: hidden; transition: width 280ms cubic-bezier(.4,0,.2,1),opacity 200ms ease,visibility 280ms linear; }
+}
+@media screen and (min-width: 851px) {
+  html body .app-shell .sidebar.curved-sidebar { width: 240px; }
+  html body .app-shell .main-shell { margin-left: 240px; transition: margin-left 280ms cubic-bezier(.4,0,.2,1); }
+  html body .app-shell[data-preview-compact=true] .sidebar.curved-sidebar { width: 76px; --rail-label-width: 0px; --rail-label-opacity: 0; --rail-brand-gap: 0px; --rail-profile-gap: 0px; --rail-profile-pad: 9px; --rail-profile-end-pad: 9px; --rail-logout-width: 0px; --rail-detail-visibility: hidden; }
+  html body .app-shell[data-preview-compact=true] .main-shell { margin-left: 76px; }
+  html body .app-shell[data-preview-compact=true] aside.sidebar.curved-sidebar>nav a { height: 48px; min-height: 48px; width: calc(100% - 8px); margin-left: 8px; padding: 9px 25px 9px 17px; gap: 0; justify-content: flex-start; }
+  html body .app-shell[data-preview-compact=true] aside.sidebar.curved-sidebar>nav [aria-current=page] { width: calc(100% - 8px); margin-left: 8px; padding-left: 17px; padding-right: 25px; }
+  html body .app-shell[data-preview-compact=true] aside.sidebar.curved-sidebar>nav a>span:not(.nav-count) { max-width: 0; opacity: 0; }
+  html body .app-shell[data-preview-compact=true] aside.sidebar.curved-sidebar>nav .nav-count { display: grid; position: absolute; top: 2px; right: 14px; margin: 0; min-width: 15px; height: 15px; font-size: 9px; line-height: 15px; }
+}
+@media screen and (min-width: 821px) {
+  html body .sa-shell .sa-sidebar.curved-sidebar { width: 240px; }
+  html body .sa-shell[data-compact=true] .sa-sidebar.curved-sidebar { width: 76px; --rail-label-width: 0px; --rail-label-opacity: 0; --rail-brand-gap: 0px; --rail-profile-gap: 0px; --rail-profile-pad: 9px; --rail-profile-end-pad: 9px; --rail-logout-width: 0px; --rail-detail-visibility: hidden; }
+  html body .sa-shell[data-compact=true] aside.sa-sidebar.curved-sidebar>nav button { height: 48px; min-height: 48px; width: calc(100% - 8px); margin-left: 8px; padding: 9px 25px 9px 17px; gap: 0; justify-content: flex-start; }
+  html body .sa-shell[data-compact=true] aside.sa-sidebar.curved-sidebar>nav button>.sa-nav-label { max-width: 0; opacity: 0; }
+  html body .sa-shell[data-compact=true] aside.sa-sidebar.curved-sidebar>nav [aria-current=page] { width: calc(100% - 8px); margin-left: 8px; padding-left: 17px; padding-right: 25px; }
+}
+@media screen and (max-width: 850px) {
+  html body .app-shell[data-preview-compact] .sidebar.curved-sidebar { width: min(292px,calc(100vw - 32px)); }
+}
+@media screen and (max-width: 820px) {
+  html body .sa-shell .sa-sidebar.curved-sidebar { width: min(292px,calc(100vw - 32px)); max-width: none; }
+  html body .sa-sidebar.curved-sidebar .sa-mobile-close { right: 8px; top: 16px; }
+}
+@media screen and (prefers-reduced-motion: reduce) {
+  html body :is(.app-shell,.sa-shell) aside.curved-sidebar,html body .app-shell .main-shell,html body aside.curved-sidebar>nav :is(a,button),html body aside.curved-sidebar>nav :is(a,button)>span,html body aside.curved-sidebar>nav :is(a,button)>.icon,html body aside.curved-sidebar>nav :is(a,button)::before,html body aside.curved-sidebar>nav :is(a,button)::after,html body aside.curved-sidebar :is(.logo,.sa-brand,.logo>span,.sa-brand-caption,.sidebar-profile-row,.sidebar-profile-trigger,.sidebar-profile-copy,.sidebar-profile-logout) { transition: none !important; }
+}

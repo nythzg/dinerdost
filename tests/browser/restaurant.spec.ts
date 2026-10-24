@@ -25,7 +25,7 @@ test("custom floors, outlines and activation switch persist with unchanged table
     table = initial.tables.find((t: any) => t.label === "T01");
   await page.goto("/app/floor");
   await expect(
-    page.getByRole("switch", { name: "Auto activation of tables" }),
+    page.getByRole("switch", { name: "QR auto activation" }),
   ).not.toBeChecked();
   await page
     .getByRole("button", { name: "Edit T01 capacity", exact: true })
@@ -38,9 +38,9 @@ test("custom floors, outlines and activation switch persist with unchanged table
       .filter({ has: page.getByRole("heading", { name: "T01", exact: true }) })
       .getByText("3 seats", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("switch", { name: "Auto activation of tables" }).click();
+  await page.getByRole("switch", { name: "QR auto activation" }).click();
   await expect(
-    page.getByRole("switch", { name: "Auto activation of tables" }),
+    page.getByRole("switch", { name: "QR auto activation" }),
   ).toBeChecked();
   const context = await browser.newContext({
       viewport: { width: 390, height: 844 },
@@ -82,9 +82,9 @@ test("custom floors, outlines and activation switch persist with unchanged table
       () => document.documentElement.scrollWidth > innerWidth,
     ),
   ).toBe(false);
-  await page.getByRole("switch", { name: "Auto activation of tables" }).click();
+  await page.getByRole("switch", { name: "QR auto activation" }).click();
   await expect(
-    page.getByRole("switch", { name: "Auto activation of tables" }),
+    page.getByRole("switch", { name: "QR auto activation" }),
   ).not.toBeChecked();
   await guest.reload();
   await expect(
@@ -546,7 +546,7 @@ test("prepaid order reaches an immutable final invoice through kitchen service",
   await expect(
     page.getByRole("button", { name: "Accept round", exact: true }),
   ).toHaveCount(0);
-  await page.getByRole("button", { name: "Add details", exact: true }).click();
+  await page.getByRole("button", { name: "Add customer details", exact: true }).click();
   await page.getByLabel("Name", { exact: true }).fill("Test Guest");
   await page.getByLabel("Mobile number", { exact: true }).fill("9876543210");
   await save(page);
@@ -711,7 +711,7 @@ test("table cards open a code-free customer menu and submit pending orders", asy
   await expect(
     guest.getByRole("button", { name: "Call waiter", exact: true }),
   ).toBeVisible();
-  for (const name of ["Menu", "Water", "Bill", "My order"])
+  for (const name of ["Menu", "Water", "Cleaning", "Play games"])
     await expect(
       guest.getByRole("button", { name, exact: true }),
     ).toBeDisabled();
@@ -753,7 +753,7 @@ test("table cards open a code-free customer menu and submit pending orders", asy
     .screenshot({ path: "verification/staff-activation-dialog.png" });
   await save(page, "Activate table");
   await guest.reload();
-  for (const name of ["Menu", "Water", "Bill", "My order"])
+  for (const name of ["Menu", "Water", "Cleaning", "Play games"])
     await expect(
       guest.getByRole("button", { name, exact: true }),
     ).toBeEnabled();
@@ -781,11 +781,9 @@ test("table cards open a code-free customer menu and submit pending orders", asy
   await expect(
     guest.getByText("Water requested.", { exact: true }),
   ).toBeVisible();
-  await guest.getByRole("button", { name: "Bill", exact: true }).click();
-  await expect(
-    guest.getByText("Your bill has been requested.", { exact: true }),
-  ).toBeVisible();
+  await expect(guest.getByRole("button", {name:"Request bill",exact:true})).toHaveCount(0);
   await guest.getByRole("button", { name: "Menu", exact: true }).click();
+  await guest.getByRole("navigation", {name:"Dining journey"}).getByRole("button", {name:/Main course/}).click();
   await expect(
     guest.getByRole("button", { name: "Add Butter naan" }),
   ).toBeEnabled();
@@ -797,6 +795,7 @@ test("table cards open a code-free customer menu and submit pending orders", asy
   await guest.getByLabel("Search menu").fill("Butter");
   await expect(guest.locator(".guest-menu article")).toHaveCount(1);
   await guest.getByRole("button", { name: "Add Butter naan" }).click();
+  await guest.getByRole("navigation", {name:"Dining journey"}).getByRole("button", {name:/Starter/}).click();
   await guest.getByLabel("Search menu").fill("Paneer");
   await guest.getByRole("button", { name: "Add Paneer tikka" }).click();
   await guest.getByLabel("Variant", { exact: true }).selectOption("large");
@@ -816,13 +815,13 @@ test("table cards open a code-free customer menu and submit pending orders", asy
   await guest.getByLabel("Customer name").fill("QR Guest");
   await guest.getByLabel("Customer phone").fill("9456789012");
   await guest.getByRole("button", { name: /Place order/ }).click();
-  await guest.getByRole("dialog", { name: "Order placed", exact: true }).getByRole("button", { name: "Done", exact: true }).click();
+  await guest.getByRole("dialog", { name: "Order placed", exact: true }).getByRole("button", { name: "Track my order", exact: true }).click();
   await expect(guest.getByRole("heading", { name: /Order #/ })).toBeVisible();
   await expect(
     guest.getByText("Waiting for your server", { exact: true }),
   ).toBeVisible();
   await guest.reload();
-  await guest.getByRole("button", { name: "My order", exact: true }).click();
+  await guest.getByRole("button", { name: "Track my order", exact: true }).click();
   await expect(guest.getByRole("heading", { name: /Order #/ })).toBeVisible();
   await guest.goto(secondUrl!);
   await guest.getByRole("button", { name: "Call waiter", exact: true }).click();
@@ -830,15 +829,13 @@ test("table cards open a code-free customer menu and submit pending orders", asy
     guest.getByText("Your waiter has been called.", { exact: true }),
   ).toBeVisible();
   await guest.goto(url!);
-  await guest.getByRole("button", { name: "My order", exact: true }).click();
+  await guest.getByRole("button", { name: "Track my order", exact: true }).click();
   await expect(guest.getByRole("heading", { name: /Order #/ })).toBeVisible();
   const second = await browser.newContext();
   const secondPage = await second.newPage();
   await secondPage.goto(url!);
 
-  await secondPage
-    .getByRole("button", { name: "My order", exact: true })
-    .click();
+  await expect(secondPage.getByRole("button", {name:"Track my order",exact:true})).toHaveCount(0);
   await expect(
     secondPage.getByRole("heading", { name: /Order #/ }),
   ).toHaveCount(0);
@@ -938,7 +935,7 @@ test("table cards open a code-free customer menu and submit pending orders", asy
     page.getByRole("button", { name: "Ban device", exact: true }),
   ).toBeVisible();
   await guest.goto(url!);
-  await guest.getByRole("button", { name: "My order", exact: true }).click();
+  await guest.getByRole("button", { name: "Track my order", exact: true }).click();
   await expect(guest.getByRole("heading", { name: /Order #/ })).toBeVisible();
   await guest
     .getByRole("button", { name: "Request water", exact: true })
@@ -1487,7 +1484,7 @@ test("order and payment filters show the corresponding records", async ({
   await filter("All").click();
   await expect(page.locator("tbody tr")).toHaveCount(3);
   await page.goto("/app/orders/" + accepted.id);
-  await page.getByRole("button", { name: "Add details", exact: true }).click();
+  await page.getByRole("button", { name: "Add customer details", exact: true }).click();
   await page.getByLabel("Name", { exact: true }).fill("Filter Guest");
   await page.getByLabel("Mobile number", { exact: true }).fill("9123456784");
   await save(page);
@@ -1498,8 +1495,8 @@ test("order and payment filters show the corresponding records", async ({
     .click();
   await expect(page.getByRole("dialog")).toBeHidden();
   await page.goto("/app/payments");
-  const tabs = page.getByLabel("Payment methods", { exact: true });
-  await tabs.getByRole("button", { name: "Cash", exact: true }).click();
+  const choosePaymentMethod=async(label:string)=>{await page.getByLabel('Filter payments',{exact:true}).click();await page.getByLabel('Filter payment method',{exact:true}).selectOption({label});await page.getByRole('button',{name:'Apply',exact:true}).click()};
+  await choosePaymentMethod('Cash');
   await expect(
     page.getByRole("cell", { name: "Cash", exact: true }),
   ).toBeVisible();
@@ -1510,12 +1507,12 @@ test("order and payment filters show the corresponding records", async ({
     "Card",
     "Online transfer",
   ]) {
-    await tabs.getByRole("button", { name, exact: true }).click();
+    await choosePaymentMethod(name);
     await expect(
       page.getByRole("cell", { name: "Cash", exact: true }),
     ).toHaveCount(0);
   }
-  await tabs.getByRole("button", { name: "All", exact: true }).click();
+  await choosePaymentMethod('All');
   await expect(
     page.getByRole("cell", { name: "Cash", exact: true }),
   ).toBeVisible();
@@ -1799,7 +1796,7 @@ test("occupied table cards retain dark green and Details opens the real separate
   await bills.selectOption(firstOrder.id);
   await expect(
     page
-      .locator(".order-summary-strip")
+      .locator(".order-header-reference")
       .getByText("#" + firstOrder.number, { exact: true }),
   ).toBeVisible();
   await expect(
@@ -1808,7 +1805,7 @@ test("occupied table cards retain dark green and Details opens the real separate
   await bills.selectOption(secondOrder.id);
   await expect(
     page
-      .locator(".order-summary-strip")
+      .locator(".order-header-reference")
       .getByText("#" + secondOrder.number, { exact: true }),
   ).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });

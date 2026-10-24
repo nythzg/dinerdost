@@ -9,6 +9,7 @@ import {
 
 // Interface copy only. Names, menu content, records and server values stay as entered.
 const hindi: Record<string, string> = {
+  "Language":"भाषा", "Restaurants":"रेस्तराँ", "Feature controls":"सुविधा नियंत्रण", "Plans & billing":"प्लान और बिलिंग", "Integrations":"एकीकरण", "Internal team":"आंतरिक टीम", "Audit history":"ऑडिट इतिहास", "Support & broadcasts":"सहायता और प्रसारण", "Administration":"प्रशासन",
   "Kitchen stages":"रसोई चरण", "On":"चालू", "Off":"बंद", "Kitchen workflow":"रसोई कार्यप्रवाह", "Save kitchen workflow":"रसोई कार्यप्रवाह सहेजें",
   "Total services":"कुल सेवाएँ", "Completed services":"पूरी हुई सेवाएँ", "Awaiting services":"लंबित सेवाएँ", "Serve requests":"परोसने के अनुरोध", "Completed on":"पूर्ण होने की तारीख", "Whole day":"पूरा दिन", "Select rounds":"राउंड चुनें", "Clear selection":"चयन हटाएँ", "Select all":"सभी चुनें", "Cancel selection":"चयन रद्द करें", "Serve selected":"चुने हुए परोसें",
   "Calculator": "कैलकुलेटर",
@@ -186,6 +187,7 @@ const hindi: Record<string, string> = {
   Arrange: "व्यवस्थित करें",
   "Add floor": "मंज़िल जोड़ें",
   "Rename floor": "मंज़िल का नाम बदलें",
+  "Edit floor name": "मंज़िल का नाम बदलें",
   "Floor name": "मंज़िल का नाम",
   "Save layout": "लेआउट सहेजें",
   "Add fixture": "फ़िक्स्चर जोड़ें",
@@ -344,7 +346,7 @@ export function useStaffTranslation() {
   const { language } = useContext(LanguageContext);
   return (value: string) => translateStaff(value, language);
 }
-export function LanguageSelect() {
+export function LanguageSelect({compact=false}:{compact?:boolean}={}) {
   const { language, setLanguage } = useContext(LanguageContext);
   return (
     <select
@@ -353,8 +355,8 @@ export function LanguageSelect() {
       value={language}
       onChange={(e) => setLanguage(e.target.value as Language)}
     >
-      <option value="en">English</option>
-      <option value="hi">हिन्दी</option>
+      <option value="en">{compact?'EN':'English'}</option>
+      <option value="hi">{compact?'हिं':'हिन्दी'}</option>
     </select>
   );
 }

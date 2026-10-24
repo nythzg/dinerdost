@@ -1,10 +1,10 @@
 import { NextRequest } from "next/server";
-import { notificationInbox, readNotifications } from "@dinerdost/services";
+import { assertPlatformFeature,notificationInbox, readNotifications } from "@dinerdost/services";
 import { body, context, csrf, failure, response } from "@/lib/server";
 export const runtime = "nodejs";
 export async function GET(request: NextRequest) {
   try {
-    const { db, actor } = await context();
+    const { db, actor } = await context();await assertPlatformFeature(db,actor,'notifications');
     const query = request.nextUrl.searchParams;
     return response(
       await notificationInbox(db, actor, {
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     await csrf(request);
-    const { db, actor } = await context();
+    const { db, actor } = await context();await assertPlatformFeature(db,actor,'notifications');
     return response(await readNotifications(db, actor, await body(request)));
   } catch (error) {
     return failure(error);

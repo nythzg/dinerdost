@@ -1,4 +1,5 @@
 import {enterpriseBrands} from './platform-analytics';
+import {platformFeatureFlags} from './platform-features';
 import {platformPolicy} from './platform-policy';
 import {platformConsoleAvailable} from './platform-console';
 import {settledRefundsRead} from './web-refunds';
@@ -65,7 +66,7 @@ export async function workspace(db: Database, actor: Actor, outletId?: string) {
       outletId: selected,
       ...(!actor.application||actor.application==='MASTER'?{platformLoyaltyAdmin:isPlatformLoyaltyAdmin(actor)}:{}),
     };
-    if(web){const policy=await platformPolicy(tx);result.platformConsole=platformConsole;result.platformPolicy=policy?{status:policy.status,features:policy.features,staffLimit:policy.staff_limit,outletLimit:policy.outlet_limit,orderLimit:policy.order_limit}:null;if((await tx.query<{present:string|null}>("SELECT to_regprocedure('public.platform_current_broadcasts()') AS present")).rows[0].present)result.platformBroadcasts=(await tx.query('SELECT * FROM platform_current_broadcasts()')).rows;}
+    if(web){result.featureFlags=await platformFeatureFlags(tx);const policy=await platformPolicy(tx);result.platformConsole=platformConsole;result.platformPolicy=policy?{status:policy.status,features:policy.features,staffLimit:policy.staff_limit,outletLimit:policy.outlet_limit,orderLimit:policy.order_limit}:null;if((await tx.query<{present:string|null}>("SELECT to_regprocedure('public.platform_current_broadcasts()') AS present")).rows[0].present)result.platformBroadcasts=(await tx.query('SELECT * FROM platform_current_broadcasts()')).rows;}
     if(web){
       const extras=(await tx.query("SELECT to_regclass('public.platform_tenant_setup') AS present")).rows[0]?.present;
       if(extras){result.platformSetup=(await tx.query('SELECT taxonomies,role_templates,branding FROM platform_tenant_setup WHERE restro_id=$1',[actor.restroId])).rows[0]??null;result.platformBroadcasts=[...(result.platformBroadcasts??[]),...(await tx.query('SELECT * FROM platform_current_notices()')).rows];}
@@ -89,7 +90,7 @@ export async function workspace(db: Database, actor: Actor, outletId?: string) {
     if (can(actor, "orders") || can(actor, "menu") || can(actor, "catalog")) {
       result.menu = (
         await tx.query(
-          "SELECT m.*,b.on_hand-b.reserved AS ready_quantity,b.expires_at AS ready_use_by FROM menu_items m LEFT JOIN prepared_food_batches b ON b.id=m.ready_food_batch_id AND b.restro_id=m.restro_id WHERE m.outlet_id=$1 AND (m.ready_food_batch_id IS NULL OR (b.on_hand>b.reserved AND b.expires_at>now() AND m.active)) ORDER BY (m.ready_food_batch_id IS NOT NULL) DESC,m.category,m.name",
+          "SELECT m.*,c.menu_course,b.on_hand-b.reserved AS ready_quantity,b.expires_at AS ready_use_by FROM menu_items m LEFT JOIN menu_categories c ON c.restro_id=m.restro_id AND c.outlet_id=m.outlet_id AND lower(c.name)=lower(m.category) LEFT JOIN prepared_food_batches b ON b.id=m.ready_food_batch_id AND b.restro_id=m.restro_id WHERE m.outlet_id=$1 AND (m.ready_food_batch_id IS NULL OR (b.on_hand>b.reserved AND b.expires_at>now() AND m.active)) ORDER BY (m.ready_food_batch_id IS NOT NULL) DESC,m.category,m.name",
           [selected],
         )
       ).rows;
@@ -186,7 +187,7 @@ export async function workspace(db: Database, actor: Actor, outletId?: string) {
     if (can(actor, "kitchen")) {
       result.tickets = (
         await tx.query<Row>(
-          "SELECT k.*,o.number,t.label AS table_label,coalesce(p.pinned,false) AS pinned,r.course,r.round_number FROM kot_tickets k JOIN orders o ON o.id=k.order_id AND o.restro_id=k.restro_id LEFT JOIN order_pins p ON p.order_id=o.id AND p.restro_id=o.restro_id JOIN order_rounds r ON r.id=k.round_id AND r.restro_id=k.restro_id LEFT JOIN table_sessions s ON s.id=o.session_id AND s.restro_id=o.restro_id LEFT JOIN dining_tables t ON t.id=s.table_id AND t.restro_id=s.restro_id WHERE k.outlet_id=$1 AND k.status NOT IN ('SERVED','CANCELLED') AND ($2::text IS NULL OR k.production_stream=$2) AND ($3 OR r.web_kitchen_stages_enabled IS DISTINCT FROM false) ORDER BY coalesce(p.pinned,false) DESC,k.created_at",
+          "SELECT k.*,o.number,t.label AS table_label,coalesce(p.pinned,false) AS pinned,r.course,r.round_number,r.version AS round_version FROM kot_tickets k JOIN orders o ON o.id=k.order_id AND o.restro_id=k.restro_id LEFT JOIN order_pins p ON p.order_id=o.id AND p.restro_id=o.restro_id JOIN order_rounds r ON r.id=k.round_id AND r.restro_id=k.restro_id LEFT JOIN table_sessions s ON s.id=o.session_id AND s.restro_id=o.restro_id LEFT JOIN dining_tables t ON t.id=s.table_id AND t.restro_id=s.restro_id WHERE k.outlet_id=$1 AND k.status NOT IN ('SERVED','CANCELLED') AND ($2::text IS NULL OR k.production_stream=$2) AND ($3 OR r.web_kitchen_stages_enabled IS DISTINCT FROM false) ORDER BY coalesce(p.pinned,false) DESC,k.created_at",
           [selected, stream,!!actor.application&&actor.application!=="MASTER"],
         )
       ).rows;

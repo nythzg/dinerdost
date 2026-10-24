@@ -1,0 +1,50 @@
+/* Shared header colors only; sidebar previews and printed documents are separate. */
+@media screen {
+  html body :is(.app-shell,.sa-shell) {
+    --topbar-bg: #e5efdf;
+    --topbar-ink: #193f30;
+    --topbar-control: #f6faf2;
+    --topbar-line: #bed1b4;
+    --topbar-hover: #d3e3c9;
+    --topbar-muted: #4d6645;
+  }
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar) {
+    background: var(--topbar-bg);
+    color: var(--topbar-ink);
+    border-bottom-color: var(--topbar-line);
+  }
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar)>:is(.icon-button,.sa-icon-button,.support-header-button,.button),
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar) .header-search-trigger {
+    background: var(--topbar-control);
+    color: var(--topbar-ink);
+    border-color: var(--topbar-line);
+  }
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar)>:is(.icon-button,.sa-icon-button,.support-header-button,.button):hover:not(:disabled),
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar) .header-search-trigger:hover:not(:disabled) {
+    background: var(--topbar-hover);
+    color: var(--topbar-ink);
+    border-color: #8caa7d;
+  }
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar) :is(.header-search-trigger,.working-nav-toggle,.sa-icon-button,.support-header-button,.notification-bell,.package-trigger):focus-visible {
+    outline: 2px solid #285b45;
+    outline-offset: 2px;
+  }
+  html body .app-shell .topbar>.workspace-name { background: var(--topbar-control); border-color: var(--topbar-line); }
+  html body .app-shell .topbar>.workspace-name strong { color: var(--topbar-ink); }
+  html body .app-shell .topbar>.workspace-name .workspace-avatar { background: #c7dcb9; color: var(--topbar-ink); }
+  html body .app-shell .topbar .outlet-switch select { background-color: transparent; color: var(--topbar-ink); }
+  html body .app-shell .topbar .outlet-switch select option { background: #fff; color: var(--topbar-ink); }
+  html body .app-shell .topbar .outlet-switch select::picker-icon { color: var(--topbar-ink); }
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar) .header-search-trigger>kbd { color: var(--topbar-muted); opacity: 1; }
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar) .header-search :is(.page-search-input,.sa-command>label) { background: #fff; color: var(--topbar-ink); border-color: #9eb791; }
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar) .header-search :is(.page-search-input,.sa-command>label):focus-within { border-color: #285b45; box-shadow: inset 0 0 0 1px #285b45; }
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar) .header-search :is(.page-search-input,.sa-command>label)>input { color: var(--topbar-ink); }
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar) .header-search input::placeholder { color: #576e4c; opacity: 1; }
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar) .header-search :is(.page-search-input,.sa-command>label)>.icon-button { background: #e8f0e1; color: var(--topbar-ink); }
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar) .header-search :is(.page-search-input,.sa-command>label)>.icon-button:hover { background: var(--topbar-hover); color: var(--topbar-ink); }
+  html body :is(.app-shell,.sa-shell) :is(.topbar,.sa-topbar) :is(.unread-count,.sa-support-bell>span) { background: #285b45; color: #fff; border-color: var(--topbar-bg); }
+  html body .app-shell .topbar .support-incoming-dot { background: #285b45; box-shadow: 0 0 0 2px var(--topbar-bg); }
+  html body .app-shell>.mobile-menu.icon-button { background: var(--topbar-control); color: var(--topbar-ink); border-color: var(--topbar-line); }
+  html body .app-shell>.mobile-menu.icon-button:hover { background: var(--topbar-hover); color: var(--topbar-ink); }
+  html body .app-shell>.mobile-menu.icon-button:focus-visible { outline: 2px solid #285b45; outline-offset: 2px; }
+}

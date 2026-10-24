@@ -2,7 +2,7 @@ import {observePlatformRoute} from '@/lib/platform-local-runtime';
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import * as service from "@dinerdost/services";
-import { DomainError } from "@dinerdost/core";
+import { webCommandFeatures,DomainError } from "@dinerdost/core";
 import { body, context, csrf, failure, response } from "@/lib/server";
 export const runtime = "nodejs";
 async function handlePOST(request: NextRequest) {
@@ -22,6 +22,7 @@ async function handlePOST(request: NextRequest) {
       })
       .strict()
       .parse(await body(request));
+    (actor as typeof actor & {webFeatures:string[]}).webFeatures=webCommandFeatures(data.action,data.input);
     const key = z.uuid().parse(request.headers.get("idempotency-key"));
     await service.requireApplicationCommand(db, actor, data);
     await service.expireActorTables(db, actor);
@@ -30,6 +31,9 @@ async function handlePOST(request: NextRequest) {
       roundId = () => z.uuid().parse(data.roundId);
     let result: unknown;
     switch (data.action) {
+      case 'outletOrderIntake':
+        result=await service.setOutletOrderIntake(db,actor,key,data.input);
+        break;
       case 'productionRecipe':
         result=await service.saveProductionRecipe(db,actor,key,data.input);
         break;
@@ -326,6 +330,9 @@ async function handlePOST(request: NextRequest) {
         break;
       case "taxSettings":
         result = await service.saveTaxSettings(db, actor, key, data.input);
+        break;
+      case "rejectKitchenRounds":
+        result=await service.rejectKitchenRounds(db,actor,key,data.input);
         break;
       case "kitchenBulk":
         result=await service.kitchenBulk(db,actor,key,data.input);

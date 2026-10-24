@@ -183,7 +183,9 @@ test("afternoon inventory item editing keeps current stock and movement history"
     page.getByRole("row").filter({ hasText: "Basmati rice" }),
   ).toContainText("3 kg");
   await page.getByRole("button", { name: "Movements", exact: true }).click();
+  await page.getByLabel("Filter stock movements", { exact: true }).click();
   await page.getByLabel("Period", { exact: true }).selectOption("month");
+  await page.getByRole("button", { name: "Apply", exact: true }).click();
   await expect(
     page.getByRole("row").filter({ hasText: "Basmati rice" }),
   ).toContainText("3 kg");
@@ -471,6 +473,7 @@ test("afternoon record filters find older expenses, checklist dates and purchase
     { kind: "expenses" },
   );
   await page.goto("/app/expenses");
+  await page.getByLabel("Filter expenses", { exact: true }).click();
   await page.getByLabel("Period", { exact: true }).selectOption("custom");
   await page.getByLabel("From date", { exact: true }).fill("2025-01-01");
   await page.getByLabel("To date", { exact: true }).fill("2025-01-31");
@@ -545,6 +548,7 @@ test("afternoon record filters find older expenses, checklist dates and purchase
   ).toBeVisible();
   await page.getByRole("button", { name: "Close dialog" }).click();
   await page.goto("/app/checklists");
+  await page.getByLabel("Filter checklists", { exact: true }).click();
   await page.getByLabel("Period", { exact: true }).selectOption("week");
   await expect(page.getByLabel("Min amount (₹)", { exact: true })).toHaveCount(
     0,

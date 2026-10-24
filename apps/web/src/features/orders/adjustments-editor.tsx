@@ -7,13 +7,13 @@ import {money,request,type Row} from '@/lib/client';
 
 type DraftCoupon={id:string;code:string;amount:string;validUntil:string;maxUses:string};
 export function AdjustmentsEditor({outletId,save}:{outletId:string;save:(input:Row)=>Promise<unknown>}){
- const [settings,setSettings]=useState<Row|null>(null),[cap,setCap]=useState(''),[rounding,setRounding]=useState('NONE'),[coupons,setCoupons]=useState<DraftCoupon[]>([]),[removed,setRemoved]=useState<string[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState(''),[reload,setReload]=useState(0);
- useEffect(()=>{const abort=new AbortController();setError('');void request('/api/bill-settings?outletId='+encodeURIComponent(outletId),{signal:abort.signal}).then(value=>{setSettings(value);setCap(String(value.loyaltyCap/100));setRounding(value.roundingMode)}).catch(issue=>{if(issue.name!=='AbortError')setError(issue.message)});return()=>abort.abort()},[outletId,reload]);
+ const [settings,setSettings]=useState<Row|null>(null),[cap,setCap]=useState(''),[rounding,setRounding]=useState('NONE'),[coupons,setCoupons]=useState<DraftCoupon[]>([]),[charges,setCharges]=useState<{name:string;amount:string}[]>([]),[removed,setRemoved]=useState<string[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState(''),[reload,setReload]=useState(0);
+ useEffect(()=>{const abort=new AbortController();setError('');void request('/api/bill-settings?outletId='+encodeURIComponent(outletId),{signal:abort.signal}).then(value=>{setSettings(value);setCap(String(value.loyaltyCap/100));setRounding(value.roundingMode==='UP'?'NEAREST':value.roundingMode);setCharges((value.charges??[]).map((charge:Row)=>({name:charge.name,amount:String(charge.amount/100)})))}).catch(issue=>{if(issue.name!=='AbortError')setError(issue.message)});return()=>abort.abort()},[outletId,reload]);
  if(!settings)return <div>{error?<><p className="error" role="alert">{error}</p><button className="button" onClick={()=>setReload(n=>n+1)}>Retry</button></>:<p>Loading bill adjustments…</p>}</div>;
  const change=(id:string,values:Partial<DraftCoupon>)=>setCoupons(rows=>rows.map(row=>row.id===id?{...row,...values}:row));
  async function submit(event:FormEvent<HTMLFormElement>){
   event.preventDefault();if(busy)return;setError('');
-  try{const input={outletId,version:settings!.version,loyaltyCap:amountPaise(cap),roundingMode:rounding,createCoupons:coupons.map(c=>({code:c.code,amount:amountPaise(c.amount),validUntil:c.validUntil,maxUses:Number(c.maxUses)})),removeCoupons:removed};setBusy(true);await save(input)}catch(issue){setError((issue as Error).message)}finally{setBusy(false)}
+  try{const input={outletId,version:settings!.version,loyaltyCap:amountPaise(cap),roundingMode:rounding,createCoupons:coupons.map(c=>({code:c.code,amount:amountPaise(c.amount),validUntil:c.validUntil,maxUses:Number(c.maxUses)})),removeCoupons:removed,...(settings!.canManageCharges?{charges:charges.map(charge=>({name:charge.name.trim(),amount:amountPaise(charge.amount)}))}:{})};setBusy(true);await save(input)}catch(issue){setError((issue as Error).message)}finally{setBusy(false)}
  }
  return <form className="form future-bill-adjustments" onSubmit={submit}><fieldset disabled={busy}>
   <section className="bill-coupon-settings" aria-label="Discount coupons">
@@ -28,11 +28,16 @@ export function AdjustmentsEditor({outletId,save}:{outletId:string;save:(input:R
    </article>)}
    <small className="muted">Coupons are applied by code. Total uses are shared across bills; expiry is at the end of the selected day in India time.</small>
   </section>
+  <section className="future-charge-settings" aria-label="Future bill charges"><h3>Other charges</h3><p className="muted">Fixed rupee amounts, added once to each new web bill.</p>
+   {charges.map((charge,index)=><div className="future-charge-row" key={index}><label className="field">Charge name<input aria-label={'Charge name '+(index+1)} required maxLength={60} readOnly={!settings.canManageCharges} value={charge.name} onChange={event=>setCharges(rows=>rows.map((row,i)=>i===index?{...row,name:event.target.value}:row))}/></label><label className="field">Amount (₹)<input aria-label={'Charge amount (₹) '+(index+1)} required type="number" min="0.01" max="10000000" step="0.01" readOnly={!settings.canManageCharges} value={charge.amount} onChange={event=>setCharges(rows=>rows.map((row,i)=>i===index?{...row,amount:event.target.value}:row))}/></label>{settings.canManageCharges&&<button type="button" className="icon-button" aria-label={'Remove charge '+(index+1)} onClick={()=>setCharges(rows=>rows.filter((_,i)=>i!==index))}><Icon name="trash"/></button>}</div>)}
+   {settings.canManageCharges?<button type="button" className="button" disabled={charges.length>=20} onClick={()=>setCharges(rows=>[...rows,{name:'',amount:''}])}><Icon name="plus"/>Add charge</button>:<small className="muted">The restaurant owner can save these charges.</small>}
+  </section>
   <label className="field">Loyalty cap per bill (₹)<input aria-label="Loyalty cap per bill (₹)" required type="number" min="0" max="10000000" step="0.01" value={cap} onChange={e=>setCap(e.target.value)}/></label>
   <div className="bill-rounding-options" role="group" aria-label="Future bill rounding">
-   <label className="adjustment-toggle"><input type="checkbox" checked={rounding==='UP'} onChange={e=>setRounding(e.target.checked?'UP':'NONE')}/>Round up to ₹1</label>
-   <label className="adjustment-toggle"><input type="checkbox" checked={rounding==='DOWN'} onChange={e=>setRounding(e.target.checked?'DOWN':'NONE')}/>Round down to ₹1</label>
+   <label className="adjustment-toggle"><input type="checkbox" role="switch" checked={rounding==='NEAREST'} onChange={e=>setRounding(e.target.checked?'NEAREST':'NONE')}/>Auto round to nearest whole number</label>
+   <label className="adjustment-toggle"><input type="checkbox" role="switch" checked={rounding==='DOWN'} onChange={e=>setRounding(e.target.checked?'DOWN':'NONE')}/>Auto round down</label>
   </div>
+  <small className="muted">Nearest rounding: ₹100.49 → ₹100; ₹100.50 → ₹101. Applies after saving.</small>
   <small className="muted">Applies to future transactions and reward claims at this outlet. Saving does not change the current bill.</small>
   {error&&<p className="error" role="alert">{error}</p>}
   <button className="button primary full-width">{busy?'Saving…':'Save adjustment'}</button>

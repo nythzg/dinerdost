@@ -167,6 +167,10 @@ export async function generateBill(
           "UPDATE orders SET status='SETTLED',version=version+1 WHERE id=$1",
           [orderId],
         );
+        if(!actor.application||actor.application==='MASTER'){
+          const unpinned=await tx.query('UPDATE order_pins SET pinned=false,version=version+1,updated_by=$2,updated_at=now() WHERE order_id=$1 AND pinned RETURNING order_id',[orderId,actor.employeeId]);
+          if(unpinned.rows.length)await audit(tx,actor,{action:'ORDER_UNPINNED',entityType:'ORDER',entityId:orderId,outletId:order.outlet_id,oldState:{pinned:true},newState:{pinned:false},reason:'VIP order settled; other order priorities unchanged'});
+        }
         for (const round of detail.rounds.filter(
           (r) => r.status === "ACCEPTED",
         )) {

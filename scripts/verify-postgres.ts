@@ -8,8 +8,14 @@ const url = new URL(
     process.env.DATABASE_URL!,
 );
 url.searchParams.set("sslmode", "verify-full");
-const admin = new Pool({ connectionString: url.toString(), max: 1 });
+const admin = new Pool({ connectionString: url.toString(), max: 1, connectionTimeoutMillis: 10000 });
 const availableSuites = [
+  "tests/guest-checkout.test.ts",
+  "tests/support-chat.test.ts",
+  "tests/payment-activity.test.ts",
+  "tests/outlet-order-intake.test.ts",
+  "tests/manual-feature-controls.test.ts",
+  "tests/kitchen-selection.test.ts",
   "tests/platform-impersonation.test.ts",
   "tests/platform-operations.test.ts",
   "tests/platform-console.test.ts",
@@ -65,6 +71,7 @@ const suites = requested ?? availableSuites;
 const pattern = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
 async function verifySuite(suite: string) {
   const databaseName = "dd_verify_" + randomBytes(6).toString("hex");
+  console.log(`Disposable PostgreSQL database: ${databaseName}`);
   let created = false;
   try {
     await admin.query(`CREATE DATABASE "${databaseName}"`);

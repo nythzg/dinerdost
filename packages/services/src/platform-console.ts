@@ -67,7 +67,7 @@ function recordData(kind:string,input:unknown){
   shape[field.key]=field.required?schema:schema.optional();
  }
  const data=z.object(shape).strict().parse(input) as Row;
- if(kind==='TICKET'&&data.status==='RESOLVED')ensure(data.resolution?.trim(),'RESOLUTION_REQUIRED','Add a resolution before closing the case.');
+ if(kind==='TICKET'&&['RESOLVED','CLOSED'].includes(data.status))ensure(data.resolution?.trim(),'RESOLUTION_REQUIRED','Add a resolution before closing the case.');
  if(kind==='DOMAIN')ensure(/^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,63}$/i.test(data.hostname),'INVALID_DOMAIN','Enter a hostname without a protocol or path.');
  if(data.color)ensure(/^#[a-f0-9]{6}$/i.test(data.color),'INVALID_COLOR','Use a six-digit hex color.');
  if(kind==='FEE_RULE'&&data.basis==='PERCENT')ensure(data.amount<=100,'INVALID_INPUT','A percentage cannot exceed 100.');
@@ -84,6 +84,12 @@ export async function savePlatformRecord(db:Database,actor:PlatformActor,key:str
   if(data.kind==='SUBSCRIPTION'){if(payload.status==='ACTIVE'&&!data.archived)ensure(!(await tx.query("SELECT id FROM platform_records WHERE kind='SUBSCRIPTION' AND tenant_id=$1 AND NOT archived AND data->>'status'='ACTIVE' AND id<>$2 AND (nullif(data->>'end','') IS NULL OR (data->>'end')::date>=$3::date) AND ($4::date IS NULL OR (data->>'start')::date<=$4::date)",[data.tenantId,data.id??'00000000-0000-0000-0000-000000000000',payload.start,payload.end??null])).rows.length,'SUBSCRIPTION_OVERLAP','Active subscription dates cannot overlap for a restaurant.',409);const plan=await one<Row>(tx,"SELECT * FROM platform_records WHERE id=$1 AND kind='PLAN' AND NOT archived",[z.uuid().parse(payload.planId)]);payload.planFee=plan.data.fee;payload.planCycle=plan.data.cycle;}
   const before=data.id?(await one<Row>(tx,'SELECT * FROM platform_records WHERE id=$1 FOR UPDATE',[data.id])):null;
   if(before)assertPlatformScope(await requirePlatformMember(tx,actor),before.tenant_id);
+  if(before?.kind==='TICKET'&&(await tx.query('SELECT id FROM platform_support_threads WHERE id=$1',[before.id])).rows.length){
+   ensure(before.tenant_id===data.tenantId,'SUPPORT_TENANT_FIXED','A support conversation must stay with its original restaurant.',409);
+   ensure(!data.archived&&payload.status===before.data.status,'SUPPORT_DESK_REQUIRED','Use the shared message desk to solve or close a conversation.',409);
+   if(before.data.closedReason)payload.closedReason=before.data.closedReason;
+  }
+  if(data.kind==='TICKET'&&payload.status==='CLOSED')ensure((await requirePlatformMember(tx,actor)).role==='SUPERADMIN','PLATFORM_FORBIDDEN','Only a Superadmin can close support cases.',403);
   ensure(!before||before.kind===data.kind,'INVALID_INPUT','Record category cannot change.');expectedVersion(before?.version??0,data.version);
   if(before?.kind==='SUBSCRIPTION'&&before.data.planId===payload.planId){payload.planFee=before.data.planFee;payload.planCycle=before.data.planCycle;}
   ensure(!(before?.kind==='BILLING'),'IMMUTABLE_BILLING','Billing records are immutable. Add a correcting credit or payment record.',409);
@@ -198,7 +204,8 @@ export async function platformSnapshot(db:Database,actor:PlatformActor,datasetIn
    const queues=(await tx.query('SELECT state,count(*) AS count FROM outbox WHERE ($1::uuid[] IS NULL OR restro_id=ANY($1)) GROUP BY state ORDER BY state',[scope])).rows;
    metrics={...counts,dataset,datasets,contractedMrr:mrr,contractedArr:mrr===null?null:mrr*12,databaseLatencyMs,queues,cac:null,nrr:null,churn:null,providerHealth:'NOT_CONFIGURED'};
   }
-  return {admin:{userId:actor.userId,name:admin.name,email:admin.email,role:admin.role,permissions,tenantScope:scope,region:admin.region??''},tenants,outlets,records,members,audits,documents,brandReports,balances,qrTables,metrics,readAt:new Date().toISOString()};
+  const featureControls=admin.role==='SUPERADMIN'?(await tx.query("SELECT id,tenant_id,data,version FROM platform_records WHERE kind='FEATURE_CONTROL' AND ($1::uuid[] IS NULL OR tenant_id IS NULL OR tenant_id=ANY($1))",[scope])).rows:[];
+  return {featureControls,admin:{userId:actor.userId,name:admin.name,email:admin.email,role:admin.role,permissions,tenantScope:scope,region:admin.region??''},tenants,outlets,records,members,audits,documents,brandReports,balances,qrTables,metrics,readAt:new Date().toISOString()};
  });
 }
 export async function platformRestaurantDirectory(db:Database,actor:PlatformActor,input:unknown={}){

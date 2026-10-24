@@ -23,9 +23,13 @@ export async function copySingleRestaurant(source:Database,destination:Database,
   }
   rows.set('restaurants',[restaurant]);
   rows.set('platform_records',(await tx.query<Row>('SELECT * FROM platform_records WHERE tenant_id IS NULL OR tenant_id=$1',[tenantId])).rows);
+  if(names.includes('platform_support_calls'))rows.set('platform_support_calls',(await tx.query<Row>('SELECT c.* FROM platform_support_calls c JOIN platform_support_threads t ON t.id=c.thread_id WHERE t.restro_id=$1',[tenantId])).rows);
+  if(names.includes('platform_support_messages'))rows.set('platform_support_messages',(await tx.query<Row>('SELECT m.* FROM platform_support_messages m JOIN platform_support_threads t ON t.id=m.thread_id WHERE t.restro_id=$1',[tenantId])).rows);
   // Keep the immutable global audit chain intact, even when it records earlier removed registrations.
   for(const name of ['platform_audit','platform_audit_head','rate_limits'])rows.set(name,(await tx.query<Row>('SELECT * FROM '+identifier(name))).rows);
   for(const name of ['platform_members','platform_sessions','platform_enrolments','platform_requests'])rows.set(name,(await tx.query<Row>('SELECT * FROM '+identifier(name)+' WHERE user_id=$1',[admin.id])).rows);
+  if(names.includes('platform_support_threads'))rows.set('platform_requests',(await tx.query<Row>("SELECT * FROM platform_requests WHERE user_id=$1 OR response->>'id' IN(SELECT id::text FROM platform_support_threads WHERE restro_id=$2)",[admin.id,tenantId])).rows);
+  if(names.includes('platform_support_threads'))rows.set('platform_members',(await tx.query<Row>('SELECT * FROM platform_members WHERE user_id=$1 OR user_id IN(SELECT assigned_to FROM platform_support_threads WHERE restro_id=$2)',[admin.id,tenantId])).rows);
   const employees=rows.get('employees')??[];
   rows.set('auth_sessions',(await tx.query<Row>('SELECT * FROM auth_sessions WHERE employee_id=ANY($1::uuid[])',[employees.map(e=>e.id)])).rows);
   const userIds=new Set<string>([admin.id,...employees.map(e=>e.user_id)]);

@@ -430,6 +430,20 @@ test("KOT printing requires an authorized released round, separates station stre
   const request = key(),
     printed = await s.requestKotPrint(db, owner, request, o.id, r.id, {});
   assert.ok(printed.url);
+  const foodReceipt = await s.kotReceipt(db, owner, o.id, r.id, {streams:['FOOD'],layout:'COMBINED'});
+  assert.equal(foodReceipt.layout,'COMBINED');
+  assert.equal(foodReceipt.tickets.length,1);
+  assert.equal(foodReceipt.tickets[0].production_stream,'FOOD');
+  const barOnly = await s.requestKotPrint(db, owner, key(), o.id, r.id, {streams:['BAR'],layout:'SEPARATE'});
+  assert.equal(barOnly.ticketIds.length,1);
+  assert.equal(new URL(barOnly.url!,'http://localhost').searchParams.get('streams'),'BAR');
+  const combined = await s.requestKotPrint(db, owner, key(), o.id, r.id, {streams:['FOOD','BAR'],layout:'COMBINED'});
+  assert.equal(combined.ticketIds.length,2);
+  assert.equal(new URL(combined.url!,'http://localhost').searchParams.get('layout'),'COMBINED');
+  await assert.rejects(()=>s.kotReceipt(db,{...owner,role:'BARTENDER'},o.id,r.id,{streams:['FOOD'],layout:'COMBINED'}),{code:'KOT_NOT_RELEASED'});
+  await assert.rejects(()=>s.kotReceipt(db,owner,o.id,r.id,{streams:[],layout:'COMBINED'}));
+  await assert.rejects(()=>s.requestKotPrint(db,owner,key(),o.id,r.id,{streams:['FOOD','FOOD'],layout:'COMBINED'}));
+
   assert.deepEqual(
     await s.requestKotPrint(db, owner, request, o.id, r.id, {}),
     printed,

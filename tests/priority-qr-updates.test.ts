@@ -15,6 +15,7 @@ before(async()=>{
  menuId=(await s.saveMenu(db,owner,key(),{outletId:w.outletId,name:'QR tracked dish',category:'Food',price:10000,taxBps:0,station:'Main kitchen',recipe:[{id:stock.id,quantityMilli:1000}]})).id;
 });
 after(async()=>{await db?.close()});
+
 async function mode(qrPaymentMode:'ORDER_ONLY'|'PAYMENT'){
  const outlet=(await s.workspace(db,owner)).outlets[0];return s.saveOutlet(db,owner,key(),{id:outlet.id,version:outlet.version,name:outlet.name,code:outlet.code,address:outlet.address,gstin:outlet.gstin,qrEnabled:true,qrPaymentMode,paymentPolicy:'PREPAID',taxBps:Number(outlet.tax_bps),earnBps:Number(outlet.earn_bps)});
 }
@@ -72,4 +73,22 @@ test('VIP status reaches kitchen and service priorities without creating tickets
  let state=await s.workspace(db,owner);assert.equal(state.tickets[0].order_id,a.id);assert(state.tickets[0].pinned);assert.equal(state.tickets.find((t:any)=>t.order_id===a.id)?.status,'RELEASED');assert.deepEqual(await frozen(),before);
  for(const o of [a,b])for(const t of state.tickets.filter((t:any)=>t.order_id===o.id)){await s.kitchenDecision(db,owner,key(),t.id,{state:'PREPARING'});await s.kitchenDecision(db,owner,key(),t.id,{state:'READY'})}
  state=await s.workspace(db,owner);assert.equal(state.readyTickets[0].order_id,a.id);assert(state.readyTickets[0].pinned);
+});
+
+test('settling one VIP clears only its pin, once, while other VIP metadata and financial history stay intact',async()=>{
+ const orders=[];
+ for(let n=0;n<2;n++){
+  const o=await s.createRound(db,owner,key(),{outletId:w.outletId,type:'TAKEAWAY',customer:{name:'VIP settlement guest',phone:'9123456701'},items:[{itemId:menuId,quantity:1}]},true);
+  await s.setOrderPin(db,owner,key(),o.id,{pinned:true,version:0});orders.push(o);
+ }
+ const [settled,other]=orders,otherBefore=await detail(other.id);
+ await assert.rejects(s.generateBill(db,owner,key(),settled.id,{final:true}),{code:'SETTLEMENT_NOT_READY'});assert.equal((await detail(settled.id)).pinned,true);
+ await s.generateBill(db,owner,key(),settled.id,{final:false});assert.equal((await detail(settled.id)).pinned,true);
+ const current=await detail(settled.id),round=current.rounds[0];
+ const paid=(await s.recordPayment(db,owner,key(),settled.id,round.id,{version:round.version,method:'CASH',amount:Number(round.payable)},true)).order;
+ await s.completePreparedService(db,owner,key(),settled.id,round.id,{version:paid.rounds[0].version,confirmedPreparedAndServed:true});
+ const request=key(),bill=await s.generateBill(db,owner,request,settled.id,{final:true});assert.deepEqual(JSON.parse(JSON.stringify(await s.generateBill(db,owner,request,settled.id,{final:true}))),JSON.parse(JSON.stringify(bill)));
+ const after=await detail(settled.id);assert.equal(after.status,'SETTLED');assert.equal(after.pinned,false);assert.equal(after.pin_version,2);const {customerVisits:previousVisits,...beforeOther}=otherBefore,{customerVisits:currentVisits,...afterOther}=await detail(other.id);assert.deepEqual(afterOther,beforeOther);assert.equal(currentVisits,previousVisits+1);
+ assert.equal((await s.activeOrderList(db,owner,w.outletId)).rows.find(o=>o.id===other.id)?.pinned,true);assert.equal((await s.workspace(db,owner)).orders.find((o:any)=>o.id===other.id)?.pinned,true);
+ const audits=await db.transaction(owner.restroId,tx=>tx.query("SELECT id FROM audit_events WHERE entity_id=$1 AND action='ORDER_UNPINNED'",[settled.id]));assert.equal(audits.rows.length,1);assert.equal((await s.verifyAudit(db,owner)).valid,true);
 });

@@ -171,6 +171,8 @@ export async function listCustomers(
       outletId: z.uuid(),
       query: z.string().trim().max(120).default(""),
       page: z.coerce.number().int().min(0).max(100000).default(0),
+      sort: z.enum(["VISITS_DESC","SPEND_DESC","POINTS_DESC","NAME_ASC","NAME_DESC"]).default("VISITS_DESC"),
+      filter: z.enum(["ALL","SETTLED","UNSETTLED","HAS_POINTS"]).default("ALL"),
     })
     .strict()
     .parse(input);
@@ -181,22 +183,25 @@ export async function listCustomers(
   return db.transaction(actor.restroId, async (tx) => {
     const where = `EXISTS(SELECT 1 FROM orders o WHERE o.customer_id=c.id AND o.outlet_id=$1) AND ($2='' OR ${phone ? "regexp_replace(c.phone,'[^0-9]','','g') LIKE $3" : "c.name ILIKE $3"})`;
     const params = [data.outletId, data.query, "%" + term + "%"];
+    const activity = `WITH customer_activity AS (SELECT c.id,c.name,c.phone,c.otp_verified,
+      (SELECT count(*) FROM orders o WHERE o.customer_id=c.id AND o.outlet_id=$1 AND o.status='SETTLED') AS visits,
+      (SELECT coalesce(sum(r.paid),0) FROM orders o JOIN order_rounds r ON r.order_id=o.id WHERE o.customer_id=c.id AND o.outlet_id=$1 AND o.status='SETTLED' AND r.status NOT IN ('VOIDED','REJECTED')) AS spend,
+      (SELECT coalesce(sum(points),0) FROM loyalty_ledger WHERE customer_id=c.id AND state<>'PENDING_EARN') AS points
+      FROM customers c WHERE ${where})`;
+    const filter = {ALL:"true",SETTLED:"visits>0",UNSETTLED:"visits=0",HAS_POINTS:"points>0"}[data.filter];
+    const order = {VISITS_DESC:"visits DESC,lower(name),id",SPEND_DESC:"spend DESC,lower(name),id",POINTS_DESC:"points DESC,lower(name),id",NAME_ASC:"lower(name),id",NAME_DESC:"lower(name) DESC,id"}[data.sort];
     const total = num(
       (
         await one(
           tx,
-          `SELECT count(*) AS total FROM customers c WHERE ${where}`,
+          `${activity} SELECT count(*) AS total FROM customer_activity WHERE ${filter}`,
           params,
         )
       ).total,
     );
     const items = (
       await tx.query<Row>(
-        `SELECT c.id,c.name,c.phone,c.otp_verified,
-      (SELECT count(*) FROM orders o WHERE o.customer_id=c.id AND o.outlet_id=$1 AND o.status='SETTLED') AS visits,
-      (SELECT coalesce(sum(r.paid),0) FROM orders o JOIN order_rounds r ON r.order_id=o.id WHERE o.customer_id=c.id AND o.outlet_id=$1 AND o.status='SETTLED' AND r.status NOT IN ('VOIDED','REJECTED')) AS spend,
-      (SELECT coalesce(sum(points),0) FROM loyalty_ledger WHERE customer_id=c.id AND state<>'PENDING_EARN') AS points
-      FROM customers c WHERE ${where} ORDER BY visits DESC,lower(c.name),c.id LIMIT 50 OFFSET $4`,
+        `${activity} SELECT * FROM customer_activity WHERE ${filter} ORDER BY ${order} LIMIT 50 OFFSET $4`,
         [...params, data.page * 50],
       )
     ).rows;

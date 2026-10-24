@@ -38,6 +38,7 @@ export async function changeMenuCategory(
       version: z.number().int().optional(),
       mode: z.enum(["SAVE", "DELETE"]).default("SAVE"),
       name: z.string().trim().min(1).max(80).optional(),
+      menuCourse: z.enum(['starter','main','freshener','dessert']).optional(),
       moveTo: z.uuid().optional(),
     })
     .strict()
@@ -98,17 +99,17 @@ export async function changeMenuCategory(
       );
       if (before) {
         await tx.query(
-          "UPDATE menu_categories SET name=$2,version=version+1 WHERE id=$1",
-          [before.id, data.name],
+          "UPDATE menu_categories SET name=$2,menu_course=$3,version=version+1 WHERE id=$1",
+          [before.id, data.name, data.menuCourse ?? before.menu_course],
         );
-        await tx.query(
+        if(before.name!==data.name)await tx.query(
           "UPDATE menu_items SET category=$3,version=version+1 WHERE outlet_id=$1 AND lower(category)=lower($2)",
           [data.outletId, before.name, data.name],
         );
       } else
         await tx.query(
-          "INSERT INTO menu_categories(id,restro_id,outlet_id,name) VALUES($1,$2,$3,$4)",
-          [categoryId, actor.restroId, data.outletId, data.name],
+          "INSERT INTO menu_categories(id,restro_id,outlet_id,name,menu_course) VALUES($1,$2,$3,$4,$5)",
+          [categoryId, actor.restroId, data.outletId, data.name, data.menuCourse ?? null],
         );
     }
     await audit(tx, actor, {

@@ -143,8 +143,7 @@ test("prepared food, selected actions, separate settlement/invoice, visits/searc
   await dialog
     .getByRole("button", { name: "Complete selected actions" })
     .click();
-  await expect(dialog).toContainText("Mark prepared food served · Completed");
-  await page.getByLabel("Close dialog").click();
+  await expect(dialog).toHaveCount(0);
   await expect(page.locator(".round-panel")).toContainText("Paid");
   const settledUrl = page.url();
   await page.getByRole("button", { name: "Settle", exact: true }).click();
