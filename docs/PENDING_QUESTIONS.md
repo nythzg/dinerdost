@@ -1,5 +1,7 @@
 # Questions to review later
 
+> Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
+
 Updated 22 October 2026. The user initially deferred these questions, then explicitly reported that the client had answered and requested review of those answers. The complete 9:31 am answer attachment has now been read and saved. Answers are requirements, not implementation/release claims. Preserve the historical questions below and track each implementation separately in CLIENT_FEEDBACK.md.
 
 Latest receiving-user instruction · 23 October: remove phone verification from local web coupon/loyalty redemption and web phone-status badges. This supersedes earlier web OTP requirements; identity, balances/caps, coupon/payment/permission guards and stored historical facts remain. Native policy is deferred and unchanged. See LOCAL_BILL_ADJUSTMENTS.md. Q111 remains unanswered.
@@ -30,7 +32,7 @@ Prem requests next-visit bill queuing at 8:32 pm. Confirm: should only an unpaid
 
 ### Q114 — Calculator scope confirmed by the receiving user
 
-The original APK request was investigated statically without installing/running it. The receiving user then explicitly requested **Standard only**, removed the mode selector and supplied a video establishing the interface and calculation sequence. The standard calculator, percentages, optional notes/history, equals autosave, seven-day retention and side tab are now implemented and verified locally. Q114 is no longer awaiting clarification; it remains unreleased. Scientific/conversion/currency/mortgage/native modes are outside that later approved scope. [Original source](https://discord.com/channels/@me/1491679750610096259/1562846352743071805) · [Current local scope](LOCAL_STANDARD_CALCULATOR.md) · [Range acceptance](DISCORD_PRIORITY_REVIEW.md). Do not reopen the broader APK question without a new instruction. Q111 remains the unanswered question.
+The original APK request was investigated statically without installing/running it. The receiving user then explicitly requested **Standard only**, removed the mode selector and supplied a video establishing the interface and calculation sequence. The standard calculator, percentages, optional notes/history, equals autosave, seven-day retention and side tab are now implemented and verified locally. Q114 is no longer awaiting clarification; its approved Standard-only scope is released in the25 October receiving deployment. Scientific/conversion/currency/mortgage/native modes are outside that later approved scope. [Original source](https://discord.com/channels/@me/1491679750610096259/1562846352743071805) · [Current local scope](LOCAL_STANDARD_CALCULATOR.md) · [Range acceptance](DISCORD_PRIORITY_REVIEW.md). Do not reopen the broader APK question without a new instruction. Q111 remains the unanswered question.
 
 ## Receiving-device investigation · 23 October 2026
 
@@ -167,3 +169,7 @@ The receiving user superseded the broad APK request with **Standard only**, no m
 ## Local superadmin provisioning input · 23 October 2026
 
 The receiving user supplied the initial email, then explicitly requested a new login after it was not found locally. A separate platform identity was created, the user completed the private password setup and authenticated into the local panel. The identity question and local enrollment are resolved. This is local account enrollment, not a new Q/PP feature number. Ordinary owners are not auto-promoted. See [local superadmin scope](LOCAL_SUPERADMIN.md). Q111 and the procurement pause remain unchanged.
+
+## Return-handoff decision reconciliation ·25 October2026
+
+All nine original policy questions remain answered. Q111 is the only unanswered Q-series request. The later explicit Standard-only/video answer resolved Q114; approved standard calculator scope is now deployed, not full ColorOS/native/scientific parity. The optional unnumbered guest-loyalty identity-broadening question remains unanswered; recognized-device/active-order identity stays required. Approved live Superadmin setup and Nythz Coooks copy are complete; do not reissue enrollment, reset passwords or repeat import. Q74 owner/assigned-manager future-cap authority, removal of web OTP, nearest future rounding and the later UI/settlement decisions are listed in RETURN_HANDOFF. Historical awaiting-answer paragraphs above are retained solely as history.

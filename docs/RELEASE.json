@@ -185,15 +185,15 @@
   },
   "temporaryCredentialFilesRemoved": false,
   "issuedDocumentCountPreserved": 30,
-  "acceptanceEvidence": "verification/production-20261025-acceptance.json",
+  "acceptanceEvidence": "docs/evidence/production-20261025-acceptance.json",
   "latestReviewQueue": {
     "requests": 102,
-    "implemented": 100,
+    "implemented": 101,
     "pendingImplementation": 0,
     "ids": "Q18-Q119",
     "latestBatch": "Q114-Q119 latest revisions",
     "readThrough": "2026-10-22T21:09:00+05:30",
-    "status": "100 released on receiving project; Q114 standard-only video scope verified locally and unreleased; Q111 awaiting details. Original project remains 0.4.30.",
+    "status": "101 released on receiving project, including explicitly narrowed Standard-only Q114; Q111 alone awaits financial rules. Original project baseline remains historical 0.4.30.",
     "pendingClarification": 1,
     "pendingClarificationIds": [
       "Q111"
@@ -202,9 +202,8 @@
     "providersDeferred": true,
     "oldRoundsPreserved": true,
     "pendingImplementationIds": [],
-    "localUnreleasedIds": [
-      "Q114"
-    ]
+    "localUnreleasedIds": [],
+    "released": 101
   },
   "productionVerificationMethod": "418 backend tests;55 cases on exact disposable PostgreSQL databases;7 focused local browser workflows; staged/live desktop and phone entry/QR checks; anonymous API and CSRF checks.",
   "petpoojaImplementation": {
@@ -212,12 +211,14 @@
     "checklist": "docs/PETPOOJA_ADDITIONS.md",
     "scope": "web-only",
     "groups": 27,
-    "completed": 4,
-    "pending": 21,
+    "completed": 6,
+    "pending": 19,
     "sourceBaseline": "0.4.11",
     "implementationBaseline": "0.4.17",
     "completeIds": [
       "PP01",
+      "PP03",
+      "PP04",
       "PP05",
       "PP18",
       "PP23"
@@ -228,7 +229,7 @@
       "PP20"
     ],
     "currentRelease": "0.4.31",
-    "status": "Four groups complete, two partial, 21 pending. Raw-ingredient expiry review complete; production and broader procurement remain pending."
+    "status": "Six groups complete for documented web scope; two partial;19 pending. PP03/PP04 source/migrations052-053 are included in the accepted25 October deployment, supported by prior15 hosted cases and current418 backend cases. PP06 remains paused WIP on a separate branch."
   },
   "receivingDevelopment": {
     "sourceVersion": "0.4.31",
@@ -923,7 +924,7 @@
     },
     "superadmin": {
       "status": "verified-local-active-initial-platform-identity",
-      "scope": "Local web platform console; see AÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“G implementation/pending matrix.",
+      "scope": "Local web platform console; see A\u00c3\u0192\u00c6\u2019\u00c3\u201a\u00c2\u00a2\u00c3\u0192\u00c2\u00a2\u00c3\u00a2\u00e2\u201a\u00ac\u00c5\u00a1\u00c3\u201a\u00c2\u00ac\u00c3\u0192\u00c2\u00a2\u00c3\u00a2\u00e2\u20ac\u0161\u00c2\u00ac\u00c3\u2026\u00e2\u20ac\u0153G implementation/pending matrix.",
       "url": "http://localhost:5090/superadmin",
       "lanUrl": "http://10.37.66.219:5090/superadmin",
       "migration": "057_platform_console.sql",
@@ -2206,5 +2207,18 @@
       "Calculator size preference is stored per employee in the current browser; clearing site data removes it.",
       "No native APK, provider connection, paid upgrade or deferred procurement/Q111 implementation is claimed."
     ]
+  },
+  "returnHandoff": {
+    "date": "2026-10-25",
+    "repository": "https://github.com/prasadgourav/dinerdost",
+    "upstream": "https://github.com/nythzg/dinerdost",
+    "branch": "local-web-calculator",
+    "sourceCommit": "968bbd9659c705b1a6337f3ec5d7aab63c3a7e4f",
+    "pausedProcurementBranch": "local-web-procurement",
+    "pausedProcurementCommit": "242d64374f8cfcb7394e4fbdf20a7a769a42aa23",
+    "handoff": "docs/RETURN_HANDOFF.md",
+    "upcoming": "docs/UPCOMING_WORK.md",
+    "productionChangedByHandoff": false,
+    "publicationStatus": "prepared; final remote verification is recorded in return acceptance"
   }
 }

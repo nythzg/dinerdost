@@ -1,5 +1,13 @@
 # Diner Dost
 
+Current return handoff ·25 October2026: **[RETURN_HANDOFF](docs/RETURN_HANDOFF.md)** and **[UPCOMING_WORK](docs/UPCOMING_WORK.md)** are authoritative. Continue branch`local-web-calculator` at [prasadgourav/dinerdost](https://github.com/prasadgourav/dinerdost); original upstream remains[nythzg/dinerdost](https://github.com/nythzg/dinerdost). Inspect local changes before syncing.
+
+The receiving production app is**0.4.31**, https://dinerdost-web.vercel.app, project`prem-2230/dinerdost-web`, deployment`dpl_DW2u9iuRG8WfmL3Dtx7FQGEYREAd`, migrations001-069. Accepted:418 backend/55 hosted PostgreSQL cases, focused desktop/phone browser checks, typecheck/build. Current Q-series:101 released/Q111 unanswered; Q114 is answered and released Standard-only. Separate Petpooja:6 complete/2 partial/19 pending. WEB ONLY; no full V2/native/provider claim.
+
+The source handoff does not change production/database ownership or copy private data/credentials. Keep the existing Neon resource and deployment; do not reset/seed/migrate/restore or repeat the completed restaurant import. The old monitor remains PAUSED. See[release evidence](docs/evidence/production-20261025-acceptance.json); old0.4.30 paragraphs below are historical.
+
+## Historical original-PC baseline
+
 For hosting on another Vercel account while keeping existing data, follow [the database/environment handoff](docs/VERCEL_DATABASE_HANDOFF.md). Reuse the existing production Neon DB; actual credentials are never in this public repository.
 
 Working web application, version **0.4.30**, deployed and verified at https://dinerdost-app.vercel.app/. Built from DinerDost PRD v2.0 and the approved green layout with large navigation. Read [HANDOFF.md](HANDOFF.md) and [new-device setup](docs/NEW_DEVICE_SETUP.md) when moving this project. Paste [CONTINUE_IN_CODEX.txt](CONTINUE_IN_CODEX.txt) into the receiving Codex chat.

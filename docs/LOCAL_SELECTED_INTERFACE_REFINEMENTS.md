@@ -1,5 +1,7 @@
 # Selected interface refinements · 24 October 2026
 
+> Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
+
 Local, uncommitted review draft. This checkpoint supersedes Revision 3's descriptions of unchanged navigation, synthetic-only work and no backend changes. No push, deployment or production migration is included. Nythz Coooks / Nihal kaman / N1 and its original credentials, orders, issued documents, payment logs, FIFO and physical observations remain retained. Q111 is unanswered; procurement is paused; external providers, hardware and native work remain deferred. Q/PP released counts are unchanged.
 
 ## Interface

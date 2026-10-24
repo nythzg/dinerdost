@@ -1,5 +1,7 @@
 # GitHub source handoff
 
+> Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
+
 The user requested pushing the project to GitHub after preparing the portable device handoff, then explicitly requested public access on **23 October 2026 IST**. Destination: **public** [nythzg/dinerdost](https://github.com/nythzg/dinerdost), branch **main**. The connected GitHub account and Git credential account both resolve to `nythzg`.
 
 The original source had no Git checkout, remote or history. This is the initial import of the currently verified **0.4.30** application, shared services/database/core packages, migrations 001–050, tests, repository documentation, continuation notes, selected nonsecret release evidence and comparison references. It does not recreate historical commits for earlier Vercel releases. Android source is retained as deferred historical work; generated builds, Firebase config, SDK paths and signing material are excluded.

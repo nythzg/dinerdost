@@ -1,5 +1,7 @@
 # Local customer journey, menu offers and KOT
 
+> Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
+
 Local, uncommitted web changes dated 24 October 2026. No push or deployment. Later instructions in this document supersede the earlier six-step browsing draft.
 
 ## Customer experience

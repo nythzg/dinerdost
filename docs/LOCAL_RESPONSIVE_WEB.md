@@ -1,5 +1,7 @@
 # Responsive web ecosystem - 24 October 2026
 
+> Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
+
 The user authorized responsive customer, staff and platform web layouts, centered content, smooth mobile side-tool overlays (superseding the earlier no-overlap direction), a reworked phone header, and compact welcome text beside a large restaurant mark. Existing appearance choices and business workflows remain.
 
 ## Layout

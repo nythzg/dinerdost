@@ -1,5 +1,7 @@
 # Local Superadmin operational completion · 23 October 2026
 
+> Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
+
 **Current UI:** the local console now has the [verified Superadmin redesign](LOCAL_SUPERADMIN_DESIGN.md), including grouped navigation, keyboard search and responsive management screens. Existing operational/API requirements below remain authoritative.
 
 This is the current A–G scope. Earlier checkpoints in LOCAL_SUPERADMIN.md are historical. Local web only: no push, deployment, production migration, provider connection or hardware activation. The approved restaurant remains **Nythz Coooks / Nihal kaman / N1**. Q111 remains unanswered; procurement stays paused. Client and Petpooja release counts are unchanged.

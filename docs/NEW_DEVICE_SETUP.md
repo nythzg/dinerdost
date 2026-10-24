@@ -1,5 +1,7 @@
 # Open Diner Dost on the receiving device
 
+> Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
+
 This transfers the source and saved project context. It does not transfer authenticated sessions, production data or ownership of any cloud account. Read `../HANDOFF.md` first. Current source/accepted production: **0.4.30**.
 
 ## 1. Extract and open

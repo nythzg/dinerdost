@@ -1,5 +1,7 @@
 # Local standard calculator · 23 October 2026
 
+> Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
+
 Q114's latest direct user instructions supersede the earlier broad APK request: keep only Standard, remove the mode selector, follow the supplied `VID_20261023_024214.mp4` interface and demonstrated arithmetic, retain the green theme and optional notes/history. Scientific, conversion, currency, mortgage and native features are outside this approved scope. Q111 remains unanswered. Procurement remains paused.
 
 The local calculator has the reference's circular 4×5 keypad, AC, percent, SVG backspace, 00 and a single equals key. Live previews do not save history. Equals promotes the answer and automatically saves the calculation; an operator continues from it and a digit starts a fresh calculation. The demonstrated chain `45×25 = 1,125`, `÷5 = 225`, `−26 = 199` passes. Display grouping does not change stored expressions. Keyboard entry, paste, selection deletion and grouped digit editing remain supported.

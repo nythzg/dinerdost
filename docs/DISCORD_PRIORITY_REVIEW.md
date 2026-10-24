@@ -1,5 +1,7 @@
 # Requested Discord range · 23 October 2026
 
+> Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
+
 The receiving user prioritized the inclusive range [first message](https://discord.com/channels/@me/1491679750610096259/1562846350469627924) through [last message](https://discord.com/channels/@me/1491679750610096259/1562853027382042818) before further Petpooja work. The signed-in browser confirmed this DM's contact is `nihh` / `nihalkaman`, user ID `1486270666444636250`. All seven message entries in that range were read, and all five attached screenshots were inspected. No messages or reactions were sent.
 
 The range matches existing Q114–Q119; no new Q IDs or duplicate implementation tasks were added.

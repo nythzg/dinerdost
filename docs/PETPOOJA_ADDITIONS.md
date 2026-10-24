@@ -1,5 +1,7 @@
 # Petpooja comparison additions
 
+Current25 October return checkpoint: **6 complete /2 partial /19 pending** of27. PP01/PP03/PP04/PP05/PP18/PP23 are complete for the documented web scope; PP02/PP20 remain partial. PP03/PP04 were already verified locally and on15 isolated PostgreSQL cases; their code and migrations052-053 are now included in the accepted receiving deployment through069, with418 current backend passes. See [public release evidence](evidence/production-20261025-acceptance.json) and [source manifest](evidence/deployed-source-20261025.json). This updates their release status, not broader Petpooja/native parity. **PP06 remains paused, unfinished and untested on a separate branch; its draft054 conflicts with deployed054.** See UPCOMING_WORK. Q114 is explicitly answered/released Standard-only; Q111 remains unanswered. Earlier counts below are dated historical checkpoints.
+
 The user authorized adding the missing comparison features to the **web app**, keeping them simple and documenting each addition, on **22 October 2026**. This turns the comparative audit into implementation work; unchecked rows are not completion claims.
 
 Sources: [saved comparison](../output/pdf/DinerDost_Petpooja_Inventory_Gap_Review.html), [PDF](../output/pdf/DinerDost_Petpooja_66_Video_Inventory_Gap_Review.pdf), [66-video evidence matrix](../verification/petpooja-playlist-20261022/review.json). That audit reviewed all 66 transcripts against 0.4.11. It describes tutorial workflows, not current commercial entitlements. Recheck each gap against current source before editing; overlapping tutorials below are one capability.
@@ -20,8 +22,8 @@ Numbers refer to videos in the evidence matrix. `[ ]` means pending; completion 
 |---|---|---|---|
 | [x] PP01 | Material categories, internal codes, HSN metadata and search/filter tools | 5,17,52 | Preserve base-unit identity and old records; no invented data. |
 | [ ] PP02 (partial) | Custom buying packs, explicit base-unit conversion and measured yield | 3–5,7 | Exact kg/L/unit conversions and rounding; preserve historical units. |
-| [ ] PP03 | Size/add-on/channel recipes and packaging snapshots | 3,7,43 | Resolve before reservation; preserve old order needs and unconfigured base recipes. |
-| [ ] PP04 | Semi-finished recipes and costed production batches with yield/loss | 6,14,57,66 | Atomic FIFO consumption/output; reservation/expiry guards; no double cost. |
+| [x] PP03 | Size/add-on/channel recipes and packaging snapshots | 3,7,43 | Resolve before reservation; preserve old order needs and unconfigured base recipes. |
+| [x] PP04 | Semi-finished recipes and costed production batches with yield/loss | 6,14,57,66 | Atomic FIFO consumption/output; reservation/expiry guards; no double cost. |
 | [x] PP05 | Planned dishes/servings → ingredient needs, usable stock and purchase shortfalls | 9,14 | Preview only; missing recipes unknown; no automatic ordering. |
 | [ ] PP06 | Ordered purchase lines, delivery schedules, partial receipts and quantity variance | 8,11,12,54,56 | Preserve legacy purchases; no duplicate expenses/receipts; concurrency checks. |
 | [ ] PP07 | Supplier invoices, attachments and actual tax/amount breakdown | 12,18,45 | Owner-only tax retained; no rewriting old approved amounts. |

@@ -1,5 +1,7 @@
 # Local web development · 23 October 2026
 
+> Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
+
 The receiving user asked **“make the updates locally”** after Q89 receiving Production acceptance. All subsequent PP work stays in the local checkout, branch `web-recipe-profiles`; it has not been pushed or deployed. The accepted receiving app remains **0.4.31**, and the original app remains **0.4.30**. Local migrations 052/053 are not applied to either production database.
 
 ## PP03 · recipe choices and packaging
