@@ -1,6 +1,6 @@
 # UI review fixes — 25 October 2026
 
-Status: preview approved by the user on 25 October 2026. Web patch 0.4.32 is prepared for the explicitly authorized production deployment and GitHub sync. Deployment acceptance will be recorded after live verification.
+Status: released as web patch 0.4.32 after the user's preview approval and explicit deployment/GitHub-sync instruction. Production is https://dinerdost-web.vercel.app, deployment `dpl_9v23V9ZUWk9MiZuiVDVd1kKKUPBB`. Deployed source commit: `fbb7e92dd90d8b206684bff23be0c20744da78dc` on the public `prasadgourav/dinerdost` fork, branch `local-web-calculator`.
 
 The user authorized fixing the Web Interface Guidelines review findings across restaurant, Superadmin and customer QR, testing them, and showing a preview before deployment.
 
@@ -26,4 +26,8 @@ The user authorized fixing the Web Interface Guidelines review findings across r
 
 The local screenshot gallery at http://127.0.0.1:5093 contains restaurant, Superadmin and customer QR desktop/phone captures, plus live local entry links. Gallery assets and QA credentials stay outside tracked source under the existing private work directory. These local URLs require this computer's preview servers to remain running.
 
-Physical phones, assistive-technology hardware and hosted PostgreSQL were not retested. There are no database, service, permission, billing-formula or migration changes. This acceptance does not update production status, Q/PP completion counts or deferred procurement/native/provider work.
+Physical phones, assistive-technology hardware and hosted PostgreSQL were not retested. There are no database, service, permission, billing-formula or migration changes. Q/PP completion counts and deferred procurement/native/provider work are unchanged.
+
+## Production acceptance
+
+The same staged production build was promoted after desktop/phone checks. Restaurant and Superadmin sign-in/password controls, the existing imported restaurant QR page, local font assets, no page overflow and anonymous API guards passed both staged and public checks (12 assertions per environment, zero browser errors). The canonical URL resolves to the new READY deployment. No production migration, seed, restore, protection change or paid upgrade was performed. [Release evidence](evidence/ui-review-0432-release.json).

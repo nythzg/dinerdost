@@ -1,5 +1,7 @@
 # Upcoming work · 25 October 2026
 
+Latest completed work: the user-approved UI review fixes are released as web **0.4.32** and pushed to the return fork. See [UI release acceptance](LOCAL_UI_REVIEW_FIXES.md). This does not resume PP procurement or answer Q111; the pending queues below remain unchanged.
+
 This is a source-backed continuation list, not permission to broaden scope. The return-handoff task starts NO new feature work. WEB APP ONLY; preserve financial history, actual stock/cost/FIFO, roles/tenant/outlet boundaries, green UI and current-day physical observations. Source/data access does not authorize provider purchases, new subscriptions or production reset/migration.
 
 ## Priority and first unblocked task

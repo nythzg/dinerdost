@@ -1,5 +1,7 @@
 # Diner Dost return handoff · 25 October 2026
 
+Current web release: **0.4.32**, deployed after the approved UI preview on 25 October. Source commit `fbb7e92dd90d8b206684bff23be0c20744da78dc` is published on `prasadgourav/dinerdost`, branch `local-web-calculator`. See [UI release acceptance](LOCAL_UI_REVIEW_FIXES.md) and [evidence](evidence/ui-review-0432-release.json). Earlier 0.4.31 return tables remain historical. Production data, migrations through069 and the paused procurement branch are preserved.
+
 ## Start here
 
 This document supersedes the earlier0.4.30 device-handoff baseline. Inspect the receiving checkout and preserve its changes BEFORE fetching or switching. This return handoff publishes source/context only: it does not reset, seed, migrate, restore or delete production data, change production variables, redeploy, transfer ownership or enable paid services.
