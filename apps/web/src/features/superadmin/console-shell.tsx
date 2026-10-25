@@ -6,9 +6,10 @@ import {StaffLanguage,T,useStaffTranslation} from '@/lib/staff-language';
 import {label,request,type Row} from '@/lib/client';
 import {SidebarProfile} from '@/components/sidebar-profile';
 import {SupportNotifications} from './support-notifications';
+import {queryHref} from '@/lib/use-url-state';
 import {consoleNavigation as navigation} from './console-navigation';
 
-type Props={data:Row;section:string;refreshing:boolean;busy:boolean;modalOpen:boolean;onNavigate:(id:string)=>void;onRefresh:()=>void;onRestaurant:(row:Row)=>void;children:ReactNode};
+type Props={data:Row;section:string;refreshing:boolean;busy:boolean;modalOpen:boolean;onNavigate:(id:string)=>boolean;onRefresh:()=>void;onRestaurant:(row:Row)=>void;children:ReactNode};
 export function ConsoleShell(props:Props){return <StaffLanguage account={'platform-'+props.data.admin.userId}><ConsoleShellContent {...props}/></StaffLanguage>}
 function ConsoleShellContent({data,section,refreshing,busy,modalOpen,onNavigate,onRefresh,onRestaurant,children}:Props){
  const translate=useStaffTranslation();
@@ -20,12 +21,12 @@ function ConsoleShellContent({data,section,refreshing,busy,modalOpen,onNavigate,
  useEffect(()=>{if(!searchOpen)return;const outside=(event:PointerEvent)=>{if(!(event.target as Element).closest('.header-search'))setSearchOpen(false)};const escape=(event:globalThis.KeyboardEvent)=>{if(event.key==='Escape'&&!modalOpen)closeSearch()};document.addEventListener('pointerdown',outside);document.addEventListener('keydown',escape);return()=>{document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',escape)}},[searchOpen,modalOpen]);
  const allowed=navigation.filter(item=>(item.id!=='features'||data.admin.role==='SUPERADMIN')&&item.permissions.some(p=>data.admin.permissions.includes(p)));
  const active=navigation.find(item=>item.id===section);
- const navigate=(id:string)=>{setMobileOpen(false);setSearchOpen(false);setQuery('');onNavigate(id)};
+ const navigate=(id:string)=>{if(!onNavigate(id))return false;setMobileOpen(false);setSearchOpen(false);setQuery('');return true};
  useEffect(()=>{const wide=matchMedia('(min-width: 821px)'),change=()=>{if(wide.matches)setMobileOpen(false)};wide.addEventListener('change',change);return()=>wide.removeEventListener('change',change)},[]);
  useEffect(()=>{const key=(event:globalThis.KeyboardEvent)=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'&&!modalOpen){event.preventDefault();setSearchOpen(value=>!value);setQuery('')}};document.addEventListener('keydown',key);return()=>document.removeEventListener('keydown',key)},[modalOpen]);
  useEffect(()=>{
   if(!mobileOpen)return;
-  const prior=document.body.style.overflow;document.body.style.overflow='hidden';(sidebar.current?.querySelector<HTMLInputElement>('.sidebar-search-content input')??sidebar.current?.querySelector<HTMLButtonElement>('nav button'))?.focus();
+  const prior=document.body.style.overflow;document.body.style.overflow='hidden';(sidebar.current?.querySelector<HTMLInputElement>('.sidebar-search-content input')??sidebar.current?.querySelector<HTMLElement>('nav a'))?.focus();
   const key=(event:globalThis.KeyboardEvent)=>{if(event.key==='Escape'){setSearchOpen(false);setMobileOpen(false);trigger.current?.focus()}
    if(event.key==='Tab'){const controls=[...Array.from(sidebar.current?.querySelectorAll<HTMLElement>('button,a[href],input,select,textarea')??[]),...Array.from(document.querySelectorAll<HTMLElement>('[data-sidebar-profile-panel] button,[data-sidebar-profile-panel] select'))].filter(e=>e.getClientRects().length);if(event.shiftKey&&document.activeElement===controls[0]){event.preventDefault();controls.at(-1)?.focus()}else if(!event.shiftKey&&document.activeElement===controls.at(-1)){event.preventDefault();controls[0]?.focus()}}};
   document.addEventListener('keydown',key);return()=>{document.body.style.overflow=prior;document.removeEventListener('keydown',key);if(!document.querySelector('[role=dialog]'))trigger.current?.focus()};
@@ -33,7 +34,7 @@ function ConsoleShellContent({data,section,refreshing,busy,modalOpen,onNavigate,
  const toggleCompact=()=>{setSearchOpen(false);setCompact(value=>{try{localStorage.setItem('dd-sa-compact',String(!value))}catch{}return !value})};
  const lower=query.trim().toLowerCase();
  const commands=[...allowed.map(item=>({id:item.id,title:item.title,detail:item.group,icon:item.icon,keywords:item.keywords,run:()=>navigate(item.id)})),
-  ...(data.admin.permissions.includes('tenants')?data.tenants.map((row:Row)=>({id:row.id,title:row.name,detail:'Restaurant settings',icon:'outlets',keywords:row.slug??'',run:()=>{setSearchOpen(false);setMobileOpen(false);navigate('tenants');onRestaurant(row)}})):[])].filter(item=>(item.title+' '+translate(item.title)+' '+item.detail+' '+item.keywords).toLowerCase().includes(lower)).slice(0,12);
+  ...(data.admin.permissions.includes('tenants')?data.tenants.map((row:Row)=>({id:row.id,title:row.name,detail:'Restaurant settings',icon:'outlets',keywords:row.slug??'',run:()=>{setSearchOpen(false);setMobileOpen(false);if(navigate('tenants'))onRestaurant(row)}})):[])].filter(item=>(item.title+' '+translate(item.title)+' '+item.detail+' '+item.keywords).toLowerCase().includes(lower)).slice(0,12);
  const results=useRef<HTMLDivElement>(null);
  const commandKey=(event:KeyboardEvent<HTMLElement>)=>{if(!['ArrowDown','ArrowUp'].includes(event.key))return;event.preventDefault();const controls=Array.from(results.current?.querySelectorAll<HTMLButtonElement>('button')??[]),index=controls.indexOf(document.activeElement as HTMLButtonElement);const down=event.key==='ArrowDown',next=index<0?(down?0:controls.length-1):(index+(down?1:-1)+controls.length)%controls.length;controls[next]?.focus()};
  return <div className="sa-shell" data-compact={compact} data-menu-open={mobileOpen}>
@@ -42,7 +43,7 @@ function ConsoleShellContent({data,section,refreshing,busy,modalOpen,onNavigate,
   <aside id="sa-sidebar" ref={sidebar} className="sa-sidebar curved-sidebar">
    <div className="sa-brand"><Logo/><span className="sa-brand-caption"><T>Administration</T></span><button className="sa-mobile-close" aria-label="Close navigation" onClick={()=>{setMobileOpen(false);trigger.current?.focus()}}><Icon name="close"/></button></div>
 
-   <nav aria-label="Superadmin navigation">{allowed.map(item=><button key={item.id} type="button" aria-label={item.title} title={compact?item.title:undefined} aria-current={section===item.id?'page':undefined} onClick={()=>navigate(item.id)}><Icon name={item.icon}/><span className="sa-nav-label"><T>{item.title}</T></span>{section===item.id&&<span className="sa-nav-active" aria-hidden="true"/>}</button>)}</nav>
+   <nav aria-label="Superadmin navigation">{allowed.map(item=><a key={item.id} data-guarded-navigation href={queryHref({section:item.id,kind:'',search:'',recordState:'all'},{section:'overview'})} aria-label={item.title} title={compact?item.title:undefined} aria-current={section===item.id?'page':undefined} onClick={event=>{if(event.button===0&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey){event.preventDefault();navigate(item.id)}}}><Icon name={item.icon}/><span className="sa-nav-label"><T>{item.title}</T></span>{section===item.id&&<span className="sa-nav-active" aria-hidden="true"/>}</a>)}</nav>
    <SidebarProfile name={data.admin.name} role={label(data.admin.role)} properties={[{label:'Name',value:data.admin.name},{label:'Role',value:label(data.admin.role)},{label:'Email',value:data.admin.email},...(data.admin.region?[{label:'Region',value:data.admin.region}]:[])]} onSignOut={async()=>{await request('/api/superadmin/auth',{method:'POST',body:JSON.stringify({action:'logout'})});location.assign('/superadmin/signin')}}/>
   </aside>
   <div className="sa-main" inert={mobileOpen}>

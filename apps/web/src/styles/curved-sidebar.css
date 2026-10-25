@@ -53,8 +53,8 @@
 @media screen and (min-width: 821px) {
   html body .sa-shell .sa-sidebar.curved-sidebar { width: 240px; }
   html body .sa-shell[data-compact=true] .sa-sidebar.curved-sidebar { width: 76px; --rail-label-width: 0px; --rail-label-opacity: 0; --rail-brand-gap: 0px; --rail-profile-gap: 0px; --rail-profile-pad: 9px; --rail-profile-end-pad: 9px; --rail-logout-width: 0px; --rail-detail-visibility: hidden; }
-  html body .sa-shell[data-compact=true] aside.sa-sidebar.curved-sidebar>nav button { height: 48px; min-height: 48px; width: calc(100% - 8px); margin-left: 8px; padding: 9px 25px 9px 17px; gap: 0; justify-content: flex-start; }
-  html body .sa-shell[data-compact=true] aside.sa-sidebar.curved-sidebar>nav button>.sa-nav-label { max-width: 0; opacity: 0; }
+  html body .sa-shell[data-compact=true] aside.sa-sidebar.curved-sidebar>nav :is(a,button) { height: 48px; min-height: 48px; width: calc(100% - 8px); margin-left: 8px; padding: 9px 25px 9px 17px; gap: 0; justify-content: flex-start; }
+  html body .sa-shell[data-compact=true] aside.sa-sidebar.curved-sidebar>nav :is(a,button)>.sa-nav-label { max-width: 0; opacity: 0; }
   html body .sa-shell[data-compact=true] aside.sa-sidebar.curved-sidebar>nav [aria-current=page] { width: calc(100% - 8px); margin-left: 8px; padding-left: 17px; padding-right: 25px; }
 }
 @media screen and (max-width: 850px) {

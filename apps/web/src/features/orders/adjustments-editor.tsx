@@ -2,6 +2,7 @@
 import {clientUuid} from "@/lib/browser-crypto";
 import {useEffect,useState,type FormEvent} from 'react';
 import {amountPaise} from '@dinerdost/core';
+import {useUnsavedChanges} from "@/lib/unsaved-changes";
 import {Icon} from '@/components/ui';
 import {money,request,type Row} from '@/lib/client';
 
@@ -9,13 +10,15 @@ type DraftCoupon={id:string;code:string;amount:string;validUntil:string;maxUses:
 export function AdjustmentsEditor({outletId,save}:{outletId:string;save:(input:Row)=>Promise<unknown>}){
  const [settings,setSettings]=useState<Row|null>(null),[cap,setCap]=useState(''),[rounding,setRounding]=useState('NONE'),[coupons,setCoupons]=useState<DraftCoupon[]>([]),[charges,setCharges]=useState<{name:string;amount:string}[]>([]),[removed,setRemoved]=useState<string[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState(''),[reload,setReload]=useState(0);
  useEffect(()=>{const abort=new AbortController();setError('');void request('/api/bill-settings?outletId='+encodeURIComponent(outletId),{signal:abort.signal}).then(value=>{setSettings(value);setCap(String(value.loyaltyCap/100));setRounding(value.roundingMode==='UP'?'NEAREST':value.roundingMode);setCharges((value.charges??[]).map((charge:Row)=>({name:charge.name,amount:String(charge.amount/100)})))}).catch(issue=>{if(issue.name!=='AbortError')setError(issue.message)});return()=>abort.abort()},[outletId,reload]);
+ const [dirty,setDirty]=useState(false);
+ useUnsavedChanges(dirty);
  if(!settings)return <div>{error?<><p className="error" role="alert">{error}</p><button className="button" onClick={()=>setReload(n=>n+1)}>Retry</button></>:<p>Loading bill adjustments…</p>}</div>;
  const change=(id:string,values:Partial<DraftCoupon>)=>setCoupons(rows=>rows.map(row=>row.id===id?{...row,...values}:row));
  async function submit(event:FormEvent<HTMLFormElement>){
   event.preventDefault();if(busy)return;setError('');
-  try{const input={outletId,version:settings!.version,loyaltyCap:amountPaise(cap),roundingMode:rounding,createCoupons:coupons.map(c=>({code:c.code,amount:amountPaise(c.amount),validUntil:c.validUntil,maxUses:Number(c.maxUses)})),removeCoupons:removed,...(settings!.canManageCharges?{charges:charges.map(charge=>({name:charge.name.trim(),amount:amountPaise(charge.amount)}))}:{})};setBusy(true);await save(input)}catch(issue){setError((issue as Error).message)}finally{setBusy(false)}
+  try{const input={outletId,version:settings!.version,loyaltyCap:amountPaise(cap),roundingMode:rounding,createCoupons:coupons.map(c=>({code:c.code,amount:amountPaise(c.amount),validUntil:c.validUntil,maxUses:Number(c.maxUses)})),removeCoupons:removed,...(settings!.canManageCharges?{charges:charges.map(charge=>({name:charge.name.trim(),amount:amountPaise(charge.amount)}))}:{})};setBusy(true);await save(input);setDirty(false)}catch(issue){setError((issue as Error).message)}finally{setBusy(false)}
  }
- return <form className="form future-bill-adjustments" onSubmit={submit}><fieldset disabled={busy}>
+ return <form className="form future-bill-adjustments" data-unsaved-changes={dirty} onChange={()=>setDirty(true)} onClick={event=>{if((event.target as Element).closest('button[type="button"]'))setDirty(true)}} onSubmit={submit}><fieldset disabled={busy}>
   <section className="bill-coupon-settings" aria-label="Discount coupons">
    <button type="button" className="button" disabled={coupons.length>=100} onClick={()=>setCoupons(rows=>[...rows,{id:clientUuid(),code:'DD-'+clientUuid().replaceAll('-','').slice(0,8).toUpperCase(),amount:'',validUntil:'',maxUses:''}])}>Generate discount coupon</button>
    {settings.coupons.map((coupon:Row)=><article className={'bill-coupon-row'+(removed.includes(coupon.id)?' is-removed':'')} key={coupon.id}><div><strong>{coupon.code}</strong><span>{money(coupon.discount_amount)} discount</span><small>Valid through {coupon.valid_until} · {Number(coupon.redeemed)+Number(coupon.held)}/{coupon.max_uses} uses used or reserved</small>{removed.includes(coupon.id)&&<small>Will be removed when you save.</small>}</div>{removed.includes(coupon.id)?<button type="button" className="text-button" onClick={()=>setRemoved(ids=>ids.filter(id=>id!==coupon.id))}>Undo removal</button>:<button type="button" className="icon-button" aria-label={'Delete coupon '+coupon.code} title="Delete coupon" onClick={()=>setRemoved(ids=>[...ids,coupon.id])}><Icon name="trash"/></button>}</article>)}

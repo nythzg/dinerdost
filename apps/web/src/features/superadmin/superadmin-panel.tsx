@@ -3,6 +3,7 @@
 import {useCallback,useEffect,useRef,useState,type FormEvent,type ReactNode} from 'react';
 
 import Link from 'next/link';
+import {useUrlState} from '@/lib/use-url-state';
 
 import {platformResources,platformPermissions,platformRolePermissions,platformFeatures,type PlatformField,type PlatformPermission} from '@dinerdost/core';
 
@@ -39,19 +40,26 @@ function SelectTenant({tenants,value,required=false,caption='Restaurant'}:{tenan
 
 function Terms({row}:{row:Row}){return <dl className="sa-record-values">{Object.entries(row).filter(([key,value])=>value!==undefined&&value!==null&&value!==''&&!['password','adminPassword'].includes(key)).map(([key,value])=><div key={key}><dt>{label(key.replace(/([a-z])([A-Z])/g,'$1 $2').replace(/([a-zA-Z])(\d)/g,'$1 $2').replace(/(\d)([a-zA-Z])/g,'$1 $2'))}</dt><dd>{typeof value==='object'?Array.isArray(value)?value.map(v=>typeof v==='object'?JSON.stringify(v):String(v)).join(', '):JSON.stringify(value):typeof value==='boolean'?value?'Yes':'No':String(value)}</dd></div>)}</dl>}
 
+const consoleDefaults={section:'overview',kind:'',search:'',recordState:'all',dataset:'all'};
 export function SuperadminPanel(){
+ const [urlState,updateUrl]=useUrlState(consoleDefaults);
+ const {kind,search,recordState,dataset}=urlState;
+ const setSearch=(search:string)=>updateUrl({search},true);
+ const setRecordState=(recordState:string)=>updateUrl({recordState},true);
+ const setDataset=(dataset:string)=>updateUrl({dataset},true);
 
- const [dataset,setDataset]=useState('all');
- const [refreshing,setRefreshing]=useState(false),[recordState,setRecordState]=useState('all');
+
+ const [refreshing,setRefreshing]=useState(false);
  const refreshSequence=useRef(0);
- const [data,setData]=useState<Row|null>(null),[section,setSection]=useState('overview'),[kind,setKind]=useState(''),[search,setSearch]=useState(''),[dialog,setDialog]=useState<Dialog|null>(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[qr,setQr]=useState<Row[]>([]),[origin,setOrigin]=useState(''),[forbidden,setForbidden]=useState(false);
+ const [data,setData]=useState<Row|null>(null),[dialog,setDialog]=useState<Dialog|null>(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[qr,setQr]=useState<Row[]>([]),[origin,setOrigin]=useState(''),[forbidden,setForbidden]=useState(false);
+ const section=navigation.some(item=>item.id===urlState.section&&(!data||item.permissions.some(p=>data.admin.permissions.includes(p)))&&(item.id!=='features'||!data||data.admin.role==='SUPERADMIN'))?urlState.section:'overview';
 
- const refresh=useCallback(async(signal?:AbortSignal)=>{const sequence=++refreshSequence.current;setRefreshing(true);try{const next=await request<Row>('/api/superadmin?dataset='+dataset,{signal});if(signal?.aborted||sequence!==refreshSequence.current)return;setData(next);setForbidden(false);setError('');setSection(current=>navigation.some(item=>item.id===current&&item.permissions.some(p=>next.admin.permissions.includes(p)))?current:navigation.find(item=>item.permissions.some(p=>next.admin.permissions.includes(p)))?.id??'overview');}catch(issue){if(signal?.aborted||sequence!==refreshSequence.current)return;setError((issue as Error).message);if(issue instanceof ApiError&&issue.status===403){setForbidden(true);setData(null)}}finally{if(sequence===refreshSequence.current)setRefreshing(false)}},[dataset]);
+ const refresh=useCallback(async(signal?:AbortSignal)=>{const sequence=++refreshSequence.current;setRefreshing(true);try{const next=await request<Row>('/api/superadmin?dataset='+dataset,{signal});if(signal?.aborted||sequence!==refreshSequence.current)return;setData(next);setForbidden(false);setError('');}catch(issue){if(signal?.aborted||sequence!==refreshSequence.current)return;setError((issue as Error).message);if(issue instanceof ApiError&&issue.status===403){setForbidden(true);setData(null)}}finally{if(sequence===refreshSequence.current)setRefreshing(false)}},[dataset]);
 
- useEffect(()=>{if(new URLSearchParams(location.search).get('supportChat')||sessionStorage.getItem('dd-return-support-thread'))setSection('messages');setOrigin(location.origin);const abort=new AbortController();void refresh(abort.signal);return()=>abort.abort()},[refresh]);
+ useEffect(()=>{if(new URLSearchParams(location.search).get('supportChat')||sessionStorage.getItem('dd-return-support-thread'))updateUrl({section:'messages'},true);setOrigin(location.origin);const abort=new AbortController();void refresh(abort.signal);return()=>abort.abort()},[refresh]);
 
  useEffect(()=>{if(!notice)return;const timer=setTimeout(()=>setNotice(''),7000);return()=>clearTimeout(timer)},[notice]);
- const changeSection=(id:string)=>{setSection(id);setKind('');setSearch('');setRecordState('all');setNotice('')};
+ const changeSection=(id:string)=>{if(!updateUrl({section:id,kind:'',search:'',recordState:'all'}))return false;setNotice('');return true};
  const run=async(action:string,input:unknown)=>{setBusy(true);setError('');try{const result=await idempotentPost<Row>('/api/superadmin',{action,input});await refresh();setNotice('Changes saved.');return result;}catch(issue){setError((issue as Error).message);throw issue;}finally{setBusy(false)}};
 
  const submit=async(event:FormEvent<HTMLFormElement>,action:string,build:(form:FormData)=>unknown)=>{event.preventDefault();try{const result=await run(action,build(new FormData(event.currentTarget)));if(action==='startSupport'){setBusy(true);try{await request('/api/superadmin/support-view',{method:'POST',body:JSON.stringify({action:'start',id:result.id})});location.assign('/app/overview');return}finally{setBusy(false)}}setDialog(null);}catch{}};
@@ -78,7 +86,7 @@ export function SuperadminPanel(){
     {section==='tenants'&&<>{data.brandReports.length>0&&<div className="sa-card-grid">{data.brandReports.map((brand:Row)=><article className="sa-card" key={brand.id}><h2>{brand.name}</h2><p className="sa-help">Brand totals · all stored records</p><Terms row={{restaurants:brand.restaurants,outlets:brand.outlets,ordersIn30Days:brand.orders_30d}}/></article>)}</div>}<RestaurantDirectory dataset={dataset} onDataset={setDataset} revision={data.readAt} onManage={row=>setDialog({type:'tenant',row})} onDocuments={row=>setDialog({type:'document',row})}/></>}
 
 
-    {resourceKinds.length>0&&<section className="sa-resources"><div className="sa-resource-tabs" role="group" aria-label="Administration categories">{resourceKinds.map(key=><button type="button" className={activeKind===key?'is-current':''} key={key} aria-label={platformResources[key].title} aria-pressed={activeKind===key} onClick={()=>{setKind(key);setSearch('');setRecordState('all')}}>{platformResources[key].title}</button>)}</div><div className="sa-section-heading"><div><h2>{platformResources[activeKind].title}</h2><p>{platformResources[activeKind].description}</p></div><button className="button primary" onClick={()=>setDialog({type:'record',kind:activeKind})}>Add {activeKind==='BILLING'?'record':'new'}</button></div>
+    {resourceKinds.length>0&&<section className="sa-resources"><div className="sa-resource-tabs" role="group" aria-label="Administration categories">{resourceKinds.map(key=><button type="button" className={activeKind===key?'is-current':''} key={key} aria-label={platformResources[key].title} aria-pressed={activeKind===key} onClick={()=>{updateUrl({kind:key,search:'',recordState:'all'})}}>{platformResources[key].title}</button>)}</div><div className="sa-section-heading"><div><h2>{platformResources[activeKind].title}</h2><p>{platformResources[activeKind].description}</p></div><button className="button primary" onClick={()=>setDialog({type:'record',kind:activeKind})}>Add {activeKind==='BILLING'?'record':'new'}</button></div>
 
      {section==='integrations'&&<div className="sa-notice">Provider connections, secret keys, webhooks, payment routing and external dispatch remain unconfigured. These records do not activate a provider.</div>}
 
