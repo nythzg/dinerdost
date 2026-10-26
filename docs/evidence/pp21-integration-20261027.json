@@ -8,8 +8,14 @@
     "pp21": "282dbc312b46bff43895103df277a565659e47cb",
     "integrationMerge": "7ea6bd5",
     "branch": "codex/pp21-count-sheets",
-    "destination": "https://github.com/prasadgourav/dinerdost",
-    "forcePush": false
+    "destination": "https://github.com/nythzg/dinerdost",
+    "forcePush": false,
+    "originalDestination": "https://github.com/prasadgourav/dinerdost",
+    "originalPush": {
+      "status": "rejected",
+      "reason": "permission denied despite successful dry run"
+    },
+    "destinationAuthorization": "User explicitly selected own nythzg/dinerdost repository after the Prasad push rejection"
   },
   "checks": {
     "backend": {
