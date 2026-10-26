@@ -1,0 +1,111 @@
+{
+  "task": "PP21 web count sheets",
+  "status": "locally-verified-unreleased",
+  "verifiedAt": "2026-10-26T19:17:28.073Z",
+  "baseCommit": "cce5086a45b90b259fa15e0344fe1094fdb16067",
+  "branch": "codex/pp21-count-sheets",
+  "fetchedNewerRemoteTip": "5ff69c8719c4b744dfb7edcba522aaf70df7ba43",
+  "integrationRequiredBeforeDeployment": true,
+  "isolation": {
+    "originalCheckout": "main at 775355a8e7a94bd86d5623f02881c368930934d5, clean",
+    "database": "Synthetic in-memory PGlite and separate local browser QA databases",
+    "productionEnvCopied": false,
+    "productionDatabaseUsed": false,
+    "productionDeploymentChanged": false,
+    "migrationsAdded": 0
+  },
+  "baseline": {
+    "install": "npm ci --include=dev --workspaces --include-workspace-root",
+    "backend": {
+      "passed": 418,
+      "failed": 0
+    },
+    "build": "passed",
+    "typecheck": "passed"
+  },
+  "finalChecks": {
+    "fullBackend": {
+      "command": "npm test",
+      "passed": 427,
+      "failed": 0
+    },
+    "affectedServices": {
+      "passed": 19,
+      "failed": 0,
+      "newPP21Tests": 9
+    },
+    "browser": {
+      "command": "npx playwright test tests/browser/stock-count-sheets.spec.ts tests/browser/stock-counts-service.spec.ts --grep 'PP21|daily physical'",
+      "engine": "Microsoft Edge",
+      "passed": 4,
+      "failed": 0,
+      "viewports": [
+        "1440x1000",
+        "390x844"
+      ],
+      "coverage": [
+        "download, print and blank physical-count cells",
+        "invalid-file preview and zero/blank semantics",
+        "explicit confirmation, corrected state and unchanged stock",
+        "historical read-only UI",
+        "stale whole-batch rejection",
+        "HTTP anonymous/origin/body-size guards",
+        "existing manual counts, corrections and variance export"
+      ]
+    },
+    "build": "passed after review fix",
+    "typecheck": "passed after review fix",
+    "diffCheck": "passed",
+    "screenshotsInspected": [
+      "pp21-preview-phone.png",
+      "pp21-preview-desktop.png",
+      "pp21-print-desktop.png",
+      "pp21-print-phone.png"
+    ]
+  },
+  "review": {
+    "readOnly": true,
+    "findings": [
+      {
+        "severity": "P2",
+        "issue": "Unescaped sheet search differed from existing literal count-report search",
+        "resolution": "Failing regression for percent, underscore and backslash, then fixed escaping and passed affected/full suites"
+      }
+    ]
+  },
+  "knownLimitations": [
+    "The adjacent unchanged legacy Service browser case failed its expected ready-order row selector in the exploratory run; no Service source or test was changed. The full browser suite is not claimed green.",
+    "Hosted PostgreSQL concurrency and physical-printer acceptance not run on this PC.",
+    "PP21 not released; retain newer 0.4.32 source changes before integration/deployment."
+  ],
+  "preservedDeferrals": [
+    "Procurement paused",
+    "Q111 unanswered",
+    "Native/providers/hardware/packages/actual client recipe data deferred"
+  ],
+  "localLogs": [
+    "verification/return-baseline-backend.log",
+    "verification/return-baseline-build.log",
+    "verification/pp21-full-backend.log",
+    "verification/pp21-service.log",
+    "verification/pp21-browser.log",
+    "verification/pp21-build.log",
+    "verification/pp21-typecheck.log",
+    "verification/pp21-search-red.log",
+    "verification/counts-browser-regression.log"
+  ],
+  "codeAndTestSha256": {
+    "packages/services/src/stock-counts.ts": "24ecf9828ac6b9201c2edbdceae46cad4b63c9cde3e958c18e83097bd7c7aa6c",
+    "packages/services/src/stock-count-sheets.ts": "6d6506c9caa5ab11cc513cab3ed9c15cc9f491d1580a8258bf97e4eadc0a12b0",
+    "packages/services/src/stock-count-sheet-csv.ts": "c225be7564b9519bae27a50c9aba505c27a0212533583f38c943ed0006bc6952",
+    "packages/services/src/index.ts": "f212d59adf725ac6fa22cc03ac82bd6d4d8ae0e430084f9a3e1f943edcfec927",
+    "apps/web/src/app/api/inventory-tools/count-sheets/route.ts": "70a2d0c1738716cf0c53a9bf31e7ee3a59b4a91dbacc524187be65926717058c",
+    "apps/web/src/app/stock-count-sheet/page.tsx": "2030f9e21434534971a2b274f0245587ad769df700ebc618c18600ae24f4e372",
+    "apps/web/src/features/management/daily-stock-counts.tsx": "957691a5bd3799b3d451964e7dc0f8da614043f0644c297590a01c9a59fce48c",
+    "apps/web/src/features/management/stock-count-sheets.tsx": "2ad4d5d328525966c46b32656e56ec1fb3f2db5236eec4a235c823ddb5bac03e",
+    "apps/web/src/features/management/stock-count-sheets.css": "fdd9558ab409adc0601a15e56f2953ef6ddedd65742af0f8f8602d4df4b91cde",
+    "apps/web/src/features/management/count-sheet-print.tsx": "d60aed605323255039d09fe607d91a1a5582f4a49df0befe58affab740a80286",
+    "tests/stock-count-sheets.test.ts": "d29a48415dcfdfc1c55e770b4b063dcfabdb2755dcb7ef56d25e0b22e40ec84b",
+    "tests/browser/stock-count-sheets.spec.ts": "1042fe04ce21863a4a646afd1ca89f19d3e3afe22f158a122266852026d9f4b7"
+  }
+}

@@ -1,5 +1,7 @@
 # Petpooja comparison additions
 
+**27 October local PP21 checkpoint:** printable/downloadable count sheets and previewed atomic current-day CSV import are implemented and verified separately on `codex/pp21-count-sheets`. See [PP21_COUNT_SHEETS.md](PP21_COUNT_SHEETS.md) and its local evidence. **Unreleased**: the accepted-release counts below remain unchanged, and no Q-series item is counted by this work. Integration must retain newer remote 0.4.32 fixes.
+
 Current25 October return checkpoint: **6 complete /2 partial /19 pending** of27. PP01/PP03/PP04/PP05/PP18/PP23 are complete for the documented web scope; PP02/PP20 remain partial. PP03/PP04 were already verified locally and on15 isolated PostgreSQL cases; their code and migrations052-053 are now included in the accepted receiving deployment through069, with418 current backend passes. See [public release evidence](evidence/production-20261025-acceptance.json) and [source manifest](evidence/deployed-source-20261025.json). This updates their release status, not broader Petpooja/native parity. **PP06 remains paused, unfinished and untested on a separate branch; its draft054 conflicts with deployed054.** See UPCOMING_WORK. Q114 is explicitly answered/released Standard-only; Q111 remains unanswered. Earlier counts below are dated historical checkpoints.
 
 The user authorized adding the missing comparison features to the **web app**, keeping them simple and documenting each addition, on **22 October 2026**. This turns the comparative audit into implementation work; unchecked rows are not completion claims.
@@ -40,7 +42,7 @@ Numbers refer to videos in the evidence matrix. `[ ]` means pending; completion 
 | [x] PP18 | Order → ingredient quantities/cost inspector and food-cost/usage exports | 42,43,55 | Stored needs/FIFO costs; no recalculation using today's recipes. |
 | [ ] PP19 | Purchase-rate analysis, supplier invoice drill-down and lifecycle/variance reports | 45,46,54,56 | Depend on actual receipts and PP06–PP10 for newer ledger/dispatch values. |
 | [ ] PP20 (partial) | Complete stock, usage, waste, period-comparison and financial exports | 32,42,43,48–53 | Complete authorized rows, not screen pagination; safe spreadsheet text cells. |
-| [ ] PP21 | Printable/downloadable count sheets and validated current-day count import | 33,48,64 | Preview first; zero valid, missing unknown; stale conflicts atomic. |
+| [ ] PP21 (implemented locally; unreleased) | Printable/downloadable count sheets and validated current-day count import | 33,48,64 | [Local implementation and verification](PP21_COUNT_SHEETS.md). Preview first; zero valid, missing unknown; stale conflicts atomic. Release acceptance still required. |
 | [ ] PP22 | Validated material/recipe/vendor imports and safe branch copy | 5,7,17 | Preview errors; no invented recipes/units; scope both outlets and retain destination history. |
 | [x] PP23 | Affected-dish expiry lookup, eligible bulk expiry handling and exports | 31 | Retain automatic event-driven expiry; no duplicate waste; invalidate reservations normally. |
 | [ ] PP24 | Dish-level recipe wastage, reasons/categories and cost trace | 32,55 | FIFO/reservation guards; distinguish raw from already-consumed cooked food. |

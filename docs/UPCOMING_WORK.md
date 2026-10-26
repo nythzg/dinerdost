@@ -1,5 +1,7 @@
 # Upcoming work · 25 October 2026
 
+> **27 October local continuation:** PP21 is now implemented on the isolated `codex/pp21-count-sheets` branch; see [count-sheet workflow, safeguards and verification](PP21_COUNT_SHEETS.md). It is **not released** and must be integrated without losing the two newer returned-branch commits (recorded 0.4.32). The earlier priority list below is preserved as the return checkpoint. Procurement, Q111 and native/provider/hardware deferrals are unchanged.
+
 This is a source-backed continuation list, not permission to broaden scope. The return-handoff task starts NO new feature work. WEB APP ONLY; preserve financial history, actual stock/cost/FIFO, roles/tenant/outlet boundaries, green UI and current-day physical observations. Source/data access does not authorize provider purchases, new subscriptions or production reset/migration.
 
 ## Priority and first unblocked task

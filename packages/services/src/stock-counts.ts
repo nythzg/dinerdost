@@ -88,7 +88,16 @@ export async function recordStockCounts(
     key,
     "DAILY_STOCK_COUNT_RECORDED",
     data,
-    async (tx) => {
+    (tx) => recordStockCountsTransaction(tx, actor, data),
+  );
+}
+
+// Shared by the guarded web sheet importer; the manual API retains its 100-row schema.
+export async function recordStockCountsTransaction(
+  tx: Sql,
+  actor: Actor,
+  data: { outletId: string; date: string; phase: 'OPENING' | 'CLOSING'; counts: { ingredientId: string; quantityMilli: number; version: number }[]; note: string },
+) {
       await one(tx, "SELECT id FROM outlets WHERE id=$1 FOR UPDATE", [
         data.outletId,
       ]);
@@ -213,8 +222,6 @@ export async function recordStockCounts(
         });
       }
       return { ok: true, counts: saved };
-    },
-  );
 }
 
 function countView(row: Row | null) {

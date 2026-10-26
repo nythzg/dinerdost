@@ -81,3 +81,5 @@ export * from "./platform-features";
 
 export * from './outlet-order-intake';
 export * from './support-chat';
+
+export { stockCountSheet, previewStockCountImport, importStockCountSheet } from './stock-count-sheets';

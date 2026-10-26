@@ -5,6 +5,7 @@ import { DataTable } from "@/components/ui";
 import { date as displayDate, request, type Row } from "@/lib/client";
 import { T } from "@/lib/staff-language";
 import { useDesk } from "../workspace/context";
+import { StockCountSheets } from './stock-count-sheets';
 const qty = (value: unknown) =>
   value == null
     ? "—"
@@ -166,6 +167,7 @@ export function DailyStockCounts({
             </button>
           </>
         )}
+        <button className="button" disabled={!result} onClick={() => modal('Count sheets', <StockCountSheets outletId={outletId} day={selected} search={search} editable={editable} onSaved={() => setRefresh(n => n + 1)} />)}><T>Count sheets</T></button>
         <button
           className="button"
           disabled={!result || exporting}

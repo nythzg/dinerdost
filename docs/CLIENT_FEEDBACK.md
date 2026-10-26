@@ -1,5 +1,7 @@
 # Client feedback queue — 19 October 2026
 
+> **27 October continuation:** the first confirmed unblocked task, PP21 count sheets/import, is implemented locally and is not yet released. See [PP21_COUNT_SHEETS.md](PP21_COUNT_SHEETS.md) and the separate Petpooja checklist. This does not change Q-series released counts, answer Q111, resume procurement or introduce new Discord requirements.
+
 > Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
 
 Source: the Diner Dost feedback in the [linked Discord conversation](https://discord.com/channels/@me/1491679750610096259/1561763166927585371), starting at 8:59 pm through the 10:19 pm message. All attached screenshots relevant to the new requests were inspected. Version 0.3.4 was deployed on 19 October 2026 after the user's deployment instruction. No unrelated redesign or feature work is included.

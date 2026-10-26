@@ -1,5 +1,7 @@
 # Diner Dost v2 implementation checklist
 
+> **27 October continuation:** PP21 count sheets/import are implemented locally, unreleased, and tracked separately in [PETPOOJA_ADDITIONS.md](PETPOOJA_ADDITIONS.md) / [PP21_COUNT_SHEETS.md](PP21_COUNT_SHEETS.md). No Q/V2 completion count or accepted deployment is changed. Procurement and unanswered questions remain paused/deferred as recorded.
+
 > Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
 
 Latest visual follow-up **Q84–Q86**, reviewed through 22 October, 8:35 am IST after Discord sign-in was restored: prepared-food timer entry, selected ready-food badge contrast and 25% floor tint. Q84's timer/date semantics await the notes; Q85/Q86 can proceed separately. No food-use-by policy was inferred.
