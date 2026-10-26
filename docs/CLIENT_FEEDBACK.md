@@ -1,6 +1,6 @@
 # Client feedback queue — 19 October 2026
 
-> **27 October continuation:** the first confirmed unblocked task, PP21 count sheets/import, is implemented locally and is not yet released. See [PP21_COUNT_SHEETS.md](PP21_COUNT_SHEETS.md) and the separate Petpooja checklist. This does not change Q-series released counts, answer Q111, resume procurement or introduce new Discord requirements.
+> **27 October integration:** PP21 count sheets/import are integrated with accepted0.4.32, and the stale Service browser regression is corrected and passing. The0.4.33 candidate remains unreleased while existing Vercel team access/deployment is held. See [PP21_COUNT_SHEETS.md](PP21_COUNT_SHEETS.md) and the separate Petpooja checklist. Q-series counts, Q111, procurement and Discord scope remain unchanged.
 
 > Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
 

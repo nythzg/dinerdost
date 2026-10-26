@@ -229,15 +229,24 @@ test("Service marks a ready round served inline only after all stations are read
   const rows = page
     .locator("#ready-orders")
     .getByRole("row")
-    .filter({ has: page.getByText("#" + order.number, { exact: true }) });
-  await expect(rows).toHaveCount(1);
-  await expect(
-    rows.getByRole("button", { name: "Mark as served", exact: true }),
-  ).toBeDisabled();
+    .filter({ has: page.getByText("#" + order.number + " · Round 1", { exact: true }) });
+  // The current Service board publishes a round only when every station is ready.
+  // A partially ready round must remain absent, and the API must reject early serving.
+  await expect(page.getByLabel("Serve requests count", { exact: true })).not.toHaveText("—");
+  await expect(rows).toHaveCount(0);
+  const early = await page.request.post("/api/commands", {
+    headers: { Origin: new URL(page.url()).origin, "Idempotency-Key": randomUUID() },
+    data: { action: "serve", orderId: order.id, roundId: order.rounds[0].id },
+  });
+  expect(early.status()).toBe(409);
+  expect((await early.json()).error.code).toBe("FOOD_NOT_READY");
   await command(page, "kitchen", { state: "PREPARING" }, { id: tickets[1].id });
   await command(page, "kitchen", { state: "READY" }, { id: tickets[1].id });
   await page.reload();
-  await expect(rows).toHaveCount(2);
+  await expect(rows).toHaveCount(1);
+  for (const ticket of tickets) await expect(rows).toContainText(ticket.station);
+  const beforeServe = await (await page.request.get("/api/orders/" + order.id)).json();
+  const movementsBefore = (await workspace(page)).movements;
   await page.setViewportSize({ width: 390, height: 844 });
   await expect.poll(() => page.locator(".sidebar").evaluate(el => el.getBoundingClientRect().right)).toBeLessThanOrEqual(0);
   await expect(
@@ -262,4 +271,6 @@ test("Service marks a ready round served inline only after all stations are read
   expect(after.status).toBe("SERVED");
   expect(after.rounds[0].payable).toBe(order.rounds[0].payable);
   expect(after.rounds[0].paid).toBe(order.rounds[0].paid);
+  expect(after.totals).toEqual(beforeServe.totals);
+  expect((await workspace(page)).movements).toEqual(movementsBefore);
 });

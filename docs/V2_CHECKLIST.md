@@ -1,6 +1,6 @@
 # Diner Dost v2 implementation checklist
 
-> **27 October continuation:** PP21 count sheets/import are implemented locally, unreleased, and tracked separately in [PETPOOJA_ADDITIONS.md](PETPOOJA_ADDITIONS.md) / [PP21_COUNT_SHEETS.md](PP21_COUNT_SHEETS.md). No Q/V2 completion count or accepted deployment is changed. Procurement and unanswered questions remain paused/deferred as recorded.
+> **27 October integration:** PP21 count sheets/import are integrated with accepted0.4.32 and verified as an unreleased0.4.33 candidate; see [PETPOOJA_ADDITIONS.md](PETPOOJA_ADDITIONS.md) / [PP21_COUNT_SHEETS.md](PP21_COUNT_SHEETS.md). The Service regression test is corrected without changing its approved per-round workflow. No Q/V2 completion count, accepted deployment or operational data is changed. Procurement/questions remain paused/deferred; deployment awaits existing-team access and the user's hold.
 
 > Current return handoff, 25 October 2026: see [RETURN_HANDOFF.md](RETURN_HANDOFF.md) and [UPCOMING_WORK.md](UPCOMING_WORK.md). The accepted app is 0.4.31 on prem-2230/dinerdost-web, migration001-069. Earlier local-only/original-PC paragraphs below are dated history, not instructions to roll back or create a new database. The handoff itself performs no database/deployment changes.
 

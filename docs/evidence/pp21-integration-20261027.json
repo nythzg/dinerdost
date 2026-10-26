@@ -1,0 +1,163 @@
+{
+  "task": "PP21 integration with accepted0.4.32 and Service regression repair",
+  "candidateVersion": "0.4.33",
+  "status": "verified-unreleased-deployment-held",
+  "verifiedAt": "2026-10-26T19:43:26.162Z",
+  "git": {
+    "base": "5ff69c8719c4b744dfb7edcba522aaf70df7ba43",
+    "pp21": "282dbc312b46bff43895103df277a565659e47cb",
+    "integrationMerge": "7ea6bd5",
+    "branch": "codex/pp21-count-sheets",
+    "destination": "https://github.com/prasadgourav/dinerdost",
+    "forcePush": false
+  },
+  "checks": {
+    "backend": {
+      "passed": 427,
+      "failed": 0,
+      "skipped": 0
+    },
+    "affectedBrowser": {
+      "passed": 5,
+      "failed": 0,
+      "notes": "PP21 desktop/phone, stale/auth/payload, existing counts and corrected Service"
+    },
+    "reviewedUi": {
+      "passed": 20,
+      "failed": 0,
+      "projects": [
+        "desktop-edge",
+        "phone-webkit"
+      ]
+    },
+    "existingRegressions": {
+      "passed": 8,
+      "failed": 0,
+      "projects": [
+        "desktop-edge",
+        "phone-webkit"
+      ],
+      "coverage": [
+        "calculator slide, sizing and persistence",
+        "password visibility",
+        "platform overview",
+        "private KYC byte/header round-trip"
+      ]
+    },
+    "realPostgres": {
+      "passed": 5,
+      "failed": 0,
+      "version": "17.10",
+      "listen": "127.0.0.1:55439",
+      "scope": "New disposable local cluster; uniquely generated dd_pp21_* database only",
+      "script": "scripts/verify-pp21-postgres.ts",
+      "coverage": [
+        "101-row concurrent atomic import",
+        "simultaneous exact retries append once",
+        "late stale rollback without audit/count changes",
+        "unit change on another connection rejected",
+        "paid invoice/payment/consumed-stock/loyalty snapshots unchanged"
+      ]
+    },
+    "finalServiceReviewNitRerun": {
+      "passed": 1,
+      "failed": 0
+    },
+    "optimizedBuild": "passed",
+    "typecheck": "passed",
+    "diffCheck": "passed"
+  },
+  "review": {
+    "readOnly": true,
+    "p1": 0,
+    "p2": 0,
+    "minor": [
+      {
+        "finding": "Global empty Service board assertion could fail with unrelated ready rounds in reused QA",
+        "resolution": "Wait for service count loading to finish, then assert only the target round is absent; final Service rerun passed"
+      },
+      {
+        "finding": "PostgreSQL script retains generated QA database",
+        "resolution": "Explicitly document external disposable-server lifecycle; do not delete retained data"
+      }
+    ]
+  },
+  "regressionRepairs": [
+    {
+      "scope": "tests only",
+      "issue": "Service expected per-ticket rows and bare order number",
+      "resolution": "Current per-round label; no partial round; API409; exactly one all-station-ready round; serve preserves totals/movements"
+    },
+    {
+      "scope": "tests only",
+      "issue": "Identical KYC filename collided across shared desktop/phone fixture",
+      "resolution": "Unique UUID filename and exact uploaded-document link; no deletion or product changes"
+    }
+  ],
+  "dataPreservation": {
+    "migrationsAdded": 0,
+    "migrationsChanged": 0,
+    "productionEnvRead": false,
+    "productionEnvChanged": false,
+    "productionDataImport": false,
+    "productionDataWrites": false,
+    "retainedPrivateDatabasesChanged": false,
+    "originalCheckout": "main at775355a remains clean",
+    "acceptedReleaseManifest": "0.4.32 unchanged",
+    "newerUiFocusNavigationFonts": "retained unchanged from5ff69c8",
+    "deferred": [
+      "procurement",
+      "Q111",
+      "native/provider/hardware/package/client-data work"
+    ]
+  },
+  "deployment": {
+    "project": "prem-2230/dinerdost-web",
+    "projectId": "prj_2ced94UWR8LFr61C47WjcS7gvZ0N",
+    "attempted": false,
+    "promoted": false,
+    "access": "Existing Vercel connector returned403 for missing team scope; consent requested; user replied wait. No retries or alternate target while held.",
+    "acceptancePending": [
+      "Existing project/team/source/environment verification",
+      "Read-only production data/migration parity where permitted",
+      "Staged production smoke and canonical URL/source confirmation",
+      "Promotion of the verified build with unchanged production environment"
+    ]
+  },
+  "limitations": [
+    "No physical printer/device acceptance",
+    "No hosted Neon tests or live deployment acceptance while access is held",
+    "Selected affected and existing browser suites, not every historical browser spec"
+  ],
+  "localLogs": [
+    "verification/pp21-service-integration-red.log",
+    "verification/pp21-integration-backend.log",
+    "verification/pp21-integration-browser.log",
+    "verification/pp21-ui-regressions.log",
+    "verification/pp21-existing-regressions.log",
+    "verification/pp21-postgres.log",
+    "verification/pp21-service-final.log",
+    "verification/pp21-integration-build.log",
+    "verification/pp21-integration-typecheck.log"
+  ],
+  "codeAndTestSha256": {
+    "packages/services/src/stock-counts.ts": "24ecf9828ac6b9201c2edbdceae46cad4b63c9cde3e958c18e83097bd7c7aa6c",
+    "packages/services/src/stock-count-sheets.ts": "6d6506c9caa5ab11cc513cab3ed9c15cc9f491d1580a8258bf97e4eadc0a12b0",
+    "packages/services/src/stock-count-sheet-csv.ts": "c225be7564b9519bae27a50c9aba505c27a0212533583f38c943ed0006bc6952",
+    "packages/services/src/index.ts": "f212d59adf725ac6fa22cc03ac82bd6d4d8ae0e430084f9a3e1f943edcfec927",
+    "apps/web/src/app/api/inventory-tools/count-sheets/route.ts": "70a2d0c1738716cf0c53a9bf31e7ee3a59b4a91dbacc524187be65926717058c",
+    "apps/web/src/app/stock-count-sheet/page.tsx": "2030f9e21434534971a2b274f0245587ad769df700ebc618c18600ae24f4e372",
+    "apps/web/src/features/management/daily-stock-counts.tsx": "957691a5bd3799b3d451964e7dc0f8da614043f0644c297590a01c9a59fce48c",
+    "apps/web/src/features/management/stock-count-sheets.tsx": "2ad4d5d328525966c46b32656e56ec1fb3f2db5236eec4a235c823ddb5bac03e",
+    "apps/web/src/features/management/stock-count-sheets.css": "fdd9558ab409adc0601a15e56f2953ef6ddedd65742af0f8f8602d4df4b91cde",
+    "apps/web/src/features/management/count-sheet-print.tsx": "d60aed605323255039d09fe607d91a1a5582f4a49df0befe58affab740a80286",
+    "tests/stock-count-sheets.test.ts": "d29a48415dcfdfc1c55e770b4b063dcfabdb2755dcb7ef56d25e0b22e40ec84b",
+    "tests/browser/stock-count-sheets.spec.ts": "1042fe04ce21863a4a646afd1ca89f19d3e3afe22f158a122266852026d9f4b7",
+    "tests/browser/stock-counts-service.spec.ts": "5f12a9e82f10b360e33350e70e9f68257e0e78f80ae2be500166894a50ad84bc",
+    "tests/browser/platform-console.spec.ts": "80a3f6de388b161fc36e34e7b6bb152802953c6999b8dbd8def4851a43273a1c",
+    "scripts/verify-pp21-postgres.ts": "3fabda747953b6c374467810902f48fbc10705d983e10aaa850bda56b96e9ded",
+    "package.json": "fb1b02e775f99ba12b1ab0d1bf3964bba8ce3ac252d211dfa4c2bb148bbeafc3",
+    "apps/web/package.json": "bb5bff077d40f7f8d72af6ebfee693c75eb1a44692b1999af8a8f78824f9794d",
+    "package-lock.json": "e62ae5c4df6bb7313a12019f7cc71fcc4882af06c4a4c1e2669057eb6fd801c3"
+  }
+}

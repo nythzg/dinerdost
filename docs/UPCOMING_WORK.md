@@ -1,6 +1,6 @@
 # Upcoming work · 25 October 2026
 
-> **27 October local continuation:** PP21 is now implemented on the isolated `codex/pp21-count-sheets` branch; see [count-sheet workflow, safeguards and verification](PP21_COUNT_SHEETS.md). It is **not released** and must be integrated without losing the two newer returned-branch commits (recorded 0.4.32). The earlier priority list below is preserved as the return checkpoint. Procurement, Q111 and native/provider/hardware deferrals are unchanged.
+> **27 October integration checkpoint:** PP21 is integrated with accepted0.4.32 on `codex/pp21-count-sheets`, with427 backend,33 selected browser and5 real PostgreSQL passes; see [workflow and verification](PP21_COUNT_SHEETS.md). The0.4.33 candidate is **not released**: Vercel team access is unavailable and deployment is held at the user's “wait” reply. Both source histories and original private data remain preserved. Procurement, Q111 and native/provider/hardware deferrals are unchanged; the older priority list below is historical.
 
 Latest completed work: the user-approved UI review fixes are released as web **0.4.32** and pushed to the return fork. See [UI release acceptance](LOCAL_UI_REVIEW_FIXES.md). This does not resume PP procurement or answer Q111; the pending queues below remain unchanged.
 
