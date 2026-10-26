@@ -1,5 +1,7 @@
 # Diner Dost — handoff to another Codex device
 
+Current web release: **0.4.32**, deployed and GitHub source synced after UI-preview approval. See [UI release acceptance](docs/LOCAL_UI_REVIEW_FIXES.md) and [production evidence](docs/evidence/ui-review-0432-release.json). The original 0.4.30/0.4.31 paragraphs below are historical; retained data and deferred scope are unchanged.
+
 Current return-to-other-PC handoff (25 October 2026): **[RETURN_HANDOFF](docs/RETURN_HANDOFF.md)** is authoritative. Source/fork, exact source checkpoint, accepted receiving 0.4.31 deployment through069, decisions, private setup and pending work are there. The original 0.4.30 tables below remain historical. Do not reset or reconnect production as part of this source handoff.
 
 

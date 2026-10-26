@@ -172,7 +172,7 @@
 @media screen and (min-width: 821px) {
   html body .sa-shell[data-compact=true] .sa-sidebar nav { width: 100%; padding-inline: 0; margin-inline: 0; scrollbar-width: none; }
   html body .sa-shell[data-compact=true] .sa-sidebar nav::-webkit-scrollbar { display: none; }
-  html body .sa-shell[data-compact=true] .sa-sidebar nav button { width: 100%; margin-inline: 0; padding-inline: 0; justify-content: center; box-sizing: border-box; }
+  html body .sa-shell[data-compact=true] .sa-sidebar nav :is(button,a) { width: 100%; margin-inline: 0; padding-inline: 0; justify-content: center; box-sizing: border-box; }
   html body .sa-shell[data-compact=true] .sa-sidebar>.sa-brand { width: 100%; padding-inline: 0; margin-inline: 0; justify-content: center; }
 }
 

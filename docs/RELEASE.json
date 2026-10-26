@@ -1,19 +1,19 @@
 {
-  "version": "0.4.31",
+  "version": "0.4.32",
   "status": "working-web-core",
   "productionUrl": "https://dinerdost-web.vercel.app",
   "vercelProject": "prem-2230/dinerdost-web",
-  "deploymentId": "dpl_DW2u9iuRG8WfmL3Dtx7FQGEYREAd",
+  "deploymentId": "dpl_9v23V9ZUWk9MiZuiVDVd1kKKUPBB",
   "functionRegion": "sin1",
   "database": "Dedicated Neon PostgreSQL Free resource; user-approved Nythz Coooks local dataset copied atomically while preserving prior live data.",
   "databasePlan": "Free",
   "businessTimeZone": "Asia/Kolkata",
   "fullPrdComplete": false,
   "updatedAt": "2026-10-25",
-  "featureUpdate": "Deploy current restaurant, Superadmin and QR web source, approved restaurant data and Superadmin access; fixed-axis persistent-size calculator, password visibility and order-scoped VIP clearing at settlement.",
-  "deploymentUrl": "https://dinerdost-rjg5gao0v-prem-2230.vercel.app",
+  "featureUpdate": "Approved web UI review fixes for restaurant, Superadmin and customer QR: dialog focus, unsaved draft warnings, URL navigation, bounded tables, animation controls and local fonts.",
+  "deploymentUrl": "https://dinerdost-ezx57pubv-prem-2230.vercel.app",
   "deploymentStatus": "production-ready-verified",
-  "productionVersion": "0.4.31",
+  "productionVersion": "0.4.32",
   "pendingMigrations": [],
   "appliedReleaseMigrations": [
     "001_initial.sql",
@@ -90,7 +90,7 @@
   "deferredIntegrationRequests": 4,
   "hostedIntegrationTestsPassed": 15,
   "productionBrowserWorkflowsPassed": 1,
-  "verifiedAt": "2026-10-22T19:38:17.580Z",
+  "verifiedAt": "2026-10-25T09:37:02.549817+00:00",
   "feedbackReadThrough": "2026-10-22T21:09:00+05:30",
   "localVerification": {
     "baselineFullBackendTestsPassed": 141,
@@ -144,7 +144,7 @@
   "previousReleaseHostedIntegrationTestsPassed": 22,
   "hostedVerificationScope": "55 cases across seven affected suites, including scoped VIP settlement. All disposable verification/rehearsal databases removed.",
   "previousProductionVersion": "0.4.31",
-  "previousProductionDeploymentId": "dpl_2jdJLLZ4R6KAW2mWCP93YFQmCs3D",
+  "previousProductionDeploymentId": "dpl_DW2u9iuRG8WfmL3Dtx7FQGEYREAd",
   "legacyPurchaseExpensesRepaired": 1,
   "unpostedApprovedPurchases": 0,
   "thermalReceiptIncluded": true,
@@ -185,7 +185,7 @@
   },
   "temporaryCredentialFilesRemoved": false,
   "issuedDocumentCountPreserved": 30,
-  "acceptanceEvidence": "docs/evidence/production-20261025-acceptance.json",
+  "acceptanceEvidence": "docs/evidence/ui-review-0432-release.json",
   "latestReviewQueue": {
     "requests": 102,
     "implemented": 101,
@@ -924,7 +924,7 @@
     },
     "superadmin": {
       "status": "verified-local-active-initial-platform-identity",
-      "scope": "Local web platform console; see A\u00c3\u0192\u00c6\u2019\u00c3\u201a\u00c2\u00a2\u00c3\u0192\u00c2\u00a2\u00c3\u00a2\u00e2\u201a\u00ac\u00c5\u00a1\u00c3\u201a\u00c2\u00ac\u00c3\u0192\u00c2\u00a2\u00c3\u00a2\u00e2\u20ac\u0161\u00c2\u00ac\u00c3\u2026\u00e2\u20ac\u0153G implementation/pending matrix.",
+      "scope": "Local web platform console; see AÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œG implementation/pending matrix.",
       "url": "http://localhost:5090/superadmin",
       "lanUrl": "http://10.37.66.219:5090/superadmin",
       "migration": "057_platform_console.sql",
@@ -2223,5 +2223,18 @@
     "publishedContentCommit": "c1460e4ce3aea13240b724e459964d5f07a9e5c4",
     "remoteVerified": true,
     "publicationEvidence": "docs/evidence/RETURN_PUBLICATION.json"
-  }
+  },
+  "uiReviewRelease": {
+    "version": "0.4.32",
+    "sourceCommit": "fbb7e92dd90d8b206684bff23be0c20744da78dc",
+    "acceptanceEvidence": "docs/evidence/ui-review-0432-release.json",
+    "backendPassed": 418,
+    "localBrowserChecksPassed": 24,
+    "stagedChecksPassed": 12,
+    "productionChecksPassed": 12,
+    "databaseChanges": false,
+    "physicalDevicesTested": false,
+    "hostedPostgresRetested": false
+  },
+  "previousAcceptanceEvidence": "docs/evidence/production-20261025-acceptance.json"
 }

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Playful winking face with its tongue out">
+
+<g class="face"><circle cx="50" cy="47" r="36" fill="#e4efd8" stroke="#c4d8b0" stroke-width="2"/><circle cx="35" cy="42" r="4" fill="#193f30"/><ellipse class="wink" cx="65" cy="42" rx="4" ry="4" fill="#193f30"/><path d="M28 31q7-5 14-1m16 0q8-4 14 1" fill="none" stroke="#285b45" stroke-width="3" stroke-linecap="round"/><ellipse cx="28" cy="54" rx="7" ry="4" fill="#91b57b" opacity=".4"/><ellipse cx="73" cy="54" rx="7" ry="4" fill="#91b57b" opacity=".4"/><path d="M32 54q18 10 36 0c-1 14-8 22-18 22s-17-8-18-22" fill="#193f30"/><path d="M38 57q12 5 24 0v5q-12 5-24 0z" fill="#fff"/><g class="tongue"><rect x="44" y="62" width="17" height="26" rx="8.5" fill="#dfa58e"/><path d="M52.5 64v12" stroke="#b97763" stroke-width="1.5" stroke-linecap="round"/></g></g>
+<path d="m87 15 2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#b5d596"/><circle cx="12" cy="73" r="3" fill="#b5d596"/>
+</svg>

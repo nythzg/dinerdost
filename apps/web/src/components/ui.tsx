@@ -10,6 +10,7 @@ import {
   type FormEvent,
 } from "react";
 import { label } from "@/lib/client";
+import {confirmDiscardChanges} from "@/lib/unsaved-changes";
 import {PasswordInput} from "./password-input";
 const shapes: Record<string, ReactNode> = {
  phone:<path d="M7 3H3v4c0 8 6 14 14 14h4v-4l-5-2-2 2a13 13 0 0 1-7-7l2-2-2-5Z"/>,
@@ -252,47 +253,55 @@ export function Modal({
 }) {
   const ref = useRef<HTMLDivElement>(null),
     titleId = useId();
+  const close = useRef(onClose);
+  close.current = onClose;
+  const requestClose = () => {
+    if (ref.current && confirmDiscardChanges(ref.current)) close.current();
+  };
   useEffect(() => {
     const prior = document.activeElement as HTMLElement;
-    const node = ref.current;
-    const initial =
-      node?.querySelector<HTMLElement>("[data-autofocus]") ??
-      node?.querySelector<HTMLElement>("input,select,textarea") ??
-      node?.querySelector<HTMLElement>("button");
-    initial?.focus();
-    function key(e: KeyboardEvent) {
-      if (document.querySelector('.swal2-container')) return;
-      if (e.key === "Escape") onClose();
-      if (e.key === "Tab") {
-        const controls = Array.from(
-          node?.querySelectorAll<HTMLElement>(
-            "button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled)",
-          ) ?? [],
-        );
-        const first = controls[0],
-          last = controls.at(-1);
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last?.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first?.focus();
+    const node = ref.current!;
+    const previousOverflow = document.body.style.overflow;
+    const controls = () => Array.from(node.querySelectorAll<HTMLElement>(
+      'button,a[href],input,select,textarea,[tabindex]'
+    )).filter(element => !element.matches(':disabled,[type="hidden"],[tabindex="-1"]') &&
+      !element.closest('[inert]') && element.getClientRects().length > 0);
+    const available = controls();
+    const initial = available.find(element => element.hasAttribute('data-autofocus')) ??
+      available.find(element => element.matches('input,select,textarea')) ?? available[0] ?? node;
+    initial.focus();
+    function key(event: KeyboardEvent) {
+      if (document.querySelector('.swal2-container') ||
+          Array.from(document.querySelectorAll('[aria-modal="true"]')).at(-1) !== node) return;
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        if (confirmDiscardChanges(node)) close.current();
+      }
+      if (event.key === 'Tab') {
+        const available = controls(), first = available[0], last = available.at(-1);
+        if (!first) {event.preventDefault(); node.focus();}
+        else if (!node.contains(document.activeElement) || document.activeElement === node) {
+          event.preventDefault(); (event.shiftKey ? last! : first).focus();
+        } else if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault(); last!.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault(); first.focus();
         }
       }
     }
-    document.addEventListener("keydown", key);
-    document.body.style.overflow = "hidden";
+    document.addEventListener('keydown', key);
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.removeEventListener("keydown", key);
-      document.body.style.overflow = "";
-      prior?.focus();
+      document.removeEventListener('keydown', key);
+      document.body.style.overflow = previousOverflow;
+      if (prior?.isConnected) prior.focus();
     };
-  }, [onClose]);
+  }, []);
   return (
     <div
       className="modal-backdrop"
       onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) requestClose();
       }}
     >
       <div
@@ -300,6 +309,7 @@ export function Modal({
         ref={ref}
         role="dialog"
         aria-modal="true"
+        tabIndex={-1}
         aria-labelledby={titleId}
       >
         <div className="modal-header">
@@ -310,7 +320,7 @@ export function Modal({
             className="icon-button"
             type="button"
             aria-label="Close dialog"
-            onClick={onClose}
+            onClick={requestClose}
           >
             <Icon name="close" />
           </button>
@@ -462,6 +472,11 @@ export function DataTable({
 }) {
   const table = useRef<HTMLTableElement>(null);
   const [visibleHeight, setVisibleHeight] = useState<number>();
+  const [page,setPage] = useState(0);
+  const pages = Math.ceil(rows.length / 50), currentPage = Math.min(page, Math.max(0,pages - 1));
+  const visibleRows = rows.slice(currentPage * 50, (currentPage + 1) * 50);
+  useEffect(() => {setPage(0);}, [rows.length]);
+
   useEffect(() => {
     const node = table.current;
     if (!node || rows.length <= 4) return;
@@ -481,7 +496,7 @@ export function DataTable({
     for (const row of Array.from(node.tBodies[0].rows).slice(0, 4))
       observer.observe(row);
     return () => observer.disconnect();
-  }, [rows]);
+  }, [rows, currentPage]);
   if (!rows.length)
     return (
       <div className="data-table-empty">
@@ -491,6 +506,7 @@ export function DataTable({
       </div>
     );
   return (
+    <>
     <div
       className="table-scroll four-row-table"
       style={rows.length > 4 ? { maxHeight: visibleHeight ?? 360 } : undefined}
@@ -509,7 +525,7 @@ export function DataTable({
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, i) => (
+          {visibleRows.map((row, i) => (
             <tr key={i}>
               {row.map((cell, j) => (
                 <td key={j}>{cell}</td>
@@ -519,5 +535,11 @@ export function DataTable({
         </tbody>
       </table>
     </div>
+    {pages > 1 && <nav className="data-table-pages inline-actions" aria-label="Table pages">
+      <button type="button" className="button" disabled={currentPage === 0} onClick={() => {setPage(currentPage - 1); table.current?.parentElement?.scrollTo(0,0);}}>Previous page</button>
+      <span role="status">{currentPage * 50 + 1}–{Math.min((currentPage + 1) * 50,rows.length)} of {rows.length}</span>
+      <button type="button" className="button" disabled={currentPage + 1 >= pages} onClick={() => {setPage(currentPage + 1); table.current?.parentElement?.scrollTo(0,0);}}>Next page</button>
+    </nav>}
+    </>
   );
 }

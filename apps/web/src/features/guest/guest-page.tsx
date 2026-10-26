@@ -19,9 +19,11 @@ import {GuestBillBreakdown} from './guest-bill-breakdown';
 import { useActivityHeartbeat } from "@/lib/use-activity-heartbeat";
 import { showOrderPlaced } from "@/lib/order-placed";
 
+import {useUrlState} from '@/lib/use-url-state';
 import {guestCourses,guestMenuCourse,guestKitchenProgress,guestCanRequestBill} from './guest-journey';
 import {GuestGames} from './guest-games';
 const journeySteps=guestCourses;
+const guestDefaults={view:'home',step:String(journeySteps[0].id),category:'All',search:''};
 export function GuestPage({ tableKey }: { tableKey: string }) {
   const [data, setData] = useState<Row | null>(null);
   const [error, setError] = useState("");
@@ -32,12 +34,19 @@ export function GuestPage({ tableKey }: { tableKey: string }) {
   const [phone, setPhone] = useState("");
   const [notice, setNotice] = useState("");
   const [noticeError, setNoticeError] = useState(false);
+  const [motionPaused,setMotionPaused]=useState(false);
+  useEffect(()=>{try{setMotionPaused(localStorage.getItem('dd-guest-motion-paused')==='true')}catch{}},[]);
+  const toggleMotion=()=>setMotionPaused(value=>{try{localStorage.setItem('dd-guest-motion-paused',String(!value))}catch{}return !value});
   const [serviceFeedback,setServiceFeedback]=useState<string|null>(null);
-  const [search, setSearch] = useState("");
+  const [urlState,updateUrl]=useUrlState(guestDefaults);
+  const view=['home','menu','order','games'].includes(urlState.view)?urlState.view:'home';
+  const menuStep=[...journeySteps.map(step=>step.id),'cart'].includes(urlState.step)?urlState.step:journeySteps[0].id;
+  const {category,search}=urlState;
+  const setView=(view:string)=>updateUrl({view});
+  const setSearch=(search:string)=>updateUrl({search},true);
+  const setCategory=(category:string)=>updateUrl({category},true);
   const [searchOpen,setSearchOpen]=useState(false);
-  const [category, setCategory] = useState("All");
-  const [view, setView] = useState("home");
-  const [menuStep,setMenuStep]=useState<string>(journeySteps[0].id);
+
   const [pick, setPick] = useState<Row | null>(null);
   const sending = useRef(false);
   const connection = useRef<Promise<unknown> | null>(null);
@@ -231,14 +240,15 @@ export function GuestPage({ tableKey }: { tableKey: string }) {
   const trackingProgress=trackingRound?guestKitchenProgress(trackingRound):0;
   const trackingLabel=trackingProgress<0?label(trackingRound.status):trackingRound?.kot_status==='SERVED'?'Served':(['Waiting for acceptance','Accepted','Released to kitchen','Preparing','Ready to serve'][trackingProgress]);
   const activeStep=menuStep==='cart'?3:journeySteps.findIndex(step=>step.id===menuStep);
-  const chooseStep=(step:string)=>{setView('menu');setMenuStep(step);setCategory('All');setSearch('')};
+  const chooseStep=(step:string)=>updateUrl({view:'menu',step,category:'All',search:''});
   const nextCourse=()=>chooseStep(journeySteps[activeStep+1]?.id??'cart');
   return (
-    <main className="guest-shell" data-view={view}>
+    <main className="guest-shell" data-view={view} data-motion-paused={motionPaused}>
       <header className="guest-header">
         <Logo />
         <span className="badge">Table {data.table}</span>
       </header>
+      <div className="guest-motion-control"><button type="button" className="button secondary" aria-pressed={motionPaused} onClick={toggleMotion}>{motionPaused?'Resume animations':'Pause animations'}</button></div>
       {data.orderingEnabled===false&&<p className="notice" role="status">This outlet is not accepting new orders right now. Existing orders remain available below.</p>}
       {view!=="home"&&<button className="guest-back-menu" onClick={()=>setView("home")}><Icon name="back"/>Back to main menu</button>}
       {view === 'home' && <section className="guest-welcome">
@@ -253,14 +263,14 @@ export function GuestPage({ tableKey }: { tableKey: string }) {
       {view === "home" ? (
         <section className="guest-home" aria-label="Table service">
           <div className="guest-home-actions">
-            <button className="guest-action-tile guest-menu-tile" aria-label="Menu" disabled={busy||data.activationRequired} onClick={()=>{setMenuStep(journeySteps[0].id);setView('menu')}}><Icon name="dish"/><span className="guest-action-copy"><strong>Menu</strong><small>Find your next favourite</small></span><Icon name="chevron" className="guest-action-arrow"/></button>
+            <button className="guest-action-tile guest-menu-tile" aria-label="Menu" disabled={busy||data.activationRequired} onClick={()=>chooseStep(journeySteps[0].id)}><Icon name="dish"/><span className="guest-action-copy"><strong>Menu</strong><small>Find your next favourite</small></span><Icon name="chevron" className="guest-action-arrow"/></button>
             <button className="guest-action-tile" aria-label="Call waiter" data-requested={serviceFeedback==='HELP'} disabled={busy} onClick={()=>service('HELP','Your waiter has been called.')}><Icon name="customers"/><span className="guest-action-copy"><strong>Call waiter</strong><small>{serviceFeedback==='HELP'?'Request sent':'Need a hand?'}</small></span><Icon name="chevron" className="guest-action-arrow"/></button>
           </div>
           <div className="guest-quick-service">
             <button aria-label="Water" data-requested={serviceFeedback==='WATER'} disabled={busy||data.activationRequired} onClick={()=>service('WATER','Water requested.')}><Icon name="cup"/><span><strong>Water</strong><small>{serviceFeedback==='WATER'?'Request sent':'Stay refreshed'}</small></span></button>
             <button aria-label="Cleaning" data-requested={serviceFeedback==='CLEANUP'} disabled={busy||data.activationRequired} onClick={()=>service('CLEANUP','Cleaning requested.')}><Icon name="leaf"/><span><strong>Cleaning</strong><small>{serviceFeedback==='CLEANUP'?'Request sent':'Freshen the table'}</small></span></button>
           </div>
-          <button className="guest-games-entry" disabled={busy} aria-label="Play games" onClick={()=>setView('games')}><span className="guest-games-entry-echo" aria-hidden="true">CAN’T WIN? CAN’T WIN?</span><Icon name="games"/><span><small>TABLE ARCADE</small><strong>Think you can win?</strong><span>Play games</span></span><img className="guest-game-tease" src="/images/guest/teasing-face.svg" width="64" height="64" alt="" aria-hidden="true"/><Icon name="chevron"/></button>
+          <button className="guest-games-entry" disabled={busy} aria-label="Play games" onClick={()=>setView('games')}><span className="guest-games-entry-echo" aria-hidden="true">CAN’T WIN? CAN’T WIN?</span><Icon name="games"/><span><small>TABLE ARCADE</small><strong>Think you can win?</strong><span>Play games</span></span><img className="guest-game-tease" src={motionPaused?'/images/guest/teasing-face-still.svg':'/images/guest/teasing-face.svg'} width="64" height="64" alt="" aria-hidden="true"/><Icon name="chevron"/></button>
           {data.activationRequired && (
             <button
               className="button primary guest-request-activation"
@@ -282,7 +292,7 @@ export function GuestPage({ tableKey }: { tableKey: string }) {
         </section>
       ) : null}
       {view==='menu'&&menuStep!=='cart'&&<nav className="guest-journey" aria-label="Dining journey"><ol>{journeySteps.map((step,index)=><li key={step.id} data-complete={index<activeStep}><button type="button" aria-current={index===activeStep?'step':undefined} onClick={()=>chooseStep(step.id)}><Icon name={step.icon}/><span>Step {index+1}</span><strong>{step.label}</strong></button></li>)}</ol></nav>}
-      {view==='games'&&<GuestGames/>}
+      {view==='games'&&<GuestGames motionPaused={motionPaused}/>}
       {view==='menu'&&menuStep==='cart'&&!cart.length&&<Empty action={<button className="button" onClick={()=>chooseStep(journeySteps[0].id)}>Browse menu</button>}>Your cart is empty.</Empty>}
       {notice && (
         <div
@@ -302,7 +312,7 @@ export function GuestPage({ tableKey }: { tableKey: string }) {
                 <header><strong>Round {round.round_number}</strong><Badge value={round.status}/></header><GuestPreparation round={round}/>
                 <button type="button" className="guest-tracking-games" aria-label="Take a games break" onClick={()=>setView('games')}>
                   <span className="guest-tracking-games-copy"><span className="guest-tracking-games-kicker"><Icon name="games"/>TABLE ARCADE</span><strong>Tired of waiting??</strong><span className="guest-tracking-games-challenge">Make sure you ain’t tired of <em>losing.</em></span><span className="guest-tracking-games-action">Challenge accepted?<Icon name="arrow"/></span></span>
-                  <img src="/images/guest/teasing-face.svg" width="112" height="112" alt="" aria-hidden="true"/>
+                  <img src={motionPaused?'/images/guest/teasing-face-still.svg':'/images/guest/teasing-face.svg'} width="112" height="112" alt="" aria-hidden="true"/>
                 </button>
                 <div className="guest-tracked-items">{round.items.map((item:Row,index:number)=><div key={index}><span><strong>{Number(item.quantity_milli)/1000} × {item.name}</strong>{item.variant&&<small>{item.variant}</small>}{item.note&&<small>{item.note}</small>}</span><strong>{money(Math.round(Number(item.unit_price)*Number(item.quantity_milli)/1000))}</strong></div>)}</div>
                 <GuestBillBreakdown bill={{subtotal:round.subtotal,discount:round.discount,discountLabel:round.coupon_code?'Coupon · '+round.coupon_code:round.reward_name??'Discount',tax:round.tax,taxes:taxBreakdown(Number(round.tax),data.order.tax_components),taxRates:[...new Set(round.items.map((item:Row)=>Number(item.tax_bps)))],charges:round.charges,roundOff:round.round_off,payable:round.payable}} paid={Number(round.paid)}/>

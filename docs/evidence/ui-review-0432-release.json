@@ -1,0 +1,197 @@
+{
+  "version": "0.4.32",
+  "verifiedAt": "2026-10-25T09:37:02.549817+00:00",
+  "productionUrl": "https://dinerdost-web.vercel.app",
+  "deploymentId": "dpl_9v23V9ZUWk9MiZuiVDVd1kKKUPBB",
+  "deploymentUrl": "https://dinerdost-ezx57pubv-prem-2230.vercel.app",
+  "project": "prem-2230/dinerdost-web",
+  "sourceCommit": "fbb7e92dd90d8b206684bff23be0c20744da78dc",
+  "sourceFileCount": 456,
+  "sourceManifestSha256": "a7669ca0bcc9e1325168c715826eb9b4f902238b374a179ba79fd3494ea729cc",
+  "sourcePushed": true,
+  "repository": "https://github.com/prasadgourav/dinerdost",
+  "branch": "local-web-calculator",
+  "backendTests": {
+    "passed": 418,
+    "failed": 0
+  },
+  "localBrowserChecks": {
+    "newPassed": 20,
+    "existingPassed": 4,
+    "browsers": [
+      "Edge desktop 1440px",
+      "WebKit phone 390px"
+    ]
+  },
+  "stagedBrowser": {
+    "base": "https://dinerdost-ezx57pubv-prem-2230.vercel.app",
+    "checkedAt": "2026-10-25T09:33:51.661Z",
+    "checks": [
+      {
+        "browser": "desktop-edge",
+        "path": "/signin",
+        "status": 200,
+        "passwordToggle": true,
+        "noOverflow": true
+      },
+      {
+        "browser": "desktop-edge",
+        "path": "/superadmin/signin",
+        "status": 200,
+        "passwordToggle": true,
+        "noOverflow": true
+      },
+      {
+        "browser": "desktop-edge",
+        "path": "/q/[existing-table]",
+        "status": 200,
+        "animationControl": true,
+        "noOverflow": true
+      },
+      {
+        "browser": "desktop-edge",
+        "path": "/api/workspace",
+        "status": 401
+      },
+      {
+        "browser": "desktop-edge",
+        "path": "/api/superadmin",
+        "status": 401
+      },
+      {
+        "browser": "desktop-edge",
+        "path": "/api/calculator",
+        "status": 401
+      },
+      {
+        "browser": "phone-webkit",
+        "path": "/signin",
+        "status": 200,
+        "passwordToggle": true,
+        "noOverflow": true
+      },
+      {
+        "browser": "phone-webkit",
+        "path": "/superadmin/signin",
+        "status": 200,
+        "passwordToggle": true,
+        "noOverflow": true
+      },
+      {
+        "browser": "phone-webkit",
+        "path": "/q/[existing-table]",
+        "status": 200,
+        "animationControl": true,
+        "noOverflow": true
+      },
+      {
+        "browser": "phone-webkit",
+        "path": "/api/workspace",
+        "status": 401
+      },
+      {
+        "browser": "phone-webkit",
+        "path": "/api/superadmin",
+        "status": 401
+      },
+      {
+        "browser": "phone-webkit",
+        "path": "/api/calculator",
+        "status": 401
+      }
+    ],
+    "browserErrors": []
+  },
+  "productionBrowser": {
+    "base": "https://dinerdost-web.vercel.app",
+    "checkedAt": "2026-10-25T09:35:34.065Z",
+    "checks": [
+      {
+        "browser": "desktop-edge",
+        "path": "/signin",
+        "status": 200,
+        "passwordToggle": true,
+        "noOverflow": true
+      },
+      {
+        "browser": "desktop-edge",
+        "path": "/superadmin/signin",
+        "status": 200,
+        "passwordToggle": true,
+        "noOverflow": true
+      },
+      {
+        "browser": "desktop-edge",
+        "path": "/q/[existing-table]",
+        "status": 200,
+        "animationControl": true,
+        "noOverflow": true
+      },
+      {
+        "browser": "desktop-edge",
+        "path": "/api/workspace",
+        "status": 401
+      },
+      {
+        "browser": "desktop-edge",
+        "path": "/api/superadmin",
+        "status": 401
+      },
+      {
+        "browser": "desktop-edge",
+        "path": "/api/calculator",
+        "status": 401
+      },
+      {
+        "browser": "phone-webkit",
+        "path": "/signin",
+        "status": 200,
+        "passwordToggle": true,
+        "noOverflow": true
+      },
+      {
+        "browser": "phone-webkit",
+        "path": "/superadmin/signin",
+        "status": 200,
+        "passwordToggle": true,
+        "noOverflow": true
+      },
+      {
+        "browser": "phone-webkit",
+        "path": "/q/[existing-table]",
+        "status": 200,
+        "animationControl": true,
+        "noOverflow": true
+      },
+      {
+        "browser": "phone-webkit",
+        "path": "/api/workspace",
+        "status": 401
+      },
+      {
+        "browser": "phone-webkit",
+        "path": "/api/superadmin",
+        "status": 401
+      },
+      {
+        "browser": "phone-webkit",
+        "path": "/api/calculator",
+        "status": 401
+      }
+    ],
+    "browserErrors": []
+  },
+  "typecheck": "passed",
+  "localOptimizedBuild": "passed",
+  "vercelOptimizedBuild": "passed",
+  "dependencyAuditVulnerabilities": 0,
+  "databaseMigrationRequired": false,
+  "productionDatabaseSeededOrRestored": false,
+  "existingMigrationRange": "001-069",
+  "physicalDevicesTested": false,
+  "productionProtectionUnchanged": true,
+  "privateCredentialsAndLocalDataExcluded": true,
+  "pausedProcurementBranch": "local-web-procurement",
+  "pausedProcurementCommit": "242d64374f8cfcb7394e4fbdf20a7a769a42aa23",
+  "pausedProcurementDeployed": false
+}

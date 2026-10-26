@@ -1,6 +1,7 @@
 "use client";
 
 import {useEffect,useState} from 'react';
+import {useUrlState} from '@/lib/use-url-state';
 import {request,money,date,label,type Row} from '@/lib/client';
 
 export const datasets=[['all','All stored records'],['demo','Demo flag on'],['nonDemo','Demo flag off'],['withOrders','Has recorded orders']] as const;
@@ -13,9 +14,15 @@ export function DatasetExplanation({counts}:{counts:Row}){
  return <details className="sa-dataset-note sa-data-disclosure"><summary><span>{counts.all_records} stored {Number(counts.all_records)===1?'restaurant':'restaurants'} · {counts.with_orders} with orders · About these counts</span></summary><p>{counts.demo} demo flag on · {counts.non_demo} demo flag off. Counts use saved database records and demo flags. Demo/QA registrations are included when present. The demo flag does not establish whether a restaurant is a real business. Filters change the view; they preserve every record.</p></details>;
 }
 
+const directoryDefaults={restaurantSearch:'',page:'1',sort:'name',descending:'false',tenant:''};
 export function RestaurantDirectory({dataset,onDataset,revision,onManage,onDocuments}:{dataset:string;onDataset:(value:string)=>void;revision:string;onManage:(row:Row)=>void;onDocuments:(row:Row)=>void}){
- const [sort,setSort]=useState({key:'name',descending:false});
- const [search,setSearch]=useState(''),[page,setPage]=useState(1),[data,setData]=useState<Row|null>(null),[error,setError]=useState(''),[selected,setSelected]=useState<Row|null>(null),[retry,setRetry]=useState(0);
+ const [urlState,updateUrl]=useUrlState(directoryDefaults);
+ const search=urlState.restaurantSearch,page=Math.max(1,Math.min(100000,Number(urlState.page)||1));
+ const sort={key:urlState.sort,descending:urlState.descending==='true'};
+ const selected=urlState.tenant?{id:urlState.tenant}:null;
+ const setSelected=(row:Row|null)=>updateUrl({tenant:row?.id??''});
+ const setPage=(page:number)=>updateUrl({page:String(page)});
+ const [data,setData]=useState<Row|null>(null),[error,setError]=useState(''),[retry,setRetry]=useState(0);
  useEffect(()=>{
   const abort=new AbortController();
   setData(null);setError('');
@@ -26,10 +33,10 @@ export function RestaurantDirectory({dataset,onDataset,revision,onManage,onDocum
   return()=>{clearTimeout(timer);abort.abort()};
  },[dataset,search,page,revision,retry]);
  if(selected)return <RestaurantData key={selected.id} tenantId={selected.id} revision={revision} onBack={()=>setSelected(null)}/>;
- const changeSort=(key:string)=>setSort(old=>({key,descending:old.key===key?!old.descending:false}));
+ const changeSort=(key:string)=>updateUrl({sort:key,descending:String(sort.key===key?!sort.descending:false)},true);
  const sorted=data?[...data.rows].sort((a:Row,b:Row)=>{const result=sort.key==='name'?String(a.name).localeCompare(String(b.name),'en',{numeric:true}):Number(a[sort.key])-Number(b[sort.key]);return sort.descending?-result:result}):[];
  return <section className="sa-directory" aria-label="Restaurant directory"><div className="sa-directory-title"><div><h2>Restaurant directory</h2><p>One place for partner profiles, verification and outlet records.</p></div></div>
-  <div className="sa-toolbar"><DatasetFilter value={dataset} onChange={value=>{setPage(1);onDataset(value)}}/><label>Find a restaurant<input type="search" value={search} onChange={e=>{setPage(1);setSearch(e.target.value)}} placeholder="Restaurant, owner or status" maxLength={150}/></label></div>
+  <div className="sa-toolbar"><DatasetFilter value={dataset} onChange={value=>{updateUrl({page:'1'},true);onDataset(value)}}/><label>Find a restaurant<input type="search" value={search} onChange={e=>{updateUrl({page:'1',restaurantSearch:e.target.value},true)}} placeholder="Restaurant, owner or status" maxLength={150}/></label></div>
   {error?<div role="alert" className="error">{error} <button className="button" onClick={()=>setRetry(value=>value+1)}>Retry</button></div>:!data?<p role="status">Loading restaurant records…</p>:<>
    <p role="status">{data.total} matching {Number(data.total)===1?'restaurant':'restaurants'} · page {data.page} of {data.pages}</p>
    <div className="sa-table-wrap"><table><thead><tr><th aria-sort={sort.key==='name'?(sort.descending?'descending':'ascending'):'none'}><button aria-label="Sort by restaurant" onClick={()=>changeSort('name')}>Restaurant <span aria-hidden="true">↕</span></button></th><th>Status / KYC</th><th>Outlets / staff</th><th aria-sort={sort.key==='orders'?(sort.descending?'descending':'ascending'):'none'}><button aria-label="Sort by orders" onClick={()=>changeSort('orders')}>Orders · all time / last 7 days <span aria-hidden="true">↕</span></button></th><th>Actions</th></tr></thead><tbody>{sorted.map((row:Row)=><tr key={row.id}>
